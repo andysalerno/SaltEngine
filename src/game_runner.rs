@@ -1,0 +1,3 @@
+struct GameRunner {}
+
+impl GameRunner {}
