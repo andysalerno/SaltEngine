@@ -5,7 +5,7 @@ use crate::game_state::GameState;
 pub struct AttackEventHandler;
 
 impl EventHandler<AttackEvent> for AttackEventHandler {
-    fn ApplyEvent(event: AttackEvent, game_state: GameState) {
+    fn apply_event(event: AttackEvent, game_state: GameState) {
         todo!()
     }
 }

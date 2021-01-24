@@ -1,9 +1,10 @@
 use crate::id::HasId;
+use crate::id::Id;
 
-struct Prawn;
+pub struct Prawn;
 
 impl HasId for Prawn {
-    fn id(&self) -> &uuid::Uuid {
+    fn id(&self) -> Id {
         // id::parse("...")
         todo!()
     }
@@ -14,7 +15,7 @@ impl super::super::card_definition::CardDefinition for Prawn {
         "Prawn"
     }
     fn flavor_text(&self) -> &str {
-        todo!()
+        "Just a lowly Prawn."
     }
     fn base_attack(&self) -> u32 {
         1

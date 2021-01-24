@@ -16,7 +16,7 @@ impl<T> CardInstance<T> {
 }
 
 impl<T> HasId for CardInstance<T> {
-    fn id(&self) -> &Id {
-        &self.id
+    fn id(&self) -> Id {
+        self.id
     }
 }

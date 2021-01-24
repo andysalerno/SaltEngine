@@ -19,4 +19,21 @@ impl GameState {
     pub fn is_game_over(&self) -> bool {
         self.player_a_health <= 0 || self.player_b_health <= 0
     }
+
+    pub fn new(player_a_id: Id, player_b_id: Id) -> Self {
+        Self {
+            player_a_id,
+            player_b_id,
+            cur_player_turn: player_a_id,
+            player_a_health: 30,
+            player_b_health: 30,
+            player_a_mana: 0,
+            player_b_mana: 0,
+            board: Box::new(Board::new()),
+        }
+    }
+
+    pub fn cur_player_turn(&self) -> Id {
+        self.cur_player_turn
+    }
 }

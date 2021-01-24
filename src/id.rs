@@ -1,11 +1,12 @@
 use uuid::Uuid;
 
-pub type Id = Uuid;
+#[derive(Copy, Clone, Debug, PartialEq)]
+pub struct Id(Uuid);
 
 pub fn new_id() -> Id {
-    Uuid::new_v4()
+    Id(Uuid::new_v4())
 }
 
 pub trait HasId {
-    fn id(&self) -> &Id;
+    fn id(&self) -> Id;
 }
