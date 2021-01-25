@@ -2,19 +2,29 @@ use crate::{
     game_agent::game_agent::GameAgent, game_logic::EventDispatcher, game_state::GameState,
 };
 
+pub trait GameDisplay {
+    fn display(&mut self, game_state: &GameState);
+}
+
 pub struct GameRunner {
     player_a: Box<dyn GameAgent>,
     player_b: Box<dyn GameAgent>,
+    display: Box<dyn GameDisplay>,
     game_state: GameState,
 }
 
 impl GameRunner {
-    pub fn new(player_a: Box<dyn GameAgent>, player_b: Box<dyn GameAgent>) -> Self {
+    pub fn new(
+        player_a: Box<dyn GameAgent>,
+        player_b: Box<dyn GameAgent>,
+        display: Box<dyn GameDisplay>,
+    ) -> Self {
         let game_state = GameState::new(player_a.id(), player_b.id());
 
         Self {
             player_a,
             player_b,
+            display,
             game_state,
         }
     }
