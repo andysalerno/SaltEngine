@@ -9,7 +9,6 @@ use console_display::ConsoleDisplay;
 use game_agent::console_agent::ConsoleAgent;
 
 fn main() {
-    println!("Hello, world!");
     let player_a = Box::new(ConsoleAgent::new());
     let player_b = Box::new(ConsoleAgent::new());
     let display = Box::new(ConsoleDisplay);

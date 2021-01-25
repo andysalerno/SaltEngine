@@ -30,11 +30,13 @@ impl GameRunner {
     }
 
     pub fn run_game(&mut self) {
-        while !self.game_state.is_game_over() {
-            let cur_player = self.get_cur_player();
-            let action = cur_player.get_action(&self.game_state);
-            EventDispatcher::dispatch(action, &mut self.game_state);
-        }
+        self.display.display(&mut self.game_state);
+        // while !self.game_state.is_game_over() {
+        //     self.display.display(&mut self.game_state);
+        //     let cur_player = self.get_cur_player();
+        //     let action = cur_player.get_action(&self.game_state);
+        //     EventDispatcher::dispatch(action, &mut self.game_state);
+        // }
     }
 
     fn get_cur_player(&self) -> &Box<dyn GameAgent> {

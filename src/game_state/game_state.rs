@@ -15,6 +15,8 @@ pub struct GameState {
     board: Box<Board>,
 }
 
+const BOARD_LEN: usize = 6;
+
 impl GameState {
     pub fn is_game_over(&self) -> bool {
         self.player_a_health <= 0 || self.player_b_health <= 0
@@ -29,11 +31,15 @@ impl GameState {
             player_b_health: 30,
             player_a_mana: 0,
             player_b_mana: 0,
-            board: Box::new(Board::new()),
+            board: Box::new(Board::new(BOARD_LEN)),
         }
     }
 
     pub fn cur_player_turn(&self) -> Id {
         self.cur_player_turn
+    }
+
+    pub fn board(&self) -> &Board {
+        &self.board
     }
 }
