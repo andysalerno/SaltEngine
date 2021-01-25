@@ -1,9 +1,8 @@
 use super::game_agent::GameAgent;
-use crate::game_logic::game_event::GameEvent;
-use crate::game_state::GameState;
 use crate::id;
 use crate::id::HasId;
 use crate::id::Id;
+use crate::{game_logic::Event, game_state::GameState};
 
 pub struct ConsoleAgent {
     id: Id,
@@ -22,7 +21,7 @@ impl HasId for ConsoleAgent {
 }
 
 impl GameAgent for ConsoleAgent {
-    fn get_action(&self, game_state: &GameState) -> Box<dyn GameEvent> {
+    fn get_action(&self, game_state: &GameState) -> Box<dyn Event> {
         todo!()
     }
 }

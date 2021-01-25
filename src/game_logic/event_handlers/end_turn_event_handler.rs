@@ -1,14 +1,13 @@
 use crate::game_logic::{
     event::{Event, EventHandler},
-    events::AttackEvent,
     is::Is,
 };
 
-pub struct AttackEventHandler;
+pub struct EndTurnEventHandler;
 
-impl EventHandler for AttackEventHandler {
+impl EventHandler for EndTurnEventHandler {
     fn can_handle(&self, event: &Box<dyn Event>) -> bool {
-        event.is::<AttackEvent>()
+        event.is::<EndTurnEventHandler>()
     }
 
     fn handle(&self, event: &dyn Event) {

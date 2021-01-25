@@ -1,5 +1,4 @@
-use crate::game_state::GameState;
-use crate::{game_agent::game_agent::GameAgent, game_state};
+use crate::{game_agent::game_agent::GameAgent, game_state::GameState};
 
 pub struct GameRunner {
     player_a: Box<dyn GameAgent>,
@@ -22,6 +21,7 @@ impl GameRunner {
         while !self.game_state.is_game_over() {
             let cur_player = self.get_cur_player();
             let action = cur_player.get_action(&self.game_state);
+            //EventDispatcher::dispatch(*action, self.game_state);
         }
     }
 

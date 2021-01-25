@@ -1,7 +1,6 @@
-use crate::game_logic::game_event::GameEvent;
-use crate::game_state::GameState;
 use crate::id::HasId;
+use crate::{game_logic::Event, game_state::GameState};
 
 pub trait GameAgent: HasId {
-    fn get_action(&self, game_state: &GameState) -> Box<dyn GameEvent>;
+    fn get_action(&self, game_state: &GameState) -> Box<dyn Event>;
 }

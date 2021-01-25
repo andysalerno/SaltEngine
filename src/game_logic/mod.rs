@@ -1,5 +1,8 @@
 mod card_definition;
 mod cards;
-mod event_handler;
+mod event;
 mod event_handlers;
-pub mod game_event;
+mod events;
+mod is;
+
+pub use event::Event;
