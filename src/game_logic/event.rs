@@ -1,10 +1,12 @@
+use crate::game_state::GameState;
+
 use super::is::Downcast;
 
 pub trait Event: Downcast {}
 
 pub trait EventHandler {
-    fn can_handle(&self, event: &Box<dyn Event>) -> bool;
-    fn handle(&self, event: &dyn Event);
+    type Event: Event;
+    fn handle(&self, event: &Self::Event, game_state: &mut GameState);
 }
 
 // fn testing() {

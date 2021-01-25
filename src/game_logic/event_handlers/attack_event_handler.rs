@@ -1,17 +1,15 @@
-use crate::game_logic::{
-    event::{Event, EventHandler},
-    events::AttackEvent,
-    is::Is,
+use crate::{
+    game_logic::{event::EventHandler, events::AttackEvent},
+    game_state::GameState,
 };
 
+#[derive(Default)]
 pub struct AttackEventHandler;
 
 impl EventHandler for AttackEventHandler {
-    fn can_handle(&self, event: &Box<dyn Event>) -> bool {
-        event.is::<AttackEvent>()
-    }
+    type Event = AttackEvent;
 
-    fn handle(&self, event: &dyn Event) {
+    fn handle(&self, event: &AttackEvent, game_state: &mut GameState) {
         todo!()
     }
 }

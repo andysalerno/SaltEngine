@@ -1,16 +1,15 @@
-use crate::game_logic::{
-    event::{Event, EventHandler},
-    is::Is,
+use crate::{
+    game_logic::{event::EventHandler, events::EndTurnEvent},
+    game_state::GameState,
 };
 
+#[derive(Default)]
 pub struct EndTurnEventHandler;
 
 impl EventHandler for EndTurnEventHandler {
-    fn can_handle(&self, event: &Box<dyn Event>) -> bool {
-        event.is::<EndTurnEventHandler>()
-    }
+    type Event = EndTurnEvent;
 
-    fn handle(&self, event: &dyn Event) {
+    fn handle(&self, event: &EndTurnEvent, game_state: &mut GameState) {
         todo!()
     }
 }
