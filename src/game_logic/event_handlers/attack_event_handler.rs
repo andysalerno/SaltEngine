@@ -1,5 +1,5 @@
 use crate::{
-    game_logic::{event::EventHandler, events::AttackEvent},
+    game_logic::{event_handlers::EventHandler, events::AttackEvent},
     game_state::GameState,
 };
 

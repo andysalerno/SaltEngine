@@ -1,22 +1,19 @@
 use crate::game_state::GameState;
 
 use super::{
-    event::EventHandler,
-    event_handlers::{AttackEventHandler, EndTurnEventHandler},
-    events::{AttackEvent, EndTurnEvent},
-    is::Downcast,
-    Event,
+    event_handlers::{AttackEventHandler, EndTurnEventHandler, EventHandler},
+    events::GameEvent,
 };
 
+/// Has the ugly, unforgiving job of detecting the concrete type of a `dyn Event`
+/// and dispatching it to the proper handler.
 pub struct EventDispatcher;
 
 impl EventDispatcher {
-    pub fn dispatch(event: Box<dyn Event>, game_state: &mut GameState) {
-        let any = event.as_any();
-        if let Some(event) = any.downcast_ref::<AttackEvent>() {
-            AttackEventHandler::default().handle(event, game_state);
-        } else if let Some(event) = any.downcast_ref::<EndTurnEvent>() {
-            EndTurnEventHandler::default().handle(event, game_state);
+    pub fn dispatch(event: GameEvent, game_state: &mut GameState) {
+        match event {
+            GameEvent::Attack(e) => AttackEventHandler::default().handle(&e, game_state),
+            GameEvent::EndTurn(e) => EndTurnEventHandler::default().handle(&e, game_state),
         }
     }
 }

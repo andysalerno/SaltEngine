@@ -1,4 +1,4 @@
-use crate::game_logic::event::Event;
+use crate::game_logic::Event;
 
 pub struct EndTurnEvent;
 
