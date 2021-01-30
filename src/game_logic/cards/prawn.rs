@@ -1,6 +1,9 @@
 use crate::id::HasId;
 use crate::id::Id;
 
+use super::{CardDefinition, UnitCardDefinition};
+
+#[derive(Debug, Clone)]
 pub struct Prawn;
 
 impl HasId for Prawn {
@@ -10,23 +13,29 @@ impl HasId for Prawn {
     }
 }
 
-impl super::super::card_definition::CardDefinition for Prawn {
+impl CardDefinition for Prawn {
     fn title(&self) -> &str {
         "Prawn"
     }
     fn flavor_text(&self) -> &str {
         "Just a lowly Prawn."
     }
-    fn base_attack(&self) -> u32 {
+
+    fn cost(&self) -> i32 {
         1
     }
-    fn base_health(&self) -> u32 {
+}
+
+impl UnitCardDefinition for Prawn {
+    fn attack(&self) -> i32 {
         1
     }
-    fn base_cost(&self) -> u32 {
+
+    fn health(&self) -> i32 {
         1
     }
-    fn base_width(&self) -> u32 {
+
+    fn row_width(&self) -> i32 {
         1
     }
 }

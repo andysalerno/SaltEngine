@@ -1,5 +1,10 @@
 use crate::{
-    game_agent::game_agent::GameAgent, game_logic::EventDispatcher, game_state::GameState,
+    game_agent::game_agent::GameAgent,
+    game_logic::{cards::prawn::Prawn, EventDispatcher, GameEvent, SummonCreatureEvent},
+    game_state::{
+        board::{BoardPos, RowId},
+        GameState,
+    },
 };
 
 pub trait GameDisplay {
@@ -11,6 +16,7 @@ pub struct GameRunner {
     player_b: Box<dyn GameAgent>,
     display: Box<dyn GameDisplay>,
     game_state: GameState,
+    event_stack: Vec<GameEvent>,
 }
 
 impl GameRunner {
@@ -26,10 +32,21 @@ impl GameRunner {
             player_b,
             display,
             game_state,
+            event_stack: Vec::new(),
         }
     }
 
     pub fn run_game(&mut self) {
+        self.event_stack
+            .push(GameEvent::Summon(SummonCreatureEvent::new(
+                Box::new(Prawn),
+                BoardPos::new(self.player_a.id(), RowId::front_row, 2),
+            )));
+
+        while let Some(event) = self.event_stack.pop() {
+            EventDispatcher::dispatch(event, &mut self.game_state);
+        }
+
         self.display.display(&mut self.game_state);
         // while !self.game_state.is_game_over() {
         //     self.display.display(&mut self.game_state);

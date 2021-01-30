@@ -31,7 +31,7 @@ impl GameState {
             player_b_health: 30,
             player_a_mana: 0,
             player_b_mana: 0,
-            board: Box::new(Board::new(BOARD_LEN)),
+            board: Box::new(Board::new(BOARD_LEN, player_a_id, player_b_id)),
         }
     }
 
@@ -41,5 +41,9 @@ impl GameState {
 
     pub fn board(&self) -> &Board {
         &self.board
+    }
+
+    pub fn board_mut(&mut self) -> &mut Board {
+        &mut self.board
     }
 }

@@ -1,5 +1,6 @@
-use crate::game_logic::Event;
+use super::Event;
 
+#[derive(Debug)]
 pub struct EndTurnEvent;
 
 impl Event for EndTurnEvent {}
