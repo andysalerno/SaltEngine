@@ -103,7 +103,7 @@ impl Board {
         &mut self.opponent_side
     }
 
-    pub fn get_at(&self, pos: BoardPos) -> &Option<UnitCardBoardInstance> {
+    pub fn get_at(&self, pos: BoardPos) -> Option<&UnitCardBoardInstance> {
         let side = if pos.player_id == self.player_id {
             self.player_side()
         } else {
@@ -116,7 +116,7 @@ impl Board {
             side.front_row()
         };
 
-        &row[pos.row_index]
+        row[pos.row_index].as_ref()
     }
 
     pub fn set_at(&mut self, pos: BoardPos, card_instance: UnitCardBoardInstance) {
@@ -131,6 +131,13 @@ impl Board {
         } else {
             side.front_row_mut()
         };
+
+        if row[pos.row_index].is_some() {
+            panic!(
+                "Cannot place at a position with an existing instance: {:?}",
+                pos
+            );
+        }
 
         row[pos.row_index] = Some(card_instance);
     }

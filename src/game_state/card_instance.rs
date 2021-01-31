@@ -1,6 +1,7 @@
 use crate::id::{new_id, Id};
 use crate::{game_logic::cards::UnitCardDefinition, id::HasId};
 
+#[derive(Debug)]
 pub struct UnitCardBoardInstance {
     definition: Box<dyn UnitCardDefinition>,
     id: Id,

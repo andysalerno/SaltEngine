@@ -9,7 +9,7 @@ pub struct EndTurnEventHandler;
 impl EventHandler for EndTurnEventHandler {
     type Event = EndTurnEvent;
 
-    fn handle(&self, event: &EndTurnEvent, game_state: &mut GameState) {
+    fn handle(&self, event: EndTurnEvent, game_state: &mut GameState) {
         todo!()
     }
 }

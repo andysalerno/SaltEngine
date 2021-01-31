@@ -12,5 +12,5 @@ use super::Event;
 
 pub trait EventHandler {
     type Event: Event;
-    fn handle(&self, event: &Self::Event, game_state: &mut GameState);
+    fn handle(&self, event: Self::Event, game_state: &mut GameState);
 }

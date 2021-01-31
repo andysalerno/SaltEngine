@@ -20,6 +20,10 @@ impl SummonCreatureEvent {
         &self.definition
     }
 
+    pub fn take_definition(self) -> Box<dyn UnitCardDefinition> {
+        self.definition
+    }
+
     pub fn target_position(&self) -> BoardPos {
         self.target_position
     }

@@ -40,20 +40,35 @@ impl GameRunner {
         self.event_stack
             .push(GameEvent::Summon(SummonCreatureEvent::new(
                 Box::new(Prawn),
-                BoardPos::new(self.player_a.id(), RowId::front_row, 2),
+                BoardPos::new(self.player_a.id(), RowId::front_row, 0),
+            )));
+        self.event_stack
+            .push(GameEvent::Summon(SummonCreatureEvent::new(
+                Box::new(Prawn),
+                BoardPos::new(self.player_a.id(), RowId::front_row, 1),
+            )));
+        self.event_stack
+            .push(GameEvent::Summon(SummonCreatureEvent::new(
+                Box::new(Prawn),
+                BoardPos::new(self.player_a.id(), RowId::front_row, 3),
+            )));
+
+        self.event_stack
+            .push(GameEvent::Summon(SummonCreatureEvent::new(
+                Box::new(Prawn),
+                BoardPos::new(self.player_a.id(), RowId::front_row, 5),
             )));
 
         while let Some(event) = self.event_stack.pop() {
             EventDispatcher::dispatch(event, &mut self.game_state);
         }
 
-        self.display.display(&mut self.game_state);
-        // while !self.game_state.is_game_over() {
-        //     self.display.display(&mut self.game_state);
-        //     let cur_player = self.get_cur_player();
-        //     let action = cur_player.get_action(&self.game_state);
-        //     EventDispatcher::dispatch(action, &mut self.game_state);
-        // }
+        while !self.game_state.is_game_over() {
+            self.display.display(&mut self.game_state);
+            let cur_player = self.get_cur_player();
+            let action = cur_player.get_action(&self.game_state);
+            EventDispatcher::dispatch(action, &mut self.game_state);
+        }
     }
 
     fn get_cur_player(&self) -> &Box<dyn GameAgent> {

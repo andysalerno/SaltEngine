@@ -9,9 +9,9 @@ impl EventDispatcher {
         println!("Dispatching: {:?}", event);
 
         match event {
-            GameEvent::Attack(e) => AttackEventHandler::default().handle(&e, game_state),
-            GameEvent::EndTurn(e) => EndTurnEventHandler::default().handle(&e, game_state),
-            GameEvent::Summon(e) => SummonCreatureEventHandler::default().handle(&e, game_state),
+            GameEvent::Attack(e) => AttackEventHandler::default().handle(e, game_state),
+            GameEvent::EndTurn(e) => EndTurnEventHandler::default().handle(e, game_state),
+            GameEvent::Summon(e) => SummonCreatureEventHandler::default().handle(e, game_state),
         }
     }
 }

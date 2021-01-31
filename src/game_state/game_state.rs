@@ -1,4 +1,7 @@
-use super::board::Board;
+use super::{
+    board::{Board, BoardPos},
+    UnitCardBoardInstance,
+};
 use crate::id::Id;
 
 pub struct GameState {
@@ -45,5 +48,13 @@ impl GameState {
 
     pub fn board_mut(&mut self) -> &mut Board {
         &mut self.board
+    }
+
+    pub fn get_at(&self, pos: BoardPos) -> Option<&UnitCardBoardInstance> {
+        self.board.get_at(pos)
+    }
+
+    pub fn set_at(&mut self, pos: BoardPos, card_instance: UnitCardBoardInstance) {
+        self.board.set_at(pos, card_instance)
     }
 }

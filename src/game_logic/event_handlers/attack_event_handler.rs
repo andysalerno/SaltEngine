@@ -9,7 +9,7 @@ pub struct AttackEventHandler;
 impl EventHandler for AttackEventHandler {
     type Event = AttackEvent;
 
-    fn handle(&self, event: &AttackEvent, game_state: &mut GameState) {
-        todo!()
+    fn handle(&self, event: AttackEvent, game_state: &mut GameState) {
+        println!("(attack handler not yet implemented)");
     }
 }
