@@ -1,3 +1,5 @@
+use std::borrow::Borrow;
+
 use crate::id::{new_id, Id};
 use crate::{game_logic::cards::UnitCardDefinition, id::HasId};
 
@@ -25,6 +27,10 @@ impl UnitCardBoardInstance {
 
     pub fn health(&self) -> i32 {
         self.health
+    }
+
+    pub fn definition(&self) -> &dyn UnitCardDefinition {
+        self.definition.borrow()
     }
 }
 

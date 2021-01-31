@@ -57,4 +57,16 @@ impl GameState {
     pub fn set_at(&mut self, pos: BoardPos, card_instance: UnitCardBoardInstance) {
         self.board.set_at(pos, card_instance)
     }
+
+    pub fn player_a_id(&self) -> Id {
+        self.player_a_id
+    }
+
+    pub fn player_b_id(&self) -> Id {
+        self.player_b_id
+    }
+
+    pub fn get_by_id(&self, id: Id) -> &UnitCardBoardInstance {
+        self.board.get_by_id(id)
+    }
 }

@@ -1,4 +1,4 @@
-use crate::id::Id;
+use crate::id::{HasId, Id};
 
 use super::card_instance::{self, UnitCardBoardInstance};
 
@@ -140,5 +140,27 @@ impl Board {
         }
 
         row[pos.row_index] = Some(card_instance);
+    }
+
+    pub fn get_by_id(&self, id: Id) -> &UnitCardBoardInstance {
+        let opponent_side = self.opponent_side();
+        let player_side = self.player_side();
+
+        let all_slots_iter = opponent_side
+            .back_row()
+            .iter()
+            .chain(opponent_side.front_row())
+            .chain(player_side.front_row())
+            .chain(player_side.back_row());
+
+        for slot in all_slots_iter {
+            if let Some(creature) = slot {
+                if creature.id() == id {
+                    return &creature;
+                }
+            }
+        }
+
+        panic!("creature by id not found")
     }
 }

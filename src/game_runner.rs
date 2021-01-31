@@ -59,15 +59,28 @@ impl GameRunner {
                 BoardPos::new(self.player_a.id(), RowId::front_row, 5),
             )));
 
+        self.event_stack
+            .push(GameEvent::Summon(SummonCreatureEvent::new(
+                Box::new(Prawn),
+                BoardPos::new(self.player_b.id(), RowId::front_row, 5),
+            )));
+        self.event_stack
+            .push(GameEvent::Summon(SummonCreatureEvent::new(
+                Box::new(Prawn),
+                BoardPos::new(self.player_b.id(), RowId::back_row, 2),
+            )));
+
+        let mut dispatcher = EventDispatcher::new();
+
         while let Some(event) = self.event_stack.pop() {
-            EventDispatcher::dispatch(event, &mut self.game_state);
+            dispatcher.dispatch(event, &mut self.game_state);
         }
 
         while !self.game_state.is_game_over() {
             self.display.display(&mut self.game_state);
             let cur_player = self.get_cur_player();
             let action = cur_player.get_action(&self.game_state);
-            EventDispatcher::dispatch(action, &mut self.game_state);
+            dispatcher.dispatch(action, &mut self.game_state);
         }
     }
 

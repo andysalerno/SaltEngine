@@ -73,7 +73,7 @@ impl ConsoleAgent {
         ask: &str,
     ) -> Option<&'a UnitCardBoardInstance> {
         self.say(ask);
-        let pos = self.prompt_pos();
+        let pos = self.prompt_pos(game_state);
         let item_at = game_state.get_at(pos);
 
         self.say(&format!("Selected: {:?}", item_at));
@@ -81,20 +81,20 @@ impl ConsoleAgent {
         item_at
     }
 
-    fn prompt_pos(&self) -> BoardPos {
-        let player = self.prompt_player();
+    fn prompt_pos(&self, game_state: &GameState) -> BoardPos {
+        let player = self.prompt_player(game_state);
         let row = self.prompt_row();
         let index = self.prompt_row_index();
 
         BoardPos::new(player, row, index)
     }
 
-    fn prompt_player(&self) -> Id {
+    fn prompt_player(&self, game_state: &GameState) -> Id {
         let player_in = self.ask("Which player? (me, opponent)");
 
         match player_in.as_str() {
             "me" => self.id(),
-            "opponent" => todo!(),
+            "opponent" => self.opponent_id(game_state),
             _ => panic!("Unknown input: {}", player_in),
         }
     }
@@ -135,5 +135,13 @@ impl ConsoleAgent {
 
         input.truncate(input.len() - 1);
         input
+    }
+
+    fn opponent_id(&self, game_state: &GameState) -> Id {
+        if self.id() == game_state.player_a_id() {
+            game_state.player_b_id()
+        } else {
+            game_state.player_a_id()
+        }
     }
 }
