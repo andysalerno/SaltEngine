@@ -13,7 +13,7 @@ impl EventHandler for SummonCreatureEventHandler {
         &self,
         event: SummonCreatureEvent,
         game_state: &mut GameState,
-        dispatcher: &mut EventDispatcher,
+        _dispatcher: &mut EventDispatcher,
     ) {
         let target_position = event.target_position();
         let instance = UnitCardBoardInstance::new(event.take_definition());

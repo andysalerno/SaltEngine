@@ -1,6 +1,6 @@
 use crate::{
     game_agent::game_agent::GameAgent,
-    game_logic::{cards::prawn::Prawn, EventDispatcher, GameEvent, SummonCreatureEvent},
+    game_logic::{cards::*, EventDispatcher, GameEvent, SummonCreatureEvent},
     game_state::{
         board::{BoardPos, RowId},
         GameState,
@@ -68,6 +68,11 @@ impl GameRunner {
             .push(GameEvent::Summon(SummonCreatureEvent::new(
                 Box::new(Prawn),
                 BoardPos::new(self.player_b.id(), RowId::back_row, 2),
+            )));
+        self.event_stack
+            .push(GameEvent::Summon(SummonCreatureEvent::new(
+                Box::new(RicketyCannon),
+                BoardPos::new(self.player_a.id(), RowId::back_row, 2),
             )));
 
         let mut dispatcher = EventDispatcher::new();

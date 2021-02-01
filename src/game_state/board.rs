@@ -1,4 +1,4 @@
-use std::fs::create_dir;
+use std::{fs::create_dir, rc::Rc};
 
 use crate::id::{HasId, Id};
 
@@ -133,13 +133,6 @@ impl Board {
         } else {
             side.front_row_mut()
         };
-
-        if row[pos.row_index].is_some() {
-            panic!(
-                "Cannot place at a position with an existing instance: {:?}",
-                pos
-            );
-        }
 
         row[pos.row_index] = Some(card_instance);
     }

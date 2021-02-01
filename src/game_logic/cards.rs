@@ -1,4 +1,8 @@
-pub mod prawn;
+mod prawn;
+mod rickety_cannon;
+
+pub use prawn::Prawn;
+pub use rickety_cannon::RicketyCannon;
 
 pub trait CardDefinition: std::fmt::Debug {
     fn title(&self) -> &str;
@@ -10,5 +14,5 @@ pub trait CardDefinition: std::fmt::Debug {
 pub trait UnitCardDefinition: CardDefinition {
     fn attack(&self) -> i32;
     fn health(&self) -> i32;
-    fn row_width(&self) -> i32;
+    fn row_width(&self) -> usize;
 }

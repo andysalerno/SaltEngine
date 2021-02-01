@@ -35,7 +35,7 @@ impl UnitCardDefinition for Prawn {
         1
     }
 
-    fn row_width(&self) -> i32 {
+    fn row_width(&self) -> usize {
         1
     }
 }
