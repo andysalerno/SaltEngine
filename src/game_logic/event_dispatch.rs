@@ -30,6 +30,9 @@ impl EventDispatcher {
                 GameEvent::CreatureTakesDamage(e) => {
                     CreatureTakesDamageHandler::default().handle(e, game_state, self)
                 }
+                GameEvent::CreatureDestroyed(e) => {
+                    CreatureDestroyedEventHandler::default().handle(e, game_state, self)
+                }
             }
         }
     }

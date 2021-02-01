@@ -1,3 +1,5 @@
+use std::fs::create_dir;
+
 use crate::id::{HasId, Id};
 
 use super::card_instance::{self, UnitCardBoardInstance};
@@ -162,5 +164,86 @@ impl Board {
         }
 
         panic!("creature by id not found")
+    }
+
+    pub fn get_by_id_mut<'a>(&'a mut self, id: Id) -> &'a mut UnitCardBoardInstance {
+        // {
+        //     let player_side = self.player_side_mut();
+        //     let front_row = player_side.front_row_mut();
+
+        //     if let Some(creature) = front_row.first_mut().unwrap_or(&mut None) {
+        //         return creature;
+        //     }
+        // }
+
+        // {
+        //     let opponent_side = self.opponent_side_mut();
+        // }
+
+        panic!()
+        // {
+        //     let found = self
+        //         .player_side_mut()
+        //         .back_row_mut()
+        //         .iter_mut()
+        //         .filter_map(|i| i.as_mut())
+        //         .find(|i| i.id() == id);
+
+        //     if let Some(creature) = found {
+        //         return creature;
+        //     }
+        // }
+        // {
+        //     let found = self
+        //         .player_side_mut()
+        //         .front_row_mut()
+        //         .iter_mut()
+        //         .filter_map(|i| i.as_mut())
+        //         .find(|i| i.id() == id);
+
+        //     if let Some(creature) = found {
+        //         return creature;
+        //     }
+        // }
+    }
+
+    pub fn update_by_id(&mut self, id: Id, update: impl FnOnce(&mut UnitCardBoardInstance)) {
+        if let Some(mut creature) = self
+            .player_side_mut()
+            .front_row_mut()
+            .iter_mut()
+            .filter_map(|i| i.as_mut())
+            .filter(|i| i.id() == id)
+            .next()
+        {
+            update(&mut creature);
+        } else if let Some(mut creature) = self
+            .player_side_mut()
+            .back_row_mut()
+            .iter_mut()
+            .filter_map(|i| i.as_mut())
+            .filter(|i| i.id() == id)
+            .next()
+        {
+            update(&mut creature);
+        } else if let Some(mut creature) = self
+            .opponent_side_mut()
+            .front_row_mut()
+            .iter_mut()
+            .filter_map(|i| i.as_mut())
+            .filter(|i| i.id() == id)
+            .next()
+        {
+            update(&mut creature);
+        } else if let Some(mut creature) = self
+            .opponent_side_mut()
+            .back_row_mut()
+            .iter_mut()
+            .filter_map(|i| i.as_mut())
+            .filter(|i| i.id() == id)
+            .next()
+        {
+            update(&mut creature);
+        }
     }
 }

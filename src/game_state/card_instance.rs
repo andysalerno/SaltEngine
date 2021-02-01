@@ -32,6 +32,10 @@ impl UnitCardBoardInstance {
     pub fn definition(&self) -> &dyn UnitCardDefinition {
         self.definition.borrow()
     }
+
+    pub fn take_damage(&mut self, damage_amount: usize) {
+        self.health -= damage_amount as i32;
+    }
 }
 
 impl HasId for UnitCardBoardInstance {

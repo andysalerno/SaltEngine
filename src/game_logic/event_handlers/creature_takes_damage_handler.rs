@@ -1,5 +1,8 @@
 use crate::{
-    game_logic::{event_handlers::EventHandler, CreatureTakesDamageEvent, EventDispatcher},
+    game_logic::{
+        event_handlers::EventHandler, CreatureDestroyedEvent, CreatureTakesDamageEvent,
+        EventDispatcher, GameEvent,
+    },
     game_state::GameState,
 };
 
@@ -13,7 +16,7 @@ impl EventHandler for CreatureTakesDamageHandler {
         &self,
         event: CreatureTakesDamageEvent,
         game_state: &mut GameState,
-        _dispatcher: &mut EventDispatcher,
+        dispatcher: &mut EventDispatcher,
     ) {
         let title = game_state
             .get_by_id(event.creature_id())
@@ -21,5 +24,18 @@ impl EventHandler for CreatureTakesDamageHandler {
             .title();
 
         println!("{} takes {} damage", title, event.damage_amount());
+
+        game_state
+            .board_mut()
+            .update_by_id(event.creature_id(), |c| {
+                c.take_damage(event.damage_amount());
+            });
+
+        if game_state.get_by_id(event.creature_id()).health() <= 0 {
+            dispatcher.dispatch(
+                GameEvent::CreatureDestroyed(CreatureDestroyedEvent::new(event.creature_id())),
+                game_state,
+            );
+        }
     }
 }
