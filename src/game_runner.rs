@@ -40,39 +40,39 @@ impl GameRunner {
         self.event_stack
             .push(GameEvent::Summon(SummonCreatureEvent::new(
                 Box::new(Prawn),
-                BoardPos::new(self.player_a.id(), RowId::front_row, 0),
+                BoardPos::new(self.player_a.id(), RowId::FrontRow, 0),
             )));
         self.event_stack
             .push(GameEvent::Summon(SummonCreatureEvent::new(
                 Box::new(Prawn),
-                BoardPos::new(self.player_a.id(), RowId::front_row, 1),
+                BoardPos::new(self.player_a.id(), RowId::FrontRow, 1),
             )));
         self.event_stack
             .push(GameEvent::Summon(SummonCreatureEvent::new(
                 Box::new(Prawn),
-                BoardPos::new(self.player_a.id(), RowId::front_row, 3),
-            )));
-
-        self.event_stack
-            .push(GameEvent::Summon(SummonCreatureEvent::new(
-                Box::new(Prawn),
-                BoardPos::new(self.player_a.id(), RowId::front_row, 5),
+                BoardPos::new(self.player_a.id(), RowId::FrontRow, 3),
             )));
 
         self.event_stack
             .push(GameEvent::Summon(SummonCreatureEvent::new(
                 Box::new(Prawn),
-                BoardPos::new(self.player_b.id(), RowId::front_row, 5),
+                BoardPos::new(self.player_a.id(), RowId::FrontRow, 5),
+            )));
+
+        self.event_stack
+            .push(GameEvent::Summon(SummonCreatureEvent::new(
+                Box::new(Prawn),
+                BoardPos::new(self.player_b.id(), RowId::FrontRow, 5),
             )));
         self.event_stack
             .push(GameEvent::Summon(SummonCreatureEvent::new(
                 Box::new(Prawn),
-                BoardPos::new(self.player_b.id(), RowId::back_row, 2),
+                BoardPos::new(self.player_b.id(), RowId::BackRow, 2),
             )));
         self.event_stack
             .push(GameEvent::Summon(SummonCreatureEvent::new(
                 Box::new(RicketyCannon),
-                BoardPos::new(self.player_a.id(), RowId::back_row, 2),
+                BoardPos::new(self.player_a.id(), RowId::BackRow, 2),
             )));
 
         let mut dispatcher = EventDispatcher::new();

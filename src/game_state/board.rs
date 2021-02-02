@@ -1,13 +1,11 @@
-use std::{fs::create_dir, rc::Rc};
-
 use crate::id::{HasId, Id};
 
-use super::card_instance::{self, UnitCardBoardInstance};
+use super::card_instance::UnitCardBoardInstance;
 
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub enum RowId {
-    front_row,
-    back_row,
+    FrontRow,
+    BackRow,
 }
 
 #[derive(Debug, Copy, Clone)]
@@ -112,7 +110,7 @@ impl Board {
             self.opponent_side()
         };
 
-        let row = if pos.row_id == RowId::back_row {
+        let row = if pos.row_id == RowId::BackRow {
             side.back_row()
         } else {
             side.front_row()
@@ -151,7 +149,7 @@ impl Board {
             self.opponent_side_mut()
         };
 
-        let row = if pos.row_id == RowId::back_row {
+        let row = if pos.row_id == RowId::BackRow {
             side.back_row_mut()
         } else {
             side.front_row_mut()

@@ -103,8 +103,8 @@ impl ConsoleAgent {
         let row_in = self.ask("Which row? (front, back)");
 
         match row_in.as_str() {
-            "front" => RowId::front_row,
-            "back" => RowId::back_row,
+            "front" => RowId::FrontRow,
+            "back" => RowId::BackRow,
             _ => panic!("Unknown input: {}", row_in),
         }
     }
