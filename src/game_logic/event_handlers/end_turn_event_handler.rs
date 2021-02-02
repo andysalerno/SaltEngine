@@ -11,10 +11,11 @@ impl EventHandler for EndTurnEventHandler {
 
     fn handle(
         &self,
-        event: EndTurnEvent,
+        _event: EndTurnEvent,
         game_state: &mut GameState,
-        dispatcher: &mut EventDispatcher,
+        _dispatcher: &mut EventDispatcher,
     ) {
-        todo!()
+        println!("Player {:?} ends turn", game_state.cur_player_turn());
+        game_state.set_next_player_turn();
     }
 }

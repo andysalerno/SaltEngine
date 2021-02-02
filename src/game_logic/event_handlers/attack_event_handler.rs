@@ -1,5 +1,3 @@
-use std::convert::TryInto;
-
 use crate::{
     game_logic::{event_handlers::EventHandler, events::*, EventDispatcher},
     game_state::GameState,

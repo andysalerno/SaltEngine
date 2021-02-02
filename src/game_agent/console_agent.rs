@@ -1,11 +1,11 @@
 use std::io::stdin;
 
 use super::game_agent::GameAgent;
+use crate::{game_logic::GameEvent, id};
 use crate::{
-    game_logic::AttackEvent,
+    game_logic::{AttackEvent, EndTurnEvent},
     game_state::{GameState, UnitCardBoardInstance},
 };
-use crate::{game_logic::GameEvent, id};
 use crate::{game_state::board::BoardPos, id::HasId};
 use crate::{game_state::board::RowId, id::Id};
 
@@ -33,7 +33,7 @@ impl GameAgent for ConsoleAgent {
 
 impl ConsoleAgent {
     fn prompt(&self, game_state: &GameState) -> Option<GameEvent> {
-        let action = self.ask("Enter an action: (info, attack, quit)");
+        let action = self.ask("Enter an action: (info, attack, end (turn), quit)");
 
         let mut event = None;
 
@@ -44,6 +44,7 @@ impl ConsoleAgent {
                     None
                 }
                 "attack" => Some(GameEvent::Attack(self.attack(game_state))),
+                "end" => Some(GameEvent::EndTurn(EndTurnEvent)),
                 "quit" => return None,
                 _ => panic!("Unknown input: {}", action),
             };

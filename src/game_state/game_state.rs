@@ -42,6 +42,21 @@ impl GameState {
         self.cur_player_turn
     }
 
+    pub fn set_next_player_turn(&mut self) -> Id {
+        let cur_player = self.cur_player_turn();
+
+        let next_player = if cur_player == self.player_a_id() {
+            self.player_b_id()
+        } else if cur_player == self.player_b_id() {
+            self.player_a_id()
+        } else {
+            panic!()
+        };
+
+        self.cur_player_turn = next_player;
+        next_player
+    }
+
     pub fn board(&self) -> &Board {
         &self.board
     }
