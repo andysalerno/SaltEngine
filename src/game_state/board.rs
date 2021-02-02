@@ -118,10 +118,33 @@ impl Board {
             side.front_row()
         };
 
-        row[pos.row_index].as_ref()
+        // start at pos.row_index, and work back, in case there's
+        // a creature taking up multiple rows
+        for i in (0..=pos.row_index).rev() {
+            let distance = pos.row_index - i;
+            let occupant = &row[i];
+
+            if let Some(occupant) = occupant {
+                if occupant.width() > distance {
+                    return Some(occupant);
+                } else {
+                    return None;
+                }
+            }
+        }
+
+        return None;
     }
 
     pub fn set_at(&mut self, pos: BoardPos, card_instance: UnitCardBoardInstance) {
+        if let Some(existing) = self.get_at(pos) {
+            panic!(
+                "Could not set at pos {:?} due to existing occupant: {:?}",
+                pos,
+                existing.id()
+            );
+        }
+
         let side = if pos.player_id == self.player_id {
             self.player_side_mut()
         } else {
@@ -141,22 +164,19 @@ impl Board {
         let opponent_side = self.opponent_side();
         let player_side = self.player_side();
 
-        let all_slots_iter = opponent_side
+        opponent_side
             .back_row()
             .iter()
             .chain(opponent_side.front_row())
             .chain(player_side.front_row())
-            .chain(player_side.back_row());
-
-        for slot in all_slots_iter {
-            if let Some(creature) = slot {
-                if creature.id() == id {
-                    return &creature;
-                }
-            }
-        }
-
-        panic!("creature by id not found")
+            .chain(player_side.back_row())
+            .filter(|i| match i {
+                None => false,
+                Some(c) => c.id() == id,
+            })
+            .filter_map(|i| i.as_ref())
+            .next()
+            .expect(&format!("No creature found with id {:?}", id))
     }
 
     pub fn update_by_id(&mut self, id: Id, update: impl FnOnce(&mut UnitCardBoardInstance)) {

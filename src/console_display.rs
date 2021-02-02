@@ -44,26 +44,15 @@ fn row_to_string(row: &[Option<UnitCardBoardInstance>]) -> String {
     while let Some(maybe_card) = row_iter.next() {
         // If the slot contains a card instance...
         if let Some(card) = maybe_card {
-            let mut id = card.id();
+            let width = card.width();
             result.push_str(&format!("[{}/{}", card.attack(), card.health()));
 
-            while let Some(maybe_card) = row_iter.next() {
-                if let Some(card) = maybe_card {
-                    // If the neighboring slot is the same card...
-                    if card.id() == id {
-                        result.push_str("   ");
-                    // If the neighboring slot is a different card...
-                    } else {
-                        id = card.id();
-                        result.push_str("]");
-                        result.push_str(&format!("[{}/{}", card.attack(), card.health()));
-                    }
-                // If the neighboring slot empty...
-                } else {
-                    result.push_str("]|   |");
-                    break;
-                }
+            for _ in 1..width {
+                let _ = row_iter.next();
+                result.push_str("-----");
             }
+
+            result.push_str("]");
 
         // If the slot is empty...
         } else {

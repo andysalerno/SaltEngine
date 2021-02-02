@@ -9,6 +9,7 @@ pub struct UnitCardBoardInstance {
     id: Id,
     attack: i32,
     health: i32,
+    width: usize,
 }
 
 impl UnitCardBoardInstance {
@@ -16,6 +17,7 @@ impl UnitCardBoardInstance {
         Self {
             attack: definition.attack(),
             health: definition.health(),
+            width: definition.row_width(),
             definition,
             id: new_id(),
         }
@@ -27,6 +29,10 @@ impl UnitCardBoardInstance {
 
     pub fn health(&self) -> i32 {
         self.health
+    }
+
+    pub fn width(&self) -> usize {
+        self.width
     }
 
     pub fn definition(&self) -> &dyn UnitCardDefinition {

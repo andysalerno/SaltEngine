@@ -89,14 +89,15 @@ impl GameRunner {
         }
     }
 
-    fn get_cur_player(&self) -> &Box<dyn GameAgent> {
+    fn get_cur_player(&self) -> &dyn GameAgent {
         let cur_id = self.game_state.cur_player_turn();
-        let player_a_id = self.player_a.id();
-        let player_b_id = self.player_b.id();
 
-        match cur_id {
-            player_a_id => &self.player_a,
-            player_b_id => &self.player_b,
+        if cur_id == self.player_a.id() {
+            self.player_a.as_ref()
+        } else if cur_id == self.player_b.id() {
+            self.player_b.as_ref()
+        } else {
+            panic!("Unknown player id: {:?}", cur_id)
         }
     }
 }
