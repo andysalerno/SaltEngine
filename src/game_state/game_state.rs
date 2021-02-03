@@ -2,7 +2,7 @@ use super::{
     board::{Board, BoardPos},
     UnitCardBoardInstance,
 };
-use crate::id::Id;
+use crate::{game_logic::PassiveEffect, id::Id};
 
 pub struct GameState {
     player_b_id: Id,
@@ -15,6 +15,7 @@ pub struct GameState {
     player_a_mana: u32,
     player_b_mana: u32,
 
+    passive_effects: Vec<Box<dyn PassiveEffect>>,
     board: Box<Board>,
 }
 
@@ -34,6 +35,7 @@ impl GameState {
             player_b_health: 30,
             player_a_mana: 0,
             player_b_mana: 0,
+            passive_effects: Vec::new(),
             board: Box::new(Board::new(BOARD_LEN, player_a_id, player_b_id)),
         }
     }
@@ -83,5 +85,24 @@ impl GameState {
 
     pub fn get_by_id(&self, id: Id) -> &UnitCardBoardInstance {
         self.board.get_by_id(id)
+    }
+
+    pub fn evaluate_passives(&mut self) {
+        let effects = self
+            .passive_effects
+            .iter()
+            .map(|e| e.update())
+            .collect::<Vec<_>>();
+
+        if !effects.is_empty() {
+            println!("Evaluating {} passive effects.", effects.len());
+        }
+
+        effects.into_iter().for_each(|e| (e)(self));
+    }
+
+    /// An iterator over all unit instances on the entire board.
+    pub fn board_iter(&self) -> impl Iterator<Item = &UnitCardBoardInstance> {
+        self.board.iter()
     }
 }

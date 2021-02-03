@@ -24,4 +24,6 @@ pub enum GameEvent {
     CreatureDealsDamage(CreatureDealsDamageEvent),
     CreatureTakesDamage(CreatureTakesDamageEvent),
     CreatureDestroyed(CreatureDestroyedEvent),
+    TurnEnd(EndTurnEvent),
+    TurnStart(TurnStartEvent),
 }

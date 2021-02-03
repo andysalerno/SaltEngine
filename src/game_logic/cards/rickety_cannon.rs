@@ -17,12 +17,16 @@ impl CardDefinition for RicketyCannon {
     fn title(&self) -> &str {
         "Rickety cannon"
     }
+    fn cost(&self) -> i32 {
+        2
+    }
+
     fn flavor_text(&self) -> &str {
         "yep"
     }
 
-    fn cost(&self) -> i32 {
-        2
+    fn text(&self) -> &str {
+        ""
     }
 }
 

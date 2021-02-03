@@ -18,6 +18,8 @@ impl EventDispatcher {
         self.stack.push(event);
 
         while let Some(event) = self.stack.pop() {
+            game_state.evaluate_passives();
+
             match event {
                 GameEvent::Attack(e) => AttackEventHandler::default().handle(e, game_state, self),
                 GameEvent::EndTurn(e) => EndTurnEventHandler::default().handle(e, game_state, self),
@@ -33,7 +35,11 @@ impl EventDispatcher {
                 GameEvent::CreatureDestroyed(e) => {
                     CreatureDestroyedEventHandler::default().handle(e, game_state, self)
                 }
+                GameEvent::TurnEnd(e) => EndTurnEventHandler::default().handle(e, game_state, self),
+                GameEvent::TurnStart(e) => TurnStartHandler::default().handle(e, game_state, self),
             }
+
+            game_state.evaluate_passives();
         }
     }
 }

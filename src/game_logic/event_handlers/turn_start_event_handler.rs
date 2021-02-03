@@ -11,9 +11,10 @@ impl EventHandler for TurnStartHandler {
 
     fn handle(
         &self,
-        event: TurnStartEvent,
+        _event: TurnStartEvent,
         game_state: &mut GameState,
         _dispatcher: &mut EventDispatcher,
     ) {
+        println!("Turn started for player {:?}", game_state.cur_player_turn());
     }
 }

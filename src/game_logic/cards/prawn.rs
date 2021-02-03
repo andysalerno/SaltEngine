@@ -17,12 +17,16 @@ impl CardDefinition for Prawn {
     fn title(&self) -> &str {
         "Prawn"
     }
+    fn cost(&self) -> i32 {
+        1
+    }
+
     fn flavor_text(&self) -> &str {
         "Just a lowly Prawn."
     }
 
-    fn cost(&self) -> i32 {
-        1
+    fn text(&self) -> &str {
+        ""
     }
 }
 

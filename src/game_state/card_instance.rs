@@ -1,11 +1,15 @@
 use std::borrow::Borrow;
 
-use crate::id::{new_id, Id};
 use crate::{game_logic::cards::UnitCardDefinition, id::HasId};
+use crate::{
+    game_logic::Buff,
+    id::{new_id, Id},
+};
 
 #[derive(Debug)]
 pub struct UnitCardBoardInstance {
     definition: Box<dyn UnitCardDefinition>,
+    buffs: Vec<Box<dyn Buff>>,
     id: Id,
     attack: i32,
     health: i32,
@@ -19,20 +23,28 @@ impl UnitCardBoardInstance {
             health: definition.health(),
             width: definition.row_width(),
             definition,
+            buffs: Vec::new(),
             id: new_id(),
         }
     }
 
     pub fn attack(&self) -> i32 {
-        self.attack
+        let attack_buf: i32 = self.buffs().iter().map(|b| b.attack_amount()).sum();
+
+        self.attack + attack_buf
     }
 
     pub fn health(&self) -> i32 {
-        self.health
+        let health_buf: i32 = self.buffs().iter().map(|b| b.health_amount()).sum();
+        self.health + health_buf
     }
 
     pub fn width(&self) -> usize {
         self.width
+    }
+
+    pub fn buffs(&self) -> &[Box<dyn Buff>] {
+        self.buffs.as_slice()
     }
 
     pub fn definition(&self) -> &dyn UnitCardDefinition {

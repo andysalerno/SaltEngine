@@ -1,3 +1,4 @@
+mod emotional_support_dog;
 mod prawn;
 mod rickety_cannon;
 
@@ -7,6 +8,7 @@ pub use rickety_cannon::RicketyCannon;
 pub trait CardDefinition: std::fmt::Debug {
     fn title(&self) -> &str;
     fn cost(&self) -> i32;
+    fn text(&self) -> &str;
     fn flavor_text(&self) -> &str;
 }
 

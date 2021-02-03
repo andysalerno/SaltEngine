@@ -177,6 +177,20 @@ impl Board {
             .expect(&format!("No creature found with id {:?}", id))
     }
 
+    /// An iterator over all unit instances on the entire board.
+    pub fn iter(&self) -> impl Iterator<Item = &UnitCardBoardInstance> {
+        let opponent_side = self.opponent_side();
+        let player_side = self.player_side();
+
+        opponent_side
+            .back_row()
+            .iter()
+            .chain(opponent_side.front_row())
+            .chain(player_side.front_row())
+            .chain(player_side.back_row())
+            .filter_map(|i| i.as_ref())
+    }
+
     pub fn update_by_id(&mut self, id: Id, update: impl FnOnce(&mut UnitCardBoardInstance)) {
         if let Some(mut creature) = self
             .player_side_mut()
