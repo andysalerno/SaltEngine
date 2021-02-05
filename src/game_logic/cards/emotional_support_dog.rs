@@ -1,16 +1,22 @@
 use crate::{
-    game_logic::buff::Buff,
+    game_logic::{
+        buff::{Buff, BuffSourceId},
+        passive_effect::PassiveEffectInstance,
+    },
     game_state::board::RowId,
-    id::{new_id, Id},
+    id::Id,
 };
-use crate::{game_logic::PassiveEffect, id::HasId};
+use crate::{
+    game_logic::{passive_effect::PassiveEffectInstanceId, PassiveEffectDefinition},
+    game_state::GameState,
+};
 
 use super::{CardDefinition, UnitCardDefinition};
 
 #[derive(Debug, Clone)]
 pub struct EmotionalSupportDog;
 
-impl HasId for EmotionalSupportDog {
+impl EmotionalSupportDog {
     fn id(&self) -> Id {
         // id::parse("...")
         todo!()
@@ -47,17 +53,23 @@ impl UnitCardDefinition for EmotionalSupportDog {
     fn row_width(&self) -> usize {
         1
     }
+
+    fn passive_effect(&self) -> Option<Box<dyn PassiveEffectDefinition>> {
+        todo!()
+    }
 }
 
 #[derive(Debug)]
 struct EmotionalSupportDogBuff {
     instance_id: Id,
+    source_id: BuffSourceId,
 }
 
 impl EmotionalSupportDogBuff {
-    pub fn new() -> Self {
+    pub fn new(source_id: PassiveEffectInstanceId) -> Self {
         Self {
-            instance_id: new_id(),
+            instance_id: Id::new(),
+            source_id: BuffSourceId::Passive(source_id),
         }
     }
 }
@@ -75,40 +87,42 @@ impl Buff for EmotionalSupportDogBuff {
         self.instance_id
     }
 
+    fn source_id(&self) -> BuffSourceId {
+        self.source_id
+    }
+
     fn definition_id(&self) -> Id {
         todo!()
     }
 }
 
 #[derive(Debug)]
-struct EmotionalSupportDogPassive {
-    originator: Id,
+struct EmotionalSupportDogPassiveDefinition {
     definition_id: Id,
-    instance_id: Id,
 }
 
-impl PassiveEffect for EmotionalSupportDogPassive {
-    fn originator(&self) -> Id {
-        self.originator
-    }
-
+impl PassiveEffectDefinition for EmotionalSupportDogPassiveDefinition {
     fn definition_id(&self) -> Id {
-        self.definition_id
+        todo!()
     }
 
-    fn instance_id(&self) -> Id {
-        self.instance_id
-    }
+    fn update(&self) -> Box<dyn FnOnce(&PassiveEffectInstance, &mut GameState)> {
+        // let id = self.instance_id;
+        // let originator_id = self.originator;
 
-    fn update(&self) -> Box<dyn FnOnce(&mut crate::game_state::GameState)> {
-        let id = self.instance_id;
-        let originator_id = self.originator;
-
-        Box::new(move |game_state| {
+        Box::new(move |instance, game_state| {
             // Find the buff already applied by this instance
             let existing = game_state
                 .board_iter()
-                .filter(|i| i.buffs().iter().any(|b| b.instance_id() == id))
+                .filter(|i| {
+                    i.buffs()
+                        .iter()
+                        .any(|&buff| match buff.soure_id() {
+                            BuffSourceId;:Passive(passive_id) => true,
+                            _ => false
+                        })
+                        //.any(|b| b.instance_id() == instance.instance_id())
+                })
                 .next();
 
             if let Some(_) = existing {
@@ -118,7 +132,7 @@ impl PassiveEffect for EmotionalSupportDogPassive {
 
             let doggy = game_state
                 .board_iter()
-                .filter(|i| i.id() == originator_id)
+                .filter(|i| i.id() == instance.originator_id())
                 .next()
                 .expect("A passive is active for ESD, but ESD doesn't exist?");
 
@@ -135,7 +149,9 @@ impl PassiveEffect for EmotionalSupportDogPassive {
 
             if let Some(front_card) = front_card {
                 game_state.update_by_id(front_card.id(), |c| {
-                    c.add_buf(Box::new(EmotionalSupportDogBuff::new()));
+                    c.add_buf(Box::new(EmotionalSupportDogBuff::new(
+                        instance.instance_id(),
+                    )));
                 });
             }
         })

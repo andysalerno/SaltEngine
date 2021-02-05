@@ -2,8 +2,11 @@ mod emotional_support_dog;
 mod prawn;
 mod rickety_cannon;
 
+pub use emotional_support_dog::EmotionalSupportDog;
 pub use prawn::Prawn;
 pub use rickety_cannon::RicketyCannon;
+
+use super::PassiveEffectDefinition;
 
 pub trait CardDefinition: std::fmt::Debug {
     fn title(&self) -> &str;
@@ -17,4 +20,5 @@ pub trait UnitCardDefinition: CardDefinition {
     fn attack(&self) -> i32;
     fn health(&self) -> i32;
     fn row_width(&self) -> usize;
+    fn passive_effect(&self) -> Option<Box<dyn PassiveEffectDefinition>>;
 }

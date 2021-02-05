@@ -1,7 +1,6 @@
 use crate::{
     game_runner::GameDisplay,
     game_state::{GameState, UnitCardBoardInstance},
-    id::HasId,
 };
 
 pub struct ConsoleDisplay;

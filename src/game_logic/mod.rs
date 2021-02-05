@@ -8,4 +8,4 @@ mod passive_effect;
 pub use buff::Buff;
 pub use event_dispatch::EventDispatcher;
 pub use events::*;
-pub use passive_effect::PassiveEffect;
+pub use passive_effect::PassiveEffectDefinition;

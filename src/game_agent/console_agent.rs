@@ -1,12 +1,12 @@
 use std::io::stdin;
 
 use super::game_agent::GameAgent;
-use crate::{game_logic::GameEvent, id};
+use crate::game_logic::GameEvent;
+use crate::game_state::board::BoardPos;
 use crate::{
     game_logic::{AttackEvent, EndTurnEvent},
     game_state::{GameState, UnitCardBoardInstance},
 };
-use crate::{game_state::board::BoardPos, id::HasId};
 use crate::{game_state::board::RowId, id::Id};
 
 pub struct ConsoleAgent {
@@ -15,19 +15,17 @@ pub struct ConsoleAgent {
 
 impl ConsoleAgent {
     pub fn new() -> Self {
-        Self { id: id::new_id() }
-    }
-}
-
-impl HasId for ConsoleAgent {
-    fn id(&self) -> Id {
-        self.id
+        Self { id: Id::new() }
     }
 }
 
 impl GameAgent for ConsoleAgent {
     fn get_action(&self, game_state: &GameState) -> GameEvent {
         self.prompt(game_state).expect("No event selected")
+    }
+
+    fn id(&self) -> Id {
+        self.id
     }
 }
 

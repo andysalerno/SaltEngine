@@ -1,4 +1,3 @@
-use crate::id::HasId;
 use crate::id::Id;
 
 use super::{CardDefinition, UnitCardDefinition};
@@ -6,7 +5,7 @@ use super::{CardDefinition, UnitCardDefinition};
 #[derive(Debug, Clone)]
 pub struct RicketyCannon;
 
-impl HasId for RicketyCannon {
+impl RicketyCannon {
     fn id(&self) -> Id {
         // id::parse("...")
         todo!()
@@ -41,5 +40,9 @@ impl UnitCardDefinition for RicketyCannon {
 
     fn row_width(&self) -> usize {
         3
+    }
+
+    fn passive_effect(&self) -> Option<Box<dyn crate::game_logic::PassiveEffectDefinition>> {
+        None
     }
 }

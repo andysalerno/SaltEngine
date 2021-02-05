@@ -1,7 +1,6 @@
 use crate::{
     game_logic::{event_handlers::EventHandler, events::*, EventDispatcher},
     game_state::GameState,
-    id::HasId,
 };
 
 #[derive(Default)]

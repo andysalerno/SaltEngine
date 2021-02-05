@@ -72,7 +72,13 @@ impl GameRunner {
         self.event_stack
             .push(GameEvent::Summon(SummonCreatureEvent::new(
                 Box::new(RicketyCannon),
-                BoardPos::new(self.player_a.id(), RowId::BackRow, 2),
+                BoardPos::new(self.player_a.id(), RowId::BackRow, 3),
+            )));
+
+        self.event_stack
+            .push(GameEvent::Summon(SummonCreatureEvent::new(
+                Box::new(EmotionalSupportDog),
+                BoardPos::new(self.player_a.id(), RowId::BackRow, 1),
             )));
 
         let mut dispatcher = EventDispatcher::new();

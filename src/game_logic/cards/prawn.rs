@@ -1,4 +1,3 @@
-use crate::id::HasId;
 use crate::id::Id;
 
 use super::{CardDefinition, UnitCardDefinition};
@@ -6,7 +5,7 @@ use super::{CardDefinition, UnitCardDefinition};
 #[derive(Debug, Clone)]
 pub struct Prawn;
 
-impl HasId for Prawn {
+impl Prawn {
     fn id(&self) -> Id {
         // id::parse("...")
         todo!()
@@ -41,5 +40,9 @@ impl UnitCardDefinition for Prawn {
 
     fn row_width(&self) -> usize {
         1
+    }
+
+    fn passive_effect(&self) -> Option<Box<dyn crate::game_logic::PassiveEffectDefinition>> {
+        None
     }
 }

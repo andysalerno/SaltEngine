@@ -1,4 +1,4 @@
-use crate::id::{HasId, Id};
+use crate::id::Id;
 
 use super::card_instance::UnitCardBoardInstance;
 
