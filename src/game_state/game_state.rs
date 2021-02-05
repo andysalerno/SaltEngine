@@ -87,6 +87,14 @@ impl GameState {
         self.board.get_by_id(id)
     }
 
+    pub fn get_pos_by_id(&self, id: Id) -> BoardPos {
+        self.board.get_position_by_id(id)
+    }
+
+    pub fn update_by_id(&mut self, id: Id, update: impl FnOnce(&mut UnitCardBoardInstance)) {
+        self.board.update_by_id(id, update);
+    }
+
     pub fn evaluate_passives(&mut self) {
         let effects = self
             .passive_effects

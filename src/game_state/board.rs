@@ -10,9 +10,9 @@ pub enum RowId {
 
 #[derive(Debug, Copy, Clone)]
 pub struct BoardPos {
-    player_id: Id,
-    row_id: RowId,
-    row_index: usize,
+    pub player_id: Id,
+    pub row_id: RowId,
+    pub row_index: usize,
 }
 
 impl BoardPos {
@@ -156,6 +156,90 @@ impl Board {
         };
 
         row[pos.row_index] = Some(card_instance);
+    }
+
+    pub fn get_position_by_id(&self, id: Id) -> BoardPos {
+        // Check opponent back
+        {
+            let found = self
+                .opponent_side()
+                .back_row()
+                .iter()
+                .enumerate()
+                .filter(|i| match i.1 {
+                    None => false,
+                    Some(c) => c.id() == id,
+                })
+                .next();
+
+            if let Some(found) = found {
+                let (index, _) = found;
+                let player_id = self.opponent_id;
+                return BoardPos::new(player_id, RowId::BackRow, index);
+            }
+        }
+
+        // Check opponent front
+        {
+            let found = self
+                .opponent_side()
+                .front_row()
+                .iter()
+                .enumerate()
+                .filter(|i| match i.1 {
+                    None => false,
+                    Some(c) => c.id() == id,
+                })
+                .next();
+
+            if let Some(found) = found {
+                let (index, _) = found;
+                let player_id = self.opponent_id;
+                return BoardPos::new(player_id, RowId::FrontRow, index);
+            }
+        }
+
+        // Check player back
+        {
+            let found = self
+                .player_side()
+                .back_row()
+                .iter()
+                .enumerate()
+                .filter(|i| match i.1 {
+                    None => false,
+                    Some(c) => c.id() == id,
+                })
+                .next();
+
+            if let Some(found) = found {
+                let (index, _) = found;
+                let player_id = self.player_id;
+                return BoardPos::new(player_id, RowId::BackRow, index);
+            }
+        }
+
+        // Check player front
+        {
+            let found = self
+                .player_side()
+                .front_row()
+                .iter()
+                .enumerate()
+                .filter(|i| match i.1 {
+                    None => false,
+                    Some(c) => c.id() == id,
+                })
+                .next();
+
+            if let Some(found) = found {
+                let (index, _) = found;
+                let player_id = self.player_id;
+                return BoardPos::new(player_id, RowId::FrontRow, index);
+            }
+        }
+
+        panic!("Id not found: {:?}", id);
     }
 
     pub fn get_by_id(&self, id: Id) -> &UnitCardBoardInstance {

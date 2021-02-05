@@ -54,6 +54,8 @@ impl UnitCardBoardInstance {
     pub fn take_damage(&mut self, damage_amount: usize) {
         self.health -= damage_amount as i32;
     }
+
+    pub fn add_buf(&mut self, buff: Box<dyn Buff>) {}
 }
 
 impl HasId for UnitCardBoardInstance {
