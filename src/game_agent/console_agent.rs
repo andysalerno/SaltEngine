@@ -65,7 +65,7 @@ impl ConsoleAgent {
     }
 
     fn info(&self, game_state: &GameState) {
-        let selected = self.select(game_state, "Select for info.");
+        let _selected = self.select(game_state, "Select for info.");
     }
 
     fn select<'a>(

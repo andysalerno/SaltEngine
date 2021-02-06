@@ -1,6 +1,6 @@
-use crate::{game_state::UnitCardBoardInstanceId, id::Id};
+use crate::game_state::UnitCardBoardInstanceId;
 
-use super::{attack, Event};
+use super::Event;
 
 #[derive(Debug)]
 pub struct CreatureTakesDamageEvent {

@@ -1,7 +1,6 @@
 use crate::{
     game_logic::{
         buff::{Buff, BuffSourceId},
-        passive_effect::PassiveEffectInstance,
         BuffInstanceId,
     },
     game_state::{board::RowId, UnitCardBoardInstanceId},

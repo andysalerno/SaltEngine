@@ -2,7 +2,7 @@ use super::{
     board::{Board, BoardPos},
     UnitCardBoardInstance, UnitCardBoardInstanceId,
 };
-use crate::{game_logic::BuffSourceId, id::Id};
+use crate::id::Id;
 
 pub struct GameState {
     player_b_id: Id,
