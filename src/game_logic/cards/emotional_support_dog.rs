@@ -2,6 +2,7 @@ use crate::{
     game_logic::{
         buff::{Buff, BuffSourceId},
         passive_effect::PassiveEffectInstance,
+        BuffInstanceId,
     },
     game_state::board::RowId,
     id::Id,
@@ -61,14 +62,14 @@ impl UnitCardDefinition for EmotionalSupportDog {
 
 #[derive(Debug)]
 struct EmotionalSupportDogBuff {
-    instance_id: Id,
+    instance_id: BuffInstanceId,
     source_id: BuffSourceId,
 }
 
 impl EmotionalSupportDogBuff {
     pub fn new(source_id: PassiveEffectInstanceId) -> Self {
         Self {
-            instance_id: Id::new(),
+            instance_id: BuffInstanceId::new(),
             source_id: BuffSourceId::Passive(source_id),
         }
     }
@@ -83,7 +84,7 @@ impl Buff for EmotionalSupportDogBuff {
         1
     }
 
-    fn instance_id(&self) -> Id {
+    fn instance_id(&self) -> BuffInstanceId {
         self.instance_id
     }
 

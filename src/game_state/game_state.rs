@@ -99,7 +99,10 @@ impl GameState {
             .flat_map(|i| {
                 let id = i.id();
 
-                i.buffs().iter().map(move |b| (id, b.instance_id()))
+                i.buffs()
+                    .iter()
+                    .filter(|b| b.is_from_passive())
+                    .map(move |b| (id, b.instance_id()))
             })
             .collect::<Vec<_>>()
             .into_iter()

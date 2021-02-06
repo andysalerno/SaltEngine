@@ -1,6 +1,6 @@
 use std::borrow::Borrow;
 
-use crate::game_logic::{cards::UnitCardDefinition, PassiveEffectInstance};
+use crate::game_logic::{cards::UnitCardDefinition, BuffInstanceId, PassiveEffectInstance};
 use crate::{game_logic::Buff, id::Id};
 
 #[derive(Debug)]
@@ -64,7 +64,7 @@ impl UnitCardBoardInstance {
         self.buffs.push(buff);
     }
 
-    pub fn remove_buff(&mut self, buff_id: Id) {
+    pub fn remove_buff(&mut self, buff_id: BuffInstanceId) {
         self.buffs.retain(|i| i.instance_id() != buff_id);
     }
 
