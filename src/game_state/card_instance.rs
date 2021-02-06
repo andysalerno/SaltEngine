@@ -60,8 +60,12 @@ impl UnitCardBoardInstance {
         self.health -= damage_amount as i32;
     }
 
-    pub fn add_buf(&mut self, buff: Box<dyn Buff>) {
+    pub fn add_buff(&mut self, buff: Box<dyn Buff>) {
         self.buffs.push(buff);
+    }
+
+    pub fn remove_buff(&mut self, buff_id: Id) {
+        self.buffs.retain(|i| i.instance_id() != buff_id);
     }
 
     pub fn passive_effect_instance(&self) -> Option<&PassiveEffectInstance> {

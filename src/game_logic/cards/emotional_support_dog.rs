@@ -156,7 +156,7 @@ impl PassiveEffectDefinition for EmotionalSupportDogPassiveDefinition {
 
             if let Some(front_card) = front_card {
                 game_state.update_by_id(front_card.id(), |c| {
-                    c.add_buf(Box::new(EmotionalSupportDogBuff::new(instance_id)));
+                    c.add_buff(Box::new(EmotionalSupportDogBuff::new(instance_id)));
                 });
             }
         })

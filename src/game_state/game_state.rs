@@ -2,7 +2,7 @@ use super::{
     board::{Board, BoardPos},
     UnitCardBoardInstance,
 };
-use crate::id::Id;
+use crate::{game_logic::BuffSourceId, id::Id};
 
 pub struct GameState {
     player_b_id: Id,
@@ -94,6 +94,21 @@ impl GameState {
     }
 
     pub fn evaluate_passives(&mut self) {
+        // clear out all passive buffs
+        self.board_iter()
+            .flat_map(|i| {
+                let id = i.id();
+
+                i.buffs().iter().map(move |b| (id, b.instance_id()))
+            })
+            .collect::<Vec<_>>()
+            .into_iter()
+            .for_each(|(card_inst_id, buff_inst_id)| {
+                self.update_by_id(card_inst_id, |i| {
+                    i.remove_buff(buff_inst_id);
+                });
+            });
+
         let effects = self
             .board_iter()
             .filter_map(|i| {
