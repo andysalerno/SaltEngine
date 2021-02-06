@@ -1,16 +1,20 @@
-use crate::id::Id;
+use crate::{game_state::UnitCardBoardInstanceId, id::Id};
 
 use super::{attack, Event};
 
 #[derive(Debug)]
 pub struct CreatureTakesDamageEvent {
-    creature_id: Id,
-    attacker_id: Id,
+    creature_id: UnitCardBoardInstanceId,
+    attacker_id: UnitCardBoardInstanceId,
     damage_amount: usize,
 }
 
 impl CreatureTakesDamageEvent {
-    pub fn new(creature_id: Id, attacker_id: Id, damage_amount: usize) -> Self {
+    pub fn new(
+        creature_id: UnitCardBoardInstanceId,
+        attacker_id: UnitCardBoardInstanceId,
+        damage_amount: usize,
+    ) -> Self {
         Self {
             creature_id,
             attacker_id,
@@ -18,11 +22,11 @@ impl CreatureTakesDamageEvent {
         }
     }
 
-    pub fn creature_id(&self) -> Id {
+    pub fn creature_id(&self) -> UnitCardBoardInstanceId {
         self.creature_id
     }
 
-    pub fn attacker_id(&self) -> Id {
+    pub fn attacker_id(&self) -> UnitCardBoardInstanceId {
         self.attacker_id
     }
 

@@ -1,23 +1,26 @@
-use crate::{game_state::UnitCardBoardInstance, id::Id};
+use crate::{
+    game_state::{UnitCardBoardInstance, UnitCardBoardInstanceId},
+    id::Id,
+};
 
 use super::Event;
 
 #[derive(Debug)]
 pub struct AttackEvent {
-    attacker: Id,
-    target: Id,
+    attacker: UnitCardBoardInstanceId,
+    target: UnitCardBoardInstanceId,
 }
 
 impl AttackEvent {
-    pub fn new(attacker: Id, target: Id) -> Self {
+    pub fn new(attacker: UnitCardBoardInstanceId, target: UnitCardBoardInstanceId) -> Self {
         Self { attacker, target }
     }
 
-    pub fn attacker(&self) -> Id {
+    pub fn attacker(&self) -> UnitCardBoardInstanceId {
         self.attacker
     }
 
-    pub fn target(&self) -> Id {
+    pub fn target(&self) -> UnitCardBoardInstanceId {
         self.target
     }
 }

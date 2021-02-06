@@ -1,6 +1,6 @@
 use super::{
     board::{Board, BoardPos},
-    UnitCardBoardInstance,
+    UnitCardBoardInstance, UnitCardBoardInstanceId,
 };
 use crate::{game_logic::BuffSourceId, id::Id};
 
@@ -81,15 +81,19 @@ impl GameState {
         self.player_b_id
     }
 
-    pub fn get_by_id(&self, id: Id) -> &UnitCardBoardInstance {
+    pub fn get_by_id(&self, id: UnitCardBoardInstanceId) -> &UnitCardBoardInstance {
         self.board.get_by_id(id)
     }
 
-    pub fn get_pos_by_id(&self, id: Id) -> BoardPos {
+    pub fn get_pos_by_id(&self, id: UnitCardBoardInstanceId) -> BoardPos {
         self.board.get_position_by_id(id)
     }
 
-    pub fn update_by_id(&mut self, id: Id, update: impl FnOnce(&mut UnitCardBoardInstance)) {
+    pub fn update_by_id(
+        &mut self,
+        id: UnitCardBoardInstanceId,
+        update: impl FnOnce(&mut UnitCardBoardInstance),
+    ) {
         self.board.update_by_id(id, update);
     }
 
