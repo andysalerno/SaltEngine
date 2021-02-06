@@ -41,8 +41,4 @@ impl UnitCardDefinition for Prawn {
     fn row_width(&self) -> usize {
         1
     }
-
-    fn passive_effect(&self) -> Option<Box<dyn crate::game_logic::PassiveEffectDefinition>> {
-        None
-    }
 }

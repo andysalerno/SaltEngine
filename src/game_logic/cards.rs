@@ -20,5 +20,7 @@ pub trait UnitCardDefinition: CardDefinition {
     fn attack(&self) -> i32;
     fn health(&self) -> i32;
     fn row_width(&self) -> usize;
-    fn passive_effect(&self) -> Option<Box<dyn PassiveEffectDefinition>>;
+    fn passive_effect(&self) -> Option<Box<dyn PassiveEffectDefinition>> {
+        None
+    }
 }

@@ -1,8 +1,10 @@
+use std::borrow::Borrow;
+
 use crate::{game_state::GameState, id::Id};
 
 pub trait PassiveEffectDefinition: std::fmt::Debug {
     fn definition_id(&self) -> Id;
-    fn update(&self) -> Box<dyn FnOnce(&PassiveEffectInstance, &mut GameState)>;
+    fn update(&self) -> Box<dyn FnOnce(PassiveEffectInstanceId, Id, &mut GameState)>;
 }
 
 #[derive(Debug, Copy, Clone, PartialEq)]
@@ -22,11 +24,23 @@ pub struct PassiveEffectInstance {
 }
 
 impl PassiveEffectInstance {
+    pub fn new(definition: Box<dyn PassiveEffectDefinition>, originator_id: Id) -> Self {
+        Self {
+            definition,
+            instance_id: PassiveEffectInstanceId::new(),
+            originator_id,
+        }
+    }
+
     pub fn instance_id(&self) -> PassiveEffectInstanceId {
         self.instance_id
     }
 
     pub fn originator_id(&self) -> Id {
         self.originator_id
+    }
+
+    pub fn definition(&self) -> &dyn PassiveEffectDefinition {
+        self.definition.borrow()
     }
 }

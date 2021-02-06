@@ -47,7 +47,7 @@ impl UnitCardDefinition for EmotionalSupportDog {
     }
 
     fn health(&self) -> i32 {
-        3
+        1
     }
 
     fn row_width(&self) -> usize {
@@ -55,7 +55,7 @@ impl UnitCardDefinition for EmotionalSupportDog {
     }
 
     fn passive_effect(&self) -> Option<Box<dyn PassiveEffectDefinition>> {
-        todo!()
+        Some(Box::new(EmotionalSupportDogPassiveDefinition::new()))
     }
 }
 
@@ -101,27 +101,34 @@ struct EmotionalSupportDogPassiveDefinition {
     definition_id: Id,
 }
 
+impl EmotionalSupportDogPassiveDefinition {
+    pub fn new() -> Self {
+        Self {
+            // TODO: replace with constant
+            definition_id: Id::new(),
+        }
+    }
+}
+
 impl PassiveEffectDefinition for EmotionalSupportDogPassiveDefinition {
     fn definition_id(&self) -> Id {
         todo!()
     }
 
-    fn update(&self) -> Box<dyn FnOnce(&PassiveEffectInstance, &mut GameState)> {
+    fn update(&self) -> Box<dyn FnOnce(PassiveEffectInstanceId, Id, &mut GameState)> {
         // let id = self.instance_id;
         // let originator_id = self.originator;
 
-        Box::new(move |instance, game_state| {
+        Box::new(move |instance_id, originator_id, game_state| {
             // Find the buff already applied by this instance
             let existing = game_state
                 .board_iter()
                 .filter(|i| {
-                    i.buffs()
-                        .iter()
-                        .any(|&buff| match buff.soure_id() {
-                            BuffSourceId;:Passive(passive_id) => true,
-                            _ => false
-                        })
-                        //.any(|b| b.instance_id() == instance.instance_id())
+                    i.buffs().iter().any(|buff| match buff.source_id() {
+                        BuffSourceId::Passive(_) => true,
+                        _ => false,
+                    })
+                    //.any(|b| b.instance_id() == instance.instance_id())
                 })
                 .next();
 
@@ -132,7 +139,7 @@ impl PassiveEffectDefinition for EmotionalSupportDogPassiveDefinition {
 
             let doggy = game_state
                 .board_iter()
-                .filter(|i| i.id() == instance.originator_id())
+                .filter(|i| i.id() == originator_id)
                 .next()
                 .expect("A passive is active for ESD, but ESD doesn't exist?");
 
@@ -149,9 +156,7 @@ impl PassiveEffectDefinition for EmotionalSupportDogPassiveDefinition {
 
             if let Some(front_card) = front_card {
                 game_state.update_by_id(front_card.id(), |c| {
-                    c.add_buf(Box::new(EmotionalSupportDogBuff::new(
-                        instance.instance_id(),
-                    )));
+                    c.add_buf(Box::new(EmotionalSupportDogBuff::new(instance_id)));
                 });
             }
         })

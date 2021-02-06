@@ -1,12 +1,13 @@
 use std::borrow::Borrow;
 
-use crate::game_logic::cards::UnitCardDefinition;
+use crate::game_logic::{cards::UnitCardDefinition, PassiveEffectInstance};
 use crate::{game_logic::Buff, id::Id};
 
 #[derive(Debug)]
 pub struct UnitCardBoardInstance {
     definition: Box<dyn UnitCardDefinition>,
     buffs: Vec<Box<dyn Buff>>,
+    passive_effect: Option<PassiveEffectInstance>,
     id: Id,
     attack: i32,
     health: i32,
@@ -15,15 +16,20 @@ pub struct UnitCardBoardInstance {
 
 impl UnitCardBoardInstance {
     pub fn new(definition: Box<dyn UnitCardDefinition>) -> Self {
-        let passive_provided = definition.passive_effect();
+        let id = Id::new();
+
+        let passive_effect = definition
+            .passive_effect()
+            .map(|e| PassiveEffectInstance::new(e, id));
 
         Self {
             attack: definition.attack(),
             health: definition.health(),
             width: definition.row_width(),
             definition,
+            passive_effect,
             buffs: Vec::new(),
-            id: Id::new(),
+            id,
         }
     }
 
@@ -58,7 +64,9 @@ impl UnitCardBoardInstance {
         self.buffs.push(buff);
     }
 
-    pub fn passive_effect_instance(&self) {}
+    pub fn passive_effect_instance(&self) -> Option<&PassiveEffectInstance> {
+        self.passive_effect.borrow().as_ref()
+    }
 
     pub fn id(&self) -> Id {
         self.id

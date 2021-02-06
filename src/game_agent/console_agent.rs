@@ -33,6 +33,8 @@ impl ConsoleAgent {
     fn prompt(&self, game_state: &GameState) -> Option<GameEvent> {
         let action = self.ask("Enter an action: (info, attack, end (turn), quit)");
 
+        println!("Saw action: {}", action);
+
         let mut event = None;
 
         while event.is_none() {

@@ -2,7 +2,7 @@ use crate::id::Id;
 
 use super::passive_effect::PassiveEffectInstanceId;
 
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone, PartialEq)]
 pub enum BuffSourceId {
     Passive(PassiveEffectInstanceId),
     Other(Id),

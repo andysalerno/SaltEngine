@@ -41,8 +41,4 @@ impl UnitCardDefinition for RicketyCannon {
     fn row_width(&self) -> usize {
         3
     }
-
-    fn passive_effect(&self) -> Option<Box<dyn crate::game_logic::PassiveEffectDefinition>> {
-        None
-    }
 }
