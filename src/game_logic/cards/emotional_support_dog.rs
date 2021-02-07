@@ -25,7 +25,8 @@ impl EmotionalSupportDog {
 
 impl CardDefinition for EmotionalSupportDog {
     fn title(&self) -> &str {
-        "Emotional Support Dog"
+        "Emo Sup Dog"
+        //"Emotional Support Dog"
     }
 
     fn cost(&self) -> i32 {

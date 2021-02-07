@@ -1,4 +1,4 @@
-use std::io::stdin;
+use std::{io::stdin, ops::Add};
 
 use super::game_agent::GameAgent;
 use crate::game_logic::{cards::UnitCardDefinition, GameEvent};
@@ -8,6 +8,8 @@ use crate::{
     game_state::{GameState, UnitCardBoardInstance},
 };
 use crate::{game_state::board::RowId, id::Id};
+
+const CARD_DISPLAY_WIDTH: usize = 20;
 
 pub struct ConsoleAgent {
     id: Id,
@@ -72,9 +74,30 @@ impl ConsoleAgent {
     }
 
     fn show_hand(&self, game_state: &GameState) {
-        for card in game_state.hand(self.id()).cards() {
-            println!("{}", display_card(card.as_ref()));
+        let mut result = String::new();
+
+        let mut all_cards = game_state
+            .hand(self.id())
+            .cards()
+            .iter()
+            .map(|c| display_card(c.as_ref()))
+            .map(|s| s.lines().map(|l| l.to_owned()).collect::<Vec<_>>())
+            .collect::<Vec<_>>();
+
+        loop {
+            if !all_cards.iter().any(|c| !c.is_empty()) {
+                break;
+            }
+
+            for card_lines in &mut all_cards {
+                result.push_str(&card_lines.remove(0));
+                result.push_str("   ");
+            }
+
+            result.push_str("\n");
         }
+
+        println!("{}", result);
     }
 
     fn select<'a>(
@@ -158,16 +181,17 @@ impl ConsoleAgent {
 
 fn display_card(card: &dyn UnitCardDefinition) -> String {
     format!(
-        r#"----------------
-|             {} |
-|               |
-|               |
-|               |
-|               |
-|               |
-|               |
-|          {}/{}  |
-----------------"#,
+        r#"-----------------------
+|{:<18} {} |
+|---------------------|
+|                     |
+|                     |
+|                     |
+|                     |
+|                     |
+|                {}/{}  |
+-----------------------"#,
+        card.title(),
         card.cost(),
         card.attack(),
         card.health()
