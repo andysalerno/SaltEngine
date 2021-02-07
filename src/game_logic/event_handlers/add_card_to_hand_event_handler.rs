@@ -14,15 +14,18 @@ impl EventHandler for AddCardToHandEventHandler {
 
     fn handle(
         &self,
-        _event: AddCardToHandEvent,
+        event: AddCardToHandEvent,
         game_state: &mut GameState,
-        dispatcher: &mut EventDispatcher,
+        _dispatcher: &mut EventDispatcher,
     ) {
-        let player_id = game_state.cur_player_id();
-        println!("Player {:?} draws a card.", player_id);
+        let player_id = event.player_id();
 
-        let _card = game_state.draw_card(player_id);
+        game_state.hand_mut(player_id).add_card(event.take_card());
 
-        dispatcher.dispatch(TurnStartEvent, game_state);
+        println!(
+            "Player {:?} adds a card to hand. Next hand size: {}",
+            player_id,
+            game_state.hand(player_id).len()
+        );
     }
 }

@@ -12,6 +12,14 @@ impl AddCardToHandEvent {
     pub fn new(player_id: Id, card: Box<dyn UnitCardDefinition>) -> Self {
         Self { player_id, card }
     }
+
+    pub fn player_id(&self) -> Id {
+        self.player_id
+    }
+
+    pub fn take_card(self) -> Box<dyn UnitCardDefinition> {
+        self.card
+    }
 }
 
 impl Event for AddCardToHandEvent {}

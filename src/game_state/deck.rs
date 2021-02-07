@@ -13,4 +13,8 @@ impl Deck {
     pub fn draw_card(&mut self) -> Option<Box<dyn UnitCardDefinition>> {
         self.cards.pop()
     }
+
+    pub fn new(cards: Vec<Box<dyn UnitCardDefinition>>) -> Self {
+        Self { cards }
+    }
 }

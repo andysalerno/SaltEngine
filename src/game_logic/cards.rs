@@ -27,4 +27,11 @@ pub trait UnitCardDefinition: CardDefinition {
     fn is_defender(&self) -> bool {
         false
     }
+
+    fn boxed(self) -> Box<Self>
+    where
+        Self: Sized,
+    {
+        Box::new(self)
+    }
 }

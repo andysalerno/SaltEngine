@@ -9,4 +9,12 @@ impl Hand {
     pub fn len(&self) -> usize {
         self.cards.len()
     }
+
+    pub fn cards(&self) -> &[Box<dyn UnitCardDefinition>] {
+        self.cards.as_slice()
+    }
+
+    pub fn add_card(&mut self, card: Box<dyn UnitCardDefinition>) {
+        self.cards.push(card);
+    }
 }

@@ -3,7 +3,7 @@ use crate::{
     game_logic::{cards::*, EventDispatcher, GameEvent, StartGameEvent, SummonCreatureEvent},
     game_state::{
         board::{BoardPos, RowId},
-        GameState,
+        Deck, GameState,
     },
 };
 
@@ -25,7 +25,40 @@ impl GameRunner {
         player_b: Box<dyn GameAgent>,
         display: Box<dyn GameDisplay>,
     ) -> Self {
-        let game_state = GameState::new(player_a.id(), player_b.id());
+        let player_a_deck = {
+            let cards: Vec<Box<dyn UnitCardDefinition>> = (0..10)
+                .flat_map(|_| {
+                    let cards: Vec<Box<dyn UnitCardDefinition>> = vec![
+                        RicketyCannon.boxed(),
+                        Prawn.boxed(),
+                        EmotionalSupportDog.boxed(),
+                    ];
+
+                    cards
+                })
+                .collect();
+
+            Deck::new(cards)
+        };
+
+        let player_b_deck = {
+            let cards: Vec<Box<dyn UnitCardDefinition>> = (0..10)
+                .flat_map(|_| {
+                    let cards: Vec<Box<dyn UnitCardDefinition>> = vec![
+                        RicketyCannon.boxed(),
+                        Prawn.boxed(),
+                        EmotionalSupportDog.boxed(),
+                    ];
+
+                    cards
+                })
+                .collect();
+
+            Deck::new(cards)
+        };
+
+        let game_state =
+            GameState::initial_state(player_a.id(), player_a_deck, player_b.id(), player_b_deck);
 
         Self {
             player_a,
@@ -40,6 +73,14 @@ impl GameRunner {
         let mut dispatcher = EventDispatcher::new();
 
         dispatcher.dispatch(StartGameEvent, &mut self.game_state);
+
+        let player_a_id = self.game_state.player_a_id();
+        let player_b_id = self.game_state.player_a_id();
+        println!(
+            "PlayerA starts with {} cards.\nPlayerB starts wtih {} cards.",
+            self.game_state.deck(player_a_id).len(),
+            self.game_state.deck(player_b_id).len()
+        );
 
         while !self.game_state.is_game_over() {
             let cur_player_id = self.game_state.cur_player_id();

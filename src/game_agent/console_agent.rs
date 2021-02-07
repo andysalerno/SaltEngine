@@ -1,7 +1,7 @@
 use std::io::stdin;
 
 use super::game_agent::GameAgent;
-use crate::game_logic::GameEvent;
+use crate::game_logic::{cards::UnitCardDefinition, GameEvent};
 use crate::game_state::board::BoardPos;
 use crate::{
     game_logic::{AttackEvent, EndTurnEvent},
@@ -31,7 +31,7 @@ impl GameAgent for ConsoleAgent {
 
 impl ConsoleAgent {
     fn prompt(&self, game_state: &GameState) -> Option<GameEvent> {
-        let action = self.ask("Enter an action: (info, attack, end (turn), quit)");
+        let action = self.ask("Enter an action: (hand, info, attack, end (turn), quit)");
 
         println!("Saw action: {}", action);
 
@@ -39,6 +39,10 @@ impl ConsoleAgent {
 
         while event.is_none() {
             event = match action.as_str() {
+                "hand" => {
+                    self.show_hand(game_state);
+                    None
+                }
                 "info" => {
                     self.info(game_state);
                     None
@@ -66,6 +70,12 @@ impl ConsoleAgent {
 
     fn info(&self, game_state: &GameState) {
         let _selected = self.select(game_state, "Select for info.");
+    }
+
+    fn show_hand(&self, game_state: &GameState) {
+        for card in game_state.hand(self.id()).cards() {
+            print!("{}", display_card(card.as_ref()));
+        }
     }
 
     fn select<'a>(
@@ -147,4 +157,20 @@ impl ConsoleAgent {
     }
 }
 
-//fn display_card() -> String {}
+fn display_card(card: &dyn UnitCardDefinition) -> String {
+    format!(
+        r#"----------------
+|             {} |
+|               |
+|               |
+|               |
+|               |
+|               |
+|               |
+|          {}/{}     |
+----------------"#,
+        card.cost(),
+        card.attack(),
+        card.health()
+    )
+}

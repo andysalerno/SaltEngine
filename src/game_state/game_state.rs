@@ -37,7 +37,12 @@ impl GameState {
         self.player_a_health <= 0 || self.player_b_health <= 0
     }
 
-    pub fn new(player_a_id: Id, player_b_id: Id) -> Self {
+    pub fn initial_state(
+        player_a_id: Id,
+        player_a_deck: Deck,
+        player_b_id: Id,
+        player_b_deck: Deck,
+    ) -> Self {
         Self {
             player_a_id,
             player_b_id,
@@ -46,10 +51,10 @@ impl GameState {
             player_b_health: STARTING_HEALTH,
 
             player_a_hand: Hand::default(),
-            player_a_deck: Deck::default(),
+            player_a_deck,
 
             player_b_hand: Hand::default(),
-            player_b_deck: Deck::default(),
+            player_b_deck,
 
             player_a_mana: 0,
             player_b_mana: 0,
@@ -93,6 +98,20 @@ impl GameState {
 
     pub fn player_b_id(&self) -> Id {
         self.player_b_id
+    }
+
+    pub fn hand(&self, player_id: Id) -> &Hand {
+        match self.player_ab(player_id) {
+            PlayerAB::PlayerA => &self.player_a_hand,
+            PlayerAB::PlayerB => &self.player_b_hand,
+        }
+    }
+
+    pub fn hand_mut(&mut self, player_id: Id) -> &mut Hand {
+        match self.player_ab(player_id) {
+            PlayerAB::PlayerA => &mut self.player_a_hand,
+            PlayerAB::PlayerB => &mut self.player_b_hand,
+        }
     }
 
     pub fn deck(&self, player_id: Id) -> &Deck {

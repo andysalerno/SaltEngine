@@ -11,6 +11,10 @@ impl DrawCardEvent {
     pub fn new(player_id: Id) -> Self {
         Self { player_id }
     }
+
+    pub fn player_id(&self) -> Id {
+        self.player_id
+    }
 }
 
 impl Into<GameEvent> for DrawCardEvent {

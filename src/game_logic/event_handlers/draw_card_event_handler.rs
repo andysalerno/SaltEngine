@@ -14,12 +14,16 @@ impl EventHandler for DrawCardEventHandler {
 
     fn handle(
         &self,
-        _event: DrawCardEvent,
+        event: DrawCardEvent,
         game_state: &mut GameState,
         dispatcher: &mut EventDispatcher,
     ) {
-        let player_id = game_state.cur_player_id();
-        println!("Player {:?} draws a card.", player_id);
+        let player_id = event.player_id();
+        println!(
+            "Player {:?} draws a card. Deck size before draw: {}",
+            player_id,
+            game_state.deck(player_id).len()
+        );
 
         let card = game_state.draw_card(player_id);
 
