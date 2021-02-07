@@ -1,13 +1,19 @@
 use super::{
     board::{Board, BoardPos},
-    UnitCardBoardInstance, UnitCardBoardInstanceId,
+    Deck, Hand, UnitCardBoardInstance, UnitCardBoardInstanceId,
 };
-use crate::id::Id;
+use crate::{game_logic::cards::UnitCardDefinition, id::Id};
 
 pub struct GameState {
     player_b_id: Id,
     player_a_id: Id,
     cur_player_turn: Id,
+
+    player_a_hand: Hand,
+    player_a_deck: Deck,
+
+    player_b_hand: Hand,
+    player_b_deck: Deck,
 
     player_a_health: i32,
     player_b_health: i32,
@@ -19,6 +25,7 @@ pub struct GameState {
 }
 
 const BOARD_LEN: usize = 6;
+const STARTING_HEALTH: i32 = 30;
 
 impl GameState {
     pub fn is_game_over(&self) -> bool {
@@ -30,8 +37,15 @@ impl GameState {
             player_a_id,
             player_b_id,
             cur_player_turn: player_a_id,
-            player_a_health: 30,
-            player_b_health: 30,
+            player_a_health: STARTING_HEALTH,
+            player_b_health: STARTING_HEALTH,
+
+            player_a_hand: Hand::default(),
+            player_a_deck: Deck::default(),
+
+            player_b_hand: Hand::default(),
+            player_b_deck: Deck::default(),
+
             player_a_mana: 0,
             player_b_mana: 0,
             board: Box::new(Board::new(BOARD_LEN, player_a_id, player_b_id)),
@@ -79,6 +93,16 @@ impl GameState {
 
     pub fn player_b_id(&self) -> Id {
         self.player_b_id
+    }
+
+    pub fn player_mana(&self, player_id: Id) -> u32 {
+        if player_id == self.player_a_id() {
+            self.player_a_mana
+        } else if player_id == self.player_b_id() {
+            self.player_b_mana
+        } else {
+            panic!("Unknown player id: {:?}", player_id)
+        }
     }
 
     pub fn get_by_id(&self, id: UnitCardBoardInstanceId) -> &UnitCardBoardInstance {

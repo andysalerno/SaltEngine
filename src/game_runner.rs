@@ -37,58 +37,19 @@ impl GameRunner {
     }
 
     pub fn run_game(&mut self) {
-        self.event_stack
-            .push(GameEvent::Summon(SummonCreatureEvent::new(
-                Box::new(Prawn),
-                BoardPos::new(self.player_a.id(), RowId::FrontRow, 0),
-            )));
-        self.event_stack
-            .push(GameEvent::Summon(SummonCreatureEvent::new(
-                Box::new(Prawn),
-                BoardPos::new(self.player_a.id(), RowId::FrontRow, 1),
-            )));
-        self.event_stack
-            .push(GameEvent::Summon(SummonCreatureEvent::new(
-                Box::new(Prawn),
-                BoardPos::new(self.player_a.id(), RowId::FrontRow, 3),
-            )));
-
-        self.event_stack
-            .push(GameEvent::Summon(SummonCreatureEvent::new(
-                Box::new(Prawn),
-                BoardPos::new(self.player_a.id(), RowId::FrontRow, 5),
-            )));
-
-        self.event_stack
-            .push(GameEvent::Summon(SummonCreatureEvent::new(
-                Box::new(Prawn),
-                BoardPos::new(self.player_b.id(), RowId::FrontRow, 5),
-            )));
-        self.event_stack
-            .push(GameEvent::Summon(SummonCreatureEvent::new(
-                Box::new(Prawn),
-                BoardPos::new(self.player_b.id(), RowId::BackRow, 2),
-            )));
-        self.event_stack
-            .push(GameEvent::Summon(SummonCreatureEvent::new(
-                Box::new(RicketyCannon),
-                BoardPos::new(self.player_a.id(), RowId::BackRow, 3),
-            )));
-
-        self.event_stack
-            .push(GameEvent::Summon(SummonCreatureEvent::new(
-                Box::new(EmotionalSupportDog),
-                BoardPos::new(self.player_a.id(), RowId::BackRow, 1),
-            )));
-
         let mut dispatcher = EventDispatcher::new();
 
-        while let Some(event) = self.event_stack.pop() {
-            dispatcher.dispatch(event, &mut self.game_state);
-        }
-
         while !self.game_state.is_game_over() {
+            let cur_player_id = self.get_cur_player().id();
+
+            println!("Start turn for player: {:?}", cur_player_id);
+            println!(
+                "Available mana: {:?}",
+                self.game_state.player_mana(cur_player_id)
+            );
+
             self.display.display(&mut self.game_state);
+
             let cur_player = self.get_cur_player();
             let action = cur_player.get_action(&self.game_state);
             dispatcher.dispatch(action, &mut self.game_state);

@@ -23,4 +23,8 @@ pub trait UnitCardDefinition: CardDefinition {
     fn passive_effect(&self) -> Option<Box<dyn PassiveEffectDefinition>> {
         None
     }
+
+    fn is_defender(&self) -> bool {
+        false
+    }
 }
