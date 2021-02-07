@@ -40,7 +40,7 @@ impl GameRunner {
         let mut dispatcher = EventDispatcher::new();
 
         while !self.game_state.is_game_over() {
-            let cur_player_id = self.get_cur_player().id();
+            let cur_player_id = self.game_state.cur_player_turn();
 
             println!("Start turn for player: {:?}", cur_player_id);
             println!(

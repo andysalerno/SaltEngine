@@ -1,6 +1,6 @@
 use crate::game_state::UnitCardBoardInstanceId;
 
-use super::Event;
+use super::{Event, GameEvent};
 
 #[derive(Debug)]
 pub struct CreatureTakesDamageEvent {
@@ -36,3 +36,9 @@ impl CreatureTakesDamageEvent {
 }
 
 impl Event for CreatureTakesDamageEvent {}
+
+impl Into<GameEvent> for CreatureTakesDamageEvent {
+    fn into(self) -> GameEvent {
+        GameEvent::CreatureTakesDamage(self)
+    }
+}

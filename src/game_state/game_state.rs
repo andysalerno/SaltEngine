@@ -2,7 +2,7 @@ use super::{
     board::{Board, BoardPos},
     Deck, Hand, UnitCardBoardInstance, UnitCardBoardInstanceId,
 };
-use crate::id::Id;
+use crate::{game_logic::cards::UnitCardDefinition, id::Id};
 
 pub struct GameState {
     player_b_id: Id,
@@ -22,6 +22,11 @@ pub struct GameState {
     player_b_mana: u32,
 
     board: Box<Board>,
+}
+
+enum PlayerAB {
+    PlayerA,
+    PlayerB,
 }
 
 const BOARD_LEN: usize = 6;
@@ -57,14 +62,9 @@ impl GameState {
     }
 
     pub fn set_next_player_turn(&mut self) -> Id {
-        let cur_player = self.cur_player_turn();
-
-        let next_player = if cur_player == self.player_a_id() {
-            self.player_b_id()
-        } else if cur_player == self.player_b_id() {
-            self.player_a_id()
-        } else {
-            panic!()
+        let next_player = match self.player_ab(self.cur_player_turn()) {
+            PlayerAB::PlayerA => self.player_b_id(),
+            PlayerAB::PlayerB => self.player_a_id(),
         };
 
         self.cur_player_turn = next_player;
@@ -95,13 +95,24 @@ impl GameState {
         self.player_b_id
     }
 
+    pub fn deck(&self, player_id: Id) -> &Deck {
+        match self.player_ab(player_id) {
+            PlayerAB::PlayerA => &self.player_a_deck,
+            PlayerAB::PlayerB => &self.player_b_deck,
+        }
+    }
+
+    fn deck_mut(&mut self, player_id: Id) -> &mut Deck {
+        match self.player_ab(player_id) {
+            PlayerAB::PlayerA => &mut self.player_a_deck,
+            PlayerAB::PlayerB => &mut self.player_b_deck,
+        }
+    }
+
     pub fn player_mana(&self, player_id: Id) -> u32 {
-        if player_id == self.player_a_id() {
-            self.player_a_mana
-        } else if player_id == self.player_b_id() {
-            self.player_b_mana
-        } else {
-            panic!("Unknown player id: {:?}", player_id)
+        match self.player_ab(player_id) {
+            PlayerAB::PlayerA => self.player_a_mana,
+            PlayerAB::PlayerB => self.player_b_mana,
         }
     }
 
@@ -111,6 +122,10 @@ impl GameState {
 
     pub fn get_pos_by_id(&self, id: UnitCardBoardInstanceId) -> BoardPos {
         self.board.get_position_by_id(id)
+    }
+
+    pub fn draw_card(&mut self, player_id: Id) -> Option<Box<dyn UnitCardDefinition>> {
+        self.deck_mut(player_id).draw_card()
     }
 
     pub fn update_by_id(
@@ -163,5 +178,15 @@ impl GameState {
     /// An iterator over all unit instances on the entire board.
     pub fn board_iter(&self) -> impl Iterator<Item = &UnitCardBoardInstance> {
         self.board.iter()
+    }
+
+    fn player_ab(&self, player_id: Id) -> PlayerAB {
+        if player_id == self.player_a_id() {
+            PlayerAB::PlayerA
+        } else if player_id == self.player_b_id() {
+            PlayerAB::PlayerB
+        } else {
+            panic!("Unknown player id: {:?}", player_id)
+        }
     }
 }

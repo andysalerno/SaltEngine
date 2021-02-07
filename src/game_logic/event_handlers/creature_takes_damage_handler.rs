@@ -32,10 +32,7 @@ impl EventHandler for CreatureTakesDamageHandler {
             });
 
         if game_state.get_by_id(event.creature_id()).health() <= 0 {
-            dispatcher.dispatch(
-                GameEvent::CreatureDestroyed(CreatureDestroyedEvent::new(event.creature_id())),
-                game_state,
-            );
+            dispatcher.dispatch(CreatureDestroyedEvent::new(event.creature_id()), game_state);
         }
     }
 }

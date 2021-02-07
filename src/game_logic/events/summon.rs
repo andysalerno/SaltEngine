@@ -1,6 +1,9 @@
-use crate::{game_logic::cards::UnitCardDefinition, game_state::board::BoardPos};
+use crate::{
+    game_logic::{cards::UnitCardDefinition, event_handlers::SummonCreatureEventHandler},
+    game_state::board::BoardPos,
+};
 
-use super::Event;
+use super::{Event, GameEvent};
 
 #[derive(Debug)]
 pub struct SummonCreatureEvent {
@@ -30,3 +33,9 @@ impl SummonCreatureEvent {
 }
 
 impl Event for SummonCreatureEvent {}
+
+impl Into<GameEvent> for SummonCreatureEvent {
+    fn into(self) -> GameEvent {
+        GameEvent::Summon(self)
+    }
+}

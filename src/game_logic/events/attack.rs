@@ -3,7 +3,7 @@ use crate::{
     id::Id,
 };
 
-use super::Event;
+use super::{Event, GameEvent};
 
 #[derive(Debug)]
 pub struct AttackEvent {
@@ -26,3 +26,9 @@ impl AttackEvent {
 }
 
 impl Event for AttackEvent {}
+
+impl Into<GameEvent> for AttackEvent {
+    fn into(self) -> GameEvent {
+        GameEvent::Attack(self)
+    }
+}

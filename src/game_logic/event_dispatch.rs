@@ -12,7 +12,9 @@ impl EventDispatcher {
         Self::default()
     }
 
-    pub fn dispatch(&mut self, event: GameEvent, game_state: &mut GameState) {
+    pub fn dispatch(&mut self, event: impl Into<GameEvent>, game_state: &mut GameState) {
+        let event = event.into();
+
         println!("Dispatching: {:?}", event);
 
         self.stack.push(event);
@@ -37,6 +39,10 @@ impl EventDispatcher {
                 }
                 GameEvent::TurnEnd(e) => EndTurnEventHandler::default().handle(e, game_state, self),
                 GameEvent::TurnStart(e) => TurnStartHandler::default().handle(e, game_state, self),
+                GameEvent::DrawCard(e) => {
+                    DrawCardEventHandler::default().handle(e, game_state, self)
+                }
+                _ => panic!("Unknown event: {:?}", event),
             }
 
             game_state.evaluate_passives();

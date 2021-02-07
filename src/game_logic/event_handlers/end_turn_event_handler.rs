@@ -21,6 +21,6 @@ impl EventHandler for EndTurnEventHandler {
         println!("Player {:?} ends turn", game_state.cur_player_turn());
         game_state.set_next_player_turn();
 
-        dispatcher.dispatch(GameEvent::TurnStart(TurnStartEvent), game_state);
+        dispatcher.dispatch(TurnStartEvent, game_state);
     }
 }
