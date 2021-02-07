@@ -1,6 +1,6 @@
 use crate::{
     game_logic::{
-        event_handlers::EventHandler, events::EndTurnEvent, EventDispatcher, GameEvent,
+        event_handlers::EventHandler, events::EndTurnEvent, EventDispatcher,
         TurnStartEvent,
     },
     game_state::GameState,

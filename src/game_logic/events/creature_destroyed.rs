@@ -1,5 +1,5 @@
 use crate::{
-    game_logic::event_handlers::CreatureDestroyedEventHandler, game_state::UnitCardBoardInstanceId,
+    game_state::UnitCardBoardInstanceId,
 };
 
 use super::{Event, GameEvent};

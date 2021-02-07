@@ -21,7 +21,7 @@ impl EventHandler for DrawCardEventHandler {
         let player_id = game_state.cur_player_turn();
         println!("Player {:?} draws a card.", player_id);
 
-        let card = game_state.draw_card(player_id);
+        let _card = game_state.draw_card(player_id);
 
         dispatcher.dispatch(TurnStartEvent, game_state);
     }
