@@ -31,13 +31,12 @@ impl GameAgent for ConsoleAgent {
 
 impl ConsoleAgent {
     fn prompt(&self, game_state: &GameState) -> Option<GameEvent> {
-        let action = self.ask("Enter an action: (hand, info, attack, end (turn), quit)");
-
-        println!("Saw action: {}", action);
-
         let mut event = None;
 
         while event.is_none() {
+            let action = self.ask("Enter an action: (hand, info, attack, end (turn), quit)");
+            println!("Saw action: {}", action);
+
             event = match action.as_str() {
                 "hand" => {
                     self.show_hand(game_state);
@@ -74,7 +73,7 @@ impl ConsoleAgent {
 
     fn show_hand(&self, game_state: &GameState) {
         for card in game_state.hand(self.id()).cards() {
-            print!("{}", display_card(card.as_ref()));
+            println!("{}", display_card(card.as_ref()));
         }
     }
 
@@ -167,7 +166,7 @@ fn display_card(card: &dyn UnitCardDefinition) -> String {
 |               |
 |               |
 |               |
-|          {}/{}     |
+|          {}/{}  |
 ----------------"#,
         card.cost(),
         card.attack(),
