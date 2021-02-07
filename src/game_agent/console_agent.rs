@@ -146,3 +146,5 @@ impl ConsoleAgent {
         }
     }
 }
+
+//fn display_card() -> String {}

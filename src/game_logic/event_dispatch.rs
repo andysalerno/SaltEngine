@@ -42,7 +42,12 @@ impl EventDispatcher {
                 GameEvent::DrawCard(e) => {
                     DrawCardEventHandler::default().handle(e, game_state, self)
                 }
-                _ => panic!("Unknown event: {:?}", event),
+                GameEvent::AddCardToHand(e) => {
+                    AddCardToHandEventHandler::default().handle(e, game_state, self)
+                }
+                GameEvent::StartGame(e) => {
+                    StartGameEventHandler::default().handle(e, game_state, self)
+                }
             }
 
             game_state.evaluate_passives();

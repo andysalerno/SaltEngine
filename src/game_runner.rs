@@ -1,6 +1,6 @@
 use crate::{
     game_agent::game_agent::GameAgent,
-    game_logic::{cards::*, EventDispatcher, GameEvent, SummonCreatureEvent},
+    game_logic::{cards::*, EventDispatcher, GameEvent, StartGameEvent, SummonCreatureEvent},
     game_state::{
         board::{BoardPos, RowId},
         GameState,
@@ -39,8 +39,10 @@ impl GameRunner {
     pub fn run_game(&mut self) {
         let mut dispatcher = EventDispatcher::new();
 
+        dispatcher.dispatch(StartGameEvent, &mut self.game_state);
+
         while !self.game_state.is_game_over() {
-            let cur_player_id = self.game_state.cur_player_turn();
+            let cur_player_id = self.game_state.cur_player_id();
 
             println!("Start turn for player: {:?}", cur_player_id);
             println!(
@@ -50,14 +52,14 @@ impl GameRunner {
 
             self.display.display(&mut self.game_state);
 
-            let cur_player = self.get_cur_player();
+            let cur_player = self.cur_player();
             let action = cur_player.get_action(&self.game_state);
             dispatcher.dispatch(action, &mut self.game_state);
         }
     }
 
-    fn get_cur_player(&self) -> &dyn GameAgent {
-        let cur_id = self.game_state.cur_player_turn();
+    fn cur_player(&self) -> &dyn GameAgent {
+        let cur_id = self.game_state.cur_player_id();
 
         if cur_id == self.player_a.id() {
             self.player_a.as_ref()

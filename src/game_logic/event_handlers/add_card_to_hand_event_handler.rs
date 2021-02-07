@@ -18,7 +18,7 @@ impl EventHandler for AddCardToHandEventHandler {
         game_state: &mut GameState,
         dispatcher: &mut EventDispatcher,
     ) {
-        let player_id = game_state.cur_player_turn();
+        let player_id = game_state.cur_player_id();
         println!("Player {:?} draws a card.", player_id);
 
         let _card = game_state.draw_card(player_id);

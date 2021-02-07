@@ -57,12 +57,12 @@ impl GameState {
         }
     }
 
-    pub fn cur_player_turn(&self) -> Id {
+    pub fn cur_player_id(&self) -> Id {
         self.cur_player_turn
     }
 
     pub fn set_next_player_turn(&mut self) -> Id {
-        let next_player = match self.player_ab(self.cur_player_turn()) {
+        let next_player = match self.player_ab(self.cur_player_id()) {
             PlayerAB::PlayerA => self.player_b_id(),
             PlayerAB::PlayerB => self.player_a_id(),
         };
