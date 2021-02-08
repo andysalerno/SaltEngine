@@ -1,15 +1,15 @@
-use crate::{game_logic::cards::UnitCardDefinition, id::Id};
+use crate::{game_logic::cards::UnitCardDefinition, game_state::UnitCardInstance, id::Id};
 
 use super::{Event, GameEvent};
 
 #[derive(Debug)]
 pub struct AddCardToHandEvent {
     player_id: Id,
-    card: Box<dyn UnitCardDefinition>,
+    card: UnitCardInstance,
 }
 
 impl AddCardToHandEvent {
-    pub fn new(player_id: Id, card: Box<dyn UnitCardDefinition>) -> Self {
+    pub fn new(player_id: Id, card: UnitCardInstance) -> Self {
         Self { player_id, card }
     }
 
@@ -17,7 +17,7 @@ impl AddCardToHandEvent {
         self.player_id
     }
 
-    pub fn take_card(self) -> Box<dyn UnitCardDefinition> {
+    pub fn take_card(self) -> UnitCardInstance {
         self.card
     }
 }

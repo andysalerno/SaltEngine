@@ -161,7 +161,7 @@ impl GameState {
         self.board.get_position_by_id(id)
     }
 
-    pub fn draw_card(&mut self, player_id: Id) -> Option<Box<dyn UnitCardDefinition>> {
+    pub fn draw_card(&mut self, player_id: Id) -> Option<UnitCardInstance> {
         self.deck_mut(player_id).draw_card()
     }
 

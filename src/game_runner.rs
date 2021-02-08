@@ -3,7 +3,7 @@ use crate::{
     game_logic::{cards::*, CreatureSetEvent, EventDispatcher, GameEvent, StartGameEvent},
     game_state::{
         board::{BoardPos, RowId},
-        Deck, GameState,
+        Deck, GameState, UnitCardInstance,
     },
 };
 
@@ -26,12 +26,12 @@ impl GameRunner {
         display: Box<dyn GameDisplay>,
     ) -> Self {
         let player_a_deck = {
-            let cards: Vec<Box<dyn UnitCardDefinition>> = (0..10)
+            let cards: Vec<UnitCardInstance> = (0..10)
                 .flat_map(|_| {
-                    let cards: Vec<Box<dyn UnitCardDefinition>> = vec![
-                        RicketyCannon.boxed(),
-                        Prawn.boxed(),
-                        EmotionalSupportDog.boxed(),
+                    let cards = vec![
+                        RicketyCannon.make_instance(),
+                        Prawn.make_instance(),
+                        EmotionalSupportDog.make_instance(),
                     ];
 
                     cards
@@ -42,12 +42,12 @@ impl GameRunner {
         };
 
         let player_b_deck = {
-            let cards: Vec<Box<dyn UnitCardDefinition>> = (0..10)
+            let cards: Vec<UnitCardInstance> = (0..10)
                 .flat_map(|_| {
-                    let cards: Vec<Box<dyn UnitCardDefinition>> = vec![
-                        RicketyCannon.boxed(),
-                        Prawn.boxed(),
-                        EmotionalSupportDog.boxed(),
+                    let cards = vec![
+                        RicketyCannon.make_instance(),
+                        Prawn.make_instance(),
+                        EmotionalSupportDog.make_instance(),
                     ];
 
                     cards

@@ -88,7 +88,7 @@ impl ConsoleAgent {
             .hand(self.id())
             .cards()
             .iter()
-            .map(|c| display_card(c.as_ref()))
+            .map(|c| display_card(c.definition()))
             .map(|s| s.lines().map(|l| l.to_owned()).collect::<Vec<_>>())
             .collect::<Vec<_>>();
 

@@ -1,8 +1,10 @@
 use crate::game_logic::cards::UnitCardDefinition;
 
+use super::UnitCardInstance;
+
 #[derive(Debug, Default)]
 pub struct Deck {
-    cards: Vec<Box<dyn UnitCardDefinition>>,
+    cards: Vec<UnitCardInstance>,
 }
 
 impl Deck {
@@ -10,11 +12,11 @@ impl Deck {
         self.cards.len()
     }
 
-    pub fn draw_card(&mut self) -> Option<Box<dyn UnitCardDefinition>> {
+    pub fn draw_card(&mut self) -> Option<UnitCardInstance> {
         self.cards.pop()
     }
 
-    pub fn new(cards: Vec<Box<dyn UnitCardDefinition>>) -> Self {
+    pub fn new(cards: Vec<UnitCardInstance>) -> Self {
         Self { cards }
     }
 }

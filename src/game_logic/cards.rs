@@ -6,6 +6,8 @@ pub use emotional_support_dog::EmotionalSupportDog;
 pub use prawn::Prawn;
 pub use rickety_cannon::RicketyCannon;
 
+use crate::game_state::UnitCardInstance;
+
 use super::PassiveEffectDefinition;
 
 pub enum Position {
@@ -40,5 +42,13 @@ pub trait UnitCardDefinition: CardDefinition {
         Self: Sized,
     {
         Box::new(self)
+    }
+
+    fn make_instance(self) -> UnitCardInstance
+    where
+        Self: Sized + 'static,
+    {
+        let boxed: Box<dyn UnitCardDefinition> = self.boxed();
+        UnitCardInstance::new(boxed)
     }
 }

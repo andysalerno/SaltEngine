@@ -1,8 +1,8 @@
-use crate::game_logic::cards::UnitCardDefinition;
+use super::UnitCardInstance;
 
 #[derive(Debug, Default)]
 pub struct Hand {
-    cards: Vec<Box<dyn UnitCardDefinition>>,
+    cards: Vec<UnitCardInstance>,
 }
 
 impl Hand {
@@ -10,11 +10,11 @@ impl Hand {
         self.cards.len()
     }
 
-    pub fn cards(&self) -> &[Box<dyn UnitCardDefinition>] {
+    pub fn cards(&self) -> &[UnitCardInstance] {
         self.cards.as_slice()
     }
 
-    pub fn add_card(&mut self, card: Box<dyn UnitCardDefinition>) {
+    pub fn add_card(&mut self, card: UnitCardInstance) {
         self.cards.push(card);
     }
 }
