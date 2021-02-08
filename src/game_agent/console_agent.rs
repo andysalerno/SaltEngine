@@ -1,7 +1,7 @@
 use std::io::stdin;
 
 use super::game_agent::GameAgent;
-use crate::game_logic::{cards::UnitCardDefinition, GameEvent};
+use crate::game_logic::{cards::UnitCardDefinition, GameEvent, SummonCreatureFromHandEvent};
 use crate::game_state::board::BoardPos;
 use crate::{
     game_logic::{AttackEvent, EndTurnEvent},
@@ -42,7 +42,7 @@ impl ConsoleAgent {
                     self.show_hand(game_state);
                     None
                 }
-                "summon" => None,
+                "summon" => Some(self.summon(game_state)),
                 "info" => {
                     self.info(game_state);
                     None
@@ -57,22 +57,31 @@ impl ConsoleAgent {
         event
     }
 
-    fn summon(&self, game_state: &GameState) {
+    fn summon(&self, game_state: &GameState) -> GameEvent {
         let player_id = game_state.cur_player_id();
-        self.show_hand(game_state);
-        let hand_size = game_state.hand(player_id).len();
-        let card_index: usize = self
-            .ask(&format!("which card? (0..={})", hand_size - 1))
-            .parse()
-            .expect("invalid input");
 
-        let selected_card = game_state
-            .hand(player_id)
-            .cards()
-            .into_iter()
-            .nth(card_index);
+        let selected_card_id = {
+            self.show_hand(game_state);
 
-        if let Some(_selected_card) = selected_card {}
+            let hand_size = game_state.hand(player_id).len();
+
+            let card_index: usize = self
+                .ask(&format!("which card? (0..={})", hand_size - 1))
+                .parse()
+                .expect("invalid input");
+
+            game_state
+                .hand(player_id)
+                .cards()
+                .into_iter()
+                .nth(card_index)
+                .expect("msg")
+                .id()
+        };
+
+        let board_pos = self.prompt_pos(game_state);
+
+        return SummonCreatureFromHandEvent::new(player_id, board_pos, selected_card_id).into();
     }
 
     fn attack(&self, game_state: &GameState) -> AttackEvent {
