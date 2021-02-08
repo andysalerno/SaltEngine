@@ -2,7 +2,6 @@ use super::{
     board::{Board, BoardPos},
     Deck, Hand, PlayerId, UnitCardInstance, UnitCardInstanceId,
 };
-use crate::id::Id;
 
 pub struct GameState {
     player_b_id: PlayerId,

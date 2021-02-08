@@ -2,6 +2,7 @@ use std::io::stdin;
 
 use super::game_agent::GameAgent;
 use crate::game_state::board::BoardPos;
+use crate::game_state::board::RowId;
 use crate::{
     game_logic::{cards::UnitCardDefinition, GameEvent, SummonCreatureFromHandEvent},
     game_state::PlayerId,
@@ -10,7 +11,6 @@ use crate::{
     game_logic::{AttackEvent, EndTurnEvent},
     game_state::{GameState, UnitCardInstance},
 };
-use crate::{game_state::board::RowId, id::Id};
 
 pub struct ConsoleAgent {
     id: PlayerId,

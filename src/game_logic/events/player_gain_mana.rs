@@ -1,4 +1,4 @@
-use crate::{game_state::PlayerId, id::Id};
+use crate::game_state::PlayerId;
 
 use super::{Event, GameEvent};
 
