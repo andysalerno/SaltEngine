@@ -13,7 +13,7 @@ impl UnitCardBoardInstanceId {
 }
 
 #[derive(Debug)]
-pub struct UnitCardBoardInstance {
+pub struct UnitCardInstance {
     definition: Box<dyn UnitCardDefinition>,
     buffs: Vec<Box<dyn Buff>>,
     passive_effect: Option<PassiveEffectInstance>,
@@ -23,7 +23,7 @@ pub struct UnitCardBoardInstance {
     width: usize,
 }
 
-impl UnitCardBoardInstance {
+impl UnitCardInstance {
     pub fn new(definition: Box<dyn UnitCardDefinition>) -> Self {
         let id = UnitCardBoardInstanceId::new();
 

@@ -1,5 +1,5 @@
 use crate::{
-    game_state::{UnitCardBoardInstance, UnitCardBoardInstanceId},
+    game_state::{UnitCardBoardInstanceId, UnitCardInstance},
     id::Id,
 };
 

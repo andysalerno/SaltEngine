@@ -1,5 +1,8 @@
 use crate::{
-    game_logic::{event_handlers::EventHandler, DrawCardEvent, EventDispatcher, TurnStartEvent},
+    game_logic::{
+        event_handlers::EventHandler, DrawCardEvent, EventDispatcher, PlayerGainManaEvent,
+        TurnStartEvent,
+    },
     game_state::GameState,
 };
 
@@ -15,9 +18,10 @@ impl EventHandler for TurnStartHandler {
         game_state: &mut GameState,
         dispatcher: &mut EventDispatcher,
     ) {
-        println!("Turn started for player {:?}", game_state.cur_player_id());
+        let player_id = game_state.cur_player_id();
+        println!("Turn started for player {:?}", player_id);
 
-        let draw_event = DrawCardEvent::new(game_state.cur_player_id());
-        dispatcher.dispatch(draw_event, game_state);
+        dispatcher.dispatch(PlayerGainManaEvent::new(player_id, 1), game_state);
+        dispatcher.dispatch(DrawCardEvent::new(player_id), game_state);
     }
 }

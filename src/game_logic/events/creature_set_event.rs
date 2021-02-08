@@ -1,22 +1,29 @@
-use crate::{
-    game_logic::{cards::UnitCardDefinition},
-    game_state::board::BoardPos,
-};
+use crate::{game_logic::cards::UnitCardDefinition, game_state::board::BoardPos, id::Id};
 
 use super::{Event, GameEvent};
 
 #[derive(Debug)]
-pub struct SummonCreatureEvent {
+pub struct CreatureSetEvent {
+    player_id: Id,
     definition: Box<dyn UnitCardDefinition>,
     target_position: BoardPos,
 }
 
-impl SummonCreatureEvent {
-    pub fn new(definition: Box<dyn UnitCardDefinition>, target_position: BoardPos) -> Self {
+impl CreatureSetEvent {
+    pub fn new(
+        player_id: Id,
+        definition: Box<dyn UnitCardDefinition>,
+        target_position: BoardPos,
+    ) -> Self {
         Self {
+            player_id,
             definition,
             target_position,
         }
+    }
+
+    pub fn player_id(&self) -> Id {
+        self.player_id
     }
 
     pub fn definition(&self) -> &Box<dyn UnitCardDefinition> {
@@ -32,9 +39,9 @@ impl SummonCreatureEvent {
     }
 }
 
-impl Event for SummonCreatureEvent {}
+impl Event for CreatureSetEvent {}
 
-impl Into<GameEvent> for SummonCreatureEvent {
+impl Into<GameEvent> for CreatureSetEvent {
     fn into(self) -> GameEvent {
         GameEvent::Summon(self)
     }

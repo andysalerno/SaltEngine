@@ -1,6 +1,6 @@
 use crate::{
     game_runner::GameDisplay,
-    game_state::{GameState, UnitCardBoardInstance},
+    game_state::{GameState, UnitCardInstance},
 };
 
 pub struct ConsoleDisplay;
@@ -30,11 +30,15 @@ fn to_string(game_state: &GameState) -> String {
     result.push_str(&row_to_string(game_state.board().player_side().front_row()));
     result.push('\n');
     result.push_str(&row_to_string(game_state.board().player_side().back_row()));
+    result.push('\n');
+
+    let mana = game_state.player_mana(game_state.cur_player_id());
+    result.push_str(&format!("Available mana: {}", mana));
 
     result
 }
 
-fn row_to_string(row: &[Option<UnitCardBoardInstance>]) -> String {
+fn row_to_string(row: &[Option<UnitCardInstance>]) -> String {
     let mut result = String::new();
 
     let mut row_iter = row.iter();

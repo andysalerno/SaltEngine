@@ -8,6 +8,12 @@ pub use rickety_cannon::RicketyCannon;
 
 use super::PassiveEffectDefinition;
 
+pub enum Position {
+    Front,
+    Back,
+    Either,
+}
+
 pub trait CardDefinition: std::fmt::Debug {
     fn title(&self) -> &str;
     fn cost(&self) -> i32;
@@ -24,6 +30,7 @@ pub trait UnitCardDefinition: CardDefinition {
         None
     }
 
+    // TODO: or naming "guardian"?
     fn is_defender(&self) -> bool {
         false
     }

@@ -1,6 +1,6 @@
 use super::{
     board::{Board, BoardPos},
-    Deck, Hand, UnitCardBoardInstance, UnitCardBoardInstanceId,
+    Deck, Hand, UnitCardBoardInstanceId, UnitCardInstance,
 };
 use crate::{game_logic::cards::UnitCardDefinition, id::Id};
 
@@ -84,11 +84,11 @@ impl GameState {
         &mut self.board
     }
 
-    pub fn get_at(&self, pos: BoardPos) -> Option<&UnitCardBoardInstance> {
+    pub fn get_at(&self, pos: BoardPos) -> Option<&UnitCardInstance> {
         self.board.get_at(pos)
     }
 
-    pub fn set_at(&mut self, pos: BoardPos, card_instance: UnitCardBoardInstance) {
+    pub fn set_at(&mut self, pos: BoardPos, card_instance: UnitCardInstance) {
         self.board.set_at(pos, card_instance)
     }
 
@@ -135,7 +135,25 @@ impl GameState {
         }
     }
 
-    pub fn get_by_id(&self, id: UnitCardBoardInstanceId) -> &UnitCardBoardInstance {
+    pub fn reduce_mana(&mut self, player_id: Id, mana_count: u32) {
+        let player_mana = match self.player_ab(player_id) {
+            PlayerAB::PlayerA => &mut self.player_a_mana,
+            PlayerAB::PlayerB => &mut self.player_b_mana,
+        };
+
+        *player_mana = *player_mana - mana_count;
+    }
+
+    pub fn gain_mana(&mut self, player_id: Id, mana_count: u32) {
+        let player_mana = match self.player_ab(player_id) {
+            PlayerAB::PlayerA => &mut self.player_a_mana,
+            PlayerAB::PlayerB => &mut self.player_b_mana,
+        };
+
+        *player_mana = *player_mana + mana_count;
+    }
+
+    pub fn get_by_id(&self, id: UnitCardBoardInstanceId) -> &UnitCardInstance {
         self.board.get_by_id(id)
     }
 
@@ -150,7 +168,7 @@ impl GameState {
     pub fn update_by_id(
         &mut self,
         id: UnitCardBoardInstanceId,
-        update: impl FnOnce(&mut UnitCardBoardInstance),
+        update: impl FnOnce(&mut UnitCardInstance),
     ) {
         self.board.update_by_id(id, update);
     }
@@ -195,7 +213,7 @@ impl GameState {
     }
 
     /// An iterator over all unit instances on the entire board.
-    pub fn board_iter(&self) -> impl Iterator<Item = &UnitCardBoardInstance> {
+    pub fn board_iter(&self) -> impl Iterator<Item = &UnitCardInstance> {
         self.board.iter()
     }
 

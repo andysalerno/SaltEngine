@@ -1,6 +1,6 @@
 use crate::id::Id;
 
-use super::{card_instance::UnitCardBoardInstance, UnitCardBoardInstanceId};
+use super::{card_instance::UnitCardInstance, UnitCardBoardInstanceId};
 
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub enum RowId {
@@ -27,7 +27,7 @@ impl BoardPos {
 
 struct BoardRow {
     size: usize,
-    slots: Vec<Option<UnitCardBoardInstance>>,
+    slots: Vec<Option<UnitCardInstance>>,
 }
 
 impl BoardRow {
@@ -53,19 +53,19 @@ impl BoardSide {
         }
     }
 
-    pub fn front_row(&self) -> &[Option<UnitCardBoardInstance>] {
+    pub fn front_row(&self) -> &[Option<UnitCardInstance>] {
         &self.front_row.slots
     }
 
-    fn front_row_mut(&mut self) -> &mut [Option<UnitCardBoardInstance>] {
+    fn front_row_mut(&mut self) -> &mut [Option<UnitCardInstance>] {
         &mut self.front_row.slots
     }
 
-    pub fn back_row(&self) -> &[Option<UnitCardBoardInstance>] {
+    pub fn back_row(&self) -> &[Option<UnitCardInstance>] {
         &self.back_row.slots
     }
 
-    fn back_row_mut(&mut self) -> &mut [Option<UnitCardBoardInstance>] {
+    fn back_row_mut(&mut self) -> &mut [Option<UnitCardInstance>] {
         &mut self.back_row.slots
     }
 }
@@ -103,7 +103,7 @@ impl Board {
         &mut self.opponent_side
     }
 
-    pub fn get_at(&self, pos: BoardPos) -> Option<&UnitCardBoardInstance> {
+    pub fn get_at(&self, pos: BoardPos) -> Option<&UnitCardInstance> {
         let side = if pos.player_id == self.player_id {
             self.player_side()
         } else {
@@ -134,7 +134,7 @@ impl Board {
         return None;
     }
 
-    pub fn set_at(&mut self, pos: BoardPos, card_instance: UnitCardBoardInstance) {
+    pub fn set_at(&mut self, pos: BoardPos, card_instance: UnitCardInstance) {
         if let Some(existing) = self.get_at(pos) {
             panic!(
                 "Could not set at pos {:?} due to existing occupant: {:?}",
@@ -242,7 +242,7 @@ impl Board {
         panic!("Id not found: {:?}", id);
     }
 
-    pub fn get_by_id(&self, id: UnitCardBoardInstanceId) -> &UnitCardBoardInstance {
+    pub fn get_by_id(&self, id: UnitCardBoardInstanceId) -> &UnitCardInstance {
         let opponent_side = self.opponent_side();
         let player_side = self.player_side();
 
@@ -262,7 +262,7 @@ impl Board {
     }
 
     /// An iterator over all unit instances on the entire board.
-    pub fn iter(&self) -> impl Iterator<Item = &UnitCardBoardInstance> {
+    pub fn iter(&self) -> impl Iterator<Item = &UnitCardInstance> {
         let opponent_side = self.opponent_side();
         let player_side = self.player_side();
 
@@ -278,7 +278,7 @@ impl Board {
     pub fn update_by_id(
         &mut self,
         id: UnitCardBoardInstanceId,
-        update: impl FnOnce(&mut UnitCardBoardInstance),
+        update: impl FnOnce(&mut UnitCardInstance),
     ) {
         if let Some(mut creature) = self
             .player_side_mut()

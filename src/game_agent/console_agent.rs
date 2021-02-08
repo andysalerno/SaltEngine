@@ -1,15 +1,13 @@
-use std::{io::stdin, ops::Add};
+use std::io::stdin;
 
 use super::game_agent::GameAgent;
 use crate::game_logic::{cards::UnitCardDefinition, GameEvent};
 use crate::game_state::board::BoardPos;
 use crate::{
     game_logic::{AttackEvent, EndTurnEvent},
-    game_state::{GameState, UnitCardBoardInstance},
+    game_state::{GameState, UnitCardInstance},
 };
 use crate::{game_state::board::RowId, id::Id};
-
-const CARD_DISPLAY_WIDTH: usize = 20;
 
 pub struct ConsoleAgent {
     id: Id,
@@ -44,6 +42,7 @@ impl ConsoleAgent {
                     self.show_hand(game_state);
                     None
                 }
+                "summon" => None,
                 "info" => {
                     self.info(game_state);
                     None
@@ -56,6 +55,15 @@ impl ConsoleAgent {
         }
 
         event
+    }
+
+    fn summon(&self, game_state: &GameState) {
+        self.show_hand(game_state);
+        let hand_size = game_state.hand(game_state.cur_player_id()).len();
+        let which_card: usize = self
+            .ask(&format!("which card? (0..={})", hand_size - 1))
+            .parse()
+            .expect("invalid input");
     }
 
     fn attack(&self, game_state: &GameState) -> AttackEvent {
@@ -100,11 +108,7 @@ impl ConsoleAgent {
         println!("{}", result);
     }
 
-    fn select<'a>(
-        &self,
-        game_state: &'a GameState,
-        ask: &str,
-    ) -> Option<&'a UnitCardBoardInstance> {
+    fn select<'a>(&self, game_state: &'a GameState, ask: &str) -> Option<&'a UnitCardInstance> {
         self.say(ask);
         let pos = self.prompt_pos(game_state);
         let item_at = game_state.get_at(pos);

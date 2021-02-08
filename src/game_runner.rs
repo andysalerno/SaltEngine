@@ -1,6 +1,6 @@
 use crate::{
     game_agent::game_agent::GameAgent,
-    game_logic::{cards::*, EventDispatcher, GameEvent, StartGameEvent, SummonCreatureEvent},
+    game_logic::{cards::*, CreatureSetEvent, EventDispatcher, GameEvent, StartGameEvent},
     game_state::{
         board::{BoardPos, RowId},
         Deck, GameState,
