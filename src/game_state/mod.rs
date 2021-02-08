@@ -8,3 +8,14 @@ pub use card_instance::{UnitCardInstance, UnitCardInstanceId};
 pub use deck::Deck;
 pub use game_state::GameState;
 pub use hand::Hand;
+
+use crate::id::Id;
+
+#[derive(Debug, Copy, Clone, PartialEq)]
+pub struct PlayerId(Id);
+
+impl PlayerId {
+    pub fn new() -> Self {
+        Self(Id::new())
+    }
+}

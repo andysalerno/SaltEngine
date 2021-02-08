@@ -1,22 +1,22 @@
-use crate::id::Id;
+use crate::{game_state::PlayerId, id::Id};
 
 use super::{Event, GameEvent};
 
 #[derive(Debug)]
 pub struct PlayerGainManaEvent {
-    player_id: Id,
+    player_id: PlayerId,
     mana_count: u32,
 }
 
 impl PlayerGainManaEvent {
-    pub fn new(player_id: Id, mana_count: u32) -> Self {
+    pub fn new(player_id: PlayerId, mana_count: u32) -> Self {
         Self {
             player_id,
             mana_count,
         }
     }
 
-    pub fn player_id(&self) -> Id {
+    pub fn player_id(&self) -> PlayerId {
         self.player_id
     }
 

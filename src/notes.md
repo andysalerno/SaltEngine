@@ -1,0 +1,24 @@
+Back row is for spellcasters/assist, front is for damage
+
+every attack has a text log like old-school RPGs.
+
+## clubs
+cats - "hidden"
+dogs - mix of support and attack
+chess pieces
+teachers (math teacher, science teacher...)
+
+"All Seeing Eye Dog"
+
+## keywords
+- summon: xyz
+- vengeance: xyz
+- hidden
+- defender
+- versatile (back row or front row)
+
+"hidden" creature cards that are "??" until attacked/attack, with price premium. Possibly in a tribe (club) like Cats.
+
+keyword guardians/defenders must be killed before anything behind them.
+
+need better flavor name for front/back row than "attack"/"support"

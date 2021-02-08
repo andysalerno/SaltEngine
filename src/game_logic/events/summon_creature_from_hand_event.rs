@@ -1,6 +1,6 @@
 use crate::{
     game_logic::cards::UnitCardDefinition,
-    game_state::{board::BoardPos, Hand, UnitCardInstanceId},
+    game_state::{board::BoardPos, Hand, PlayerId, UnitCardInstanceId},
     id::Id,
 };
 
@@ -8,27 +8,21 @@ use super::{Event, GameEvent};
 
 #[derive(Debug)]
 pub struct SummonCreatureFromHandEvent {
-    player_id: Id,
+    player_id: PlayerId,
     board_pos: BoardPos,
     hand_card_id: UnitCardInstanceId,
-    //creature_definition: Box<dyn UnitCardDefinition>,
 }
 
 impl SummonCreatureFromHandEvent {
-    pub fn new(
-        player_id: Id,
-        board_pos: BoardPos,
-        hand_card_id: UnitCardInstanceId,
-        //creature_definition: Box<dyn UnitCardDefinition>,
-    ) -> Self {
+    pub fn new(player_id: PlayerId, board_pos: BoardPos, hand_card_id: UnitCardInstanceId) -> Self {
         Self {
             player_id,
             board_pos,
-            hand_card_id, //creature_definition,
+            hand_card_id,
         }
     }
 
-    pub fn player_id(&self) -> Id {
+    pub fn player_id(&self) -> PlayerId {
         self.player_id
     }
 
@@ -39,14 +33,6 @@ impl SummonCreatureFromHandEvent {
     pub fn hand_card_id(&self) -> UnitCardInstanceId {
         self.hand_card_id
     }
-
-    // pub fn take_definition(self) -> Box<dyn UnitCardDefinition> {
-    //     self.creature_definition
-    // }
-
-    // pub fn definition(&self) -> &dyn UnitCardDefinition {
-    //     self.creature_definition.as_ref()
-    // }
 }
 
 impl Event for SummonCreatureFromHandEvent {}

@@ -1,8 +1,11 @@
 use std::io::stdin;
 
 use super::game_agent::GameAgent;
-use crate::game_logic::{cards::UnitCardDefinition, GameEvent, SummonCreatureFromHandEvent};
 use crate::game_state::board::BoardPos;
+use crate::{
+    game_logic::{cards::UnitCardDefinition, GameEvent, SummonCreatureFromHandEvent},
+    game_state::PlayerId,
+};
 use crate::{
     game_logic::{AttackEvent, EndTurnEvent},
     game_state::{GameState, UnitCardInstance},
@@ -10,12 +13,14 @@ use crate::{
 use crate::{game_state::board::RowId, id::Id};
 
 pub struct ConsoleAgent {
-    id: Id,
+    id: PlayerId,
 }
 
 impl ConsoleAgent {
     pub fn new() -> Self {
-        Self { id: Id::new() }
+        Self {
+            id: PlayerId::new(),
+        }
     }
 }
 
@@ -24,7 +29,7 @@ impl GameAgent for ConsoleAgent {
         self.prompt(game_state).expect("No event selected")
     }
 
-    fn id(&self) -> Id {
+    fn id(&self) -> PlayerId {
         self.id
     }
 }
@@ -185,7 +190,7 @@ impl ConsoleAgent {
         BoardPos::new(player, row, index)
     }
 
-    fn prompt_player(&self, game_state: &GameState) -> Id {
+    fn prompt_player(&self, game_state: &GameState) -> PlayerId {
         let player_in = self.ask("Which player? (me, opponent)");
 
         match player_in.as_str() {

@@ -1,13 +1,13 @@
 use super::{
     board::{Board, BoardPos},
-    Deck, Hand, UnitCardInstance, UnitCardInstanceId,
+    Deck, Hand, PlayerId, UnitCardInstance, UnitCardInstanceId,
 };
 use crate::id::Id;
 
 pub struct GameState {
-    player_b_id: Id,
-    player_a_id: Id,
-    cur_player_turn: Id,
+    player_b_id: PlayerId,
+    player_a_id: PlayerId,
+    cur_player_turn: PlayerId,
 
     player_a_hand: Hand,
     player_a_deck: Deck,
@@ -38,9 +38,9 @@ impl GameState {
     }
 
     pub fn initial_state(
-        player_a_id: Id,
+        player_a_id: PlayerId,
         player_a_deck: Deck,
-        player_b_id: Id,
+        player_b_id: PlayerId,
         player_b_deck: Deck,
     ) -> Self {
         Self {
@@ -62,11 +62,11 @@ impl GameState {
         }
     }
 
-    pub fn cur_player_id(&self) -> Id {
+    pub fn cur_player_id(&self) -> PlayerId {
         self.cur_player_turn
     }
 
-    pub fn set_next_player_turn(&mut self) -> Id {
+    pub fn set_next_player_turn(&mut self) -> PlayerId {
         let next_player = match self.player_ab(self.cur_player_id()) {
             PlayerAB::PlayerA => self.player_b_id(),
             PlayerAB::PlayerB => self.player_a_id(),
@@ -92,58 +92,58 @@ impl GameState {
         self.board.set_at(pos, card_instance)
     }
 
-    pub fn player_a_id(&self) -> Id {
+    pub fn player_a_id(&self) -> PlayerId {
         self.player_a_id
     }
 
-    pub fn player_b_id(&self) -> Id {
+    pub fn player_b_id(&self) -> PlayerId {
         self.player_b_id
     }
 
     /// Given the ID of a player, returns the ID of the other player.
-    pub fn other_player(&self, player_id: Id) -> Id {
+    pub fn other_player(&self, player_id: PlayerId) -> PlayerId {
         match self.player_ab(player_id) {
             PlayerAB::PlayerA => self.player_b_id(),
             PlayerAB::PlayerB => self.player_a_id(),
         }
     }
 
-    pub fn hand(&self, player_id: Id) -> &Hand {
+    pub fn hand(&self, player_id: PlayerId) -> &Hand {
         match self.player_ab(player_id) {
             PlayerAB::PlayerA => &self.player_a_hand,
             PlayerAB::PlayerB => &self.player_b_hand,
         }
     }
 
-    pub fn hand_mut(&mut self, player_id: Id) -> &mut Hand {
+    pub fn hand_mut(&mut self, player_id: PlayerId) -> &mut Hand {
         match self.player_ab(player_id) {
             PlayerAB::PlayerA => &mut self.player_a_hand,
             PlayerAB::PlayerB => &mut self.player_b_hand,
         }
     }
 
-    pub fn deck(&self, player_id: Id) -> &Deck {
+    pub fn deck(&self, player_id: PlayerId) -> &Deck {
         match self.player_ab(player_id) {
             PlayerAB::PlayerA => &self.player_a_deck,
             PlayerAB::PlayerB => &self.player_b_deck,
         }
     }
 
-    fn deck_mut(&mut self, player_id: Id) -> &mut Deck {
+    fn deck_mut(&mut self, player_id: PlayerId) -> &mut Deck {
         match self.player_ab(player_id) {
             PlayerAB::PlayerA => &mut self.player_a_deck,
             PlayerAB::PlayerB => &mut self.player_b_deck,
         }
     }
 
-    pub fn player_mana(&self, player_id: Id) -> u32 {
+    pub fn player_mana(&self, player_id: PlayerId) -> u32 {
         match self.player_ab(player_id) {
             PlayerAB::PlayerA => self.player_a_mana,
             PlayerAB::PlayerB => self.player_b_mana,
         }
     }
 
-    pub fn reduce_mana(&mut self, player_id: Id, mana_count: u32) {
+    pub fn reduce_mana(&mut self, player_id: PlayerId, mana_count: u32) {
         let player_mana = match self.player_ab(player_id) {
             PlayerAB::PlayerA => &mut self.player_a_mana,
             PlayerAB::PlayerB => &mut self.player_b_mana,
@@ -152,7 +152,7 @@ impl GameState {
         *player_mana = *player_mana - mana_count;
     }
 
-    pub fn gain_mana(&mut self, player_id: Id, mana_count: u32) {
+    pub fn gain_mana(&mut self, player_id: PlayerId, mana_count: u32) {
         let player_mana = match self.player_ab(player_id) {
             PlayerAB::PlayerA => &mut self.player_a_mana,
             PlayerAB::PlayerB => &mut self.player_b_mana,
@@ -169,7 +169,7 @@ impl GameState {
         self.board.get_position_by_id(id)
     }
 
-    pub fn draw_card(&mut self, player_id: Id) -> Option<UnitCardInstance> {
+    pub fn draw_card(&mut self, player_id: PlayerId) -> Option<UnitCardInstance> {
         self.deck_mut(player_id).draw_card()
     }
 
@@ -225,7 +225,7 @@ impl GameState {
         self.board.iter()
     }
 
-    fn player_ab(&self, player_id: Id) -> PlayerAB {
+    fn player_ab(&self, player_id: PlayerId) -> PlayerAB {
         if player_id == self.player_a_id() {
             PlayerAB::PlayerA
         } else if player_id == self.player_b_id() {

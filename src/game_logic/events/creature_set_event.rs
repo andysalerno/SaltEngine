@@ -1,5 +1,5 @@
 use crate::{
-    game_state::{board::BoardPos, UnitCardInstance},
+    game_state::{board::BoardPos, PlayerId, UnitCardInstance},
     id::Id,
 };
 
@@ -7,13 +7,13 @@ use super::{Event, GameEvent};
 
 #[derive(Debug)]
 pub struct CreatureSetEvent {
-    player_id: Id,
+    player_id: PlayerId,
     card: UnitCardInstance,
     target_position: BoardPos,
 }
 
 impl CreatureSetEvent {
-    pub fn new(player_id: Id, card: UnitCardInstance, target_position: BoardPos) -> Self {
+    pub fn new(player_id: PlayerId, card: UnitCardInstance, target_position: BoardPos) -> Self {
         Self {
             player_id,
             card,
@@ -21,7 +21,7 @@ impl CreatureSetEvent {
         }
     }
 
-    pub fn player_id(&self) -> Id {
+    pub fn player_id(&self) -> PlayerId {
         self.player_id
     }
 

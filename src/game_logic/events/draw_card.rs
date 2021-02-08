@@ -1,18 +1,18 @@
-use crate::id::Id;
+use crate::{game_state::PlayerId, id::Id};
 
 use super::{Event, GameEvent};
 
 #[derive(Debug)]
 pub struct DrawCardEvent {
-    player_id: Id,
+    player_id: PlayerId,
 }
 
 impl DrawCardEvent {
-    pub fn new(player_id: Id) -> Self {
+    pub fn new(player_id: PlayerId) -> Self {
         Self { player_id }
     }
 
-    pub fn player_id(&self) -> Id {
+    pub fn player_id(&self) -> PlayerId {
         self.player_id
     }
 }

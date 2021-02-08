@@ -1,6 +1,6 @@
 use crate::id::Id;
 
-use super::{card_instance::UnitCardInstance, UnitCardInstanceId};
+use super::{card_instance::UnitCardInstance, PlayerId, UnitCardInstanceId};
 
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub enum RowId {
@@ -10,13 +10,13 @@ pub enum RowId {
 
 #[derive(Debug, Copy, Clone)]
 pub struct BoardPos {
-    pub player_id: Id,
+    pub player_id: PlayerId,
     pub row_id: RowId,
     pub row_index: usize,
 }
 
 impl BoardPos {
-    pub fn new(player_id: Id, row_id: RowId, row_index: usize) -> Self {
+    pub fn new(player_id: PlayerId, row_id: RowId, row_index: usize) -> Self {
         Self {
             player_id,
             row_id,
@@ -73,12 +73,12 @@ impl BoardSide {
 pub struct Board {
     player_side: BoardSide,
     opponent_side: BoardSide,
-    player_id: Id,
-    opponent_id: Id,
+    player_id: PlayerId,
+    opponent_id: PlayerId,
 }
 
 impl Board {
-    pub fn new(size: usize, player_id: Id, opponent_id: Id) -> Self {
+    pub fn new(size: usize, player_id: PlayerId, opponent_id: PlayerId) -> Self {
         Self {
             player_side: BoardSide::new(size),
             opponent_side: BoardSide::new(size),
