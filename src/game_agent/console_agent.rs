@@ -31,18 +31,20 @@ impl GameAgent for ConsoleAgent {
 
 impl ConsoleAgent {
     fn prompt(&self, game_state: &GameState) -> Option<GameEvent> {
+        self.show_hand(game_state);
+
         let mut event = None;
 
         while event.is_none() {
-            let action = self.ask("Enter an action: (hand, info, attack, end (turn), quit)");
-            println!("Saw action: {}", action);
+            let action =
+                self.ask("Enter an action: (summon, hand, info, attack, end (turn), quit)");
 
             event = match action.as_str() {
                 "hand" => {
                     self.show_hand(game_state);
                     None
                 }
-                "summon" => Some(self.summon(game_state)),
+                "summon" => self.summon(game_state),
                 "info" => {
                     self.info(game_state);
                     None
@@ -57,7 +59,7 @@ impl ConsoleAgent {
         event
     }
 
-    fn summon(&self, game_state: &GameState) -> GameEvent {
+    fn summon(&self, game_state: &GameState) -> Option<GameEvent> {
         let player_id = game_state.cur_player_id();
 
         let selected_card_id = {
@@ -70,29 +72,52 @@ impl ConsoleAgent {
                 .parse()
                 .expect("invalid input");
 
-            game_state
+            let selected_card = game_state
                 .hand(player_id)
                 .cards()
                 .into_iter()
                 .nth(card_index)
-                .expect("msg")
-                .id()
+                .expect("msg");
+
+            let mana_cost = selected_card.definition().cost() as u32;
+            let player_mana = game_state.player_mana(player_id);
+
+            if mana_cost > player_mana {
+                self.say(&format!(
+                    "Card costs {} mana; you only have {}.",
+                    mana_cost, player_mana
+                ));
+                return None;
+            }
+
+            selected_card.id()
         };
 
-        let board_pos = self.prompt_pos(game_state);
+        let board_pos = self.prompt_pos_myside(game_state);
 
-        return SummonCreatureFromHandEvent::new(player_id, board_pos, selected_card_id).into();
+        return Some(
+            SummonCreatureFromHandEvent::new(player_id, board_pos, selected_card_id).into(),
+        );
     }
 
     fn attack(&self, game_state: &GameState) -> AttackEvent {
-        let selected = self
-            .select(game_state, "Select attacker.")
-            .expect("Selected attacker was None.");
-        let target = self
-            .select(game_state, "Select target.")
-            .expect("Selected target was none.");
+        let attacker = loop {
+            let pos = self.prompt_pos_myside(game_state);
+            match game_state.get_at(pos) {
+                Some(c) => break c.id(),
+                _ => self.say("No card found at that pos; try again"),
+            }
+        };
 
-        AttackEvent::new(selected.id(), target.id())
+        let target = loop {
+            let pos = self.prompt_pos_enemyside(game_state);
+            match game_state.get_at(pos) {
+                Some(c) => break c.id(),
+                _ => self.say("No card found at that pos; try again"),
+            }
+        };
+
+        AttackEvent::new(attacker, target)
     }
 
     fn info(&self, game_state: &GameState) {
@@ -128,7 +153,7 @@ impl ConsoleAgent {
 
     fn select<'a>(&self, game_state: &'a GameState, ask: &str) -> Option<&'a UnitCardInstance> {
         self.say(ask);
-        let pos = self.prompt_pos(game_state);
+        let pos = self.prompt_pos_any(game_state);
         let item_at = game_state.get_at(pos);
 
         self.say(&format!("Selected: {:?}", item_at));
@@ -136,8 +161,24 @@ impl ConsoleAgent {
         item_at
     }
 
-    fn prompt_pos(&self, game_state: &GameState) -> BoardPos {
+    fn prompt_pos_any(&self, game_state: &GameState) -> BoardPos {
         let player = self.prompt_player(game_state);
+        let row = self.prompt_row();
+        let index = self.prompt_row_index();
+
+        BoardPos::new(player, row, index)
+    }
+
+    fn prompt_pos_myside(&self, _game_state: &GameState) -> BoardPos {
+        let player = self.id();
+        let row = self.prompt_row();
+        let index = self.prompt_row_index();
+
+        BoardPos::new(player, row, index)
+    }
+
+    fn prompt_pos_enemyside(&self, game_state: &GameState) -> BoardPos {
+        let player = game_state.other_player(self.id());
         let row = self.prompt_row();
         let index = self.prompt_row_index();
 
@@ -149,7 +190,7 @@ impl ConsoleAgent {
 
         match player_in.as_str() {
             "me" => self.id(),
-            "opponent" => self.opponent_id(game_state),
+            "opponent" => game_state.other_player(self.id()),
             _ => panic!("Unknown input: {}", player_in),
         }
     }
@@ -190,14 +231,6 @@ impl ConsoleAgent {
 
         input.truncate(input.len() - 1);
         input
-    }
-
-    fn opponent_id(&self, game_state: &GameState) -> Id {
-        if self.id() == game_state.player_a_id() {
-            game_state.player_b_id()
-        } else {
-            game_state.player_a_id()
-        }
     }
 }
 

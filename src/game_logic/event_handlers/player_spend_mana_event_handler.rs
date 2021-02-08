@@ -1,8 +1,5 @@
 use crate::{
-    game_logic::{
-        event_handlers::EventHandler, events::EndTurnEvent, EventDispatcher, PlayerGainManaEvent,
-        PlayerSpendManaEvent, TurnStartEvent,
-    },
+    game_logic::{event_handlers::EventHandler, EventDispatcher, PlayerSpendManaEvent},
     game_state::GameState,
 };
 
@@ -18,10 +15,15 @@ impl EventHandler for PlayerSpendManaEventHandler {
         game_state: &mut GameState,
         _dispatcher: &mut EventDispatcher,
     ) {
-        println!(
-            "Player {:?} spends {} mana.",
-            event.player_id(),
-            event.mana_count()
+        let player_id = event.player_id();
+
+        println!("Player {:?} spends {} mana.", player_id, event.mana_count());
+
+        let cur_mana = game_state.player_mana(player_id);
+
+        assert!(
+            event.mana_count() <= cur_mana,
+            "Player does not have enough mana."
         );
 
         game_state.reduce_mana(event.player_id(), event.mana_count());

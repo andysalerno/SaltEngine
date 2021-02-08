@@ -100,6 +100,14 @@ impl GameState {
         self.player_b_id
     }
 
+    /// Given the ID of a player, returns the ID of the other player.
+    pub fn other_player(&self, player_id: Id) -> Id {
+        match self.player_ab(player_id) {
+            PlayerAB::PlayerA => self.player_b_id(),
+            PlayerAB::PlayerB => self.player_a_id(),
+        }
+    }
+
     pub fn hand(&self, player_id: Id) -> &Hand {
         match self.player_ab(player_id) {
             PlayerAB::PlayerA => &self.player_a_hand,

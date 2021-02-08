@@ -1,5 +1,8 @@
 use crate::{
-    game_logic::{event_handlers::EventHandler, DrawCardEvent, EventDispatcher, StartGameEvent},
+    game_logic::{
+        event_handlers::EventHandler, DrawCardEvent, EventDispatcher, StartGameEvent,
+        TurnStartEvent,
+    },
     game_state::GameState,
 };
 
@@ -29,5 +32,7 @@ impl EventHandler for StartGameEventHandler {
             dispatcher.dispatch(DrawCardEvent::new(player_a_id), game_state);
             dispatcher.dispatch(DrawCardEvent::new(player_b_id), game_state);
         });
+
+        dispatcher.dispatch(TurnStartEvent, game_state);
     }
 }
