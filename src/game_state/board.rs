@@ -1,6 +1,6 @@
 use crate::id::Id;
 
-use super::{card_instance::UnitCardInstance, UnitCardBoardInstanceId};
+use super::{card_instance::UnitCardInstance, UnitCardInstanceId};
 
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub enum RowId {
@@ -158,7 +158,7 @@ impl Board {
         row[pos.row_index] = Some(card_instance);
     }
 
-    pub fn get_position_by_id(&self, id: UnitCardBoardInstanceId) -> BoardPos {
+    pub fn get_position_by_id(&self, id: UnitCardInstanceId) -> BoardPos {
         // Check opponent back
         {
             let found = self
@@ -242,7 +242,7 @@ impl Board {
         panic!("Id not found: {:?}", id);
     }
 
-    pub fn get_by_id(&self, id: UnitCardBoardInstanceId) -> &UnitCardInstance {
+    pub fn get_by_id(&self, id: UnitCardInstanceId) -> &UnitCardInstance {
         let opponent_side = self.opponent_side();
         let player_side = self.player_side();
 
@@ -277,7 +277,7 @@ impl Board {
 
     pub fn update_by_id(
         &mut self,
-        id: UnitCardBoardInstanceId,
+        id: UnitCardInstanceId,
         update: impl FnOnce(&mut UnitCardInstance),
     ) {
         if let Some(mut creature) = self
@@ -319,7 +319,7 @@ impl Board {
         }
     }
 
-    pub fn remove_by_id(&mut self, id: UnitCardBoardInstanceId) {
+    pub fn remove_by_id(&mut self, id: UnitCardInstanceId) {
         if let Some(creature) = self
             .player_side_mut()
             .front_row_mut()

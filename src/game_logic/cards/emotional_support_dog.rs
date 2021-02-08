@@ -3,7 +3,7 @@ use crate::{
         buff::{Buff, BuffSourceId},
         BuffInstanceId,
     },
-    game_state::{board::RowId, UnitCardBoardInstanceId},
+    game_state::{board::RowId, UnitCardInstanceId},
     id::Id,
 };
 use crate::{
@@ -118,7 +118,7 @@ impl PassiveEffectDefinition for EmotionalSupportDogPassiveDefinition {
 
     fn update(
         &self,
-    ) -> Box<dyn FnOnce(PassiveEffectInstanceId, UnitCardBoardInstanceId, &mut GameState)> {
+    ) -> Box<dyn FnOnce(PassiveEffectInstanceId, UnitCardInstanceId, &mut GameState)> {
         // let id = self.instance_id;
         // let originator_id = self.originator;
 

@@ -4,9 +4,9 @@ use crate::game_logic::{cards::UnitCardDefinition, BuffInstanceId, PassiveEffect
 use crate::{game_logic::Buff, id::Id};
 
 #[derive(Debug, Copy, Clone, PartialEq)]
-pub struct UnitCardBoardInstanceId(Id);
+pub struct UnitCardInstanceId(Id);
 
-impl UnitCardBoardInstanceId {
+impl UnitCardInstanceId {
     pub fn new() -> Self {
         Self(Id::new())
     }
@@ -17,7 +17,7 @@ pub struct UnitCardInstance {
     definition: Box<dyn UnitCardDefinition>,
     buffs: Vec<Box<dyn Buff>>,
     passive_effect: Option<PassiveEffectInstance>,
-    id: UnitCardBoardInstanceId,
+    id: UnitCardInstanceId,
     attack: i32,
     health: i32,
     width: usize,
@@ -25,7 +25,7 @@ pub struct UnitCardInstance {
 
 impl UnitCardInstance {
     pub fn new(definition: Box<dyn UnitCardDefinition>) -> Self {
-        let id = UnitCardBoardInstanceId::new();
+        let id = UnitCardInstanceId::new();
 
         let passive_effect = definition
             .passive_effect()
@@ -81,7 +81,7 @@ impl UnitCardInstance {
         self.passive_effect.borrow().as_ref()
     }
 
-    pub fn id(&self) -> UnitCardBoardInstanceId {
+    pub fn id(&self) -> UnitCardInstanceId {
         self.id
     }
 }

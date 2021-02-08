@@ -19,8 +19,12 @@ impl EventHandler for SummonCreatureFromHandEventHandler {
         dispatcher: &mut EventDispatcher,
     ) {
         let player_id = event.player_id();
-        let creature_name = event.definition().title();
-        let mana_amount = event.definition().cost();
+        let hand_card_id = event.hand_card_id();
+
+        let card_from_hand = game_state.hand_mut(player_id).take_card(hand_card_id);
+
+        let creature_name = card_from_hand.definition().title();
+        let mana_amount = card_from_hand.definition().cost();
         println!("Player {:?} summons {}", player_id, creature_name);
 
         dispatcher.dispatch(
@@ -29,9 +33,9 @@ impl EventHandler for SummonCreatureFromHandEventHandler {
         );
 
         let pos = event.board_pos();
-        let definition = event.take_definition();
+
         dispatcher.dispatch(
-            CreatureSetEvent::new(player_id, definition, pos),
+            CreatureSetEvent::new(player_id, card_from_hand, pos),
             game_state,
         );
     }

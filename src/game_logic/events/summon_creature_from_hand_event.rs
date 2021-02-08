@@ -1,4 +1,8 @@
-use crate::{game_logic::cards::UnitCardDefinition, game_state::board::BoardPos, id::Id};
+use crate::{
+    game_logic::cards::UnitCardDefinition,
+    game_state::{board::BoardPos, Hand, UnitCardInstanceId},
+    id::Id,
+};
 
 use super::{Event, GameEvent};
 
@@ -6,19 +10,21 @@ use super::{Event, GameEvent};
 pub struct SummonCreatureFromHandEvent {
     player_id: Id,
     board_pos: BoardPos,
-    creature_definition: Box<dyn UnitCardDefinition>,
+    hand_card_id: UnitCardInstanceId,
+    //creature_definition: Box<dyn UnitCardDefinition>,
 }
 
 impl SummonCreatureFromHandEvent {
     pub fn new(
         player_id: Id,
         board_pos: BoardPos,
-        creature_definition: Box<dyn UnitCardDefinition>,
+        hand_card_id: UnitCardInstanceId,
+        //creature_definition: Box<dyn UnitCardDefinition>,
     ) -> Self {
         Self {
             player_id,
             board_pos,
-            creature_definition,
+            hand_card_id, //creature_definition,
         }
     }
 
@@ -30,13 +36,17 @@ impl SummonCreatureFromHandEvent {
         self.board_pos
     }
 
-    pub fn take_definition(self) -> Box<dyn UnitCardDefinition> {
-        self.creature_definition
+    pub fn hand_card_id(&self) -> UnitCardInstanceId {
+        self.hand_card_id
     }
 
-    pub fn definition(&self) -> &dyn UnitCardDefinition {
-        self.creature_definition.as_ref()
-    }
+    // pub fn take_definition(self) -> Box<dyn UnitCardDefinition> {
+    //     self.creature_definition
+    // }
+
+    // pub fn definition(&self) -> &dyn UnitCardDefinition {
+    //     self.creature_definition.as_ref()
+    // }
 }
 
 impl Event for SummonCreatureFromHandEvent {}

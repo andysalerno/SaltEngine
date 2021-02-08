@@ -1,6 +1,6 @@
 use super::{
     board::{Board, BoardPos},
-    Deck, Hand, UnitCardBoardInstanceId, UnitCardInstance,
+    Deck, Hand, UnitCardInstance, UnitCardInstanceId,
 };
 use crate::{game_logic::cards::UnitCardDefinition, id::Id};
 
@@ -153,11 +153,11 @@ impl GameState {
         *player_mana = *player_mana + mana_count;
     }
 
-    pub fn get_by_id(&self, id: UnitCardBoardInstanceId) -> &UnitCardInstance {
+    pub fn get_by_id(&self, id: UnitCardInstanceId) -> &UnitCardInstance {
         self.board.get_by_id(id)
     }
 
-    pub fn get_pos_by_id(&self, id: UnitCardBoardInstanceId) -> BoardPos {
+    pub fn get_pos_by_id(&self, id: UnitCardInstanceId) -> BoardPos {
         self.board.get_position_by_id(id)
     }
 
@@ -167,7 +167,7 @@ impl GameState {
 
     pub fn update_by_id(
         &mut self,
-        id: UnitCardBoardInstanceId,
+        id: UnitCardInstanceId,
         update: impl FnOnce(&mut UnitCardInstance),
     ) {
         self.board.update_by_id(id, update);

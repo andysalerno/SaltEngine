@@ -58,12 +58,21 @@ impl ConsoleAgent {
     }
 
     fn summon(&self, game_state: &GameState) {
+        let player_id = game_state.cur_player_id();
         self.show_hand(game_state);
-        let hand_size = game_state.hand(game_state.cur_player_id()).len();
-        let which_card: usize = self
+        let hand_size = game_state.hand(player_id).len();
+        let card_index: usize = self
             .ask(&format!("which card? (0..={})", hand_size - 1))
             .parse()
             .expect("invalid input");
+
+        let selected_card = game_state
+            .hand(player_id)
+            .cards()
+            .into_iter()
+            .nth(card_index);
+
+        if let Some(selected_card) = selected_card {}
     }
 
     fn attack(&self, game_state: &GameState) -> AttackEvent {

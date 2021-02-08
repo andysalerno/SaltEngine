@@ -16,7 +16,7 @@ impl EventHandler for CreatureSetEventHandler {
         _dispatcher: &mut EventDispatcher,
     ) {
         let target_position = event.target_position();
-        let instance = UnitCardInstance::new(event.take_definition());
+        let instance = event.take_card();
         game_state.board_mut().set_at(target_position, instance);
     }
 }

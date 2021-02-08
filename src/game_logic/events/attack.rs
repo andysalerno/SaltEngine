@@ -1,5 +1,5 @@
 use crate::{
-    game_state::{UnitCardBoardInstanceId, UnitCardInstance},
+    game_state::{UnitCardInstance, UnitCardInstanceId},
     id::Id,
 };
 
@@ -7,20 +7,20 @@ use super::{Event, GameEvent};
 
 #[derive(Debug)]
 pub struct AttackEvent {
-    attacker: UnitCardBoardInstanceId,
-    target: UnitCardBoardInstanceId,
+    attacker: UnitCardInstanceId,
+    target: UnitCardInstanceId,
 }
 
 impl AttackEvent {
-    pub fn new(attacker: UnitCardBoardInstanceId, target: UnitCardBoardInstanceId) -> Self {
+    pub fn new(attacker: UnitCardInstanceId, target: UnitCardInstanceId) -> Self {
         Self { attacker, target }
     }
 
-    pub fn attacker(&self) -> UnitCardBoardInstanceId {
+    pub fn attacker(&self) -> UnitCardInstanceId {
         self.attacker
     }
 
-    pub fn target(&self) -> UnitCardBoardInstanceId {
+    pub fn target(&self) -> UnitCardInstanceId {
         self.target
     }
 }
