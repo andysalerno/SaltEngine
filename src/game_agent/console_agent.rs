@@ -72,7 +72,7 @@ impl ConsoleAgent {
             .into_iter()
             .nth(card_index);
 
-        if let Some(selected_card) = selected_card {}
+        if let Some(_selected_card) = selected_card {}
     }
 
     fn attack(&self, game_state: &GameState) -> AttackEvent {

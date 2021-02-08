@@ -1,5 +1,3 @@
-use crate::game_logic::cards::UnitCardDefinition;
-
 use super::UnitCardInstance;
 
 #[derive(Debug, Default)]

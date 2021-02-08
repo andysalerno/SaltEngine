@@ -16,7 +16,7 @@ impl EventHandler for PlayerSpendManaEventHandler {
         &self,
         event: PlayerSpendManaEvent,
         game_state: &mut GameState,
-        dispatcher: &mut EventDispatcher,
+        _dispatcher: &mut EventDispatcher,
     ) {
         println!(
             "Player {:?} spends {} mana.",

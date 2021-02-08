@@ -1,8 +1,5 @@
 use crate::{
-    game_logic::{
-        event_handlers::EventHandler, CreatureDealsDamageEvent, DrawCardEvent, EventDispatcher,
-        StartGameEvent,
-    },
+    game_logic::{event_handlers::EventHandler, DrawCardEvent, EventDispatcher, StartGameEvent},
     game_state::GameState,
 };
 

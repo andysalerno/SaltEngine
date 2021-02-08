@@ -1,4 +1,4 @@
-use crate::{game_logic::cards::UnitCardDefinition, game_state::UnitCardInstance, id::Id};
+use crate::{game_state::UnitCardInstance, id::Id};
 
 use super::{Event, GameEvent};
 

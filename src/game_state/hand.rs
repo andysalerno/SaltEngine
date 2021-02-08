@@ -1,5 +1,3 @@
-use std::ops::IndexMut;
-
 use super::{UnitCardInstance, UnitCardInstanceId};
 
 #[derive(Debug, Default)]
@@ -29,7 +27,7 @@ impl Hand {
             .cards
             .iter()
             .enumerate()
-            .filter(|(i, c)| c.id() == id)
+            .filter(|(_i, c)| c.id() == id)
             .next()
             .expect(&format!(
                 "Attempted to take card with id {:?} from hand, but no such card was found.",

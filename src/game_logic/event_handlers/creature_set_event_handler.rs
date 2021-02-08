@@ -1,6 +1,6 @@
 use crate::{
     game_logic::{event_handlers::EventHandler, events::CreatureSetEvent, EventDispatcher},
-    game_state::{GameState, UnitCardInstance},
+    game_state::GameState,
 };
 
 #[derive(Default)]
