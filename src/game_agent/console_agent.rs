@@ -246,13 +246,14 @@ fn display_card(card: &dyn UnitCardDefinition) -> String {
 |---------------------|
 |                     |
 |                     |
-|                     |
+|{:^21}|
 |                     |
 |                     |
 |                {}/{}  |
 -----------------------"#,
         card.title(),
         card.cost(),
+        card.text(),
         card.attack(),
         card.health()
     )

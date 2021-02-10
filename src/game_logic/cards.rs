@@ -1,9 +1,11 @@
 mod emotional_support_dog;
 mod prawn;
+mod really_big_rock;
 mod rickety_cannon;
 
 pub use emotional_support_dog::EmotionalSupportDog;
 pub use prawn::Prawn;
+pub use really_big_rock::ReallyBigRock;
 pub use rickety_cannon::RicketyCannon;
 
 use crate::game_state::UnitCardInstance;

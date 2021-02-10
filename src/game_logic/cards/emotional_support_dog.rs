@@ -38,7 +38,7 @@ impl CardDefinition for EmotionalSupportDog {
     }
 
     fn text(&self) -> &str {
-        "Passive: the unit in front gets +1/+1."
+        "Frontbuff: +1/+1"
     }
 }
 

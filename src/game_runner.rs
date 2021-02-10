@@ -1,10 +1,7 @@
 use crate::{
     game_agent::game_agent::GameAgent,
-    game_logic::{cards::*, CreatureSetEvent, EventDispatcher, GameEvent, StartGameEvent},
-    game_state::{
-        board::{BoardPos, RowId},
-        Deck, GameState, UnitCardInstance,
-    },
+    game_logic::{cards::*, EventDispatcher, StartGameEvent},
+    game_state::{Deck, GameState, UnitCardInstance},
 };
 
 pub trait GameDisplay {
@@ -16,7 +13,6 @@ pub struct GameRunner {
     player_b: Box<dyn GameAgent>,
     display: Box<dyn GameDisplay>,
     game_state: GameState,
-    event_stack: Vec<GameEvent>,
 }
 
 impl GameRunner {
@@ -26,12 +22,13 @@ impl GameRunner {
         display: Box<dyn GameDisplay>,
     ) -> Self {
         let player_a_deck = {
-            let cards: Vec<UnitCardInstance> = (0..10)
+            let cards: Vec<UnitCardInstance> = (0..8)
                 .flat_map(|_| {
                     let cards = vec![
                         RicketyCannon.make_instance(),
                         Prawn.make_instance(),
                         EmotionalSupportDog.make_instance(),
+                        ReallyBigRock.make_instance(),
                     ];
 
                     cards
@@ -42,12 +39,13 @@ impl GameRunner {
         };
 
         let player_b_deck = {
-            let cards: Vec<UnitCardInstance> = (0..10)
+            let cards: Vec<UnitCardInstance> = (0..8)
                 .flat_map(|_| {
                     let cards = vec![
                         RicketyCannon.make_instance(),
                         Prawn.make_instance(),
                         EmotionalSupportDog.make_instance(),
+                        ReallyBigRock.make_instance(),
                     ];
 
                     cards
@@ -65,7 +63,6 @@ impl GameRunner {
             player_b,
             display,
             game_state,
-            event_stack: Vec::new(),
         }
     }
 
