@@ -22,6 +22,9 @@ impl EventHandler for TurnStartHandler {
         println!("Turn started for player {:?}", player_id);
 
         dispatcher.dispatch(PlayerGainManaEvent::new(player_id, 1), game_state);
+
+        game_state.refresh_player_mana(player_id);
+
         dispatcher.dispatch(DrawCardEvent::new(player_id), game_state);
     }
 }

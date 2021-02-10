@@ -1,8 +1,5 @@
 use crate::{
-    game_logic::{
-        event_handlers::EventHandler, events::EndTurnEvent, EventDispatcher, PlayerGainManaEvent,
-        TurnStartEvent,
-    },
+    game_logic::{event_handlers::EventHandler, EventDispatcher, PlayerGainManaEvent},
     game_state::GameState,
 };
 
@@ -24,6 +21,6 @@ impl EventHandler for PlayerGainManaEventHandler {
             event.mana_count()
         );
 
-        game_state.gain_mana(event.player_id(), event.mana_count());
+        game_state.raise_mana_limit(event.player_id(), event.mana_count());
     }
 }

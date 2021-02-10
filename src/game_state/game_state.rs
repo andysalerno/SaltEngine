@@ -18,7 +18,9 @@ pub struct GameState {
     player_b_health: i32,
 
     player_a_mana: u32,
+    player_a_mana_limit: u32,
     player_b_mana: u32,
+    player_b_mana_limit: u32,
 
     board: Box<Board>,
 }
@@ -56,7 +58,9 @@ impl GameState {
             player_b_deck,
 
             player_a_mana: 0,
+            player_a_mana_limit: 0,
             player_b_mana: 0,
+            player_b_mana_limit: 0,
             board: Box::new(Board::new(BOARD_LEN, player_a_id, player_b_id)),
         }
     }
@@ -142,6 +146,21 @@ impl GameState {
         }
     }
 
+    /// Resets a player's mana count back to their limit.
+    pub fn refresh_player_mana(&mut self, player_id: PlayerId) {
+        match self.player_ab(player_id) {
+            PlayerAB::PlayerA => self.player_a_mana = self.player_a_mana_limit,
+            PlayerAB::PlayerB => self.player_b_mana = self.player_a_mana_limit,
+        }
+    }
+
+    pub fn player_mana_limit(&self, player_id: PlayerId) -> u32 {
+        match self.player_ab(player_id) {
+            PlayerAB::PlayerA => self.player_a_mana_limit,
+            PlayerAB::PlayerB => self.player_b_mana_limit,
+        }
+    }
+
     pub fn reduce_mana(&mut self, player_id: PlayerId, mana_count: u32) {
         let player_mana = match self.player_ab(player_id) {
             PlayerAB::PlayerA => &mut self.player_a_mana,
@@ -151,13 +170,13 @@ impl GameState {
         *player_mana = *player_mana - mana_count;
     }
 
-    pub fn gain_mana(&mut self, player_id: PlayerId, mana_count: u32) {
-        let player_mana = match self.player_ab(player_id) {
-            PlayerAB::PlayerA => &mut self.player_a_mana,
-            PlayerAB::PlayerB => &mut self.player_b_mana,
+    pub fn raise_mana_limit(&mut self, player_id: PlayerId, mana_count: u32) {
+        let player_mana_limit = match self.player_ab(player_id) {
+            PlayerAB::PlayerA => &mut self.player_a_mana_limit,
+            PlayerAB::PlayerB => &mut self.player_b_mana_limit,
         };
 
-        *player_mana = *player_mana + mana_count;
+        *player_mana_limit = *player_mana_limit + mana_count;
     }
 
     pub fn get_by_id(&self, id: UnitCardInstanceId) -> &UnitCardInstance {
