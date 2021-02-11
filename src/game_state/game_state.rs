@@ -1,5 +1,5 @@
 use super::{
-    board::{Board, BoardPos},
+    board::{Board, BoardPos, RowId},
     Deck, Hand, PlayerId, UnitCardInstance, UnitCardInstanceId,
 };
 
@@ -197,6 +197,19 @@ impl GameState {
         update: impl FnOnce(&mut UnitCardInstance),
     ) {
         self.board.update_by_id(id, update);
+    }
+
+    pub fn is_pos_defended(&self, pos: BoardPos) -> bool {
+        if pos.row_id == RowId::FrontRow {
+            return false;
+        }
+
+        let front_pos = BoardPos::new(pos.player_id, RowId::FrontRow, pos.row_index);
+
+        match self.get_at(front_pos) {
+            Some(creature) => creature.definition().is_defender(),
+            _ => false,
+        }
     }
 
     pub fn evaluate_passives(&mut self) {

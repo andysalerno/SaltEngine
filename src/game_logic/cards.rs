@@ -12,6 +12,7 @@ use crate::game_state::UnitCardInstance;
 
 use super::PassiveEffectDefinition;
 
+#[derive(Debug, Copy, Clone, PartialEq)]
 pub enum Position {
     Front,
     Back,
@@ -30,6 +31,8 @@ pub trait UnitCardDefinition: CardDefinition {
     fn attack(&self) -> i32;
     fn health(&self) -> i32;
     fn row_width(&self) -> usize;
+    fn placeable_at(&self) -> Position;
+
     fn passive_effect(&self) -> Option<Box<dyn PassiveEffectDefinition>> {
         None
     }

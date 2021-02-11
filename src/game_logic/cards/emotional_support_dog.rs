@@ -11,7 +11,7 @@ use crate::{
     game_state::GameState,
 };
 
-use super::{CardDefinition, UnitCardDefinition};
+use super::{CardDefinition, Position, UnitCardDefinition};
 
 #[derive(Debug, Clone)]
 pub struct EmotionalSupportDog;
@@ -57,6 +57,10 @@ impl UnitCardDefinition for EmotionalSupportDog {
 
     fn passive_effect(&self) -> Option<Box<dyn PassiveEffectDefinition>> {
         Some(Box::new(EmotionalSupportDogPassiveDefinition::new()))
+    }
+
+    fn placeable_at(&self) -> Position {
+        Position::Back
     }
 }
 

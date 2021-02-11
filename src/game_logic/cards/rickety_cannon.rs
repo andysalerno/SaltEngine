@@ -1,6 +1,6 @@
 use crate::id::Id;
 
-use super::{CardDefinition, UnitCardDefinition};
+use super::{CardDefinition, Position, UnitCardDefinition};
 
 #[derive(Debug, Clone)]
 pub struct RicketyCannon;
@@ -25,7 +25,7 @@ impl CardDefinition for RicketyCannon {
     }
 
     fn text(&self) -> &str {
-        ""
+        "Back\nSummon: pick a slot.\nAt the start of\nyour turn, deal\n1 damage there."
     }
 }
 
@@ -35,10 +35,14 @@ impl UnitCardDefinition for RicketyCannon {
     }
 
     fn health(&self) -> i32 {
-        3
+        2
     }
 
     fn row_width(&self) -> usize {
         3
+    }
+
+    fn placeable_at(&self) -> Position {
+        Position::Back
     }
 }

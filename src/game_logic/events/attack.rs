@@ -1,7 +1,4 @@
-use crate::{
-    game_state::{UnitCardInstance, UnitCardInstanceId},
-    id::Id,
-};
+use crate::game_state::UnitCardInstanceId;
 
 use super::{Event, GameEvent};
 

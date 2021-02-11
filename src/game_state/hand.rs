@@ -22,6 +22,17 @@ impl Hand {
         self.cards.push(card);
     }
 
+    pub fn card(&self, id: UnitCardInstanceId) -> &UnitCardInstance {
+        self.cards
+            .iter()
+            .filter(|c| c.id() == id)
+            .next()
+            .expect(&format!(
+                "Attempted to find card with id {:?} in hand, but no such card was found.",
+                id
+            ))
+    }
+
     pub fn take_card(&mut self, id: UnitCardInstanceId) -> UnitCardInstance {
         let (index, _) = self
             .cards

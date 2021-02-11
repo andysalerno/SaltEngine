@@ -18,18 +18,31 @@ fn to_string(game_state: &GameState) -> String {
 
     result.push_str(&row_to_string(
         game_state.board().opponent_side().back_row(),
+        0,
+        false,
     ));
     result.push('\n');
     result.push_str(&row_to_string(
         game_state.board().opponent_side().front_row(),
+        6,
+        true,
     ));
 
     result.push('\n');
     result.push('\n');
 
-    result.push_str(&row_to_string(game_state.board().player_side().front_row()));
+    result.push_str(&row_to_string(
+        game_state.board().player_side().front_row(),
+        12,
+        false,
+    ));
+
     result.push('\n');
-    result.push_str(&row_to_string(game_state.board().player_side().back_row()));
+    result.push_str(&row_to_string(
+        game_state.board().player_side().back_row(),
+        18,
+        true,
+    ));
     result.push('\n');
 
     let mana = game_state.player_mana(game_state.cur_player_id());
@@ -38,8 +51,20 @@ fn to_string(game_state: &GameState) -> String {
     result
 }
 
-fn row_to_string(row: &[Option<UnitCardInstance>]) -> String {
+fn row_to_string(
+    row: &[Option<UnitCardInstance>],
+    start_index: usize,
+    index_after: bool,
+) -> String {
     let mut result = String::new();
+
+    if !index_after {
+        for i in 0..row.len() {
+            let c = get_alpha_char(i + start_index);
+            result.push_str(&format!("  {}  ", c));
+        }
+        result.push_str("\n");
+    }
 
     let mut row_iter = row.iter();
 
@@ -63,5 +88,21 @@ fn row_to_string(row: &[Option<UnitCardInstance>]) -> String {
         }
     }
 
+    if index_after {
+        result.push_str("\n");
+
+        for i in 0..row.len() {
+            let c = get_alpha_char(i + start_index);
+            result.push_str(&format!("  {}  ", c));
+        }
+    }
+
     result
+}
+
+fn get_alpha_char(index: usize) -> char {
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        .chars()
+        .nth(index)
+        .expect("Expected index to be within range")
 }

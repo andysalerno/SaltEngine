@@ -6,6 +6,13 @@ use crate::{
 #[derive(Default)]
 pub struct AttackEventHandler;
 
+fn validate(event: &AttackEvent, game_state: &GameState) {
+    let pos = game_state.get_pos_by_id(event.target());
+    if game_state.is_pos_defended(pos) {
+        panic!("Cannot attack defended pos {:?}", pos);
+    }
+}
+
 impl EventHandler for AttackEventHandler {
     type Event = AttackEvent;
 
@@ -15,6 +22,8 @@ impl EventHandler for AttackEventHandler {
         game_state: &mut GameState,
         dispatcher: &mut EventDispatcher,
     ) {
+        validate(&event, game_state);
+
         {
             let attacker_instance = game_state.get_by_id(event.attacker());
             let target_instance = game_state.get_by_id(event.target());

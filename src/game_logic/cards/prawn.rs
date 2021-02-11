@@ -1,6 +1,6 @@
 use crate::id::Id;
 
-use super::{CardDefinition, UnitCardDefinition};
+use super::{CardDefinition, Position, UnitCardDefinition};
 
 #[derive(Debug, Clone)]
 pub struct Prawn;
@@ -14,18 +14,19 @@ impl Prawn {
 
 impl CardDefinition for Prawn {
     fn title(&self) -> &str {
-        "Prawn"
+        "Pawn"
     }
+
     fn cost(&self) -> i32 {
         1
     }
 
     fn flavor_text(&self) -> &str {
-        "Just a lowly Prawn."
+        "Just a lowly Pawn."
     }
 
     fn text(&self) -> &str {
-        ""
+        "Front"
     }
 }
 
@@ -40,5 +41,9 @@ impl UnitCardDefinition for Prawn {
 
     fn row_width(&self) -> usize {
         1
+    }
+
+    fn placeable_at(&self) -> Position {
+        Position::Front
     }
 }

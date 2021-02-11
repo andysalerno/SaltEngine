@@ -1,6 +1,6 @@
 use crate::id::Id;
 
-use super::{CardDefinition, UnitCardDefinition};
+use super::{CardDefinition, Position, UnitCardDefinition};
 
 #[derive(Debug, Clone)]
 pub struct ReallyBigRock;
@@ -26,7 +26,7 @@ impl CardDefinition for ReallyBigRock {
     }
 
     fn text(&self) -> &str {
-        "Defender"
+        "Defender\nOn death, deal\n1 damage to slots\n behind this."
     }
 }
 
@@ -45,5 +45,9 @@ impl UnitCardDefinition for ReallyBigRock {
 
     fn is_defender(&self) -> bool {
         true
+    }
+
+    fn placeable_at(&self) -> Position {
+        Position::Either
     }
 }

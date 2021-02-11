@@ -82,7 +82,7 @@ impl ConsoleAgent {
                 .cards()
                 .into_iter()
                 .nth(card_index)
-                .expect("msg");
+                .expect(&format!("No card at index {}", card_index));
 
             let mana_cost = selected_card.definition().cost() as u32;
             let player_mana = game_state.player_mana(player_id);
@@ -98,7 +98,8 @@ impl ConsoleAgent {
             selected_card.id()
         };
 
-        let board_pos = self.prompt_pos_myside(game_state);
+        // let board_pos = self.prompt_pos_myside(game_state);
+        let board_pos = self.prompt_pos_index(game_state);
 
         return Some(
             SummonCreatureFromHandEvent::new(player_id, board_pos, selected_card_id).into(),
@@ -164,6 +165,29 @@ impl ConsoleAgent {
         self.say(&format!("Selected: {:?}", item_at));
 
         item_at
+    }
+
+    fn prompt_pos_index(&self, game_state: &GameState) -> BoardPos {
+        let c = self.ask("Which letter position?");
+        let input_c = c.chars().nth(0).expect("Expected single-char response");
+
+        let enemy_back_chars = "ABCDEF".chars();
+        let enemy_front_chars = "GHIJKL".chars();
+        let my_front_chars = "MNOPQR".chars();
+        let my_back_chars = "STUVWX".chars();
+
+        if let Some((index, _)) = enemy_back_chars.enumerate().find(|&(_, c)| c == input_c) {
+            return BoardPos::new(game_state.player_b_id(), RowId::BackRow, index);
+        } else if let Some((index, _)) = enemy_front_chars.enumerate().find(|&(_, c)| c == input_c)
+        {
+            return BoardPos::new(game_state.player_b_id(), RowId::FrontRow, index);
+        } else if let Some((index, _)) = my_front_chars.enumerate().find(|&(_, c)| c == input_c) {
+            return BoardPos::new(game_state.player_a_id(), RowId::FrontRow, index);
+        } else if let Some((index, _)) = my_back_chars.enumerate().find(|&(_, c)| c == input_c) {
+            return BoardPos::new(game_state.player_a_id(), RowId::BackRow, index);
+        }
+
+        panic!("The input char {} did not match any position", input_c);
     }
 
     fn prompt_pos_any(&self, game_state: &GameState) -> BoardPos {
@@ -240,20 +264,26 @@ impl ConsoleAgent {
 }
 
 fn display_card(card: &dyn UnitCardDefinition) -> String {
+    let text_lines = card.text().lines().collect::<Vec<_>>();
+
     format!(
         r#"-----------------------
 |{:<18} {} |
 |---------------------|
-|                     |
-|                     |
 |{:^21}|
-|                     |
-|                     |
+|{:^21}|
+|{:^21}|
+|{:^21}|
+|{:^21}|
 |                {}/{}  |
 -----------------------"#,
         card.title(),
         card.cost(),
-        card.text(),
+        text_lines.get(0).unwrap_or(&""),
+        text_lines.get(1).unwrap_or(&""),
+        text_lines.get(2).unwrap_or(&""),
+        text_lines.get(3).unwrap_or(&""),
+        text_lines.get(4).unwrap_or(&""),
         card.attack(),
         card.health()
     )

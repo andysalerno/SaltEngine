@@ -22,3 +22,10 @@ teachers (math teacher, science teacher...)
 keyword guardians/defenders must be killed before anything behind them.
 
 need better flavor name for front/back row than "attack"/"support"
+
+alternate project name: NetDeck
+
+some AoE cards damage per "slot" and not per "enemy" so deal double damage to 2-wide creatures
+
+front cards are attack-oriented
+back cards are support/defense oriented
