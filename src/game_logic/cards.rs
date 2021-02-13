@@ -8,9 +8,9 @@ pub use prawn::Prawn;
 pub use really_big_rock::ReallyBigRock;
 pub use rickety_cannon::RicketyCannon;
 
-use crate::game_state::UnitCardInstance;
+use crate::game_state::{GameState, UnitCardInstance, UnitCardInstanceId};
 
-use super::PassiveEffectDefinition;
+use super::{GameEvent, PassiveEffectDefinition};
 
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub enum Position {
@@ -32,6 +32,10 @@ pub trait UnitCardDefinition: CardDefinition {
     fn health(&self) -> i32;
     fn row_width(&self) -> usize;
     fn placeable_at(&self) -> Position;
+
+    fn upon_death(&self, own_id: UnitCardInstanceId, game_state: &GameState) -> Vec<GameEvent> {
+        Vec::new()
+    }
 
     fn passive_effect(&self) -> Option<Box<dyn PassiveEffectDefinition>> {
         None

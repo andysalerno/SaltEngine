@@ -15,7 +15,7 @@ impl EventDispatcher {
     pub fn dispatch(&mut self, event: impl Into<GameEvent>, game_state: &mut GameState) {
         let event = event.into();
 
-        println!("Dispatching: {:?}", event);
+        // println!("Dispatching: {:?}", event);
 
         self.stack.push(event);
 
@@ -57,6 +57,9 @@ impl EventDispatcher {
             }
             GameEvent::SummonCreatureFromHand(e) => {
                 SummonCreatureFromHandEventHandler::default().handle(e, game_state, self)
+            }
+            GameEvent::PosTakesDamage(e) => {
+                PosTakesDamageHandler::default().handle(e, game_state, self)
             }
         }
     }

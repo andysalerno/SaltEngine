@@ -52,13 +52,13 @@ impl EventHandler for AttackEventHandler {
 
         // 3. Target receives damage
         let take_damage_event =
-            CreatureTakesDamageEvent::new(event.target(), event.attacker(), attacker_attack_amount);
+            CreatureTakesDamageEvent::new(event.target(), attacker_attack_amount);
 
         dispatcher.dispatch(take_damage_event, game_state);
 
         // 4. Attacker receives damage
         let take_damage_event =
-            CreatureTakesDamageEvent::new(event.attacker(), event.target(), target_attack_amount);
+            CreatureTakesDamageEvent::new(event.attacker(), target_attack_amount);
 
         dispatcher.dispatch(take_damage_event, game_state);
     }

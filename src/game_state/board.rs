@@ -6,7 +6,7 @@ pub enum RowId {
     BackRow,
 }
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, PartialEq)]
 pub struct BoardPos {
     pub player_id: PlayerId,
     pub row_id: RowId,

@@ -1,4 +1,11 @@
-use crate::id::Id;
+use crate::{
+    game_logic::{CreatureTakesDamageEvent, GameEvent, PosTakesDamageEvent},
+    game_state::{
+        board::{BoardPos, RowId},
+        GameState, UnitCardInstanceId,
+    },
+    id::Id,
+};
 
 use super::{CardDefinition, Position, UnitCardDefinition};
 
@@ -36,7 +43,8 @@ impl UnitCardDefinition for ReallyBigRock {
     }
 
     fn health(&self) -> i32 {
-        4
+        //4
+        1
     }
 
     fn row_width(&self) -> usize {
@@ -49,5 +57,26 @@ impl UnitCardDefinition for ReallyBigRock {
 
     fn placeable_at(&self) -> Position {
         Position::Either
+    }
+
+    fn upon_death(&self, own_id: UnitCardInstanceId, game_state: &GameState) -> Vec<GameEvent> {
+        let my_pos = game_state.get_pos_by_id(own_id);
+
+        if my_pos.row_id != RowId::FrontRow {
+            return Vec::new();
+        }
+
+        let width = game_state.get_by_id(own_id).width();
+
+        let mut events = Vec::new();
+
+        for i in 0..width {
+            let index = my_pos.row_index + i;
+            let behind_pos = BoardPos::new(my_pos.player_id, RowId::BackRow, index);
+            let event = PosTakesDamageEvent::new(behind_pos, 1);
+            events.push(event.into());
+        }
+
+        events
     }
 }
