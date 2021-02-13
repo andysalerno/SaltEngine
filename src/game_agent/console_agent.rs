@@ -1,4 +1,4 @@
-use std::io::stdin;
+use std::{collections::VecDeque, io::stdin};
 
 use super::game_agent::GameAgent;
 use crate::game_state::board::BoardPos;
@@ -38,23 +38,27 @@ impl ConsoleAgent {
     fn prompt(&self, game_state: &GameState) -> Option<GameEvent> {
         self.show_hand(game_state);
 
+        let mut input_queue = VecDeque::new();
+
         let mut event = None;
 
         while event.is_none() {
-            let action =
-                self.ask("Enter an action: (summon, hand, info, attack, end (turn), quit)");
+            let action = self.ask(
+                "Enter an action: (summon, hand, info, attack, end (turn), quit)",
+                &mut input_queue,
+            );
 
             event = match action.as_str() {
                 "hand" => {
                     self.show_hand(game_state);
                     None
                 }
-                "summon" => self.summon(game_state),
+                "summon" => self.summon(game_state, &mut input_queue),
                 "info" => {
-                    self.info(game_state);
+                    self.info(game_state, &mut input_queue);
                     None
                 }
-                "attack" => Some(GameEvent::Attack(self.attack(game_state))),
+                "attack" => Some(GameEvent::Attack(self.attack(game_state, &mut input_queue))),
                 "end" => Some(GameEvent::EndTurn(EndTurnEvent)),
                 "quit" => return None,
                 _ => panic!("Unknown input: {}", action),
@@ -64,7 +68,11 @@ impl ConsoleAgent {
         event
     }
 
-    fn summon(&self, game_state: &GameState) -> Option<GameEvent> {
+    fn summon(
+        &self,
+        game_state: &GameState,
+        input_queue: &mut VecDeque<String>,
+    ) -> Option<GameEvent> {
         let player_id = game_state.cur_player_id();
 
         let selected_card_id = {
@@ -73,7 +81,7 @@ impl ConsoleAgent {
             let hand_size = game_state.hand(player_id).len();
 
             let card_index: usize = self
-                .ask(&format!("which card? (0..={})", hand_size - 1))
+                .ask(&format!("which card? (0..={})", hand_size - 1), input_queue)
                 .parse()
                 .expect("invalid input");
 
@@ -98,17 +106,16 @@ impl ConsoleAgent {
             selected_card.id()
         };
 
-        // let board_pos = self.prompt_pos_myside(game_state);
-        let board_pos = self.prompt_pos_index(game_state);
+        let board_pos = self.prompt_pos_index(game_state, input_queue);
 
         return Some(
             SummonCreatureFromHandEvent::new(player_id, board_pos, selected_card_id).into(),
         );
     }
 
-    fn attack(&self, game_state: &GameState) -> AttackEvent {
+    fn attack(&self, game_state: &GameState, input_queue: &mut VecDeque<String>) -> AttackEvent {
         let attacker = loop {
-            let pos = self.prompt_pos_myside(game_state);
+            let pos = self.prompt_pos_myside(game_state, input_queue);
             match game_state.get_at(pos) {
                 Some(c) => break c.id(),
                 _ => self.say("No card found at that pos; try again"),
@@ -116,7 +123,7 @@ impl ConsoleAgent {
         };
 
         let target = loop {
-            let pos = self.prompt_pos_enemyside(game_state);
+            let pos = self.prompt_pos_enemyside(game_state, input_queue);
             match game_state.get_at(pos) {
                 Some(c) => break c.id(),
                 _ => self.say("No card found at that pos; try again"),
@@ -126,8 +133,8 @@ impl ConsoleAgent {
         AttackEvent::new(attacker, target)
     }
 
-    fn info(&self, game_state: &GameState) {
-        let _selected = self.select(game_state, "Select for info.");
+    fn info(&self, game_state: &GameState, input_queue: &mut VecDeque<String>) {
+        let _selected = self.select(game_state, "Select for info.", input_queue);
     }
 
     fn show_hand(&self, game_state: &GameState) {
@@ -137,7 +144,8 @@ impl ConsoleAgent {
             .hand(self.id())
             .cards()
             .iter()
-            .map(|c| display_card(c.definition()))
+            .enumerate()
+            .map(|(index, c)| display_card(c.definition(), index))
             .map(|s| s.lines().map(|l| l.to_owned()).collect::<Vec<_>>())
             .collect::<Vec<_>>();
 
@@ -157,9 +165,14 @@ impl ConsoleAgent {
         println!("{}", result);
     }
 
-    fn select<'a>(&self, game_state: &'a GameState, ask: &str) -> Option<&'a UnitCardInstance> {
+    fn select<'a>(
+        &self,
+        game_state: &'a GameState,
+        ask: &str,
+        input_queue: &mut VecDeque<String>,
+    ) -> Option<&'a UnitCardInstance> {
         self.say(ask);
-        let pos = self.prompt_pos_any(game_state);
+        let pos = self.prompt_pos_any(game_state, input_queue);
         let item_at = game_state.get_at(pos);
 
         self.say(&format!("Selected: {:?}", item_at));
@@ -167,8 +180,12 @@ impl ConsoleAgent {
         item_at
     }
 
-    fn prompt_pos_index(&self, game_state: &GameState) -> BoardPos {
-        let c = self.ask("Which letter position?");
+    fn prompt_pos_index(
+        &self,
+        game_state: &GameState,
+        input_queue: &mut VecDeque<String>,
+    ) -> BoardPos {
+        let c = self.ask("Which letter position?", input_queue);
         let input_c = c.chars().nth(0).expect("Expected single-char response");
 
         let enemy_back_chars = "ABCDEF".chars();
@@ -190,32 +207,48 @@ impl ConsoleAgent {
         panic!("The input char {} did not match any position", input_c);
     }
 
-    fn prompt_pos_any(&self, game_state: &GameState) -> BoardPos {
-        let player = self.prompt_player(game_state);
-        let row = self.prompt_row();
-        let index = self.prompt_row_index();
+    fn prompt_pos_any(
+        &self,
+        game_state: &GameState,
+        input_queue: &mut VecDeque<String>,
+    ) -> BoardPos {
+        let player = self.prompt_player(game_state, input_queue);
+        let row = self.prompt_row(input_queue);
+        let index = self.prompt_row_index(input_queue);
 
         BoardPos::new(player, row, index)
     }
 
-    fn prompt_pos_myside(&self, _game_state: &GameState) -> BoardPos {
+    fn prompt_pos_myside(
+        &self,
+        _game_state: &GameState,
+        input_queue: &mut VecDeque<String>,
+    ) -> BoardPos {
         let player = self.id();
-        let row = self.prompt_row();
-        let index = self.prompt_row_index();
+        let row = self.prompt_row(input_queue);
+        let index = self.prompt_row_index(input_queue);
 
         BoardPos::new(player, row, index)
     }
 
-    fn prompt_pos_enemyside(&self, game_state: &GameState) -> BoardPos {
+    fn prompt_pos_enemyside(
+        &self,
+        game_state: &GameState,
+        input_queue: &mut VecDeque<String>,
+    ) -> BoardPos {
         let player = game_state.other_player(self.id());
-        let row = self.prompt_row();
-        let index = self.prompt_row_index();
+        let row = self.prompt_row(input_queue);
+        let index = self.prompt_row_index(input_queue);
 
         BoardPos::new(player, row, index)
     }
 
-    fn prompt_player(&self, game_state: &GameState) -> PlayerId {
-        let player_in = self.ask("Which player? (me, opponent)");
+    fn prompt_player(
+        &self,
+        game_state: &GameState,
+        input_queue: &mut VecDeque<String>,
+    ) -> PlayerId {
+        let player_in = self.ask("Which player? (me, opponent)", input_queue);
 
         match player_in.as_str() {
             "me" => self.id(),
@@ -224,8 +257,8 @@ impl ConsoleAgent {
         }
     }
 
-    fn prompt_row(&self) -> RowId {
-        let row_in = self.ask("Which row? (front, back)");
+    fn prompt_row(&self, input_queue: &mut VecDeque<String>) -> RowId {
+        let row_in = self.ask("Which row? (front, back)", input_queue);
 
         match row_in.as_str() {
             "front" => RowId::FrontRow,
@@ -234,8 +267,8 @@ impl ConsoleAgent {
         }
     }
 
-    fn prompt_row_index(&self) -> usize {
-        let row_index = self.ask("What row index? (0..=5)");
+    fn prompt_row_index(&self, input_queue: &mut VecDeque<String>) -> usize {
+        let row_index = self.ask("What row index? (0..=5)", input_queue);
 
         let index = row_index.parse::<usize>().expect("Invalid index");
 
@@ -250,7 +283,11 @@ impl ConsoleAgent {
         println!("{}", message);
     }
 
-    fn ask(&self, message: &str) -> String {
+    fn ask(&self, message: &str, input_queue: &mut VecDeque<String>) -> String {
+        if let Some(input) = input_queue.pop_front() {
+            return input;
+        }
+
         self.say(message);
 
         let mut input = String::new();
@@ -258,12 +295,15 @@ impl ConsoleAgent {
             .read_line(&mut input)
             .expect("stdin readline failed");
 
-        input.truncate(input.len() - 1);
-        input
+        for token in input.split_whitespace() {
+            input_queue.push_back(token.into());
+        }
+
+        input_queue.pop_front().expect("No input provided.")
     }
 }
 
-fn display_card(card: &dyn UnitCardDefinition) -> String {
+fn display_card(card: &dyn UnitCardDefinition, tag: usize) -> String {
     let text_lines = card.text().lines().collect::<Vec<_>>();
 
     format!(
@@ -276,7 +316,8 @@ fn display_card(card: &dyn UnitCardDefinition) -> String {
 |{:^21}|
 |{:^21}|
 |                {}/{}  |
------------------------"#,
+-----------------------
+{:^23}"#,
         card.title(),
         card.cost(),
         text_lines.get(0).unwrap_or(&""),
@@ -285,6 +326,7 @@ fn display_card(card: &dyn UnitCardDefinition) -> String {
         text_lines.get(3).unwrap_or(&""),
         text_lines.get(4).unwrap_or(&""),
         card.attack(),
-        card.health()
+        card.health(),
+        tag
     )
 }

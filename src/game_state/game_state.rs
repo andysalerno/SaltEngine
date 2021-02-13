@@ -237,12 +237,8 @@ impl GameState {
                 let passive_instance = i.passive_effect_instance();
                 passive_instance
                     .map(|p| (p.instance_id(), p.originator_id(), p.definition().update()))
-            }) // i.passive_effect_instance().map(|p| p.definition().update()))
+            })
             .collect::<Vec<_>>();
-
-        if !effects.is_empty() {
-            println!("Evaluating {} passive effects.", effects.len());
-        }
 
         effects
             .into_iter()

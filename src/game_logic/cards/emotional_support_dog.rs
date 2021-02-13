@@ -123,27 +123,7 @@ impl PassiveEffectDefinition for EmotionalSupportDogPassiveDefinition {
     fn update(
         &self,
     ) -> Box<dyn FnOnce(PassiveEffectInstanceId, UnitCardInstanceId, &mut GameState)> {
-        // let id = self.instance_id;
-        // let originator_id = self.originator;
-
         Box::new(move |instance_id, originator_id, game_state| {
-            // Find the buff already applied by this instance
-            let existing = game_state
-                .board_iter()
-                .filter(|i| {
-                    i.buffs().iter().any(|buff| match buff.source_id() {
-                        BuffSourceId::Passive(_) => true,
-                        _ => false,
-                    })
-                    //.any(|b| b.instance_id() == instance.instance_id())
-                })
-                .next();
-
-            if let Some(_) = existing {
-                // Nothing to do since it already exists
-                return;
-            }
-
             let doggy = game_state
                 .board_iter()
                 .filter(|i| i.id() == originator_id)
