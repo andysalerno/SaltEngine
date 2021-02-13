@@ -1,7 +1,7 @@
 use crate::{
     game_logic::{
-        event_handlers::EventHandler, CreatureDestroyedEvent, CreatureTakesDamageEvent,
-        EventDispatcher, PosTakesDamageEvent,
+        event_handlers::EventHandler, CreatureTakesDamageEvent, EventDispatcher,
+        PosTakesDamageEvent,
     },
     game_state::GameState,
 };

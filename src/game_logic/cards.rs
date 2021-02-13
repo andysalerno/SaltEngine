@@ -33,7 +33,7 @@ pub trait UnitCardDefinition: CardDefinition {
     fn row_width(&self) -> usize;
     fn placeable_at(&self) -> Position;
 
-    fn upon_death(&self, own_id: UnitCardInstanceId, game_state: &GameState) -> Vec<GameEvent> {
+    fn upon_death(&self, _own_id: UnitCardInstanceId, _game_state: &GameState) -> Vec<GameEvent> {
         Vec::new()
     }
 

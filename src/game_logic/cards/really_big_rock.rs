@@ -1,5 +1,5 @@
 use crate::{
-    game_logic::{CreatureTakesDamageEvent, GameEvent, PosTakesDamageEvent},
+    game_logic::{GameEvent, PosTakesDamageEvent},
     game_state::{
         board::{BoardPos, RowId},
         GameState, UnitCardInstanceId,
