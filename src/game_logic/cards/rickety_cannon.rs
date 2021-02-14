@@ -1,4 +1,8 @@
-use crate::id::Id;
+use crate::{
+    game_logic::EventDispatcher,
+    game_state::{GameState, UnitCardInstanceId},
+    id::Id,
+};
 
 use super::{CardDefinition, Position, UnitCardDefinition};
 
@@ -16,6 +20,7 @@ impl CardDefinition for RicketyCannon {
     fn title(&self) -> &str {
         "Rickety cannon"
     }
+
     fn cost(&self) -> i32 {
         2
     }
@@ -44,5 +49,26 @@ impl UnitCardDefinition for RicketyCannon {
 
     fn placeable_at(&self) -> Position {
         Position::Back
+    }
+
+    fn upon_summon(
+        &self,
+        _own_id: crate::game_state::UnitCardInstanceId,
+        _game_state: &crate::game_state::GameState,
+    ) -> Vec<crate::game_logic::GameEvent> {
+        // 1. prompt user for the position they want to target
+        // 2. set state on _own_id with that pos
+        // 3. impl an "upon_turn_start" that does the damage to that pos
+        Vec::new()
+    }
+
+    fn upon_summonz(
+        &self,
+    ) -> Box<dyn FnOnce(UnitCardInstanceId, &GameState, &mut EventDispatcher)> {
+        Box::new(|id, game_state, dispatcher| {
+            // 1. prompt user for the position they want to target
+            // 2. set state on _own_id with that pos
+            // 3. impl an "upon_turn_start" that does the damage to that pos
+        })
     }
 }

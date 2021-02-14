@@ -71,18 +71,20 @@ impl GameRunner {
 
         dispatcher.dispatch(StartGameEvent, &mut self.game_state);
 
-        let player_a_id = self.game_state.player_a_id();
-        let player_b_id = self.game_state.player_a_id();
-        println!(
-            "PlayerA starts with {} cards.\nPlayerB starts wtih {} cards.",
-            self.game_state.deck(player_a_id).len(),
-            self.game_state.deck(player_b_id).len()
-        );
+        {
+            let player_a_id = self.game_state.player_a_id();
+            let player_b_id = self.game_state.player_b_id();
+            println!(
+                "PlayerA starts with {} cards.\nPlayerB starts wtih {} cards.",
+                self.game_state.deck(player_a_id).len(),
+                self.game_state.deck(player_b_id).len()
+            );
+        }
 
         while !self.game_state.is_game_over() {
             let cur_player_id = self.game_state.cur_player_id();
 
-            println!("Start turn for player: {:?}", cur_player_id);
+            println!("Player {:?} to take an action.", cur_player_id);
             println!(
                 "Available mana: {:?}",
                 self.game_state.player_mana(cur_player_id)

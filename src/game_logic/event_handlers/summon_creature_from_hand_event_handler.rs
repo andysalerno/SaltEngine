@@ -34,6 +34,11 @@ impl EventHandler for SummonCreatureFromHandEventHandler {
             game_state,
         );
 
+        let upon_summon = card_from_hand.definition().upon_summonz();
+
+        // Execute the "upon summon" behavior
+        (upon_summon)(hand_card_id, game_state, dispatcher);
+
         let pos = event.board_pos();
 
         dispatcher.dispatch(

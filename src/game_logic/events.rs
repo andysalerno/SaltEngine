@@ -9,6 +9,7 @@ mod end_turn;
 mod player_gain_mana;
 mod player_spend_mana;
 mod pos_takes_damage_event;
+mod prompt_player_event;
 mod start_game_event;
 mod summon_creature_from_hand_event;
 mod turn_start_event;
@@ -24,6 +25,7 @@ pub use end_turn::EndTurnEvent;
 pub use player_gain_mana::PlayerGainManaEvent;
 pub use player_spend_mana::PlayerSpendManaEvent;
 pub use pos_takes_damage_event::PosTakesDamageEvent;
+pub use prompt_player_event::PromptPlayerEvent;
 pub use start_game_event::StartGameEvent;
 pub use summon_creature_from_hand_event::SummonCreatureFromHandEvent;
 pub use turn_start_event::TurnStartEvent;
@@ -47,4 +49,5 @@ pub enum GameEvent {
     SpendMana(PlayerSpendManaEvent),
     SummonCreatureFromHand(SummonCreatureFromHandEvent),
     PosTakesDamage(PosTakesDamageEvent),
+    PromptPlayerEvent(PromptPlayerEvent),
 }

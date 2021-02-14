@@ -3,6 +3,8 @@ use std::borrow::Borrow;
 use crate::game_logic::{cards::UnitCardDefinition, BuffInstanceId, PassiveEffectInstance};
 use crate::{game_logic::Buff, id::Id};
 
+use super::board::BoardPos;
+
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct UnitCardInstanceId(Id);
 
@@ -10,6 +12,11 @@ impl UnitCardInstanceId {
     pub fn new() -> Self {
         Self(Id::new())
     }
+}
+
+#[derive(Debug, Clone)]
+enum InstanceState {
+    Pos(BoardPos),
 }
 
 #[derive(Debug)]
@@ -21,6 +28,7 @@ pub struct UnitCardInstance {
     attack: i32,
     health: i32,
     width: usize,
+    state: Option<InstanceState>,
 }
 
 impl UnitCardInstance {
@@ -39,6 +47,7 @@ impl UnitCardInstance {
             passive_effect,
             buffs: Vec::new(),
             id,
+            state: None,
         }
     }
 
@@ -83,5 +92,13 @@ impl UnitCardInstance {
 
     pub fn id(&self) -> UnitCardInstanceId {
         self.id
+    }
+
+    pub fn state(&self) -> Option<&InstanceState> {
+        self.state.as_ref()
+    }
+
+    pub fn state_mut(&mut self) -> Option<&mut InstanceState> {
+        self.state.as_mut()
     }
 }

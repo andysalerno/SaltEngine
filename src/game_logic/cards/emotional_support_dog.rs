@@ -124,13 +124,7 @@ impl PassiveEffectDefinition for EmotionalSupportDogPassiveDefinition {
         &self,
     ) -> Box<dyn FnOnce(PassiveEffectInstanceId, UnitCardInstanceId, &mut GameState)> {
         Box::new(move |instance_id, originator_id, game_state| {
-            let doggy = game_state
-                .board_iter()
-                .filter(|i| i.id() == originator_id)
-                .next()
-                .expect("A passive is active for ESD, but ESD doesn't exist?");
-
-            let doggy_pos = game_state.get_pos_by_id(doggy.id());
+            let doggy_pos = game_state.get_pos_by_id(originator_id);
 
             if doggy_pos.row_id != RowId::BackRow {
                 return;
@@ -142,7 +136,8 @@ impl PassiveEffectDefinition for EmotionalSupportDogPassiveDefinition {
             let front_card = game_state.get_at(front_pos);
 
             if let Some(front_card) = front_card {
-                game_state.update_by_id(front_card.id(), |c| {
+                let id = front_card.id();
+                game_state.update_by_id(id, |c| {
                     c.add_buff(Box::new(EmotionalSupportDogBuff::new(instance_id)));
                 });
             }
