@@ -1,6 +1,6 @@
 use crate::{
     game_logic::EventDispatcher,
-    game_state::{GameState, UnitCardInstanceId},
+    game_state::{GameState, UnitCardInstance, UnitCardInstanceId},
     id::Id,
 };
 
@@ -60,6 +60,12 @@ impl UnitCardDefinition for RicketyCannon {
         // 2. set state on _own_id with that pos
         // 3. impl an "upon_turn_start" that does the damage to that pos
         Vec::new()
+    }
+
+    fn upon_summonx(
+        &self,
+    ) -> Box<dyn FnOnce(&mut UnitCardInstance, &GameState, &mut EventDispatcher)> {
+        Box::new(|instance, _game_state, _dispatcher| {})
     }
 
     fn upon_summonz(

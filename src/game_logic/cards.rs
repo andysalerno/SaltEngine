@@ -45,6 +45,12 @@ pub trait UnitCardDefinition: CardDefinition {
         Box::new(|_id, _game_state, _dispatcher| {})
     }
 
+    fn upon_summonx(
+        &self,
+    ) -> Box<dyn FnOnce(&mut UnitCardInstance, &GameState, &mut EventDispatcher)> {
+        Box::new(|instance, _game_state, _dispatcher| {})
+    }
+
     fn upon_death(&self, _own_id: UnitCardInstanceId, _game_state: &GameState) -> Vec<GameEvent> {
         Vec::new()
     }
