@@ -32,6 +32,11 @@ impl GameAgent for ConsoleAgent {
     fn id(&self) -> PlayerId {
         self.id
     }
+
+    fn prompt_pos(&self, game_state: &GameState) -> BoardPos {
+        let mut empty_queue = VecDeque::new();
+        self.prompt_pos_index(game_state, &mut empty_queue)
+    }
 }
 
 impl ConsoleAgent {
