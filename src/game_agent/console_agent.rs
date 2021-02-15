@@ -51,23 +51,23 @@ impl Prompter for ConsolePrompter {
         self.prompt_pos_index(game_state, &mut empty_queue)
     }
 
-    fn prompt_player_slot(&self, game_state: &GameState) -> BoardPos {
+    fn prompt_player_slot(&self, _game_state: &GameState) -> BoardPos {
         todo!()
     }
 
-    fn prompt_opponent_slot(&self, game_state: &GameState) -> BoardPos {
+    fn prompt_opponent_slot(&self, _game_state: &GameState) -> BoardPos {
         todo!()
     }
 
-    fn prompt_creature_pos(&self, game_state: &GameState) -> BoardPos {
+    fn prompt_creature_pos(&self, _game_state: &GameState) -> BoardPos {
         todo!()
     }
 
-    fn prompt_player_creature_pos(&self, game_state: &GameState) -> BoardPos {
+    fn prompt_player_creature_pos(&self, _game_state: &GameState) -> BoardPos {
         todo!()
     }
 
-    fn prompt_opponent_creature_pos(&self, game_state: &GameState) -> BoardPos {
+    fn prompt_opponent_creature_pos(&self, _game_state: &GameState) -> BoardPos {
         todo!()
     }
 }

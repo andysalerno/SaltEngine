@@ -1,5 +1,3 @@
-use std::mem::swap;
-
 use super::{card_instance::UnitCardInstance, PlayerId, UnitCardInstanceId};
 
 #[derive(Debug, Copy, Clone, PartialEq)]
@@ -320,7 +318,7 @@ impl Board {
     }
 
     pub fn remove_by_id(&mut self, id: UnitCardInstanceId) -> UnitCardInstance {
-        let mut found_creature;
+        let found_creature;
         if let Some(creature) = self
             .player_side_mut()
             .front_row_mut()

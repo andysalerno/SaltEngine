@@ -2,7 +2,7 @@ use crate::{
     game_logic::{EventDispatcher, PosTakesDamageEvent},
     game_state::{
         board::{BoardPos, RowId},
-        GameState, InstanceState, UnitCardInstance, UnitCardInstanceId,
+        GameState, InstanceState, UnitCardInstance,
     },
     id::Id,
 };

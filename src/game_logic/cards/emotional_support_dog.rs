@@ -204,38 +204,41 @@ mod tests {
     struct StubPrompter;
 
     impl Prompter for StubPrompter {
-        fn prompt_slot(&self, game_state: &GameState) -> crate::game_state::board::BoardPos {
+        fn prompt_slot(&self, _game_state: &GameState) -> crate::game_state::board::BoardPos {
             todo!()
         }
 
-        fn prompt_player_slot(&self, game_state: &GameState) -> crate::game_state::board::BoardPos {
+        fn prompt_player_slot(
+            &self,
+            _game_state: &GameState,
+        ) -> crate::game_state::board::BoardPos {
             todo!()
         }
 
         fn prompt_opponent_slot(
             &self,
-            game_state: &GameState,
+            _game_state: &GameState,
         ) -> crate::game_state::board::BoardPos {
             todo!()
         }
 
         fn prompt_creature_pos(
             &self,
-            game_state: &GameState,
+            _game_state: &GameState,
         ) -> crate::game_state::board::BoardPos {
             todo!()
         }
 
         fn prompt_player_creature_pos(
             &self,
-            game_state: &GameState,
+            _game_state: &GameState,
         ) -> crate::game_state::board::BoardPos {
             todo!()
         }
 
         fn prompt_opponent_creature_pos(
             &self,
-            game_state: &GameState,
+            _game_state: &GameState,
         ) -> crate::game_state::board::BoardPos {
             todo!()
         }

@@ -8,9 +8,9 @@ pub use prawn::Prawn;
 pub use really_big_rock::ReallyBigRock;
 pub use rickety_cannon::RicketyCannon;
 
-use crate::game_state::{board::BoardPos, GameState, UnitCardInstance, UnitCardInstanceId};
+use crate::game_state::{board::BoardPos, GameState, UnitCardInstance};
 
-use super::{EventDispatcher, GameEvent, PassiveEffectDefinition};
+use super::{EventDispatcher, PassiveEffectDefinition};
 
 /// Describes which board positions
 /// this creature card may occupy.
