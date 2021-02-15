@@ -23,7 +23,7 @@ impl EventHandler for SummonCreatureFromHandEventHandler {
         let player_id = event.player_id();
         let hand_card_id = event.hand_card_id();
 
-        let card_from_hand = game_state.hand_mut(player_id).take_card(hand_card_id);
+        let mut card_from_hand = game_state.hand_mut(player_id).take_card(hand_card_id);
 
         let creature_name = card_from_hand.definition().title();
         let mana_amount = card_from_hand.definition().cost();
@@ -38,6 +38,9 @@ impl EventHandler for SummonCreatureFromHandEventHandler {
 
         // Execute the "upon summon" behavior
         (upon_summon)(hand_card_id, game_state, dispatcher);
+
+        let upon_summonx = card_from_hand.definition().upon_summonx();
+        (upon_summonx)(&mut card_from_hand, game_state, dispatcher);
 
         let pos = event.board_pos();
 

@@ -1,6 +1,6 @@
 use crate::{
     game_logic::EventDispatcher,
-    game_state::{GameState, UnitCardInstance, UnitCardInstanceId},
+    game_state::{GameState, InstanceState, UnitCardInstance, UnitCardInstanceId},
     id::Id,
 };
 
@@ -65,7 +65,9 @@ impl UnitCardDefinition for RicketyCannon {
     fn upon_summonx(
         &self,
     ) -> Box<dyn FnOnce(&mut UnitCardInstance, &GameState, &mut EventDispatcher)> {
-        Box::new(|instance, _game_state, _dispatcher| {})
+        Box::new(|instance, _game_state, _dispatcher| {
+            instance.set_state(Some(InstanceState::Pos(todo!())));
+        })
     }
 
     fn upon_summonz(

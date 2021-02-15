@@ -15,7 +15,7 @@ impl UnitCardInstanceId {
 }
 
 #[derive(Debug, Clone)]
-enum InstanceState {
+pub enum InstanceState {
     Pos(BoardPos),
 }
 
@@ -98,7 +98,7 @@ impl UnitCardInstance {
         self.state.as_ref()
     }
 
-    pub fn state_mut(&mut self) -> Option<&mut InstanceState> {
-        self.state.as_mut()
+    pub fn set_state(&mut self, state: Option<InstanceState>) {
+        self.state = state;
     }
 }

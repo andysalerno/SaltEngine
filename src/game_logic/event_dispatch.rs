@@ -61,6 +61,7 @@ impl EventDispatcher {
             GameEvent::PosTakesDamage(e) => {
                 PosTakesDamageHandler::default().handle(e, game_state, self)
             }
+            GameEvent::PromptPlayerEvent(_) => todo!(),
         }
     }
 }
