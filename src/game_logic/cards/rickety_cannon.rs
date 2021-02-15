@@ -1,6 +1,9 @@
 use crate::{
-    game_logic::EventDispatcher,
-    game_state::{GameState, InstanceState, UnitCardInstance, UnitCardInstanceId},
+    game_logic::{EventDispatcher, PosTakesDamageEvent},
+    game_state::{
+        board::{BoardPos, RowId},
+        GameState, InstanceState, UnitCardInstance, UnitCardInstanceId,
+    },
     id::Id,
 };
 
@@ -53,30 +56,19 @@ impl UnitCardDefinition for RicketyCannon {
 
     fn upon_summon(
         &self,
-        _own_id: crate::game_state::UnitCardInstanceId,
-        _game_state: &crate::game_state::GameState,
-    ) -> Vec<crate::game_logic::GameEvent> {
-        // 1. prompt user for the position they want to target
-        // 2. set state on _own_id with that pos
-        // 3. impl an "upon_turn_start" that does the damage to that pos
-        Vec::new()
-    }
+    ) -> Box<dyn FnOnce(&mut UnitCardInstance, BoardPos, &mut GameState, &mut EventDispatcher)>
+    {
+        Box::new(|instance, _summoned_to_pos, game_state, dispatcher| {
+            let pos = dispatcher.player_prompter().prompt_slot(game_state);
 
-    fn upon_summonx(
-        &self,
-    ) -> Box<dyn FnOnce(&mut UnitCardInstance, &GameState, &mut EventDispatcher)> {
-        Box::new(|instance, _game_state, _dispatcher| {
-            instance.set_state(Some(InstanceState::Pos(todo!())));
-        })
-    }
+            instance.set_state(Some(InstanceState::Pos(pos)));
 
-    fn upon_summonz(
-        &self,
-    ) -> Box<dyn FnOnce(UnitCardInstanceId, &GameState, &mut EventDispatcher)> {
-        Box::new(|id, game_state, dispatcher| {
-            // 1. prompt user for the position they want to target
-            // 2. set state on _own_id with that pos
-            // 3. impl an "upon_turn_start" that does the damage to that pos
+            println!("Hello from callback :)");
+
+            let behind_pos = BoardPos::new(game_state.cur_player_id(), RowId::BackRow, 0);
+            let event = PosTakesDamageEvent::new(behind_pos, 1);
+
+            dispatcher.dispatch(event, game_state);
         })
     }
 }

@@ -1,15 +1,21 @@
-use crate::game_state::GameState;
+use crate::{game_agent::game_agent::Prompter, game_state::GameState};
 
 use super::{event_handlers::*, events::GameEvent};
 
-#[derive(Debug, Default)]
+#[derive(Debug)]
 pub struct EventDispatcher {
     stack: Vec<GameEvent>,
+    player_a_prompter: Box<dyn Prompter>,
+    player_b_prompter: Box<dyn Prompter>,
 }
 
 impl EventDispatcher {
-    pub fn new() -> Self {
-        Self::default()
+    pub fn new(player_a_prompter: Box<dyn Prompter>, player_b_prompter: Box<dyn Prompter>) -> Self {
+        Self {
+            stack: Vec::new(),
+            player_a_prompter,
+            player_b_prompter,
+        }
     }
 
     pub fn dispatch(&mut self, event: impl Into<GameEvent>, game_state: &mut GameState) {
@@ -26,6 +32,10 @@ impl EventDispatcher {
 
             game_state.evaluate_passives();
         }
+    }
+
+    pub fn player_prompter(&self) -> &dyn Prompter {
+        self.player_a_prompter.as_ref()
     }
 
     fn handle(&mut self, event: GameEvent, game_state: &mut GameState) {
@@ -61,7 +71,6 @@ impl EventDispatcher {
             GameEvent::PosTakesDamage(e) => {
                 PosTakesDamageHandler::default().handle(e, game_state, self)
             }
-            GameEvent::PromptPlayerEvent(_) => todo!(),
         }
     }
 }

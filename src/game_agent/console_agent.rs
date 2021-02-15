@@ -1,6 +1,6 @@
 use std::{collections::VecDeque, io::stdin};
 
-use super::game_agent::GameAgent;
+use super::game_agent::{GameAgent, Prompter};
 use crate::game_state::board::BoardPos;
 use crate::game_state::board::RowId;
 use crate::{
@@ -26,20 +26,61 @@ impl ConsoleAgent {
 
 impl GameAgent for ConsoleAgent {
     fn get_action(&self, game_state: &GameState) -> GameEvent {
-        self.prompt(game_state).expect("No event selected")
+        ConsolePrompter::new(self.id())
+            .prompt(game_state)
+            .expect("No event selected")
     }
 
     fn id(&self) -> PlayerId {
         self.id
     }
 
-    fn prompt_pos(&self, game_state: &GameState) -> BoardPos {
-        let mut empty_queue = VecDeque::new();
-        self.prompt_pos_index(game_state, &mut empty_queue)
+    fn make_prompter(&self) -> Box<dyn Prompter> {
+        Box::new(ConsolePrompter::new(self.id()))
     }
 }
 
-impl ConsoleAgent {
+#[derive(Debug, Clone)]
+struct ConsolePrompter {
+    id: PlayerId,
+}
+
+impl Prompter for ConsolePrompter {
+    fn prompt_slot(&self, game_state: &GameState) -> BoardPos {
+        let mut empty_queue = VecDeque::new();
+        self.prompt_pos_index(game_state, &mut empty_queue)
+    }
+
+    fn prompt_player_slot(&self, game_state: &GameState) -> BoardPos {
+        todo!()
+    }
+
+    fn prompt_opponent_slot(&self, game_state: &GameState) -> BoardPos {
+        todo!()
+    }
+
+    fn prompt_creature_pos(&self, game_state: &GameState) -> BoardPos {
+        todo!()
+    }
+
+    fn prompt_player_creature_pos(&self, game_state: &GameState) -> BoardPos {
+        todo!()
+    }
+
+    fn prompt_opponent_creature_pos(&self, game_state: &GameState) -> BoardPos {
+        todo!()
+    }
+}
+
+impl ConsolePrompter {
+    fn new(id: PlayerId) -> Self {
+        Self { id }
+    }
+
+    fn id(&self) -> PlayerId {
+        self.id
+    }
+
     fn prompt(&self, game_state: &GameState) -> Option<GameEvent> {
         self.show_hand(game_state);
 

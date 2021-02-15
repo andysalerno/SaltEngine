@@ -1,3 +1,5 @@
+use std::mem::swap;
+
 use super::{card_instance::UnitCardInstance, PlayerId, UnitCardInstanceId};
 
 #[derive(Debug, Copy, Clone, PartialEq)]
@@ -317,7 +319,8 @@ impl Board {
         }
     }
 
-    pub fn remove_by_id(&mut self, id: UnitCardInstanceId) {
+    pub fn remove_by_id(&mut self, id: UnitCardInstanceId) -> UnitCardInstance {
+        let mut found_creature;
         if let Some(creature) = self
             .player_side_mut()
             .front_row_mut()
@@ -328,7 +331,7 @@ impl Board {
             })
             .next()
         {
-            *creature = None;
+            found_creature = creature;
         } else if let Some(creature) = self
             .player_side_mut()
             .back_row_mut()
@@ -339,7 +342,7 @@ impl Board {
             })
             .next()
         {
-            *creature = None;
+            found_creature = creature;
         } else if let Some(creature) = self
             .opponent_side_mut()
             .front_row_mut()
@@ -350,7 +353,7 @@ impl Board {
             })
             .next()
         {
-            *creature = None;
+            found_creature = creature;
         } else if let Some(creature) = self
             .opponent_side_mut()
             .back_row_mut()
@@ -361,7 +364,13 @@ impl Board {
             })
             .next()
         {
-            *creature = None;
+            found_creature = creature;
+        } else {
+            panic!("Creature not found on board with id: {:?}", id);
         }
+
+        let mut next = None;
+        std::mem::swap(&mut next, found_creature);
+        return next.unwrap();
     }
 }

@@ -59,24 +59,30 @@ impl UnitCardDefinition for ReallyBigRock {
         Position::Either
     }
 
-    fn upon_death(&self, own_id: UnitCardInstanceId, game_state: &GameState) -> Vec<GameEvent> {
-        let my_pos = game_state.get_pos_by_id(own_id);
+    fn upon_death(
+        &self,
+    ) -> Box<
+        dyn FnOnce(
+            &mut crate::game_state::UnitCardInstance,
+            BoardPos,
+            &mut GameState,
+            &mut crate::game_logic::EventDispatcher,
+        ),
+    > {
+        Box::new(|instance, died_at_pos, game_state, dispatcher| {
+            if died_at_pos.row_id != RowId::FrontRow {
+                return;
+            }
 
-        if my_pos.row_id != RowId::FrontRow {
-            return Vec::new();
-        }
+            let width = instance.width();
 
-        let width = game_state.get_by_id(own_id).width();
+            for i in 0..width {
+                let index = died_at_pos.row_index + i;
+                let behind_pos = BoardPos::new(died_at_pos.player_id, RowId::BackRow, index);
+                let event = PosTakesDamageEvent::new(behind_pos, 1);
 
-        let mut events = Vec::new();
-
-        for i in 0..width {
-            let index = my_pos.row_index + i;
-            let behind_pos = BoardPos::new(my_pos.player_id, RowId::BackRow, index);
-            let event = PosTakesDamageEvent::new(behind_pos, 1);
-            events.push(event.into());
-        }
-
-        events
+                dispatcher.dispatch(event, game_state);
+            }
+        })
     }
 }

@@ -9,7 +9,6 @@ mod end_turn_event_handler;
 mod player_gain_mana_event_handler;
 mod player_spend_mana_event_handler;
 mod pos_takes_damage_event_handler;
-mod prompt_player_event_handler;
 mod start_game_event_handler;
 mod summon_creature_from_hand_event_handler;
 mod turn_start_event_handler;

@@ -67,7 +67,9 @@ impl GameRunner {
     }
 
     pub fn run_game(&mut self) {
-        let mut dispatcher = EventDispatcher::new();
+        let a_prompter = self.player_a.make_prompter();
+        let b_prompter = self.player_b.make_prompter();
+        let mut dispatcher = EventDispatcher::new(a_prompter, b_prompter);
 
         dispatcher.dispatch(StartGameEvent, &mut self.game_state);
 

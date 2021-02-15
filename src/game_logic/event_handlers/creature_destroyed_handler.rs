@@ -15,7 +15,8 @@ impl EventHandler for CreatureDestroyedEventHandler {
         game_state: &mut GameState,
         dispatcher: &mut EventDispatcher,
     ) {
-        let creature_instance = game_state.get_by_id(event.creature_id());
+        let pos = game_state.get_pos_by_id(event.creature_id());
+        let mut creature_instance = game_state.board_mut().remove_by_id(event.creature_id());
 
         println!(
             "{} was destroyed (instance id: {:?})",
@@ -23,14 +24,7 @@ impl EventHandler for CreatureDestroyedEventHandler {
             creature_instance.id()
         );
 
-        let upon_death_event = creature_instance
-            .definition()
-            .upon_death(event.creature_id(), game_state);
-
-        game_state.board_mut().remove_by_id(event.creature_id());
-
-        upon_death_event
-            .into_iter()
-            .for_each(|e| dispatcher.dispatch(e, game_state));
+        let upon_death = creature_instance.definition().upon_death();
+        (upon_death)(&mut creature_instance, pos, game_state, dispatcher);
     }
 }

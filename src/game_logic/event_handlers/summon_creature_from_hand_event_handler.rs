@@ -21,33 +21,39 @@ impl EventHandler for SummonCreatureFromHandEventHandler {
         validate(&event, game_state);
 
         let player_id = event.player_id();
-        let hand_card_id = event.hand_card_id();
 
-        let mut card_from_hand = game_state.hand_mut(player_id).take_card(hand_card_id);
+        // Take the card out of the player's hand
+        let mut card_from_hand = game_state
+            .hand_mut(player_id)
+            .take_card(event.hand_card_id());
 
-        let creature_name = card_from_hand.definition().title();
-        let mana_amount = card_from_hand.definition().cost();
-        println!("Player {:?} summons {}", player_id, creature_name);
+        // Spend the mana
+        {
+            let creature_name = card_from_hand.definition().title();
+            let mana_amount = card_from_hand.definition().cost();
+            println!("Player {:?} summons {}", player_id, creature_name);
 
-        dispatcher.dispatch(
-            PlayerSpendManaEvent::new(player_id, mana_amount as u32),
-            game_state,
-        );
-
-        let upon_summon = card_from_hand.definition().upon_summonz();
-
-        // Execute the "upon summon" behavior
-        (upon_summon)(hand_card_id, game_state, dispatcher);
-
-        let upon_summonx = card_from_hand.definition().upon_summonx();
-        (upon_summonx)(&mut card_from_hand, game_state, dispatcher);
+            dispatcher.dispatch(
+                PlayerSpendManaEvent::new(player_id, mana_amount as u32),
+                game_state,
+            );
+        }
 
         let pos = event.board_pos();
 
-        dispatcher.dispatch(
-            CreatureSetEvent::new(player_id, card_from_hand, pos),
-            game_state,
-        );
+        // Perform the "upon summon"
+        {
+            let upon_summon = card_from_hand.definition().upon_summon();
+            (upon_summon)(&mut card_from_hand, pos, game_state, dispatcher);
+        }
+
+        // Set the card instance on the board
+        {
+            dispatcher.dispatch(
+                CreatureSetEvent::new(player_id, card_from_hand, pos),
+                game_state,
+            );
+        }
     }
 }
 
