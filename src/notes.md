@@ -29,3 +29,5 @@ some AoE cards damage per "slot" and not per "enemy" so deal double damage to 2-
 
 front cards are attack-oriented
 back cards are support/defense oriented
+
+hero power: summon a 1/1 bug; then, class cards: only summonable while you control a bug
