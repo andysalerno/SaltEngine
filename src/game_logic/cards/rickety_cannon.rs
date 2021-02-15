@@ -60,15 +60,17 @@ impl UnitCardDefinition for RicketyCannon {
     {
         Box::new(|instance, _summoned_to_pos, game_state, dispatcher| {
             let pos = dispatcher.player_prompter().prompt_slot(game_state);
-
             instance.set_state(Some(InstanceState::Pos(pos)));
+        })
+    }
 
-            println!("Hello from callback :)");
-
-            let behind_pos = BoardPos::new(game_state.cur_player_id(), RowId::BackRow, 0);
-            let event = PosTakesDamageEvent::new(behind_pos, 1);
-
-            dispatcher.dispatch(event, game_state);
+    fn upon_turn_start(
+        &self,
+    ) -> Box<dyn FnOnce(&mut UnitCardInstance, BoardPos, &mut GameState, &mut EventDispatcher)>
+    {
+        Box::new(|instance, _summoned_to_pos, game_state, dispatcher| {
+            let pos = dispatcher.player_prompter().prompt_slot(game_state);
+            instance.set_state(Some(InstanceState::Pos(pos)));
         })
     }
 }
