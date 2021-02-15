@@ -48,7 +48,7 @@ struct ConsolePrompter {
 impl Prompter for ConsolePrompter {
     fn prompt_slot(&self, game_state: &GameState) -> BoardPos {
         let mut empty_queue = VecDeque::new();
-        self.prompt_pos_index(game_state, &mut empty_queue)
+        self.prompt_pos_any(game_state, &mut empty_queue)
     }
 
     fn prompt_player_slot(&self, _game_state: &GameState) -> BoardPos {
@@ -152,7 +152,7 @@ impl ConsolePrompter {
             selected_card.id()
         };
 
-        let board_pos = self.prompt_pos_index(game_state, input_queue);
+        let board_pos = self.prompt_pos_any(game_state, input_queue);
 
         return Some(
             SummonCreatureFromHandEvent::new(player_id, board_pos, selected_card_id).into(),
@@ -226,12 +226,12 @@ impl ConsolePrompter {
         item_at
     }
 
-    fn prompt_pos_index(
+    fn prompt_pos_any(
         &self,
         game_state: &GameState,
         input_queue: &mut VecDeque<String>,
     ) -> BoardPos {
-        let c = self.ask("Which letter position?", input_queue);
+        let c = self.ask("Select any position on the board.", input_queue);
         let input_c = c.chars().nth(0).expect("Expected single-char response");
 
         let enemy_back_chars = "ABCDEF".chars();
@@ -251,18 +251,6 @@ impl ConsolePrompter {
         }
 
         panic!("The input char {} did not match any position", input_c);
-    }
-
-    fn prompt_pos_any(
-        &self,
-        game_state: &GameState,
-        input_queue: &mut VecDeque<String>,
-    ) -> BoardPos {
-        let player = self.prompt_player(game_state, input_queue);
-        let row = self.prompt_row(input_queue);
-        let index = self.prompt_row_index(input_queue);
-
-        BoardPos::new(player, row, index)
     }
 
     fn prompt_pos_myside(
