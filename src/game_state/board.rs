@@ -1,5 +1,28 @@
 use super::{card_instance::UnitCardInstance, PlayerId, UnitCardInstanceId};
 
+const BOARD_WIDTH: usize = 6;
+const SLOTS_COUNT: usize = BOARD_WIDTH * 4;
+
+enum PlayerAB {
+    PlayerA,
+    PlayerB,
+}
+
+#[derive(Debug)]
+pub struct BoardSlot {
+    pos: BoardPos,
+    creature: Option<UnitCardInstance>,
+}
+
+impl BoardSlot {
+    fn new(pos: BoardPos) -> Self {
+        Self {
+            pos,
+            creature: None,
+        }
+    }
+}
+
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub enum RowId {
     FrontRow,
@@ -73,47 +96,97 @@ impl BoardSide {
             .chain(self.back_row())
             .filter_map(|i| i.as_ref())
     }
+
+    pub fn iter_mut(&mut self) -> impl Iterator<Item = &mut UnitCardInstance> {
+        let front = &mut self.front_row.slots;
+        let back = &mut self.back_row.slots;
+
+        front.iter_mut().chain(back).filter_map(|i| i.as_mut())
+    }
 }
 
 pub struct Board {
-    player_side: BoardSide,
-    opponent_side: BoardSide,
-    player_id: PlayerId,
-    opponent_id: PlayerId,
+    player_a_id: PlayerId,
+    player_b_id: PlayerId,
+    slots: Vec<BoardSlot>,
 }
 
 impl Board {
-    pub fn new(size: usize, player_id: PlayerId, opponent_id: PlayerId) -> Self {
+    pub fn new(size: usize, player_a_id: PlayerId, player_b_id: PlayerId) -> Self {
+        let mut slots = Vec::with_capacity(SLOTS_COUNT);
+
+        // playber b
+        for i in 0..BOARD_WIDTH {
+            let pos = BoardPos::new(player_b_id, RowId::BackRow, i);
+            slots.push(BoardSlot::new(pos));
+        }
+        for i in 0..BOARD_WIDTH {
+            let pos = BoardPos::new(player_b_id, RowId::FrontRow, i);
+            slots.push(BoardSlot::new(pos));
+        }
+
+        // playber a
+        for i in 0..BOARD_WIDTH {
+            let pos = BoardPos::new(player_a_id, RowId::FrontRow, i);
+            slots.push(BoardSlot::new(pos));
+        }
+        for i in 0..BOARD_WIDTH {
+            let pos = BoardPos::new(player_a_id, RowId::BackRow, i);
+            slots.push(BoardSlot::new(pos));
+        }
+
         Self {
-            player_side: BoardSide::new(size),
-            opponent_side: BoardSide::new(size),
-            player_id,
-            opponent_id,
+            player_a_id,
+            player_b_id,
+            slots,
         }
     }
 
-    pub fn player_side(&self) -> &BoardSide {
-        &self.player_side
-    }
-
-    fn player_side_mut(&mut self) -> &mut BoardSide {
-        &mut self.player_side
-    }
-
-    pub fn opponent_side(&self) -> &BoardSide {
-        &self.opponent_side
-    }
-
-    fn opponent_side_mut(&mut self) -> &mut BoardSide {
-        &mut self.opponent_side
-    }
-
-    pub fn player_side_id(&self, id: PlayerId) -> &BoardSide {
-        match id {
-            p if p == self.player_id => self.player_side(),
-            p if p == self.opponent_id => self.opponent_side(),
-            _ => panic!("Unknown player id {:?}", id),
+    fn player_ab(&self, player_id: PlayerId) -> PlayerAB {
+        if player_id == self.player_a_id {
+            PlayerAB::PlayerA
+        } else if player_id == self.player_b_id {
+            PlayerAB::PlayerB
+        } else {
+            panic!("Unknown player id: {:?}", player_id)
         }
+    }
+
+    /// The range for the entire board.
+    fn board_range(&self, player_id: PlayerId) -> std::ops::Range<usize> {
+        0..SLOTS_COUNT
+    }
+
+    /// The range for the given player.
+    fn player_range(&self, player_id: PlayerId) -> std::ops::Range<usize> {
+        match self.player_ab(player_id) {
+            PlayerAB::PlayerB => front_half(0..SLOTS_COUNT),
+            PlayerAB::PlayerA => end_half(0..SLOTS_COUNT),
+        }
+    }
+
+    /// The range for the given player's row.
+    fn row_range(&self, player_id: PlayerId, row_id: RowId) -> std::ops::Range<usize> {
+        let player_range = self.player_range(player_id);
+
+        match self.player_ab(player_id) {
+            PlayerAB::PlayerB => match row_id {
+                RowId::BackRow => front_half(player_range),
+                RowId::FrontRow => end_half(player_range),
+            },
+            PlayerAB::PlayerA => match row_id {
+                RowId::FrontRow => front_half(player_range),
+                RowId::BackRow => end_half(player_range),
+            },
+        }
+    }
+
+    pub fn player_side(&self, player_id: PlayerId) -> &[BoardSlot] {
+        &self.slots[self.player_range(player_id)]
+    }
+
+    pub fn player_side_mut(&mut self, player_id: PlayerId) -> &mut [BoardSlot] {
+        &mut self.slots[self.player_range(player_id)]
     }
 
     pub fn get_at(&self, pos: BoardPos) -> Option<&UnitCardInstance> {
@@ -368,4 +441,21 @@ impl Board {
         std::mem::swap(&mut next, found_creature);
         return next.unwrap();
     }
+}
+
+fn front_half(ops: std::ops::Range<usize>) -> std::ops::Range<usize> {
+    // ex: 10..20. includes 10 thru 19, with 10 total elements
+
+    // 20 - 10 = 10
+    let len = ops.end - ops.start;
+    assert!(len % 2 == 0);
+
+    // 10..15 (5 elements, 10-14 inclusive)
+    ops.start..ops.start + len / 2
+}
+
+fn end_half(ops: std::ops::Range<usize>) -> std::ops::Range<usize> {
+    let len = ops.end - ops.start;
+    assert!(len % 2 == 0);
+    ops.start + len / 2..ops.end
 }
