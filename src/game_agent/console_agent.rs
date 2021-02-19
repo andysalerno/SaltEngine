@@ -1,8 +1,8 @@
 use std::{collections::VecDeque, io::stdin};
 
 use super::game_agent::{GameAgent, Prompter};
-use crate::game_state::board::BoardPos;
 use crate::game_state::board::RowId;
+use crate::{game_logic::Event, game_state::board::BoardPos};
 use crate::{
     game_logic::{cards::UnitCardDefinition, GameEvent, SummonCreatureFromHandEvent},
     game_state::PlayerId,
@@ -11,6 +11,8 @@ use crate::{
     game_logic::{AttackEvent, EndTurnEvent},
     game_state::{GameState, UnitCardInstance},
 };
+
+use std::error::Error;
 
 pub struct ConsoleAgent {
     id: PlayerId,
@@ -26,9 +28,17 @@ impl ConsoleAgent {
 
 impl GameAgent for ConsoleAgent {
     fn get_action(&self, game_state: &GameState) -> GameEvent {
-        ConsolePrompter::new(self.id())
-            .prompt(game_state)
-            .expect("No event selected")
+        let prompter = ConsolePrompter::new(self.id());
+        prompter.show_hand(game_state);
+
+        loop {
+            let result = prompter.prompt(game_state);
+
+            match result {
+                Ok(game_event) => break game_event,
+                Err(e) => say(&format!("Invalid input: {}", e.to_string())),
+            }
+        }
     }
 
     fn id(&self) -> PlayerId {
@@ -81,16 +91,14 @@ impl ConsolePrompter {
         self.id
     }
 
-    fn prompt(&self, game_state: &GameState) -> Option<GameEvent> {
-        self.show_hand(game_state);
-
+    fn prompt(&self, game_state: &GameState) -> Result<GameEvent, Box<dyn Error>> {
         let mut input_queue = VecDeque::new();
 
         let mut event = None;
 
         while event.is_none() {
             let action = self.ask(
-                "Enter an action: (summon, hand, info, attack, end (turn), quit)",
+                "Enter an action: (summon, (show) board, (show) hand, info, attack, end (turn), quit)",
                 &mut input_queue,
             );
 
@@ -99,26 +107,30 @@ impl ConsolePrompter {
                     self.show_hand(game_state);
                     None
                 }
-                "summon" => self.summon(game_state, &mut input_queue),
+                "board" => {
+                    self.show_hand(game_state);
+                    None
+                }
+                "summon" => Some(self.summon(game_state, &mut input_queue)),
                 "info" => {
                     self.info(game_state, &mut input_queue);
                     None
                 }
-                "attack" => Some(GameEvent::Attack(self.attack(game_state, &mut input_queue))),
-                "end" => Some(GameEvent::EndTurn(EndTurnEvent)),
-                "quit" => return None,
+                "attack" => Some(self.attack(game_state, &mut input_queue)),
+                "end" => Some(Ok(EndTurnEvent.into())),
+                "quit" => None,
                 _ => panic!("Unknown input: {}", action),
             };
         }
 
-        event
+        event.unwrap()
     }
 
     fn summon(
         &self,
         game_state: &GameState,
         input_queue: &mut VecDeque<String>,
-    ) -> Option<GameEvent> {
+    ) -> Result<GameEvent, Box<dyn Error>> {
         let player_id = game_state.cur_player_id();
 
         let selected_card_id = {
@@ -131,40 +143,28 @@ impl ConsolePrompter {
                 .parse()
                 .expect("invalid input");
 
-            let selected_card = game_state
-                .hand(player_id)
-                .cards()
-                .into_iter()
-                .nth(card_index)
-                .expect(&format!("No card at index {}", card_index));
-
-            let mana_cost = selected_card.definition().cost() as u32;
-            let player_mana = game_state.player_mana(player_id);
-
-            if mana_cost > player_mana {
-                self.say(&format!(
-                    "Card costs {} mana; you only have {}.",
-                    mana_cost, player_mana
-                ));
-                return None;
-            }
+            let selected_card = game_state.hand(player_id).nth(card_index);
 
             selected_card.id()
         };
 
         let board_pos = self.prompt_pos_any(game_state, input_queue);
 
-        return Some(
-            SummonCreatureFromHandEvent::new(player_id, board_pos, selected_card_id).into(),
-        );
+        let event = SummonCreatureFromHandEvent::new(player_id, board_pos, selected_card_id);
+
+        event.validate(game_state).map(|_| event.into())
     }
 
-    fn attack(&self, game_state: &GameState, input_queue: &mut VecDeque<String>) -> AttackEvent {
+    fn attack(
+        &self,
+        game_state: &GameState,
+        input_queue: &mut VecDeque<String>,
+    ) -> Result<GameEvent, Box<dyn Error>> {
         let attacker = loop {
             let pos = self.prompt_pos_myside(game_state, input_queue);
             match game_state.get_at(pos) {
                 Some(c) => break c.id(),
-                _ => self.say("No card found at that pos; try again"),
+                _ => say("No card found at that pos; try again"),
             }
         };
 
@@ -172,11 +172,13 @@ impl ConsolePrompter {
             let pos = self.prompt_pos_enemyside(game_state, input_queue);
             match game_state.get_at(pos) {
                 Some(c) => break c.id(),
-                _ => self.say("No card found at that pos; try again"),
+                _ => say("No card found at that pos; try again"),
             }
         };
 
-        AttackEvent::new(attacker, target)
+        let event = AttackEvent::new(attacker, target);
+
+        event.validate(game_state).map(|_| event.into())
     }
 
     fn info(&self, game_state: &GameState, input_queue: &mut VecDeque<String>) {
@@ -217,11 +219,11 @@ impl ConsolePrompter {
         ask: &str,
         input_queue: &mut VecDeque<String>,
     ) -> Option<&'a UnitCardInstance> {
-        self.say(ask);
+        say(ask);
         let pos = self.prompt_pos_any(game_state, input_queue);
         let item_at = game_state.get_at(pos);
 
-        self.say(&format!("Selected: {:?}", item_at));
+        say(&format!("Selected: {:?}", item_at));
 
         item_at
     }
@@ -313,16 +315,12 @@ impl ConsolePrompter {
         index
     }
 
-    fn say(&self, message: &str) {
-        println!("{}", message);
-    }
-
     fn ask(&self, message: &str, input_queue: &mut VecDeque<String>) -> String {
         if let Some(input) = input_queue.pop_front() {
             return input;
         }
 
-        self.say(message);
+        say(message);
 
         let mut input = String::new();
         stdin()
@@ -335,6 +333,10 @@ impl ConsolePrompter {
 
         input_queue.pop_front().expect("No input provided.")
     }
+}
+
+fn say(message: &str) {
+    println!("{}", message);
 }
 
 fn display_card(card: &dyn UnitCardDefinition, tag: usize) -> String {

@@ -33,6 +33,13 @@ impl Hand {
             ))
     }
 
+    pub fn nth(&self, n: usize) -> &UnitCardInstance {
+        self.cards()
+            .iter()
+            .nth(n)
+            .expect(&format!("No card at index {}", n))
+    }
+
     pub fn take_card(&mut self, id: UnitCardInstanceId) -> UnitCardInstance {
         let (index, _) = self
             .cards

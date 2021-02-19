@@ -61,9 +61,8 @@ pub trait UnitCardDefinition: CardDefinition {
 
     fn upon_turn_start(
         &self,
-    ) -> Box<dyn FnOnce(&mut UnitCardInstance, BoardPos, &mut GameState, &mut EventDispatcher)>
-    {
-        Box::new(|_instance, _destroyed_at_pos, _game_state, _dispatcher| {})
+    ) -> Box<dyn FnOnce(&mut UnitCardInstance, &mut GameState, &mut EventDispatcher)> {
+        Box::new(|_instance, _game_state, _dispatcher| {})
     }
 
     fn passive_effect(&self) -> Option<Box<dyn PassiveEffectDefinition>> {

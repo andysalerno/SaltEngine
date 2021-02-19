@@ -28,7 +28,15 @@ pub use start_game_event::StartGameEvent;
 pub use summon_creature_from_hand_event::SummonCreatureFromHandEvent;
 pub use turn_start_event::TurnStartEvent;
 
-pub trait Event: Into<GameEvent> {}
+use crate::game_state::GameState;
+
+pub type Result = std::result::Result<(), Box<dyn std::error::Error>>;
+
+pub trait Event: Into<GameEvent> {
+    fn validate(&self, _game_state: &GameState) -> Result {
+        Ok(())
+    }
+}
 
 #[derive(Debug)]
 pub enum GameEvent {
@@ -38,7 +46,6 @@ pub enum GameEvent {
     CreatureDealsDamage(CreatureDealsDamageEvent),
     CreatureTakesDamage(CreatureTakesDamageEvent),
     CreatureDestroyed(CreatureDestroyedEvent),
-    TurnEnd(EndTurnEvent),
     TurnStart(TurnStartEvent),
     DrawCard(DrawCardEvent),
     AddCardToHand(AddCardToHandEvent),

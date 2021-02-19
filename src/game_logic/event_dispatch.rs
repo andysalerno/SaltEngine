@@ -52,7 +52,6 @@ impl EventDispatcher {
             GameEvent::CreatureDestroyed(e) => {
                 CreatureDestroyedEventHandler::default().handle(e, game_state, self)
             }
-            GameEvent::TurnEnd(e) => EndTurnEventHandler::default().handle(e, game_state, self),
             GameEvent::TurnStart(e) => TurnStartHandler::default().handle(e, game_state, self),
             GameEvent::DrawCard(e) => DrawCardEventHandler::default().handle(e, game_state, self),
             GameEvent::AddCardToHand(e) => {
