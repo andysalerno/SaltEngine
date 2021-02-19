@@ -2,7 +2,7 @@ use crate::{
     game_logic::{event_handlers::PosTakesDamageHandler, EventDispatcher, PosTakesDamageEvent},
     game_state::{
         board::{BoardPos, RowId},
-        GameState, InstanceState, UnitCardInstance,
+        GameState, InstanceState, UnitCardInstance, UnitCardInstanceId,
     },
     id::Id,
 };
@@ -66,8 +66,9 @@ impl UnitCardDefinition for RicketyCannon {
 
     fn upon_turn_start(
         &self,
-    ) -> Box<dyn FnOnce(&mut UnitCardInstance, &mut GameState, &mut EventDispatcher)> {
-        Box::new(|instance, game_state, dispatcher| {
+    ) -> Box<dyn FnOnce(UnitCardInstanceId, &mut GameState, &mut EventDispatcher)> {
+        Box::new(|id, game_state, dispatcher| {
+            let instance = game_state.get_by_id(id);
             let cannon_target = instance.state();
 
             if let Some(InstanceState::Pos(pos)) = cannon_target {

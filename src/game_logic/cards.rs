@@ -8,7 +8,7 @@ pub use prawn::Prawn;
 pub use really_big_rock::ReallyBigRock;
 pub use rickety_cannon::RicketyCannon;
 
-use crate::game_state::{board::BoardPos, GameState, UnitCardInstance};
+use crate::game_state::{board::BoardPos, GameState, UnitCardInstance, UnitCardInstanceId};
 
 use super::{EventDispatcher, PassiveEffectDefinition};
 
@@ -61,7 +61,7 @@ pub trait UnitCardDefinition: CardDefinition {
 
     fn upon_turn_start(
         &self,
-    ) -> Box<dyn FnOnce(&mut UnitCardInstance, &mut GameState, &mut EventDispatcher)> {
+    ) -> Box<dyn FnOnce(UnitCardInstanceId, &mut GameState, &mut EventDispatcher)> {
         Box::new(|_instance, _game_state, _dispatcher| {})
     }
 
