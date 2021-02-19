@@ -118,7 +118,7 @@ impl ConsolePrompter {
                 }
                 "attack" => Some(self.attack(game_state, &mut input_queue)),
                 "end" => Some(Ok(EndTurnEvent.into())),
-                "quit" => None,
+                "quit" => panic!(),
                 _ => panic!("Unknown input: {}", action),
             };
         }

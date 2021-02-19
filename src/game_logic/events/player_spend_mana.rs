@@ -31,4 +31,20 @@ impl Into<GameEvent> for PlayerSpendManaEvent {
     }
 }
 
-impl Event for PlayerSpendManaEvent {}
+impl Event for PlayerSpendManaEvent {
+    fn validate(&self, game_state: &crate::game_state::GameState) -> super::Result {
+        let mana_count = game_state.player_mana(self.player_id());
+
+        if mana_count >= self.mana_count() {
+            Ok(())
+        } else {
+            Err(format!(
+                "Player {:?} only has {} mana, but tried to spend {} mana.",
+                self.player_id(),
+                mana_count,
+                self.mana_count()
+            )
+            .into())
+        }
+    }
+}

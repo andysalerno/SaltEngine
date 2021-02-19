@@ -66,6 +66,20 @@ impl BoardSide {
     fn back_row_mut(&mut self) -> &mut [Option<UnitCardInstance>] {
         &mut self.back_row.slots
     }
+
+    pub fn iter(&self) -> impl Iterator<Item = &UnitCardInstance> {
+        self.front_row()
+            .iter()
+            .chain(self.back_row())
+            .filter_map(|i| i.as_ref())
+    }
+
+    pub fn iter_mut<'a>(&'a mut self) -> impl Iterator<Item = &'a mut UnitCardInstance> {
+        self.front_row_mut()
+            .iter_mut()
+            .chain(self.back_row_mut())
+            .filter_map(|i| i.as_mut())
+    }
 }
 
 pub struct Board {
@@ -99,6 +113,14 @@ impl Board {
 
     fn opponent_side_mut(&mut self) -> &mut BoardSide {
         &mut self.opponent_side
+    }
+
+    pub fn player_side_id(&self, id: PlayerId) -> &BoardSide {
+        match id {
+            p if p == self.player_id => self.player_side(),
+            p if p == self.opponent_id => self.opponent_side(),
+            _ => panic!("Unknown player id {:?}", id),
+        }
     }
 
     pub fn get_at(&self, pos: BoardPos) -> Option<&UnitCardInstance> {
@@ -241,20 +263,15 @@ impl Board {
     }
 
     pub fn get_by_id(&self, id: UnitCardInstanceId) -> &UnitCardInstance {
-        let opponent_side = self.opponent_side();
-        let player_side = self.player_side();
+        self.iter()
+            .filter(|i| i.id() == id)
+            .next()
+            .expect(&format!("No creature found with id {:?}", id))
+    }
 
-        opponent_side
-            .back_row()
-            .iter()
-            .chain(opponent_side.front_row())
-            .chain(player_side.front_row())
-            .chain(player_side.back_row())
-            .filter(|i| match i {
-                None => false,
-                Some(c) => c.id() == id,
-            })
-            .filter_map(|i| i.as_ref())
+    pub fn get_by_mut(&mut self, id: UnitCardInstanceId) -> &mut UnitCardInstance {
+        self.iter()
+            .filter(|i| i.id() == id)
             .next()
             .expect(&format!("No creature found with id {:?}", id))
     }
@@ -264,13 +281,14 @@ impl Board {
         let opponent_side = self.opponent_side();
         let player_side = self.player_side();
 
-        opponent_side
-            .back_row()
-            .iter()
-            .chain(opponent_side.front_row())
-            .chain(player_side.front_row())
-            .chain(player_side.back_row())
-            .filter_map(|i| i.as_ref())
+        opponent_side.iter().chain(player_side.iter())
+    }
+
+    pub fn iter_mut(&mut self) -> impl Iterator<Item = &mut UnitCardInstance> {
+        let opponent_side = self.opponent_side_mut();
+        let player_side = self.player_side_mut();
+
+        opponent_side.iter_mut().chain(player_side.iter_mut())
     }
 
     pub fn update_by_id(

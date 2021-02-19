@@ -26,5 +26,15 @@ impl EventHandler for TurnStartHandler {
         game_state.refresh_player_mana(player_id);
 
         dispatcher.dispatch(DrawCardEvent::new(player_id), game_state);
+
+        let turn_start_triggers = game_state
+            .player_side(player_id)
+            .map(|card| (card.id(), card.definition().upon_turn_start()))
+            .collect::<Vec<_>>();
+
+        for (id, action) in turn_start_triggers {
+            let instance = game_state.get_by_id(id);
+            (action)(instance, game_state, dispatcher);
+        }
     }
 }

@@ -252,6 +252,10 @@ impl GameState {
         self.board.iter()
     }
 
+    pub fn player_side(&self, player_id: PlayerId) -> impl Iterator<Item = &UnitCardInstance> {
+        self.board.player_side_id(player_id).iter()
+    }
+
     fn player_ab(&self, player_id: PlayerId) -> PlayerAB {
         if player_id == self.player_a_id() {
             PlayerAB::PlayerA
