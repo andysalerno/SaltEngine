@@ -21,6 +21,18 @@ impl BoardSlot {
             creature: None,
         }
     }
+
+    fn maybe_creature(&self) -> Option<&UnitCardInstance> {
+        self.creature.as_ref()
+    }
+
+    fn set_creature(&mut self, creature: UnitCardInstance) {
+        self.creature = Some(creature);
+    }
+
+    fn pos(&self) -> BoardPos {
+        self.pos
+    }
 }
 
 #[derive(Debug, Copy, Clone, PartialEq)]
@@ -43,65 +55,6 @@ impl BoardPos {
             row_id,
             row_index,
         }
-    }
-}
-
-struct BoardRow {
-    size: usize,
-    slots: Vec<Option<UnitCardInstance>>,
-}
-
-impl BoardRow {
-    pub fn new(size: usize) -> Self {
-        let mut slots = Vec::new();
-
-        (0..size).for_each(|_| slots.push(None));
-
-        Self { size, slots }
-    }
-}
-
-pub struct BoardSide {
-    front_row: BoardRow,
-    back_row: BoardRow,
-}
-
-impl BoardSide {
-    pub fn new(size: usize) -> Self {
-        Self {
-            front_row: BoardRow::new(size),
-            back_row: BoardRow::new(size),
-        }
-    }
-
-    pub fn front_row(&self) -> &[Option<UnitCardInstance>] {
-        &self.front_row.slots
-    }
-
-    fn front_row_mut(&mut self) -> &mut [Option<UnitCardInstance>] {
-        &mut self.front_row.slots
-    }
-
-    pub fn back_row(&self) -> &[Option<UnitCardInstance>] {
-        &self.back_row.slots
-    }
-
-    fn back_row_mut(&mut self) -> &mut [Option<UnitCardInstance>] {
-        &mut self.back_row.slots
-    }
-
-    pub fn iter(&self) -> impl Iterator<Item = &UnitCardInstance> {
-        self.front_row()
-            .iter()
-            .chain(self.back_row())
-            .filter_map(|i| i.as_ref())
-    }
-
-    pub fn iter_mut(&mut self) -> impl Iterator<Item = &mut UnitCardInstance> {
-        let front = &mut self.front_row.slots;
-        let back = &mut self.back_row.slots;
-
-        front.iter_mut().chain(back).filter_map(|i| i.as_mut())
     }
 }
 
@@ -181,6 +134,16 @@ impl Board {
         }
     }
 
+    /// An iterator over all slots on the entire board (even empty ones).
+    pub fn slots_iter(&self) -> impl Iterator<Item = &BoardSlot> {
+        self.slots.iter()
+    }
+
+    /// An iterator over all the creatures on the board.
+    pub fn creatures_iter(&self) -> impl Iterator<Item = &UnitCardInstance> {
+        self.slots_iter().filter_map(|s| s.maybe_creature())
+    }
+
     pub fn player_side(&self, player_id: PlayerId) -> &[BoardSlot] {
         &self.slots[self.player_range(player_id)]
     }
@@ -189,18 +152,16 @@ impl Board {
         &mut self.slots[self.player_range(player_id)]
     }
 
-    pub fn get_at(&self, pos: BoardPos) -> Option<&UnitCardInstance> {
-        let side = if pos.player_id == self.player_id {
-            self.player_side()
-        } else {
-            self.opponent_side()
-        };
+    pub fn player_row(&self, player_id: PlayerId, row: RowId) -> &[BoardSlot] {
+        &self.slots[self.row_range(player_id, row)]
+    }
 
-        let row = if pos.row_id == RowId::BackRow {
-            side.back_row()
-        } else {
-            side.front_row()
-        };
+    pub fn player_row_mut(&mut self, player_id: PlayerId, row: RowId) -> &mut [BoardSlot] {
+        &mut self.slots[self.row_range(player_id, row)]
+    }
+
+    pub fn creature_at_pos(&self, pos: BoardPos) -> Option<&UnitCardInstance> {
+        let row = self.player_row(pos.player_id, pos.row_id);
 
         // start at pos.row_index, and work back, in case there's
         // a creature taking up multiple rows
@@ -208,7 +169,7 @@ impl Board {
             let distance = pos.row_index - i;
             let occupant = &row[i];
 
-            if let Some(occupant) = occupant {
+            if let Some(occupant) = occupant.maybe_creature() {
                 if occupant.width() > distance {
                     return Some(occupant);
                 } else {
@@ -221,7 +182,7 @@ impl Board {
     }
 
     pub fn set_at(&mut self, pos: BoardPos, card_instance: UnitCardInstance) {
-        if let Some(existing) = self.get_at(pos) {
+        if let Some(existing) = self.creature_at_pos(pos) {
             panic!(
                 "Could not set at pos {:?} due to existing occupant: {:?}",
                 pos,
@@ -229,217 +190,24 @@ impl Board {
             );
         }
 
-        let side = if pos.player_id == self.player_id {
-            self.player_side_mut()
-        } else {
-            self.opponent_side_mut()
-        };
+        let row = self.player_row_mut(pos.player_id, pos.row_id);
 
-        let row = if pos.row_id == RowId::BackRow {
-            side.back_row_mut()
-        } else {
-            side.front_row_mut()
-        };
-
-        row[pos.row_index] = Some(card_instance);
+        row[pos.row_index].set_creature(card_instance);
     }
 
-    pub fn get_position_by_id(&self, id: UnitCardInstanceId) -> BoardPos {
-        // Check opponent back
-        {
-            let found = self
-                .opponent_side()
-                .back_row()
-                .iter()
-                .enumerate()
-                .filter(|i| match i.1 {
-                    None => false,
-                    Some(c) => c.id() == id,
-                })
-                .next();
-
-            if let Some(found) = found {
-                let (index, _) = found;
-                let player_id = self.opponent_id;
-                return BoardPos::new(player_id, RowId::BackRow, index);
-            }
-        }
-
-        // Check opponent front
-        {
-            let found = self
-                .opponent_side()
-                .front_row()
-                .iter()
-                .enumerate()
-                .filter(|i| match i.1 {
-                    None => false,
-                    Some(c) => c.id() == id,
-                })
-                .next();
-
-            if let Some(found) = found {
-                let (index, _) = found;
-                let player_id = self.opponent_id;
-                return BoardPos::new(player_id, RowId::FrontRow, index);
-            }
-        }
-
-        // Check player back
-        {
-            let found = self
-                .player_side()
-                .back_row()
-                .iter()
-                .enumerate()
-                .filter(|i| match i.1 {
-                    None => false,
-                    Some(c) => c.id() == id,
-                })
-                .next();
-
-            if let Some(found) = found {
-                let (index, _) = found;
-                let player_id = self.player_id;
-                return BoardPos::new(player_id, RowId::BackRow, index);
-            }
-        }
-
-        // Check player front
-        {
-            let found = self
-                .player_side()
-                .front_row()
-                .iter()
-                .enumerate()
-                .filter(|i| match i.1 {
-                    None => false,
-                    Some(c) => c.id() == id,
-                })
-                .next();
-
-            if let Some(found) = found {
-                let (index, _) = found;
-                let player_id = self.player_id;
-                return BoardPos::new(player_id, RowId::FrontRow, index);
-            }
-        }
-
-        panic!("Id not found: {:?}", id);
+    pub fn slot_with_creature(&self, id: UnitCardInstanceId) -> &BoardSlot {
+        self.slots_iter()
+            .filter(|s| s.maybe_creature().map(|c| c.id()) == Some(id))
+            .next()
+            .expect(&format!("Creature instance with id {:?} not found.", id))
     }
 
-    pub fn get_by_id(&self, id: UnitCardInstanceId) -> &UnitCardInstance {
-        self.iter()
-            .filter(|i| i.id() == id)
-            .next()
-            .expect(&format!("No creature found with id {:?}", id))
+    pub fn position_with_creature(&self, id: UnitCardInstanceId) -> BoardPos {
+        self.slot_with_creature(id).pos()
     }
 
-    /// An iterator over all unit instances on the entire board.
-    pub fn iter(&self) -> impl Iterator<Item = &UnitCardInstance> {
-        let opponent_side = self.opponent_side();
-        let player_side = self.player_side();
-
-        opponent_side.iter().chain(player_side.iter())
-    }
-
-    pub fn update_by_id(
-        &mut self,
-        id: UnitCardInstanceId,
-        update: impl FnOnce(&mut UnitCardInstance),
-    ) {
-        if let Some(mut creature) = self
-            .player_side_mut()
-            .front_row_mut()
-            .iter_mut()
-            .filter_map(|i| i.as_mut())
-            .filter(|i| i.id() == id)
-            .next()
-        {
-            update(&mut creature);
-        } else if let Some(mut creature) = self
-            .player_side_mut()
-            .back_row_mut()
-            .iter_mut()
-            .filter_map(|i| i.as_mut())
-            .filter(|i| i.id() == id)
-            .next()
-        {
-            update(&mut creature);
-        } else if let Some(mut creature) = self
-            .opponent_side_mut()
-            .front_row_mut()
-            .iter_mut()
-            .filter_map(|i| i.as_mut())
-            .filter(|i| i.id() == id)
-            .next()
-        {
-            update(&mut creature);
-        } else if let Some(mut creature) = self
-            .opponent_side_mut()
-            .back_row_mut()
-            .iter_mut()
-            .filter_map(|i| i.as_mut())
-            .filter(|i| i.id() == id)
-            .next()
-        {
-            update(&mut creature);
-        }
-    }
-
-    pub fn remove_by_id(&mut self, id: UnitCardInstanceId) -> UnitCardInstance {
-        let found_creature;
-        if let Some(creature) = self
-            .player_side_mut()
-            .front_row_mut()
-            .iter_mut()
-            .filter(|i| match i {
-                Some(c) => c.id() == id,
-                None => false,
-            })
-            .next()
-        {
-            found_creature = creature;
-        } else if let Some(creature) = self
-            .player_side_mut()
-            .back_row_mut()
-            .iter_mut()
-            .filter(|i| match i {
-                Some(c) => c.id() == id,
-                None => false,
-            })
-            .next()
-        {
-            found_creature = creature;
-        } else if let Some(creature) = self
-            .opponent_side_mut()
-            .front_row_mut()
-            .iter_mut()
-            .filter(|i| match i {
-                Some(c) => c.id() == id,
-                None => false,
-            })
-            .next()
-        {
-            found_creature = creature;
-        } else if let Some(creature) = self
-            .opponent_side_mut()
-            .back_row_mut()
-            .iter_mut()
-            .filter(|i| match i {
-                Some(c) => c.id() == id,
-                None => false,
-            })
-            .next()
-        {
-            found_creature = creature;
-        } else {
-            panic!("Creature not found on board with id: {:?}", id);
-        }
-
-        let mut next = None;
-        std::mem::swap(&mut next, found_creature);
-        return next.unwrap();
+    pub fn creature_instance(&self, id: UnitCardInstanceId) -> &UnitCardInstance {
+        self.slot_with_creature(id).maybe_creature().unwrap()
     }
 }
 
@@ -455,7 +223,12 @@ fn front_half(ops: std::ops::Range<usize>) -> std::ops::Range<usize> {
 }
 
 fn end_half(ops: std::ops::Range<usize>) -> std::ops::Range<usize> {
+    // ex: 10..20. includes 10 thru 19, with 10 total elements
+
+    // 20 - 10 = 10
     let len = ops.end - ops.start;
     assert!(len % 2 == 0);
+
+    // 10 + (10 / 2) .. 20 => 15..20
     ops.start + len / 2..ops.end
 }
