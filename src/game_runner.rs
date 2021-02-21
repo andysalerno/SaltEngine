@@ -21,7 +21,7 @@ impl GameRunner {
         player_b: Box<dyn GameAgent>,
         display: Box<dyn GameDisplay>,
     ) -> Self {
-        let player_a_deck = {
+        let mut player_a_deck = {
             let cards: Vec<UnitCardInstance> = (0..8)
                 .flat_map(|_| {
                     let cards = vec![
@@ -38,7 +38,7 @@ impl GameRunner {
             Deck::new(cards)
         };
 
-        let player_b_deck = {
+        let mut player_b_deck = {
             let cards: Vec<UnitCardInstance> = (0..8)
                 .flat_map(|_| {
                     let cards = vec![
@@ -54,6 +54,9 @@ impl GameRunner {
 
             Deck::new(cards)
         };
+
+        player_a_deck.shuffle();
+        player_b_deck.shuffle();
 
         let game_state =
             GameState::initial_state(player_a.id(), player_a_deck, player_b.id(), player_b_deck);
