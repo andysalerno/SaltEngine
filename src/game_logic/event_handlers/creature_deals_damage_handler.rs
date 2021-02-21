@@ -16,6 +16,7 @@ impl EventHandler for CreatureDealsDamageHandler {
         _dispatcher: &mut EventDispatcher,
     ) {
         let title = game_state
+            .board()
             .creature_instance(event.creature_id())
             .definition()
             .title();

@@ -7,7 +7,7 @@ use crate::{
 pub struct AttackEventHandler;
 
 fn validate(event: &AttackEvent, game_state: &GameState) {
-    let pos = game_state.position_with_creature(event.target());
+    let pos = game_state.board().position_with_creature(event.target());
     if game_state.is_pos_defended(pos) {
         panic!("Cannot attack defended pos {:?}", pos);
     }
@@ -25,8 +25,8 @@ impl EventHandler for AttackEventHandler {
         validate(&event, game_state);
 
         {
-            let attacker_instance = game_state.creature_instance(event.attacker());
-            let target_instance = game_state.creature_instance(event.target());
+            let attacker_instance = game_state.board().creature_instance(event.attacker());
+            let target_instance = game_state.board().creature_instance(event.target());
             let attack_amount = attacker_instance.attack() as usize;
             println!(
                 "{} attacks {} for {} damage",
@@ -37,15 +37,20 @@ impl EventHandler for AttackEventHandler {
         }
 
         // 1. Attacker deals damage
-        let attacker_attack_amount =
-            game_state.creature_instance(event.attacker()).attack() as usize;
+        let attacker_attack_amount = game_state
+            .board()
+            .creature_instance(event.attacker())
+            .attack() as usize;
         let deal_damage_event =
             CreatureDealsDamageEvent::new(event.attacker(), event.target(), attacker_attack_amount);
 
         dispatcher.dispatch(deal_damage_event, game_state);
 
         // 2. Target deals damage
-        let target_attack_amount = game_state.creature_instance(event.target()).attack() as usize;
+        let target_attack_amount = game_state
+            .board()
+            .creature_instance(event.target())
+            .attack() as usize;
         let deal_damage_event =
             CreatureDealsDamageEvent::new(event.target(), event.attacker(), target_attack_amount);
 

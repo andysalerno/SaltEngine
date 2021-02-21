@@ -87,14 +87,6 @@ impl GameState {
         &mut self.board
     }
 
-    pub fn creature_at_pos(&self, pos: BoardPos) -> Option<&UnitCardInstance> {
-        self.board.creature_at_pos(pos)
-    }
-
-    pub fn set_creature_at_pos(&mut self, pos: BoardPos, card_instance: UnitCardInstance) {
-        self.board.set_creature_at_pos(pos, card_instance)
-    }
-
     pub fn player_a_id(&self) -> PlayerId {
         self.player_a_id
     }
@@ -179,24 +171,8 @@ impl GameState {
         *player_mana_limit = *player_mana_limit + mana_count;
     }
 
-    pub fn creature_instance(&self, id: UnitCardInstanceId) -> &UnitCardInstance {
-        self.board.creature_instance(id)
-    }
-
-    pub fn creature_instance_mut(&mut self, id: UnitCardInstanceId) -> &mut UnitCardInstance {
-        self.board.creature_instance_mut(id)
-    }
-
-    pub fn position_with_creature(&self, id: UnitCardInstanceId) -> BoardPos {
-        self.board.position_with_creature(id)
-    }
-
     pub fn draw_card(&mut self, player_id: PlayerId) -> Option<UnitCardInstance> {
         self.deck_mut(player_id).draw_card()
-    }
-
-    pub fn take_creature(&mut self, _id: UnitCardInstanceId) -> UnitCardInstance {
-        todo!()
     }
 
     pub fn update_by_id(
@@ -221,7 +197,7 @@ impl GameState {
 
         let front_pos = BoardPos::new(pos.player_id, RowId::FrontRow, pos.row_index);
 
-        match self.creature_at_pos(front_pos) {
+        match self.board().creature_at_pos(front_pos) {
             Some(creature) => creature.definition().is_defender(),
             _ => false,
         }
@@ -229,7 +205,8 @@ impl GameState {
 
     pub fn evaluate_passives(&mut self) {
         // clear out all passive buffs
-        self.creatures_iter()
+        self.board()
+            .creatures_iter()
             .flat_map(|i| {
                 let id = i.id();
 
@@ -247,6 +224,7 @@ impl GameState {
             });
 
         let effects = self
+            .board()
             .creatures_iter()
             .filter_map(|i| {
                 let passive_instance = i.passive_effect_instance();
@@ -260,19 +238,6 @@ impl GameState {
             .for_each(|(instance_id, originator_id, updater)| {
                 (updater)(instance_id, originator_id, self);
             });
-    }
-
-    /// An iterator over all unit instances on the entire board.
-    pub fn creatures_iter(&self) -> impl Iterator<Item = &UnitCardInstance> {
-        self.board.creatures_iter()
-    }
-
-    pub fn creatures_iter_mut(&mut self) -> impl Iterator<Item = &mut UnitCardInstance> {
-        self.board.creatures_iter_mut()
-    }
-
-    pub fn player_side(&self, player_id: PlayerId) -> impl Iterator<Item = &BoardSlot> {
-        self.board.player_side(player_id).iter()
     }
 
     fn player_ab(&self, player_id: PlayerId) -> PlayerAB {

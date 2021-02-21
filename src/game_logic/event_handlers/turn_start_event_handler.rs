@@ -28,7 +28,9 @@ impl EventHandler for TurnStartHandler {
         dispatcher.dispatch(DrawCardEvent::new(player_id), game_state);
 
         game_state
+            .board()
             .player_side(player_id)
+            .iter()
             .filter_map(|s| {
                 s.maybe_creature()
                     .map(|c| (c.id(), c.definition().upon_turn_start()))

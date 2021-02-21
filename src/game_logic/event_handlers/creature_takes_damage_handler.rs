@@ -19,6 +19,7 @@ impl EventHandler for CreatureTakesDamageHandler {
         dispatcher: &mut EventDispatcher,
     ) {
         let title = game_state
+            .board()
             .creature_instance(event.creature_id())
             .definition()
             .title();
@@ -29,7 +30,12 @@ impl EventHandler for CreatureTakesDamageHandler {
             c.take_damage(event.damage_amount());
         });
 
-        if game_state.creature_instance(event.creature_id()).health() <= 0 {
+        if game_state
+            .board()
+            .creature_instance(event.creature_id())
+            .health()
+            <= 0
+        {
             dispatcher.dispatch(CreatureDestroyedEvent::new(event.creature_id()), game_state);
         }
     }

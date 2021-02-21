@@ -68,7 +68,7 @@ impl UnitCardDefinition for RicketyCannon {
         &self,
     ) -> Box<dyn FnOnce(UnitCardInstanceId, &mut GameState, &mut EventDispatcher)> {
         Box::new(|id, game_state, dispatcher| {
-            let instance = game_state.creature_instance(id);
+            let instance = game_state.board().creature_instance(id);
             let cannon_target = instance.state();
 
             if let Some(InstanceState::Pos(pos)) = cannon_target {

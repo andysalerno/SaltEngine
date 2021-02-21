@@ -24,7 +24,7 @@ impl EventHandler for PosTakesDamageHandler {
             event.damage_amount()
         );
 
-        if let Some(creature_there) = game_state.creature_at_pos(event.pos()) {
+        if let Some(creature_there) = game_state.board().creature_at_pos(event.pos()) {
             let damage_event =
                 CreatureTakesDamageEvent::new(creature_there.id(), event.damage_amount());
 
