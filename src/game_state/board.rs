@@ -219,11 +219,28 @@ impl Board {
         row[pos.row_index].set_creature(card_instance);
     }
 
+    /// The single slot where the creature instance exists.
     pub fn slot_with_creature(&self, id: UnitCardInstanceId) -> &BoardSlot {
         self.slots_iter()
             .filter(|s| s.maybe_creature().map(|c| c.id()) == Some(id))
             .next()
             .expect(&format!("Creature instance with id {:?} not found.", id))
+    }
+
+    /// A slice starting at the slot where the creature instance exists,
+    /// and including all subsequent slots it occupies (if the creature has a Width of more than 1 slot).
+    pub fn slots_with_creature(&self, id: UnitCardInstanceId) -> &[BoardSlot] {
+        let (start_index, slot) = self
+            .slots
+            .iter()
+            .enumerate()
+            .filter(|(_, slot)| slot.maybe_creature().map(|c| c.id()) == Some(id))
+            .next()
+            .expect(&format!("Creature instance with id {:?} not found.", id));
+
+        let creature_width = slot.maybe_creature().unwrap().width();
+
+        &self.slots[start_index..start_index + creature_width]
     }
 
     pub fn slot_with_creature_mut(&mut self, id: UnitCardInstanceId) -> &mut BoardSlot {

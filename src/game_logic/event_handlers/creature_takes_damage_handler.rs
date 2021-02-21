@@ -30,6 +30,14 @@ impl EventHandler for CreatureTakesDamageHandler {
             c.take_damage(event.damage_amount());
         });
 
+        let card_trigger = game_state
+            .board()
+            .creature_instance(event.creature_id())
+            .definition()
+            .upon_receive_damage();
+
+        (card_trigger)(event.creature_id(), game_state, dispatcher);
+
         if game_state
             .board()
             .creature_instance(event.creature_id())

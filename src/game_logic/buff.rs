@@ -1,4 +1,4 @@
-use crate::id::Id;
+use crate::{game_state::UnitCardInstanceId, id::Id};
 
 use super::passive_effect::PassiveEffectInstanceId;
 
@@ -14,6 +14,7 @@ impl BuffInstanceId {
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub enum BuffSourceId {
     Passive(PassiveEffectInstanceId),
+    CreatureInstance(UnitCardInstanceId),
     Other(Id),
 }
 

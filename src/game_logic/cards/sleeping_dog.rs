@@ -38,9 +38,10 @@ impl CardDefinition for SleepingDog {
 
     fn text(&self) -> &str {
         "Back
-If Sleeping Dog takes damage,
-move it to the front row
-if possible, and +7 attack."
+When damaged, if
+in back row,
+move to front row,
+and +7 attack."
     }
 }
 
@@ -59,5 +60,58 @@ impl UnitCardDefinition for SleepingDog {
 
     fn placeable_at(&self) -> Position {
         Position::Back
+    }
+
+    fn upon_receive_damage(
+        &self,
+    ) -> Box<dyn FnOnce(UnitCardInstanceId, &mut GameState, &mut crate::game_logic::EventDispatcher)>
+    {
+        Box::new(|id, game_state, _dispatcher| {
+            // can move to front row?
+            let slots = game_state.board().slots_with_creature(id);
+
+            println!("sleeping dog is in slots: {:?}", slots);
+
+            let buff = Box::new(SleepingDogBuff::new(id));
+            let instance_mut = game_state.board_mut().creature_instance_mut(id);
+            instance_mut.add_buff(buff);
+        })
+    }
+}
+
+#[derive(Debug)]
+struct SleepingDogBuff {
+    instance_id: BuffInstanceId,
+    source_id: BuffSourceId,
+}
+
+impl SleepingDogBuff {
+    pub fn new(source_id: UnitCardInstanceId) -> Self {
+        Self {
+            instance_id: BuffInstanceId::new(),
+            source_id: BuffSourceId::CreatureInstance(source_id),
+        }
+    }
+}
+
+impl Buff for SleepingDogBuff {
+    fn attack_amount(&self) -> i32 {
+        7
+    }
+
+    fn health_amount(&self) -> i32 {
+        0
+    }
+
+    fn instance_id(&self) -> BuffInstanceId {
+        self.instance_id
+    }
+
+    fn source_id(&self) -> BuffSourceId {
+        self.source_id
+    }
+
+    fn definition_id(&self) -> Id {
+        todo!()
     }
 }
