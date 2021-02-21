@@ -195,7 +195,7 @@ impl GameState {
         self.deck_mut(player_id).draw_card()
     }
 
-    pub fn take_creature(&mut self, id: UnitCardInstanceId) -> UnitCardInstance {
+    pub fn take_creature(&mut self, _id: UnitCardInstanceId) -> UnitCardInstance {
         todo!()
     }
 

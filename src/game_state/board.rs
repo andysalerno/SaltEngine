@@ -1,5 +1,3 @@
-use std::iter::FilterMap;
-
 use super::{card_instance::UnitCardInstance, PlayerId, UnitCardInstanceId};
 
 const BOARD_WIDTH: usize = 6;
@@ -75,7 +73,7 @@ pub struct Board {
 }
 
 impl Board {
-    pub fn new(size: usize, player_a_id: PlayerId, player_b_id: PlayerId) -> Self {
+    pub fn new(_size: usize, player_a_id: PlayerId, player_b_id: PlayerId) -> Self {
         let mut slots = Vec::with_capacity(SLOTS_COUNT);
 
         // playber b
@@ -116,7 +114,7 @@ impl Board {
     }
 
     /// The range for the entire board.
-    fn board_range(&self, player_id: PlayerId) -> std::ops::Range<usize> {
+    fn board_range(&self, _player_id: PlayerId) -> std::ops::Range<usize> {
         0..SLOTS_COUNT
     }
 
