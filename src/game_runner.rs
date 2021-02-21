@@ -21,6 +21,15 @@ impl GameRunner {
         player_b: Box<dyn GameAgent>,
         display: Box<dyn GameDisplay>,
     ) -> Self {
+        let card_set: Vec<Box<dyn UnitCardDefinition>> = vec![
+            Box::new(Prawn),
+            Box::new(RicketyCannon),
+            Box::new(EmotionalSupportDog),
+            Box::new(ReallyBigRock),
+            Box::new(AttackDog),
+            Box::new(SleepingDog),
+        ];
+
         let mut player_a_deck = {
             let cards: Vec<UnitCardInstance> = (0..8)
                 .flat_map(|_| {
@@ -34,6 +43,14 @@ impl GameRunner {
                     cards
                 })
                 .collect();
+
+            let mut cards = Vec::new();
+
+            while cards.len() < 30 {
+                for definition in &card_set {
+                    cards.push(definition.make_instance());
+                }
+            }
 
             Deck::new(cards)
         };

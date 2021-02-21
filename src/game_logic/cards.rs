@@ -1,12 +1,16 @@
+mod attack_dog;
 mod emotional_support_dog;
 mod prawn;
 mod really_big_rock;
 mod rickety_cannon;
+mod sleeping_dog;
 
+pub use attack_dog::AttackDog;
 pub use emotional_support_dog::EmotionalSupportDog;
 pub use prawn::Prawn;
 pub use really_big_rock::ReallyBigRock;
 pub use rickety_cannon::RicketyCannon;
+pub use sleeping_dog::SleepingDog;
 
 use crate::game_state::{board::BoardPos, GameState, UnitCardInstance, UnitCardInstanceId};
 
