@@ -1,5 +1,5 @@
 use super::{
-    board::{Board, BoardPos, BoardSlot, RowId},
+    board::{Board, BoardPos, RowId},
     Deck, Hand, PlayerId, UnitCardInstance, UnitCardInstanceId,
 };
 
