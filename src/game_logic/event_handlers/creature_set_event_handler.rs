@@ -17,6 +17,8 @@ impl EventHandler for CreatureSetEventHandler {
     ) {
         let target_position = event.target_position();
         let instance = event.take_card();
-        game_state.board_mut().set_at(target_position, instance);
+        game_state
+            .board_mut()
+            .set_creature_at_pos(target_position, instance);
     }
 }

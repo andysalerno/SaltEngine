@@ -1,5 +1,5 @@
 use super::{
-    board::{Board, BoardPos, RowId},
+    board::{Board, BoardPos, BoardSlot, RowId},
     Deck, Hand, PlayerId, UnitCardInstance, UnitCardInstanceId,
 };
 
@@ -87,12 +87,12 @@ impl GameState {
         &mut self.board
     }
 
-    pub fn get_at(&self, pos: BoardPos) -> Option<&UnitCardInstance> {
-        self.board.get_at(pos)
+    pub fn creature_at_pos(&self, pos: BoardPos) -> Option<&UnitCardInstance> {
+        self.board.creature_at_pos(pos)
     }
 
-    pub fn set_at(&mut self, pos: BoardPos, card_instance: UnitCardInstance) {
-        self.board.set_at(pos, card_instance)
+    pub fn set_creature_at_pos(&mut self, pos: BoardPos, card_instance: UnitCardInstance) {
+        self.board.set_creature_at_pos(pos, card_instance)
     }
 
     pub fn player_a_id(&self) -> PlayerId {
@@ -179,16 +179,24 @@ impl GameState {
         *player_mana_limit = *player_mana_limit + mana_count;
     }
 
-    pub fn get_by_id(&self, id: UnitCardInstanceId) -> &UnitCardInstance {
-        self.board.get_by_id(id)
+    pub fn creature_instance(&self, id: UnitCardInstanceId) -> &UnitCardInstance {
+        self.board.creature_instance(id)
     }
 
-    pub fn get_pos_by_id(&self, id: UnitCardInstanceId) -> BoardPos {
-        self.board.get_position_by_id(id)
+    pub fn creature_instance_mut(&mut self, id: UnitCardInstanceId) -> &mut UnitCardInstance {
+        self.board.creature_instance_mut(id)
+    }
+
+    pub fn position_with_creature(&self, id: UnitCardInstanceId) -> BoardPos {
+        self.board.position_with_creature(id)
     }
 
     pub fn draw_card(&mut self, player_id: PlayerId) -> Option<UnitCardInstance> {
         self.deck_mut(player_id).draw_card()
+    }
+
+    pub fn take_creature(&mut self, id: UnitCardInstanceId) -> UnitCardInstance {
+        todo!()
     }
 
     pub fn update_by_id(
@@ -196,7 +204,14 @@ impl GameState {
         id: UnitCardInstanceId,
         update: impl FnOnce(&mut UnitCardInstance),
     ) {
-        self.board.update_by_id(id, update);
+        let creature = self
+            .board_mut()
+            .creatures_iter_mut()
+            .filter(|i| i.id() == id)
+            .next()
+            .expect("Cannot update_by_id; creature with id not found");
+
+        (update)(creature);
     }
 
     pub fn is_pos_defended(&self, pos: BoardPos) -> bool {
@@ -206,7 +221,7 @@ impl GameState {
 
         let front_pos = BoardPos::new(pos.player_id, RowId::FrontRow, pos.row_index);
 
-        match self.get_at(front_pos) {
+        match self.creature_at_pos(front_pos) {
             Some(creature) => creature.definition().is_defender(),
             _ => false,
         }
@@ -214,7 +229,7 @@ impl GameState {
 
     pub fn evaluate_passives(&mut self) {
         // clear out all passive buffs
-        self.board_iter()
+        self.creatures_iter()
             .flat_map(|i| {
                 let id = i.id();
 
@@ -232,7 +247,7 @@ impl GameState {
             });
 
         let effects = self
-            .board_iter()
+            .creatures_iter()
             .filter_map(|i| {
                 let passive_instance = i.passive_effect_instance();
                 passive_instance
@@ -248,12 +263,16 @@ impl GameState {
     }
 
     /// An iterator over all unit instances on the entire board.
-    pub fn board_iter(&self) -> impl Iterator<Item = &UnitCardInstance> {
-        self.board.iter()
+    pub fn creatures_iter(&self) -> impl Iterator<Item = &UnitCardInstance> {
+        self.board.creatures_iter()
     }
 
-    pub fn player_side(&self, player_id: PlayerId) -> impl Iterator<Item = &UnitCardInstance> {
-        self.board.player_side_id(player_id).iter()
+    pub fn creatures_iter_mut(&mut self) -> impl Iterator<Item = &mut UnitCardInstance> {
+        self.board.creatures_iter_mut()
+    }
+
+    pub fn player_side(&self, player_id: PlayerId) -> impl Iterator<Item = &BoardSlot> {
+        self.board.player_side(player_id).iter()
     }
 
     fn player_ab(&self, player_id: PlayerId) -> PlayerAB {

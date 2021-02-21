@@ -1,3 +1,5 @@
+use std::iter::FilterMap;
+
 use super::{card_instance::UnitCardInstance, PlayerId, UnitCardInstanceId};
 
 const BOARD_WIDTH: usize = 6;
@@ -22,15 +24,23 @@ impl BoardSlot {
         }
     }
 
-    fn maybe_creature(&self) -> Option<&UnitCardInstance> {
+    pub fn take_creature(&mut self) -> UnitCardInstance {
+        self.creature.take().unwrap()
+    }
+
+    pub fn maybe_creature(&self) -> Option<&UnitCardInstance> {
         self.creature.as_ref()
     }
 
-    fn set_creature(&mut self, creature: UnitCardInstance) {
+    pub fn maybe_creature_mut(&mut self) -> Option<&mut UnitCardInstance> {
+        self.creature.as_mut()
+    }
+
+    pub fn set_creature(&mut self, creature: UnitCardInstance) {
         self.creature = Some(creature);
     }
 
-    fn pos(&self) -> BoardPos {
+    pub fn pos(&self) -> BoardPos {
         self.pos
     }
 }
@@ -139,9 +149,19 @@ impl Board {
         self.slots.iter()
     }
 
+    /// An iterator over all slots on the entire board (even empty ones).
+    pub fn slots_iter_mut(&mut self) -> impl Iterator<Item = &mut BoardSlot> {
+        self.slots.iter_mut()
+    }
+
     /// An iterator over all the creatures on the board.
     pub fn creatures_iter(&self) -> impl Iterator<Item = &UnitCardInstance> {
         self.slots_iter().filter_map(|s| s.maybe_creature())
+    }
+
+    /// An iterator over all the creatures on the board.
+    pub fn creatures_iter_mut(&mut self) -> impl Iterator<Item = &mut UnitCardInstance> {
+        self.slots_iter_mut().filter_map(|s| s.maybe_creature_mut())
     }
 
     pub fn player_side(&self, player_id: PlayerId) -> &[BoardSlot] {
@@ -149,7 +169,8 @@ impl Board {
     }
 
     pub fn player_side_mut(&mut self, player_id: PlayerId) -> &mut [BoardSlot] {
-        &mut self.slots[self.player_range(player_id)]
+        let range = self.player_range(player_id);
+        &mut self.slots[range]
     }
 
     pub fn player_row(&self, player_id: PlayerId, row: RowId) -> &[BoardSlot] {
@@ -157,7 +178,12 @@ impl Board {
     }
 
     pub fn player_row_mut(&mut self, player_id: PlayerId, row: RowId) -> &mut [BoardSlot] {
-        &mut self.slots[self.row_range(player_id, row)]
+        let range = self.row_range(player_id, row);
+        &mut self.slots[range]
+    }
+
+    pub fn take_creature_by_id(&mut self, id: UnitCardInstanceId) -> UnitCardInstance {
+        self.slot_with_creature_mut(id).take_creature()
     }
 
     pub fn creature_at_pos(&self, pos: BoardPos) -> Option<&UnitCardInstance> {
@@ -181,7 +207,7 @@ impl Board {
         return None;
     }
 
-    pub fn set_at(&mut self, pos: BoardPos, card_instance: UnitCardInstance) {
+    pub fn set_creature_at_pos(&mut self, pos: BoardPos, card_instance: UnitCardInstance) {
         if let Some(existing) = self.creature_at_pos(pos) {
             panic!(
                 "Could not set at pos {:?} due to existing occupant: {:?}",
@@ -202,12 +228,27 @@ impl Board {
             .expect(&format!("Creature instance with id {:?} not found.", id))
     }
 
+    pub fn slot_with_creature_mut(&mut self, id: UnitCardInstanceId) -> &mut BoardSlot {
+        self.slots_iter_mut()
+            .collect::<Vec<_>>()
+            .into_iter()
+            .filter(|s| s.maybe_creature().map(|c| c.id()) == Some(id))
+            .next()
+            .expect(&format!("Creature instance with id {:?} not found.", id))
+    }
+
     pub fn position_with_creature(&self, id: UnitCardInstanceId) -> BoardPos {
         self.slot_with_creature(id).pos()
     }
 
     pub fn creature_instance(&self, id: UnitCardInstanceId) -> &UnitCardInstance {
         self.slot_with_creature(id).maybe_creature().unwrap()
+    }
+
+    pub fn creature_instance_mut(&mut self, id: UnitCardInstanceId) -> &mut UnitCardInstance {
+        self.slot_with_creature_mut(id)
+            .maybe_creature_mut()
+            .unwrap()
     }
 }
 

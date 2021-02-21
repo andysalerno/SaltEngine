@@ -29,7 +29,10 @@ impl EventHandler for TurnStartHandler {
 
         game_state
             .player_side(player_id)
-            .map(|card| (card.id(), card.definition().upon_turn_start()))
+            .filter_map(|s| {
+                s.maybe_creature()
+                    .map(|c| (c.id(), c.definition().upon_turn_start()))
+            })
             .collect::<Vec<_>>()
             .into_iter()
             .for_each(|(id, action)| (action)(id, game_state, dispatcher));

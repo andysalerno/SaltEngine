@@ -1,6 +1,9 @@
 use crate::{
     game_runner::GameDisplay,
-    game_state::{GameState, UnitCardInstance},
+    game_state::{
+        board::{BoardSlot, RowId},
+        GameState, UnitCardInstance,
+    },
 };
 
 pub struct ConsoleDisplay;
@@ -17,29 +20,37 @@ fn to_string(game_state: &GameState) -> String {
     let mut result = String::new();
 
     result.push_str(&row_to_string(
-        game_state.board().opponent_side().back_row(),
+        game_state
+            .board()
+            .player_row(game_state.player_b_id(), RowId::BackRow),
         0,
         false,
     ));
+
     result.push('\n');
     result.push_str(&row_to_string(
-        game_state.board().opponent_side().front_row(),
+        game_state
+            .board()
+            .player_row(game_state.player_b_id(), RowId::FrontRow),
         6,
         true,
     ));
 
     result.push('\n');
     result.push('\n');
-
     result.push_str(&row_to_string(
-        game_state.board().player_side().front_row(),
+        game_state
+            .board()
+            .player_row(game_state.player_a_id(), RowId::FrontRow),
         12,
         false,
     ));
 
     result.push('\n');
     result.push_str(&row_to_string(
-        game_state.board().player_side().back_row(),
+        game_state
+            .board()
+            .player_row(game_state.player_a_id(), RowId::BackRow),
         18,
         true,
     ));
@@ -51,11 +62,7 @@ fn to_string(game_state: &GameState) -> String {
     result
 }
 
-fn row_to_string(
-    row: &[Option<UnitCardInstance>],
-    start_index: usize,
-    index_after: bool,
-) -> String {
+fn row_to_string(row: &[BoardSlot], start_index: usize, index_after: bool) -> String {
     let mut result = String::new();
 
     if !index_after {
@@ -69,9 +76,9 @@ fn row_to_string(
     let mut row_iter = row.iter();
 
     // For every slot in the row...
-    while let Some(maybe_card) = row_iter.next() {
+    while let Some(slot) = row_iter.next() {
         // If the slot contains a card instance...
-        if let Some(card) = maybe_card {
+        if let Some(card) = slot.maybe_creature() {
             let width = card.width();
             result.push_str(&format!("[{}/{}", card.attack(), card.health()));
 

@@ -162,7 +162,7 @@ impl ConsolePrompter {
     ) -> Result<GameEvent, Box<dyn Error>> {
         let attacker = loop {
             let pos = self.prompt_pos_myside(game_state, input_queue);
-            match game_state.get_at(pos) {
+            match game_state.creature_at_pos(pos) {
                 Some(c) => break c.id(),
                 _ => say("No card found at that pos; try again"),
             }
@@ -170,7 +170,7 @@ impl ConsolePrompter {
 
         let target = loop {
             let pos = self.prompt_pos_enemyside(game_state, input_queue);
-            match game_state.get_at(pos) {
+            match game_state.creature_at_pos(pos) {
                 Some(c) => break c.id(),
                 _ => say("No card found at that pos; try again"),
             }
@@ -221,7 +221,7 @@ impl ConsolePrompter {
     ) -> Option<&'a UnitCardInstance> {
         say(ask);
         let pos = self.prompt_pos_any(game_state, input_queue);
-        let item_at = game_state.get_at(pos);
+        let item_at = game_state.creature_at_pos(pos);
 
         say(&format!("Selected: {:?}", item_at));
 

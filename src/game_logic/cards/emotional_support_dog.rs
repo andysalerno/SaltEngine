@@ -124,7 +124,7 @@ impl PassiveEffectDefinition for EmotionalSupportDogPassiveDefinition {
         &self,
     ) -> Box<dyn FnOnce(PassiveEffectInstanceId, UnitCardInstanceId, &mut GameState)> {
         Box::new(move |instance_id, originator_id, game_state| {
-            let doggy_pos = game_state.get_pos_by_id(originator_id);
+            let doggy_pos = game_state.position_with_creature(originator_id);
 
             if doggy_pos.row_id != RowId::BackRow {
                 return;
@@ -133,7 +133,7 @@ impl PassiveEffectDefinition for EmotionalSupportDogPassiveDefinition {
             let mut front_pos = doggy_pos.clone();
             front_pos.row_id = RowId::FrontRow;
 
-            let front_card = game_state.get_at(front_pos);
+            let front_card = game_state.creature_at_pos(front_pos);
 
             if let Some(front_card) = front_card {
                 let id = front_card.id();
@@ -181,8 +181,8 @@ mod tests {
             dispatcher.dispatch(summon_doggy_event, &mut state);
         }
 
-        let rock_updated_attack = state.get_by_id(buffed_id).attack();
-        let rock_updated_health = state.get_by_id(buffed_id).health();
+        let rock_updated_attack = state.creature_instance(buffed_id).attack();
+        let rock_updated_health = state.creature_instance(buffed_id).health();
 
         assert_eq!(attack_start + 1, rock_updated_attack);
         assert_eq!(health_start + 1, rock_updated_health);
