@@ -97,8 +97,10 @@ impl ConsolePrompter {
         let mut event = None;
 
         while event.is_none() {
+            let available_mana = game_state.player_mana(self.id());
+            let mana_limit = game_state.player_mana_limit(self.id());
             let action = self.ask(
-                "Enter an action: (summon, (show) board, (show) hand, info, attack, end (turn), quit)",
+                &format!("({}/{} mana) Enter an action: (summon, (show) board, (show) hand, info, attack, end (turn), quit)", available_mana, mana_limit),
                 &mut input_queue,
             );
 

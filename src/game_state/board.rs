@@ -146,6 +146,14 @@ impl Board {
         }
     }
 
+    /// True if there are 'n_slots' starting at 'pos' within one row.
+    /// Does not consider whether the slots are occupied or not.
+    pub fn check_slots_row_boundary(&self, pos: BoardPos, n_slots: usize) -> bool {
+        let row = self.player_row(pos.player_id, pos.row());
+        let space_in_row = row.len() - pos.row_index;
+        space_in_row >= n_slots
+    }
+
     /// An iterator over all slots on the entire board (even empty ones).
     pub fn slots_iter(&self) -> impl Iterator<Item = &BoardSlot> {
         self.slots.iter()
@@ -254,6 +262,20 @@ impl Board {
             .filter(|s| s.maybe_creature().map(|c| c.id()) == Some(id))
             .next()
             .expect(&format!("Creature instance with id {:?} not found.", id))
+    }
+
+    pub fn slot_at_pos_mut(&mut self, pos: BoardPos) -> &mut BoardSlot {
+        self.slots_iter_mut()
+            .filter(|s| s.pos() == pos)
+            .next()
+            .expect("The position was not a valid board slot.")
+    }
+
+    pub fn slot_at_pos(&self, pos: BoardPos) -> &BoardSlot {
+        self.slots_iter()
+            .filter(|s| s.pos() == pos)
+            .next()
+            .expect("The position was not a valid board slot.")
     }
 
     pub fn position_with_creature(&self, id: UnitCardInstanceId) -> BoardPos {

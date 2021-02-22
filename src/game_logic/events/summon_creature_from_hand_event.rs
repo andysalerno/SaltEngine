@@ -40,6 +40,7 @@ impl SummonCreatureFromHandEvent {
 impl Event for SummonCreatureFromHandEvent {
     fn validate(&self, game_state: &GameState) -> super::Result {
         validate_is_players_side(self, game_state)?;
+        validate_slots_available(self, game_state)?;
         validate_respects_placeableat(self, game_state)?;
         validate_player_has_enough_mana(self, game_state)?;
 
@@ -51,6 +52,44 @@ impl Into<GameEvent> for SummonCreatureFromHandEvent {
     fn into(self) -> GameEvent {
         GameEvent::SummonCreatureFromHand(self)
     }
+}
+
+fn validate_slots_available(
+    event: &SummonCreatureFromHandEvent,
+    game_state: &GameState,
+) -> super::Result {
+    let creature_width = game_state
+        .hand(event.player_id())
+        .card(event.hand_card_id())
+        .width();
+
+    let requested_pos = event.board_pos();
+
+    if !game_state
+        .board()
+        .check_slots_row_boundary(requested_pos, creature_width)
+    {
+        return Err(format!(
+            "Creature has width {} and cannot be summoned at {:?}",
+            creature_width, requested_pos
+        )
+        .into());
+    }
+
+    for i in 0..creature_width {
+        let mut look_pos = requested_pos;
+        look_pos.row_index += i;
+
+        if game_state.board().creature_at_pos(look_pos).is_some() {
+            return Err(format!(
+                "Cannot summon at pos {:?} with width {} since a creature occupies pos {:?}",
+                requested_pos, creature_width, look_pos
+            )
+            .into());
+        }
+    }
+
+    return Ok(());
 }
 
 fn validate_is_players_side(
