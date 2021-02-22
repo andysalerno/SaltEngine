@@ -69,8 +69,34 @@ impl UnitCardDefinition for SleepingDog {
         Box::new(|id, game_state, _dispatcher| {
             // can move to front row?
             let slots = game_state.board().slots_with_creature(id);
+            let starting_pos = slots[0].pos();
+
+            for slot in slots {
+                if slot.pos().row() == RowId::FrontRow {
+                    // Can't move to front row if already in front row.
+                    return;
+                }
+
+                let mut in_front = slot.pos();
+                in_front.row_id = RowId::FrontRow;
+
+                if game_state.board().creature_at_pos(in_front).is_some() {
+                    // Can't moveto front row if something is already there.
+                    return;
+                }
+            }
 
             println!("sleeping dog is in slots: {:?}", slots);
+
+            // Take the card off the back row
+            let instance = game_state.board_mut().take_creature_by_id(id);
+
+            // Put it on the front row
+            let mut front_slot = starting_pos;
+            front_slot.row_id = RowId::FrontRow;
+            game_state
+                .board_mut()
+                .set_creature_at_pos(front_slot, instance);
 
             let buff = Box::new(SleepingDogBuff::new(id));
             let instance_mut = game_state.board_mut().creature_instance_mut(id);

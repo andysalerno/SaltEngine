@@ -64,6 +64,10 @@ impl BoardPos {
             row_index,
         }
     }
+
+    pub fn row(&self) -> RowId {
+        self.row_id
+    }
 }
 
 pub struct Board {
