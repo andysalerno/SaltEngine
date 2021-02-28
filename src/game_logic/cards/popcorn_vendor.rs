@@ -25,11 +25,11 @@ impl PopcornVendor {
 
 impl CardDefinition for PopcornVendor {
     fn title(&self) -> &str {
-        "Sleeping Dog"
+        "Popcorn Vendor"
     }
 
     fn cost(&self) -> i32 {
-        3
+        1
     }
 
     fn flavor_text(&self) -> &str {
@@ -59,7 +59,7 @@ impl UnitCardDefinition for PopcornVendor {
     }
 
     fn placeable_at(&self) -> Position {
-        Position::Back
+        Position::Either
     }
 
     fn upon_summon(
@@ -72,7 +72,10 @@ impl UnitCardDefinition for PopcornVendor {
                 instance.add_buff(Box::new(buff_self::PopcornVendorBuff::new(instance.id())))
             } else {
                 // Back: buffs another
-                //let other_instance
+                if game_state.board().creatures_iter().next().is_none() {
+                    return;
+                }
+
                 let other_pos = dispatcher.player_prompter().prompt_creature_pos(game_state);
                 let slot = game_state.board_mut().slot_at_pos_mut(other_pos);
 

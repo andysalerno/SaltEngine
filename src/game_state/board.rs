@@ -22,6 +22,10 @@ impl BoardSlot {
         }
     }
 
+    pub fn has_creature(&self) -> bool {
+        self.maybe_creature().is_some()
+    }
+
     pub fn take_creature(&mut self) -> UnitCardInstance {
         self.creature.take().unwrap()
     }
@@ -190,6 +194,14 @@ impl Board {
     pub fn player_row_mut(&mut self, player_id: PlayerId, row: RowId) -> &mut [BoardSlot] {
         let range = self.row_range(player_id, row);
         &mut self.slots[range]
+    }
+
+    /// An iterator over the slots on a player's side that have creatures.
+    /// Creatures of width > 1 only appear once, in their leftmost slot.
+    pub fn player_creatures(&self, player_id: PlayerId) -> impl Iterator<Item = &BoardSlot> {
+        self.player_side(player_id)
+            .iter()
+            .filter(|s| s.has_creature())
     }
 
     pub fn take_creature_by_id(&mut self, id: UnitCardInstanceId) -> UnitCardInstance {
