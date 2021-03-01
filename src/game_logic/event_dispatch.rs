@@ -21,8 +21,6 @@ impl EventDispatcher {
     pub fn dispatch(&mut self, event: impl Into<GameEvent>, game_state: &mut GameState) {
         let event = event.into();
 
-        // println!("Dispatching: {:?}", event);
-
         self.stack.push(event);
 
         while let Some(event) = self.stack.pop() {
@@ -69,6 +67,9 @@ impl EventDispatcher {
             }
             GameEvent::PosTakesDamage(e) => {
                 PosTakesDamageHandler::default().handle(e, game_state, self)
+            }
+            GameEvent::CreatureHealed(e) => {
+                CreatureHealedEventHandler::default().handle(e, game_state, self)
             }
         }
     }

@@ -2,6 +2,7 @@ mod add_card_to_hand_event;
 mod attack;
 mod creature_deals_damage_event;
 mod creature_destroyed;
+mod creature_healed_event;
 mod creature_set_event;
 mod creature_takes_damage_event;
 mod draw_card;
@@ -17,6 +18,7 @@ pub use add_card_to_hand_event::AddCardToHandEvent;
 pub use attack::AttackEvent;
 pub use creature_deals_damage_event::CreatureDealsDamageEvent;
 pub use creature_destroyed::CreatureDestroyedEvent;
+pub use creature_healed_event::CreatureHealedEvent;
 pub use creature_set_event::CreatureSetEvent;
 pub use creature_takes_damage_event::CreatureTakesDamageEvent;
 pub use draw_card::DrawCardEvent;
@@ -54,4 +56,5 @@ pub enum GameEvent {
     SpendMana(PlayerSpendManaEvent),
     SummonCreatureFromHand(SummonCreatureFromHandEvent),
     PosTakesDamage(PosTakesDamageEvent),
+    CreatureHealed(CreatureHealedEvent),
 }

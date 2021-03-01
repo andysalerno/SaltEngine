@@ -1,14 +1,14 @@
 use crate::{
-    game_logic::EventDispatcher,
-    game_state::{board::BoardPos, GameState, UnitCardInstance},
-};
-use crate::{
     game_logic::{
         buff::{Buff, BuffSourceId},
         BuffInstanceId,
     },
     game_state::{board::RowId, UnitCardInstanceId},
     id::Id,
+};
+use crate::{
+    game_logic::{CreatureHealedEvent, EventDispatcher},
+    game_state::{board::BoardPos, GameState, InstanceState, UnitCardInstance},
 };
 
 use super::{CardDefinition, Position, UnitCardDefinition};
@@ -39,9 +39,11 @@ impl CardDefinition for PopcornVendor {
     fn text(&self) -> &str {
         "Front or Back
 Front: +3 attack
-Back: Give a friendly
-creature +3 attack
-and fully heal it."
+Back: Give another
+friendly creature +2
+attack, and heal it
+for 3 each time your
+turn ends."
     }
 }
 
@@ -69,7 +71,7 @@ impl UnitCardDefinition for PopcornVendor {
         Box::new(|instance, pos, game_state, dispatcher| {
             if pos.row() == RowId::FrontRow {
                 // Front: buffs self
-                instance.add_buff(Box::new(buff_self::PopcornVendorBuff::new(instance.id())))
+                instance.add_buff(Box::new(buff_self::PopcornVendorBuff::new(instance.id())));
             } else {
                 // Back: buffs another
                 if game_state.board().creatures_iter().next().is_none() {
@@ -82,7 +84,40 @@ impl UnitCardDefinition for PopcornVendor {
                 let creature = slot.maybe_creature_mut().expect(
                     "Slot must have a creature, since player was prompted for a creature slot.",
                 );
-                creature.add_buff(Box::new(buff_other::PopcornVendorBuff::new(instance.id())))
+                creature.add_buff(Box::new(buff_other::PopcornVendorBuff::new(instance.id())));
+
+                instance.set_state(Some(InstanceState::CreatureInstanceId(creature.id())));
+            }
+        })
+    }
+
+    fn upon_turn_end(
+        &self,
+    ) -> Box<dyn FnOnce(UnitCardInstanceId, &mut GameState, &mut EventDispatcher)> {
+        Box::new(|id, game_state, dispatcher| {
+            let instance = game_state.board().creature_instance(id);
+
+            // Front row has no turn-end action.
+            if game_state.board().position_with_creature(id).row() == RowId::FrontRow {
+                return;
+            }
+
+            let state = instance.state();
+
+            if let Some(InstanceState::CreatureInstanceId(target_id)) = state {
+                // Heal the target for 3
+                let heal_amount = 3;
+                let heal_event = CreatureHealedEvent::new(*target_id, heal_amount);
+
+                {
+                    let target_creature = game_state.board().creature_instance(*target_id);
+                    println!(
+                        "Popcorn Vendor heals {} for 3",
+                        target_creature.definition().title()
+                    );
+                }
+
+                dispatcher.dispatch(heal_event, game_state);
             }
         })
     }

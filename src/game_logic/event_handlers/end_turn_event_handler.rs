@@ -18,6 +18,9 @@ impl EventHandler for EndTurnEventHandler {
         dispatcher: &mut EventDispatcher,
     ) {
         println!("Player {:?} ends turn", game_state.cur_player_id());
+
+        // Trigger 'upon turn end' events
+
         game_state.set_next_player_turn();
 
         dispatcher.dispatch(TurnStartEvent, game_state);

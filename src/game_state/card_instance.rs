@@ -17,6 +17,7 @@ impl UnitCardInstanceId {
 #[derive(Debug, Clone)]
 pub enum InstanceState {
     Pos(BoardPos),
+    CreatureInstanceId(UnitCardInstanceId),
 }
 
 #[derive(Debug)]
@@ -76,6 +77,17 @@ impl UnitCardInstance {
 
     pub fn take_damage(&mut self, damage_amount: usize) {
         self.health -= damage_amount as i32;
+    }
+
+    /// Increases health by heal_amount, but not beyond the starting health from the
+    /// creature's definition.
+    pub fn receive_heal(&mut self, heal_amount: usize) {
+        let starting_health = self.health();
+        let max_health = self.definition().health();
+
+        let new_health = std::cmp::min(max_health, starting_health + heal_amount as i32);
+
+        self.health = new_health;
     }
 
     pub fn add_buff(&mut self, buff: Box<dyn Buff>) {

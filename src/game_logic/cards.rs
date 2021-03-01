@@ -77,6 +77,12 @@ pub trait UnitCardDefinition: CardDefinition {
         Box::new(|_id, _game_state, _dispatcher| {})
     }
 
+    fn upon_turn_end(
+        &self,
+    ) -> Box<dyn FnOnce(UnitCardInstanceId, &mut GameState, &mut EventDispatcher)> {
+        Box::new(|_id, _game_state, _dispatcher| {})
+    }
+
     fn passive_effect(&self) -> Option<Box<dyn PassiveEffectDefinition>> {
         None
     }

@@ -174,7 +174,7 @@ impl ConsolePrompter {
                 "attack" => Some(self.attack(game_state, &mut input_queue)),
                 "end" => Some(Ok(EndTurnEvent.into())),
                 "quit" => panic!(),
-                _ => panic!("Unknown input: {}", action),
+                _ => None,
             };
         }
 
@@ -410,7 +410,10 @@ fn display_card(card: &dyn UnitCardDefinition, tag: usize) -> String {
 |{:^21}|
 |{:^21}|
 |{:^21}|
-|                {}/{}  |
+|{:^21}|
+|{:^21}|
+|{:^21}|
+|W: {}            {}/{}  |
 -----------------------
 {:^23}"#,
         card.title(),
@@ -420,6 +423,10 @@ fn display_card(card: &dyn UnitCardDefinition, tag: usize) -> String {
         text_lines.get(2).unwrap_or(&""),
         text_lines.get(3).unwrap_or(&""),
         text_lines.get(4).unwrap_or(&""),
+        text_lines.get(5).unwrap_or(&""),
+        text_lines.get(6).unwrap_or(&""),
+        text_lines.get(7).unwrap_or(&""),
+        card.row_width(),
         card.attack(),
         card.health(),
         tag
