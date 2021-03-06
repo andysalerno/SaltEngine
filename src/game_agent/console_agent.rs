@@ -1,4 +1,5 @@
 use std::{collections::VecDeque, io::stdin};
+use thiserror::Error;
 
 use super::game_agent::{GameAgent, Prompter};
 use crate::{console_display::ConsoleDisplay, game_runner::GameDisplay, game_state::board::RowId};
@@ -12,7 +13,11 @@ use crate::{
     game_state::{GameState, UnitCardInstance},
 };
 
-use std::error::Error;
+#[derive(Debug, Error)]
+enum ConsoleError {
+    #[error("Not a valid position.")]
+    InputNotAValidPosition(char),
+}
 
 pub struct ConsoleAgent {
     id: PlayerId,
@@ -113,7 +118,7 @@ impl Prompter for ConsolePrompter {
 
         say("Enter the letter of a slot containing a creature you control.");
 
-        let validate = |board_pos: BoardPos| -> Result<BoardPos, Box<dyn Error>> {
+        let validate = |board_pos: BoardPos| -> Result<BoardPos, ConsoleError> {
             if true {
                 Ok(board_pos)
             } else {
@@ -159,7 +164,7 @@ impl ConsolePrompter {
         self.id
     }
 
-    fn prompt(&self, game_state: &GameState) -> Result<GameEvent, Box<dyn Error>> {
+    fn prompt(&self, game_state: &GameState) -> Result<GameEvent, ConsoleError> {
         let mut input_queue = VecDeque::new();
 
         let mut event = None;
@@ -200,7 +205,7 @@ impl ConsolePrompter {
         &self,
         game_state: &GameState,
         input_queue: &mut VecDeque<String>,
-    ) -> Result<GameEvent, Box<dyn Error>> {
+    ) -> Result<GameEvent, ConsoleError> {
         let player_id = game_state.cur_player_id();
 
         let selected_card_id = {
@@ -229,7 +234,7 @@ impl ConsolePrompter {
         &self,
         game_state: &GameState,
         input_queue: &mut VecDeque<String>,
-    ) -> Result<GameEvent, Box<dyn Error>> {
+    ) -> Result<GameEvent, ConsoleError> {
         let attacker = loop {
             let pos = self.prompt_player_creature_pos(game_state);
             match game_state.board().creature_at_pos(pos) {
@@ -306,7 +311,7 @@ impl ConsolePrompter {
         &self,
         game_state: &GameState,
         input_queue: &mut VecDeque<String>,
-    ) -> Result<BoardPos, Box<dyn Error>> {
+    ) -> Result<BoardPos, ConsoleError> {
         let c = self.ask("Letter position: ", input_queue);
         let input_c = c.chars().nth(0).ok_or_else(|| Box::new(Err("bad")))?;
 
