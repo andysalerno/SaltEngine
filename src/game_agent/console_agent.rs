@@ -1,6 +1,3 @@
-use std::{collections::VecDeque, io::stdin};
-use thiserror::Error;
-
 use super::game_agent::{GameAgent, Prompter};
 use crate::{console_display::ConsoleDisplay, game_runner::GameDisplay, game_state::board::RowId};
 use crate::{game_logic::Event, game_state::board::BoardPos};
@@ -12,6 +9,8 @@ use crate::{
     game_logic::{AttackEvent, EndTurnEvent},
     game_state::{GameState, UnitCardInstance},
 };
+use std::{collections::VecDeque, io::stdin};
+use thiserror::Error;
 
 #[derive(Debug, Error)]
 enum ConsoleError {
