@@ -1,7 +1,7 @@
 use std::{collections::VecDeque, io::stdin};
 
 use super::game_agent::{GameAgent, Prompter};
-use crate::game_state::board::RowId;
+use crate::{console_display::ConsoleDisplay, game_runner::GameDisplay, game_state::board::RowId};
 use crate::{game_logic::Event, game_state::board::BoardPos};
 use crate::{
     game_logic::{cards::UnitCardDefinition, GameEvent, SummonCreatureFromHandEvent},
@@ -113,12 +113,27 @@ impl Prompter for ConsolePrompter {
 
         say("Enter the letter of a slot containing a creature you control.");
 
-        loop {
-            match self.prompt_pos(game_state, &mut empty_queue) {
-                Ok(board_pos) => return board_pos,
+        let validate = |board_pos: BoardPos| -> Result<BoardPos, Box<dyn Error>> {
+            if true {
+                Ok(board_pos)
+            } else {
+                Err("bad!".into())
+            }
+        };
+
+        let friendly_creature_pos = loop {
+            let any_pos = retry_until_ok(
+                || self.prompt_pos(game_state, &mut empty_queue),
+                |e| say(format!("{}", e)),
+            );
+
+            match validate(any_pos) {
+                Ok(p) => break p,
                 Err(e) => say(format!("{}", e)),
             }
-        }
+        };
+
+        friendly_creature_pos
     }
 
     fn prompt_opponent_creature_pos(&self, game_state: &GameState) -> BoardPos {
@@ -163,7 +178,7 @@ impl ConsolePrompter {
                     None
                 }
                 "board" => {
-                    self.show_hand(game_state);
+                    self.show_board(game_state);
                     None
                 }
                 "summon" => Some(self.summon(game_state, &mut input_queue)),
@@ -216,7 +231,7 @@ impl ConsolePrompter {
         input_queue: &mut VecDeque<String>,
     ) -> Result<GameEvent, Box<dyn Error>> {
         let attacker = loop {
-            let pos = self.prompt_pos_myside(game_state, input_queue);
+            let pos = self.prompt_player_creature_pos(game_state);
             match game_state.board().creature_at_pos(pos) {
                 Some(c) => break c.id(),
                 _ => say("No card found at that pos; try again"),
@@ -224,7 +239,7 @@ impl ConsolePrompter {
         };
 
         let target = loop {
-            let pos = self.prompt_pos_enemyside(game_state, input_queue);
+            let pos = self.prompt_opponent_creature_pos(game_state);
             match game_state.board().creature_at_pos(pos) {
                 Some(c) => break c.id(),
                 _ => say("No card found at that pos; try again"),
@@ -238,6 +253,10 @@ impl ConsolePrompter {
 
     fn info(&self, game_state: &GameState, input_queue: &mut VecDeque<String>) {
         let _selected = self.select(game_state, "Select for info.", input_queue);
+    }
+
+    fn show_board(&self, game_state: &GameState) {
+        ConsoleDisplay.display(game_state);
     }
 
     fn show_hand(&self, game_state: &GameState) {
@@ -289,7 +308,7 @@ impl ConsolePrompter {
         input_queue: &mut VecDeque<String>,
     ) -> Result<BoardPos, Box<dyn Error>> {
         let c = self.ask("Letter position: ", input_queue);
-        let input_c = c.chars().nth(0).expect("Expected single-char response");
+        let input_c = c.chars().nth(0).ok_or_else(|| Box::new(Err("bad")))?;
 
         let enemy_back_chars = "ABCDEF".chars();
         let enemy_front_chars = "GHIJKL".chars();
@@ -312,18 +331,6 @@ impl ConsolePrompter {
         };
 
         Ok(board_pos)
-    }
-
-    fn prompt_pos_myside(
-        &self,
-        _game_state: &GameState,
-        input_queue: &mut VecDeque<String>,
-    ) -> BoardPos {
-        let player = self.id();
-        let row = self.prompt_row(input_queue);
-        let index = self.prompt_row_index(input_queue);
-
-        BoardPos::new(player, row, index)
     }
 
     fn prompt_pos_enemyside(
@@ -431,4 +438,16 @@ fn display_card(card: &dyn UnitCardDefinition, tag: usize) -> String {
         card.health(),
         tag
     )
+}
+
+fn retry_until_ok<TOut, TErr>(
+    mut action: impl FnMut() -> Result<TOut, TErr>,
+    mut on_err: impl FnMut(TErr),
+) -> TOut {
+    loop {
+        match (action)() {
+            Ok(ok) => return ok,
+            Err(e) => (on_err)(e),
+        }
+    }
 }
