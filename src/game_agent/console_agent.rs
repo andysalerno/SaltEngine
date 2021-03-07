@@ -14,8 +14,8 @@ use thiserror::Error;
 
 #[derive(Debug, Error)]
 enum ConsoleError {
-    #[error("Not a valid position.")]
-    InputNotAValidPosition(char),
+    #[error("{0}")]
+    UserInputError(String),
 }
 
 pub struct ConsoleAgent {
@@ -121,7 +121,7 @@ impl Prompter for ConsolePrompter {
             if true {
                 Ok(board_pos)
             } else {
-                Err("bad!".into())
+                Err(ConsoleError::UserInputError("no".to_owned()))
             }
         };
 
@@ -226,7 +226,10 @@ impl ConsolePrompter {
 
         let event = SummonCreatureFromHandEvent::new(player_id, board_pos, selected_card_id);
 
-        event.validate(game_state).map(|_| event.into())
+        event
+            .validate(game_state)
+            .map(|_| event.into())
+            .map_err(|e| ConsoleError::UserInputError(format!("{:?}", e)))
     }
 
     fn attack(
@@ -252,7 +255,10 @@ impl ConsolePrompter {
 
         let event = AttackEvent::new(attacker, target);
 
-        event.validate(game_state).map(|_| event.into())
+        event
+            .validate(game_state)
+            .map(|_| event.into())
+            .map_err(|e| ConsoleError::UserInputError(format!("{:?}", e)))
     }
 
     fn info(&self, game_state: &GameState, input_queue: &mut VecDeque<String>) {
@@ -312,7 +318,9 @@ impl ConsolePrompter {
         input_queue: &mut VecDeque<String>,
     ) -> Result<BoardPos, ConsoleError> {
         let c = self.ask("Letter position: ", input_queue);
-        let input_c = c.chars().nth(0).ok_or_else(|| Box::new(Err("bad")))?;
+        let input_c = c.chars().nth(0).ok_or_else(|| {
+            ConsoleError::UserInputError("Input was not a valid character.".to_owned())
+        })?;
 
         let enemy_back_chars = "ABCDEF".chars();
         let enemy_front_chars = "GHIJKL".chars();
@@ -331,58 +339,12 @@ impl ConsolePrompter {
         } else if let Some((index, _)) = my_back_chars.enumerate().find(|&(_, c)| c == input_c) {
             BoardPos::new(game_state.player_a_id(), RowId::BackRow, index)
         } else {
-            return Err(format!("The input char {} did not match any position", input_c).into());
+            return Err(ConsoleError::UserInputError(
+                format!("The input char {} did not match any position", input_c).into(),
+            ));
         };
 
         Ok(board_pos)
-    }
-
-    fn prompt_pos_enemyside(
-        &self,
-        game_state: &GameState,
-        input_queue: &mut VecDeque<String>,
-    ) -> BoardPos {
-        let player = game_state.other_player(self.id());
-        let row = self.prompt_row(input_queue);
-        let index = self.prompt_row_index(input_queue);
-
-        BoardPos::new(player, row, index)
-    }
-
-    fn prompt_player(
-        &self,
-        game_state: &GameState,
-        input_queue: &mut VecDeque<String>,
-    ) -> PlayerId {
-        let player_in = self.ask("Which player? (me, opponent)", input_queue);
-
-        match player_in.as_str() {
-            "me" => self.id(),
-            "opponent" => game_state.other_player(self.id()),
-            _ => panic!("Unknown input: {}", player_in),
-        }
-    }
-
-    fn prompt_row(&self, input_queue: &mut VecDeque<String>) -> RowId {
-        let row_in = self.ask("Which row? (front, back)", input_queue);
-
-        match row_in.as_str() {
-            "front" => RowId::FrontRow,
-            "back" => RowId::BackRow,
-            _ => panic!("Unknown input: {}", row_in),
-        }
-    }
-
-    fn prompt_row_index(&self, input_queue: &mut VecDeque<String>) -> usize {
-        let row_index = self.ask("What row index? (0..=5)", input_queue);
-
-        let index = row_index.parse::<usize>().expect("Invalid index");
-
-        if !(0..6).contains(&index) {
-            panic!("not in range");
-        }
-
-        index
     }
 
     fn ask(&self, message: &str, input_queue: &mut VecDeque<String>) -> String {
