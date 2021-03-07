@@ -203,6 +203,14 @@ impl GameState {
         }
     }
 
+    /// A Vector of the creatures on the board, controlled by player_id, that are able to attack.
+    pub fn active_attackers(&self, player_id: PlayerId) -> Vec<UnitCardInstanceId> {
+        self.board()
+            .player_creatures(player_id)
+            .filter_map(|slot| slot.maybe_creature().map(|c| c.id()))
+            .collect()
+    }
+
     pub fn evaluate_passives(&mut self) {
         // clear out all passive buffs
         self.board()

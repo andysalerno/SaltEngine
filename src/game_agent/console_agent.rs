@@ -118,10 +118,16 @@ impl Prompter for ConsolePrompter {
         say("Enter the letter of a slot containing a creature you control.");
 
         let validate = |board_pos: BoardPos| -> Result<BoardPos, ConsoleError> {
-            if true {
-                Ok(board_pos)
+            if board_pos.player_id != self.id() {
+                Err(ConsoleError::UserInputError(
+                    "That position is not yours.".to_owned(),
+                ))
+            } else if game_state.board().creature_at_pos(board_pos).is_none() {
+                Err(ConsoleError::UserInputError(
+                    "That position doesn't contain a creature.".to_owned(),
+                ))
             } else {
-                Err(ConsoleError::UserInputError("no".to_owned()))
+                Ok(board_pos)
             }
         };
 
@@ -145,12 +151,33 @@ impl Prompter for ConsolePrompter {
 
         say("Enter the letter of a slot containing a creature your opponent controls.");
 
-        loop {
-            match self.prompt_pos(game_state, &mut empty_queue) {
-                Ok(board_pos) => return board_pos,
+        let validate = |board_pos: BoardPos| -> Result<BoardPos, ConsoleError> {
+            if board_pos.player_id == self.id() {
+                Err(ConsoleError::UserInputError(
+                    "That's not an enemy position.".to_owned(),
+                ))
+            } else if game_state.board().creature_at_pos(board_pos).is_none() {
+                Err(ConsoleError::UserInputError(
+                    "That position doesn't contain a creature.".to_owned(),
+                ))
+            } else {
+                Ok(board_pos)
+            }
+        };
+
+        let enemy_creature_pos = loop {
+            let any_pos = retry_until_ok(
+                || self.prompt_pos(game_state, &mut empty_queue),
+                |e| say(format!("{}", e)),
+            );
+
+            match validate(any_pos) {
+                Ok(p) => break p,
                 Err(e) => say(format!("{}", e)),
             }
-        }
+        };
+
+        enemy_creature_pos
     }
 }
 
@@ -237,23 +264,35 @@ impl ConsolePrompter {
         game_state: &GameState,
         input_queue: &mut VecDeque<String>,
     ) -> Result<GameEvent, ConsoleError> {
-        let attacker = loop {
+        if game_state.active_attackers(self.id()).is_empty() {
+            return Err(ConsoleError::UserInputError(
+                "You don't control any creatures that can attack.".to_owned(),
+            ));
+        }
+
+        let other_player = game_state.other_player(self.id());
+        if game_state
+            .board()
+            .player_creatures(other_player)
+            .next()
+            .is_none()
+        {
+            return Err(ConsoleError::UserInputError(
+                "The enemy doesn't have any creatures you can attack.".to_owned(),
+            ));
+        }
+
+        let attacker_id = {
             let pos = self.prompt_player_creature_pos(game_state);
-            match game_state.board().creature_at_pos(pos) {
-                Some(c) => break c.id(),
-                _ => say("No card found at that pos; try again"),
-            }
+            game_state.board().creature_at_pos(pos).unwrap().id()
         };
 
-        let target = loop {
+        let target_id = {
             let pos = self.prompt_opponent_creature_pos(game_state);
-            match game_state.board().creature_at_pos(pos) {
-                Some(c) => break c.id(),
-                _ => say("No card found at that pos; try again"),
-            }
+            game_state.board().creature_at_pos(pos).unwrap().id()
         };
 
-        let event = AttackEvent::new(attacker, target);
+        let event = AttackEvent::new(attacker_id, target_id);
 
         event
             .validate(game_state)
