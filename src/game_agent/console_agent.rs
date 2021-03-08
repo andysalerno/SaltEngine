@@ -264,7 +264,7 @@ impl ConsolePrompter {
     fn attack(
         &self,
         game_state: &GameState,
-        input_queue: &mut VecDeque<String>,
+        _input_queue: &mut VecDeque<String>,
     ) -> Result<GameEvent, ConsoleError> {
         if game_state.active_attackers(self.id()).is_empty() {
             return Err(ConsoleError::UserInputError(

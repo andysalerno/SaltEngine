@@ -1,3 +1,4 @@
+use crate::game_state::GameState;
 use crate::{
     game_logic::{
         buff::{Buff, BuffSourceId},
@@ -5,10 +6,6 @@ use crate::{
     },
     game_state::{board::RowId, UnitCardInstanceId},
     id::Id,
-};
-use crate::{
-    game_logic::{passive_effect::PassiveEffectInstanceId, PassiveEffectDefinition},
-    game_state::GameState,
 };
 
 use super::{CardDefinition, Position, UnitCardDefinition};
