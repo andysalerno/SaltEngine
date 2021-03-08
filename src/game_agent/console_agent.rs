@@ -244,6 +244,8 @@ impl ConsolePrompter {
                 .parse()
                 .expect("invalid input");
 
+            if card_index > game_state.hand(player_id).len() {}
+
             let selected_card = game_state.hand(player_id).nth(card_index);
 
             selected_card.id()
