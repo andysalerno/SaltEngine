@@ -9,7 +9,7 @@ pub use card_instance::{InstanceState, UnitCardInstance, UnitCardInstanceId};
 pub use deck::Deck;
 pub use game_state::GameState;
 pub use hand::Hand;
-pub use selector::BoardSelector;
+pub use selector::*;
 
 use crate::id::Id;
 

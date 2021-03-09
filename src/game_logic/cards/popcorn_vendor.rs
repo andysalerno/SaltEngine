@@ -3,7 +3,7 @@ use crate::{
         buff::{Buff, BuffSourceId},
         BuffInstanceId,
     },
-    game_state::{board::RowId, UnitCardInstanceId},
+    game_state::{board::RowId, AsSelector, UnitCardInstanceId},
     id::Id,
 };
 use crate::{
@@ -74,11 +74,13 @@ impl UnitCardDefinition for PopcornVendor {
                 instance.add_buff(Box::new(buff_self::PopcornVendorBuff::new(instance.id())));
             } else {
                 // Back: buffs another
-                if game_state.board().creatures_iter().next().is_none() {
+                if !game_state.player_has_any_creature(pos.player_id) {
                     return;
                 }
 
-                let other_pos = dispatcher.player_prompter().prompt_creature_pos(game_state);
+                let other_pos = dispatcher
+                    .player_prompter()
+                    .prompt_player_creature_pos(game_state);
                 let slot = game_state.board_mut().slot_at_pos_mut(other_pos);
 
                 let creature = slot.maybe_creature_mut().expect(

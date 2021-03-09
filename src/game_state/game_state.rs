@@ -1,6 +1,6 @@
 use super::{
     board::{Board, BoardPos, RowId},
-    Deck, Hand, PlayerId, UnitCardInstance, UnitCardInstanceId,
+    AsSelector, Deck, Hand, PlayerId, UnitCardInstance, UnitCardInstanceId,
 };
 
 pub struct GameState {
@@ -203,12 +203,17 @@ impl GameState {
         }
     }
 
+    pub fn player_has_any_creature(&self, player_id: PlayerId) -> bool {
+        self.selector()
+            .player(player_id)
+            .creatures()
+            .next()
+            .is_some()
+    }
+
     /// A Vector of the creatures on the board, controlled by player_id, that are able to attack.
     pub fn active_attackers(&self, player_id: PlayerId) -> Vec<UnitCardInstanceId> {
-        self.board()
-            .player_creatures(player_id)
-            .filter_map(|slot| slot.maybe_creature().map(|c| c.id()))
-            .collect()
+        self.selector().player(player_id).creature_ids()
     }
 
     pub fn evaluate_passives(&mut self) {

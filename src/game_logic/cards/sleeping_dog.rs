@@ -83,8 +83,6 @@ impl UnitCardDefinition for SleepingDog {
                 }
             }
 
-            println!("sleeping dog is in slots: {:?}", slots);
-
             // Take the card off the back row
             let instance = game_state.board_mut().take_creature_by_id(id);
 

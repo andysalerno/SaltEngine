@@ -36,6 +36,10 @@ fn to_string(game_state: &GameState) -> String {
         true,
     ));
 
+    if game_state.cur_player_id() == game_state.player_b_id() {
+        result.push_str("    <--- Player turn");
+    }
+
     result.push('\n');
     result.push('\n');
     result.push_str(&row_to_string(
@@ -54,6 +58,9 @@ fn to_string(game_state: &GameState) -> String {
         18,
         true,
     ));
+    if game_state.cur_player_id() == game_state.player_a_id() {
+        result.push_str("    <--- Player turn");
+    }
     result.push('\n');
 
     let mana = game_state.player_mana(game_state.cur_player_id());

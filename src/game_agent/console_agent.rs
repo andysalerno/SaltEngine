@@ -1,5 +1,9 @@
 use super::game_agent::{GameAgent, Prompter};
-use crate::{console_display::ConsoleDisplay, game_runner::GameDisplay, game_state::board::RowId};
+use crate::{
+    console_display::ConsoleDisplay,
+    game_runner::GameDisplay,
+    game_state::{board::RowId, AsSelector},
+};
 use crate::{game_logic::Event, game_state::board::BoardPos};
 use crate::{
     game_logic::{cards::UnitCardDefinition, GameEvent, SummonCreatureFromHandEvent},
@@ -114,6 +118,10 @@ impl Prompter for ConsolePrompter {
 
     fn prompt_player_creature_pos(&self, game_state: &GameState) -> BoardPos {
         let mut empty_queue = VecDeque::new();
+
+        if !game_state.player_has_any_creature(self.id()) {
+            panic!("Can't prompt for a friendly creature if there is none.");
+        }
 
         say("Enter the letter of a slot containing a creature you control.");
 
@@ -242,9 +250,13 @@ impl ConsolePrompter {
             let card_index: usize = self
                 .ask(&format!("which card? (0..={})", hand_size - 1), input_queue)
                 .parse()
-                .expect("invalid input");
+                .map_err(|_| ConsoleError::UserInputError("Not a valid input.".to_owned()))?;
 
-            if card_index > game_state.hand(player_id).len() {}
+            if card_index > game_state.hand(player_id).len() {
+                return Err(ConsoleError::UserInputError(
+                    "That index is out of range.".into(),
+                ));
+            }
 
             let selected_card = game_state.hand(player_id).nth(card_index);
 
@@ -273,12 +285,7 @@ impl ConsolePrompter {
         }
 
         let other_player = game_state.other_player(self.id());
-        if game_state
-            .board()
-            .player_creatures(other_player)
-            .next()
-            .is_none()
-        {
+        if !game_state.player_has_any_creature(other_player) {
             return Err(ConsoleError::UserInputError(
                 "The enemy doesn't have any creatures you can attack.".to_owned(),
             ));
