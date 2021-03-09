@@ -320,12 +320,20 @@ impl ConsolePrompter {
     fn show_hand(&self, game_state: &GameState) {
         let mut result = String::new();
 
+        let available_mana = game_state.player_mana(self.id());
+
         let mut all_cards = game_state
             .hand(self.id())
             .cards()
             .iter()
             .enumerate()
-            .map(|(index, c)| display_card(c.definition(), index))
+            .map(|(index, c)| {
+                display_card(
+                    c.definition(),
+                    c.definition().cost() <= available_mana as i32,
+                    index,
+                )
+            })
             .map(|s| s.lines().map(|l| l.to_owned()).collect::<Vec<_>>())
             .collect::<Vec<_>>();
 
@@ -419,13 +427,22 @@ fn say(message: impl AsRef<str>) {
     println!("{}", message.as_ref());
 }
 
-fn display_card(card: &dyn UnitCardDefinition, tag: usize) -> String {
+fn display_card(card: &dyn UnitCardDefinition, playable: bool, tag: usize) -> String {
     let text_lines = card.text().lines().collect::<Vec<_>>();
 
+    let width = 23;
+
+    let border = match playable {
+        true => '+',
+        false => '-',
+    };
+
+    let border = std::iter::repeat(border).take(23).collect::<String>();
+
     format!(
-        r#"-----------------------
+        r#"{}
 |{:<18} {} |
-|---------------------|
+|{}|
 |{:^21}|
 |{:^21}|
 |{:^21}|
@@ -435,10 +452,12 @@ fn display_card(card: &dyn UnitCardDefinition, tag: usize) -> String {
 |{:^21}|
 |{:^21}|
 |W: {}            {}/{}  |
------------------------
+{}
 {:^23}"#,
+        border,
         card.title(),
         card.cost(),
+        &border[..border.len() - 2],
         text_lines.get(0).unwrap_or(&""),
         text_lines.get(1).unwrap_or(&""),
         text_lines.get(2).unwrap_or(&""),
@@ -450,6 +469,7 @@ fn display_card(card: &dyn UnitCardDefinition, tag: usize) -> String {
         card.row_width(),
         card.attack(),
         card.health(),
+        border,
         tag
     )
 }
