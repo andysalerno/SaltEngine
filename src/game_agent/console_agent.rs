@@ -276,30 +276,43 @@ impl ConsolePrompter {
     fn attack(
         &self,
         game_state: &GameState,
-        _input_queue: &mut VecDeque<String>,
+        input_queue: &mut VecDeque<String>,
     ) -> Result<GameEvent, ConsoleError> {
-        if game_state.active_attackers(self.id()).is_empty() {
+        let attacker_pos = self.prompt_pos(game_state, input_queue)?;
+
+        if !game_state
+            .selector()
+            .player(self.id())
+            .with_creature()
+            .slots()
+            .any(|s| s.pos() == attacker_pos)
+        {
             return Err(ConsoleError::UserInputError(
-                "You don't control any creatures that can attack.".to_owned(),
+                "That's not a valid attacker.".to_owned(),
             ));
         }
 
-        let other_player = game_state.other_player(self.id());
-        if !game_state.player_has_any_creature(other_player) {
+        let target_pos = self.prompt_pos(game_state, input_queue)?;
+
+        if !game_state
+            .selector()
+            .player(game_state.other_player(self.id()))
+            .with_creature()
+            .slots()
+            .any(|s| s.pos() == target_pos)
+        {
             return Err(ConsoleError::UserInputError(
-                "The enemy doesn't have any creatures you can attack.".to_owned(),
+                "That's not a valid target.".to_owned(),
             ));
         }
 
-        let attacker_id = {
-            let pos = self.prompt_player_creature_pos(game_state);
-            game_state.board().creature_at_pos(pos).unwrap().id()
-        };
+        let attacker_id = game_state
+            .board()
+            .creature_at_pos(attacker_pos)
+            .unwrap()
+            .id();
 
-        let target_id = {
-            let pos = self.prompt_opponent_creature_pos(game_state);
-            game_state.board().creature_at_pos(pos).unwrap().id()
-        };
+        let target_id = game_state.board().creature_at_pos(target_pos).unwrap().id();
 
         let event = AttackEvent::new(attacker_id, target_id);
 
