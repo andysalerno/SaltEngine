@@ -268,6 +268,34 @@ mod tests {
     }
 
     #[test]
+    fn when_summoned_back_empty_board_expects_no_prompt() {
+        let mut state = make_test_state();
+        let mut dispatcher = make_default_dispatcher();
+        let player_id = state.player_a_id();
+
+        {
+            let mut prompter_a = Box::new(MockPrompter::new());
+            prompter_a.expect_prompt_player_creature_pos().never();
+            dispatcher.set_player_a_prompter(prompter_a);
+        }
+
+        // Summon the popcorn vendor alone in the back row
+        let hand = state.hand_mut(player_id);
+        let pop_vend_pos = BoardPos::new(player_id, RowId::BackRow, 0);
+        let pop_vend = PopcornVendor.make_instance();
+        let pop_vend_id = pop_vend.id();
+        {
+            hand.add_card(pop_vend);
+            let summon_event =
+                SummonCreatureFromHandEvent::new(player_id, pop_vend_pos, pop_vend_id);
+            dispatcher.dispatch(summon_event, &mut state);
+        }
+
+        // assertion: we would have panicked if the prompter was called,
+        // since the mock is configured with `never()`
+    }
+
+    #[test]
     fn when_summoned_front_gets_buff() {
         let mut state = make_test_state();
         let mut dispatcher = make_default_dispatcher();
