@@ -78,13 +78,23 @@ impl EventDispatcher {
 #[cfg(test)]
 pub(crate) mod tests {
     use crate::{
-        game_agent::game_agent::Prompter,
+        game_agent::game_agent::*,
         game_state::{Deck, GameState, PlayerId},
     };
 
     use super::EventDispatcher;
 
-    pub fn make_test_state() -> (GameState, EventDispatcher) {
+    pub fn make_default_test_state() -> (GameState, EventDispatcher) {
+        let prompt_a = MockPrompter::new();
+        let prompt_b = MockPrompter::new();
+
+        make_test_state(prompt_a, prompt_b)
+    }
+
+    pub fn make_test_state(
+        prompt_a: impl Prompter + 'static,
+        prompt_b: impl Prompter + 'static,
+    ) -> (GameState, EventDispatcher) {
         let state = {
             let player_a_deck = Deck::new(Vec::new());
             let player_b_deck = Deck::new(Vec::new());
@@ -104,52 +114,8 @@ pub(crate) mod tests {
             state
         };
 
-        let dispatcher = EventDispatcher::new(Box::new(StubPrompter), Box::new(StubPrompter));
+        let dispatcher = EventDispatcher::new(Box::new(prompt_a), Box::new(prompt_b));
 
         (state, dispatcher)
-    }
-
-    #[derive(Debug)]
-    struct StubPrompter;
-
-    impl Prompter for StubPrompter {
-        fn prompt_slot(&self, _game_state: &GameState) -> crate::game_state::board::BoardPos {
-            todo!()
-        }
-
-        fn prompt_player_slot(
-            &self,
-            _game_state: &GameState,
-        ) -> crate::game_state::board::BoardPos {
-            todo!()
-        }
-
-        fn prompt_opponent_slot(
-            &self,
-            _game_state: &GameState,
-        ) -> crate::game_state::board::BoardPos {
-            todo!()
-        }
-
-        fn prompt_creature_pos(
-            &self,
-            _game_state: &GameState,
-        ) -> crate::game_state::board::BoardPos {
-            todo!()
-        }
-
-        fn prompt_player_creature_pos(
-            &self,
-            _game_state: &GameState,
-        ) -> crate::game_state::board::BoardPos {
-            todo!()
-        }
-
-        fn prompt_opponent_creature_pos(
-            &self,
-            _game_state: &GameState,
-        ) -> crate::game_state::board::BoardPos {
-            todo!()
-        }
     }
 }

@@ -26,7 +26,7 @@ impl GameRunner {
                 .flat_map(|_| {
                     let cards = vec![
                         RicketyCannon.make_instance(),
-                        Prawn.make_instance(),
+                        Pawn.make_instance(),
                         EmotionalSupportDog.make_instance(),
                         ReallyBigRock.make_instance(),
                         AttackDog.make_instance(),
@@ -46,7 +46,7 @@ impl GameRunner {
                 .flat_map(|_| {
                     let cards = vec![
                         RicketyCannon.make_instance(),
-                        Prawn.make_instance(),
+                        Pawn.make_instance(),
                         EmotionalSupportDog.make_instance(),
                         ReallyBigRock.make_instance(),
                         AttackDog.make_instance(),

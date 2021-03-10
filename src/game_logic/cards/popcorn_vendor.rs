@@ -210,19 +210,44 @@ mod buff_other {
 #[cfg(test)]
 mod tests {
     use super::PopcornVendor;
+    use crate::game_logic::cards::Pawn;
     use crate::{
-        game_logic::{
-            cards::UnitCardDefinition, tests::make_test_state, SummonCreatureFromHandEvent,
-        },
+        game_logic::{cards::UnitCardDefinition, tests::*, SummonCreatureFromHandEvent},
         game_state::board::{BoardPos, RowId},
     };
 
     #[test]
-    fn when_summoned_back_gives_buff() {}
+    fn when_summoned_back_gives_buff() {
+        let (mut state, mut dispatcher) = make_default_test_state();
+        let player_id = state.player_a_id();
+
+        // Summon a pawn to receive the buff
+        let hand = state.hand_mut(player_id);
+        let pawn_pos = BoardPos::new(player_id, RowId::FrontRow, 0);
+        let pawn = Pawn.make_instance();
+        let pawn_id = pawn.id();
+        {
+            hand.add_card(pawn);
+            let summon_event = SummonCreatureFromHandEvent::new(player_id, pawn_pos, pawn_id);
+            dispatcher.dispatch(summon_event, &mut state);
+        }
+
+        // Summon the popcorn vendor and target the Pawn with the buff
+        let hand = state.hand_mut(player_id);
+        let pop_vend_pos = BoardPos::new(player_id, RowId::BackRow, 0);
+        let pop_vend = PopcornVendor.make_instance();
+        let pop_vend_id = pop_vend.id();
+        {
+            hand.add_card(pop_vend);
+            let summon_event =
+                SummonCreatureFromHandEvent::new(player_id, pop_vend_pos, pop_vend_id);
+            dispatcher.dispatch(summon_event, &mut state);
+        }
+    }
 
     #[test]
     fn when_summoned_front_gets_buff() {
-        let (mut state, mut dispatcher) = make_test_state();
+        let (mut state, mut dispatcher) = make_default_test_state();
 
         let player_a = state.player_a_id();
         let hand = state.hand_mut(player_a);

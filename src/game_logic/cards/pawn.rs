@@ -3,16 +3,16 @@ use crate::id::Id;
 use super::{CardDefinition, Position, UnitCardDefinition};
 
 #[derive(Debug, Clone)]
-pub struct Prawn;
+pub struct Pawn;
 
-impl Prawn {
+impl Pawn {
     fn id(&self) -> Id {
         // id::parse("...")
         todo!()
     }
 }
 
-impl CardDefinition for Prawn {
+impl CardDefinition for Pawn {
     fn title(&self) -> &str {
         "Pawn"
     }
@@ -30,7 +30,7 @@ impl CardDefinition for Prawn {
     }
 }
 
-impl UnitCardDefinition for Prawn {
+impl UnitCardDefinition for Pawn {
     fn attack(&self) -> i32 {
         1
     }

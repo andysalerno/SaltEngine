@@ -1,13 +1,17 @@
 use crate::game_state::{GameState, PlayerId};
 use crate::{game_logic::GameEvent, game_state::board::BoardPos};
 
+#[cfg(test)]
+use mockall::{automock, predicate::*};
+
 pub trait GameAgent {
     fn get_action(&self, game_state: &GameState) -> GameEvent;
     fn id(&self) -> PlayerId;
     fn make_prompter(&self) -> Box<dyn Prompter>;
 }
 
-pub trait Prompter: std::fmt::Debug {
+#[cfg_attr(test, automock)]
+pub trait Prompter {
     /// Prompt the player for for any position (slot) on the board.
     fn prompt_slot(&self, game_state: &GameState) -> BoardPos;
 
@@ -25,4 +29,10 @@ pub trait Prompter: std::fmt::Debug {
 
     /// Prompt the player for a slot on the opponent's side of the board containing a creature.
     fn prompt_opponent_creature_pos(&self, game_state: &GameState) -> BoardPos;
+}
+
+impl std::fmt::Debug for dyn Prompter {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{{Prompter}}")
+    }
 }

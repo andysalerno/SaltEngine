@@ -157,7 +157,7 @@ mod tests {
 
     #[test]
     fn when_summoned_expects_provides_buff() {
-        let (mut state, mut dispatcher) = crate::game_logic::tests::make_test_state();
+        let (mut state, mut dispatcher) = crate::game_logic::tests::make_default_test_state();
 
         // Summon the thing that will get buffed.
         let rock = ReallyBigRock.make_instance();
