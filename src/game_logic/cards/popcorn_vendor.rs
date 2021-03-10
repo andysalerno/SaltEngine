@@ -206,3 +206,40 @@ mod buff_other {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::PopcornVendor;
+    use crate::{
+        game_logic::{
+            cards::UnitCardDefinition, tests::make_test_state, SummonCreatureFromHandEvent,
+        },
+        game_state::board::{BoardPos, RowId},
+    };
+
+    #[test]
+    fn when_summoned_back_gives_buff() {}
+
+    #[test]
+    fn when_summoned_front_gets_buff() {
+        let (mut state, mut dispatcher) = make_test_state();
+
+        let player_a = state.player_a_id();
+        let hand = state.hand_mut(player_a);
+
+        let popcorn_vendor = PopcornVendor.make_instance();
+        let popcorn_vendor_id = popcorn_vendor.id();
+        hand.add_card(popcorn_vendor);
+
+        let pos = BoardPos::new(player_a, RowId::FrontRow, 0);
+        let summon_event = SummonCreatureFromHandEvent::new(player_a, pos, popcorn_vendor_id);
+        dispatcher.dispatch(summon_event, &mut state);
+
+        let summoned_vendor = state.board().creature_instance(popcorn_vendor_id);
+
+        assert!(
+            !summoned_vendor.buffs().is_empty(),
+            "Expected it to receive the buff."
+        );
+    }
+}

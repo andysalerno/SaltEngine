@@ -74,3 +74,82 @@ impl EventDispatcher {
         }
     }
 }
+
+#[cfg(test)]
+pub(crate) mod tests {
+    use crate::{
+        game_agent::game_agent::Prompter,
+        game_state::{Deck, GameState, PlayerId},
+    };
+
+    use super::EventDispatcher;
+
+    pub fn make_test_state() -> (GameState, EventDispatcher) {
+        let state = {
+            let player_a_deck = Deck::new(Vec::new());
+            let player_b_deck = Deck::new(Vec::new());
+
+            let mut state = GameState::initial_state(
+                PlayerId::new(),
+                player_a_deck,
+                PlayerId::new(),
+                player_b_deck,
+            );
+
+            state.raise_mana_limit(state.player_a_id(), 10);
+            state.raise_mana_limit(state.player_b_id(), 10);
+            state.refresh_player_mana(state.player_a_id());
+            state.refresh_player_mana(state.player_b_id());
+
+            state
+        };
+
+        let dispatcher = EventDispatcher::new(Box::new(StubPrompter), Box::new(StubPrompter));
+
+        (state, dispatcher)
+    }
+
+    #[derive(Debug)]
+    struct StubPrompter;
+
+    impl Prompter for StubPrompter {
+        fn prompt_slot(&self, _game_state: &GameState) -> crate::game_state::board::BoardPos {
+            todo!()
+        }
+
+        fn prompt_player_slot(
+            &self,
+            _game_state: &GameState,
+        ) -> crate::game_state::board::BoardPos {
+            todo!()
+        }
+
+        fn prompt_opponent_slot(
+            &self,
+            _game_state: &GameState,
+        ) -> crate::game_state::board::BoardPos {
+            todo!()
+        }
+
+        fn prompt_creature_pos(
+            &self,
+            _game_state: &GameState,
+        ) -> crate::game_state::board::BoardPos {
+            todo!()
+        }
+
+        fn prompt_player_creature_pos(
+            &self,
+            _game_state: &GameState,
+        ) -> crate::game_state::board::BoardPos {
+            todo!()
+        }
+
+        fn prompt_opponent_creature_pos(
+            &self,
+            _game_state: &GameState,
+        ) -> crate::game_state::board::BoardPos {
+            todo!()
+        }
+    }
+}

@@ -148,11 +148,11 @@ impl PassiveEffectDefinition for EmotionalSupportDogPassiveDefinition {
 #[cfg(test)]
 mod tests {
     use crate::{
-        game_agent::game_agent::Prompter,
-        game_logic::{cards::ReallyBigRock, CreatureSetEvent, EventDispatcher},
+        game_logic::cards::UnitCardDefinition,
+        game_logic::{cards::ReallyBigRock, CreatureSetEvent},
         game_state::{
             board::{BoardPos, RowId},
-            Deck, GameState, PlayerId, UnitCardInstance,
+            UnitCardInstance,
         },
     };
 
@@ -160,11 +160,10 @@ mod tests {
 
     #[test]
     fn when_summoned_expects_provides_buff() {
-        let mut state = make_test_state();
-        let mut dispatcher = EventDispatcher::new(Box::new(StubPrompter), Box::new(StubPrompter));
+        let (mut state, mut dispatcher) = crate::game_logic::tests::make_test_state();
 
         // Summon the thing that will get buffed.
-        let rock = UnitCardInstance::new(Box::new(ReallyBigRock));
+        let rock = ReallyBigRock.make_instance();
         let attack_start = rock.attack();
         let health_start = rock.health();
         let buffed_id = rock.id();
@@ -175,7 +174,7 @@ mod tests {
         }
 
         {
-            let doggy = UnitCardInstance::new(Box::new(EmotionalSupportDog));
+            let doggy = EmotionalSupportDog.make_instance();
             let summon_at = BoardPos::new(state.player_a_id(), RowId::BackRow, 3);
             let summon_doggy_event = CreatureSetEvent::new(state.player_a_id(), doggy, summon_at);
             dispatcher.dispatch(summon_doggy_event, &mut state);
@@ -186,61 +185,5 @@ mod tests {
 
         assert_eq!(attack_start + 1, rock_updated_attack);
         assert_eq!(health_start + 1, rock_updated_health);
-    }
-
-    fn make_test_state() -> GameState {
-        let player_a_deck = Deck::new(Vec::new());
-        let player_b_deck = Deck::new(Vec::new());
-
-        GameState::initial_state(
-            PlayerId::new(),
-            player_a_deck,
-            PlayerId::new(),
-            player_b_deck,
-        )
-    }
-
-    #[derive(Debug)]
-    struct StubPrompter;
-
-    impl Prompter for StubPrompter {
-        fn prompt_slot(&self, _game_state: &GameState) -> crate::game_state::board::BoardPos {
-            todo!()
-        }
-
-        fn prompt_player_slot(
-            &self,
-            _game_state: &GameState,
-        ) -> crate::game_state::board::BoardPos {
-            todo!()
-        }
-
-        fn prompt_opponent_slot(
-            &self,
-            _game_state: &GameState,
-        ) -> crate::game_state::board::BoardPos {
-            todo!()
-        }
-
-        fn prompt_creature_pos(
-            &self,
-            _game_state: &GameState,
-        ) -> crate::game_state::board::BoardPos {
-            todo!()
-        }
-
-        fn prompt_player_creature_pos(
-            &self,
-            _game_state: &GameState,
-        ) -> crate::game_state::board::BoardPos {
-            todo!()
-        }
-
-        fn prompt_opponent_creature_pos(
-            &self,
-            _game_state: &GameState,
-        ) -> crate::game_state::board::BoardPos {
-            todo!()
-        }
     }
 }
