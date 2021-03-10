@@ -282,7 +282,7 @@ impl ConsolePrompter {
 
         if !game_state
             .selector()
-            .player(self.id())
+            .for_player(self.id())
             .with_creature()
             .slots()
             .any(|s| s.pos() == attacker_pos)
@@ -296,7 +296,8 @@ impl ConsolePrompter {
 
         if !game_state
             .selector()
-            .player(game_state.other_player(self.id()))
+            .for_player(game_state.other_player(self.id()))
+            .include_heroes()
             .with_creature()
             .slots()
             .any(|s| s.pos() == target_pos)
@@ -390,6 +391,15 @@ impl ConsolePrompter {
         let input_c = c.chars().nth(0).ok_or_else(|| {
             ConsoleError::UserInputError("Input was not a valid character.".to_owned())
         })?;
+
+        // special case for Y/Z as hero pos
+        if input_c == 'Y' {
+            let player_id = game_state.player_b_id();
+            return Ok(BoardPos::hero_pos(player_id));
+        } else if input_c == 'X' {
+            let player_id = game_state.player_a_id();
+            return Ok(BoardPos::hero_pos(player_id));
+        }
 
         let enemy_back_chars = "ABCDEF".chars();
         let enemy_front_chars = "GHIJKL".chars();

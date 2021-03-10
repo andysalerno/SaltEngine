@@ -26,6 +26,8 @@ fn to_string(game_state: &GameState) -> String {
         0,
         false,
     ));
+    let player_b_health = game_state.board().hero(game_state.player_b_id()).health();
+    result.push_str(&format!("    (Y) Health: {}", player_b_health));
 
     result.push('\n');
     result.push_str(&row_to_string(
@@ -49,6 +51,8 @@ fn to_string(game_state: &GameState) -> String {
         12,
         false,
     ));
+    let player_a_health = game_state.board().hero(game_state.player_a_id()).health();
+    result.push_str(&format!("    (Z) Health: {}", player_a_health));
 
     result.push('\n');
     result.push_str(&row_to_string(

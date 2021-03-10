@@ -3,6 +3,7 @@ mod card_instance;
 mod deck;
 mod game_state;
 mod hand;
+mod hero;
 mod selector;
 
 pub use card_instance::{InstanceState, UnitCardInstance, UnitCardInstanceId};

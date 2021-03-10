@@ -14,9 +14,6 @@ pub struct GameState {
     player_b_hand: Hand,
     player_b_deck: Deck,
 
-    player_a_health: i32,
-    player_b_health: i32,
-
     player_a_mana: u32,
     player_a_mana_limit: u32,
     player_b_mana: u32,
@@ -31,11 +28,11 @@ enum PlayerAB {
 }
 
 const BOARD_LEN: usize = 6;
-const STARTING_HEALTH: i32 = 30;
 
 impl GameState {
     pub fn is_game_over(&self) -> bool {
-        self.player_a_health <= 0 || self.player_b_health <= 0
+        self.board().hero(self.player_a_id).health() <= 0
+            || self.board().hero(self.player_b_id).health() <= 0
     }
 
     pub fn initial_state(
@@ -44,12 +41,17 @@ impl GameState {
         player_b_id: PlayerId,
         player_b_deck: Deck,
     ) -> Self {
+        let hero_a = super::hero::make_hero_instance();
+        let hero_b = super::hero::make_hero_instance();
+        let mut board = Box::new(Board::new(BOARD_LEN, player_a_id, player_b_id));
+
+        board.set_creature_at_pos(BoardPos::hero_pos(player_a_id), hero_a);
+        board.set_creature_at_pos(BoardPos::hero_pos(player_b_id), hero_b);
+
         Self {
             player_a_id,
             player_b_id,
             cur_player_turn: player_a_id,
-            player_a_health: STARTING_HEALTH,
-            player_b_health: STARTING_HEALTH,
 
             player_a_hand: Hand::default(),
             player_a_deck,
@@ -61,7 +63,7 @@ impl GameState {
             player_a_mana_limit: 0,
             player_b_mana: 0,
             player_b_mana_limit: 0,
-            board: Box::new(Board::new(BOARD_LEN, player_a_id, player_b_id)),
+            board,
         }
     }
 
@@ -205,7 +207,7 @@ impl GameState {
 
     pub fn player_has_any_creature(&self, player_id: PlayerId) -> bool {
         self.selector()
-            .player(player_id)
+            .for_player(player_id)
             .creatures()
             .next()
             .is_some()
@@ -213,7 +215,7 @@ impl GameState {
 
     /// A Vector of the creatures on the board, controlled by player_id, that are able to attack.
     pub fn active_attackers(&self, player_id: PlayerId) -> Vec<UnitCardInstanceId> {
-        self.selector().player(player_id).creature_ids()
+        self.selector().for_player(player_id).creature_ids()
     }
 
     pub fn evaluate_passives(&mut self) {

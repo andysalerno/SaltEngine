@@ -51,6 +51,7 @@ impl BoardSlot {
 pub enum RowId {
     FrontRow,
     BackRow,
+    Hero,
 }
 
 #[derive(Debug, Copy, Clone, PartialEq)]
@@ -69,6 +70,14 @@ impl BoardPos {
         }
     }
 
+    pub fn hero_pos(player_id: PlayerId) -> Self {
+        Self {
+            player_id,
+            row_id: RowId::Hero,
+            row_index: 0,
+        }
+    }
+
     pub fn row(&self) -> RowId {
         self.row_id
     }
@@ -82,7 +91,7 @@ pub struct Board {
 
 impl Board {
     pub fn new(_size: usize, player_a_id: PlayerId, player_b_id: PlayerId) -> Self {
-        let mut slots = Vec::with_capacity(SLOTS_COUNT);
+        let mut slots = Vec::with_capacity(SLOTS_COUNT + 4);
 
         // playber b
         for i in 0..BOARD_WIDTH {
@@ -101,6 +110,18 @@ impl Board {
         }
         for i in 0..BOARD_WIDTH {
             let pos = BoardPos::new(player_a_id, RowId::BackRow, i);
+            slots.push(BoardSlot::new(pos));
+        }
+
+        // player a hero
+        for i in 0..2 {
+            let pos = BoardPos::new(player_a_id, RowId::Hero, i);
+            slots.push(BoardSlot::new(pos));
+        }
+
+        // player b hero
+        for i in 0..2 {
+            let pos = BoardPos::new(player_b_id, RowId::Hero, i);
             slots.push(BoardSlot::new(pos));
         }
 
@@ -136,16 +157,31 @@ impl Board {
 
     /// The range for the given player's row.
     fn row_range(&self, player_id: PlayerId, row_id: RowId) -> std::ops::Range<usize> {
+        // Hero row is a special case
+        if row_id == RowId::Hero {
+            let player_offset = match self.player_ab(player_id) {
+                PlayerAB::PlayerA => 0,
+                PlayerAB::PlayerB => 2,
+            };
+
+            let start = SLOTS_COUNT + player_offset;
+            let end = start + 2;
+
+            return start..end;
+        }
+
         let player_range = self.player_range(player_id);
 
         match self.player_ab(player_id) {
             PlayerAB::PlayerB => match row_id {
                 RowId::BackRow => front_half(player_range),
                 RowId::FrontRow => end_half(player_range),
+                RowId::Hero => panic!("hero is not part of row range"),
             },
             PlayerAB::PlayerA => match row_id {
                 RowId::FrontRow => front_half(player_range),
                 RowId::BackRow => end_half(player_range),
+                RowId::Hero => panic!("hero is not part of row range"),
             },
         }
     }
@@ -209,6 +245,13 @@ impl Board {
     }
 
     pub fn creature_at_pos(&self, pos: BoardPos) -> Option<&UnitCardInstance> {
+        if pos.row() == RowId::Hero {
+            let player_offset = match self.player_ab(pos.player_id) {
+                PlayerAB::PlayerA => 0,
+                PlayerAB::PlayerB => 2,
+            };
+        }
+
         let row = self.player_row(pos.player_id, pos.row_id);
 
         // start at pos.row_index, and work back, in case there's
@@ -229,6 +272,11 @@ impl Board {
         return None;
     }
 
+    pub fn hero(&self, player_id: PlayerId) -> &UnitCardInstance {
+        let pos = BoardPos::hero_pos(player_id);
+        self.creature_at_pos(pos).expect("must have a hero")
+    }
+
     pub fn set_creature_at_pos(&mut self, pos: BoardPos, card_instance: UnitCardInstance) {
         if let Some(existing) = self.creature_at_pos(pos) {
             panic!(
@@ -238,9 +286,13 @@ impl Board {
             );
         }
 
-        let row = self.player_row_mut(pos.player_id, pos.row_id);
-
-        row[pos.row_index].set_creature(card_instance);
+        if pos.row() == RowId::Hero {
+            let slot = self.slot_at_pos_mut(pos);
+            slot.set_creature(card_instance);
+        } else {
+            let row = self.player_row_mut(pos.player_id, pos.row_id);
+            row[pos.row_index].set_creature(card_instance);
+        }
     }
 
     /// The single slot where the creature instance exists.

@@ -1,4 +1,7 @@
-use super::{board::BoardSlot, GameState, PlayerId, UnitCardInstance, UnitCardInstanceId};
+use super::{
+    board::{BoardSlot, RowId},
+    GameState, PlayerId, UnitCardInstance, UnitCardInstanceId,
+};
 
 pub trait AsSelector<'a> {
     fn selector(&'a self) -> BoardSelector<'a>;
@@ -20,6 +23,7 @@ pub struct BoardSelector<'a> {
     game_state: &'a GameState,
     player_id: Option<PlayerId>,
     with_creature: bool,
+    include_heroes: bool,
 }
 
 impl<'a> BoardSelector<'a> {
@@ -28,10 +32,11 @@ impl<'a> BoardSelector<'a> {
             game_state,
             player_id: None,
             with_creature: false,
+            include_heroes: false,
         }
     }
 
-    pub fn player(mut self, player_id: PlayerId) -> Self {
+    pub fn for_player(mut self, player_id: PlayerId) -> Self {
         assert!(self.player_id.is_none());
         self.player_id = Some(player_id);
         self
@@ -50,9 +55,15 @@ impl<'a> BoardSelector<'a> {
         self
     }
 
+    pub fn include_heroes(mut self) -> Self {
+        self.include_heroes = true;
+        self
+    }
+
     pub fn slots(self) -> impl Iterator<Item = &'a BoardSlot> {
         let player_id_filter = self.player_id.clone();
         let with_creature = self.with_creature;
+        let include_heroes = self.include_heroes;
 
         let iter = self
             .game_state
@@ -65,13 +76,24 @@ impl<'a> BoardSelector<'a> {
             .filter(move |s| match with_creature {
                 true => s.maybe_creature().is_some(),
                 _ => true,
+            })
+            .filter(move |s| match s.pos().row() {
+                RowId::Hero => include_heroes,
+                _ => true,
             });
 
         iter
     }
 
     pub fn creatures(self) -> impl Iterator<Item = &'a UnitCardInstance> {
-        self.slots().filter_map(|s| s.maybe_creature())
+        let include_heroes = self.include_heroes;
+
+        self.slots()
+            .filter(move |s| match s.pos().row() {
+                RowId::Hero => include_heroes,
+                _ => true,
+            })
+            .filter_map(|s| s.maybe_creature())
     }
 
     pub fn creature_ids(self) -> Vec<UnitCardInstanceId> {
