@@ -1,5 +1,3 @@
-use std::collections::VecDeque;
-
 use crate::{
     game_logic::{
         event_handlers::EventHandler, events::EndTurnEvent, EventDispatcher, TurnStartEvent,

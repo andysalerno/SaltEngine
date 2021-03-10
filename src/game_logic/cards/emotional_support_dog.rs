@@ -150,10 +150,7 @@ mod tests {
     use crate::{
         game_logic::cards::UnitCardDefinition,
         game_logic::{cards::ReallyBigRock, CreatureSetEvent},
-        game_state::{
-            board::{BoardPos, RowId},
-            UnitCardInstance,
-        },
+        game_state::board::{BoardPos, RowId},
     };
 
     use super::EmotionalSupportDog;

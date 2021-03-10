@@ -3,7 +3,7 @@ use crate::{
         buff::{Buff, BuffSourceId},
         BuffInstanceId,
     },
-    game_state::{board::RowId, AsSelector, UnitCardInstanceId},
+    game_state::{board::RowId, UnitCardInstanceId},
     id::Id,
 };
 use crate::{

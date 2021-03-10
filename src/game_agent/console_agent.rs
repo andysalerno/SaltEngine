@@ -443,7 +443,7 @@ fn say(message: impl AsRef<str>) {
 fn display_card(card: &dyn UnitCardDefinition, playable: bool, tag: usize) -> String {
     let text_lines = card.text().lines().collect::<Vec<_>>();
 
-    let width = 23;
+    let _width = 23;
 
     let border = match playable {
         true => '+',
