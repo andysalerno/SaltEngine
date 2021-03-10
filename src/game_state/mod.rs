@@ -21,3 +21,6 @@ impl PlayerId {
         Self(Id::new())
     }
 }
+
+#[cfg(test)]
+pub use game_state::tests::*;

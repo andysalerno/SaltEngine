@@ -210,20 +210,36 @@ mod buff_other {
 #[cfg(test)]
 mod tests {
     use super::PopcornVendor;
+    use crate::game_agent::game_agent::*;
     use crate::game_logic::cards::Pawn;
+    use crate::game_logic::*;
     use crate::{
-        game_logic::{cards::UnitCardDefinition, tests::*, SummonCreatureFromHandEvent},
+        game_logic::{cards::UnitCardDefinition, SummonCreatureFromHandEvent},
         game_state::board::{BoardPos, RowId},
+        game_state::make_test_state,
     };
 
     #[test]
     fn when_summoned_back_gives_buff() {
-        let (mut state, mut dispatcher) = make_default_test_state();
+        let mut state = make_test_state();
+        let mut dispatcher = make_default_dispatcher();
         let player_id = state.player_a_id();
+
+        // Pawn will be summoned here.
+        let pawn_pos = BoardPos::new(player_id, RowId::FrontRow, 0);
+
+        // When prompted, player will pick the pawn
+        // to receive the buff
+        {
+            let mut prompter_a = Box::new(MockPrompter::new());
+            prompter_a
+                .expect_prompt_player_creature_pos()
+                .returning(move |_| pawn_pos);
+            dispatcher.set_player_a_prompter(prompter_a);
+        }
 
         // Summon a pawn to receive the buff
         let hand = state.hand_mut(player_id);
-        let pawn_pos = BoardPos::new(player_id, RowId::FrontRow, 0);
         let pawn = Pawn.make_instance();
         let pawn_id = pawn.id();
         {
@@ -243,11 +259,18 @@ mod tests {
                 SummonCreatureFromHandEvent::new(player_id, pop_vend_pos, pop_vend_id);
             dispatcher.dispatch(summon_event, &mut state);
         }
+
+        let pawn_instance = state.board().creature_instance(pawn_id);
+        assert!(
+            !pawn_instance.buffs().is_empty(),
+            "Expected the pawn to receive the buff."
+        );
     }
 
     #[test]
     fn when_summoned_front_gets_buff() {
-        let (mut state, mut dispatcher) = make_default_test_state();
+        let mut state = make_test_state();
+        let mut dispatcher = make_default_dispatcher();
 
         let player_a = state.player_a_id();
         let hand = state.hand_mut(player_a);

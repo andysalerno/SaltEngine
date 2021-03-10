@@ -149,15 +149,18 @@ impl PassiveEffectDefinition for EmotionalSupportDogPassiveDefinition {
 mod tests {
     use crate::{
         game_logic::cards::UnitCardDefinition,
+        game_logic::*,
         game_logic::{cards::ReallyBigRock, CreatureSetEvent},
         game_state::board::{BoardPos, RowId},
+        game_state::make_test_state,
     };
 
     use super::EmotionalSupportDog;
 
     #[test]
     fn when_summoned_expects_provides_buff() {
-        let (mut state, mut dispatcher) = crate::game_logic::tests::make_default_test_state();
+        let mut state = make_test_state();
+        let mut dispatcher = make_default_dispatcher();
 
         // Summon the thing that will get buffed.
         let rock = ReallyBigRock.make_instance();

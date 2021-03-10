@@ -263,3 +263,27 @@ impl GameState {
         }
     }
 }
+
+#[cfg(test)]
+pub(crate) mod tests {
+    use super::*;
+
+    pub fn make_test_state() -> GameState {
+        let player_a_deck = Deck::new(Vec::new());
+        let player_b_deck = Deck::new(Vec::new());
+
+        let mut state = GameState::initial_state(
+            PlayerId::new(),
+            player_a_deck,
+            PlayerId::new(),
+            player_b_deck,
+        );
+
+        state.raise_mana_limit(state.player_a_id(), 10);
+        state.raise_mana_limit(state.player_b_id(), 10);
+        state.refresh_player_mana(state.player_a_id());
+        state.refresh_player_mana(state.player_b_id());
+
+        state
+    }
+}

@@ -36,6 +36,11 @@ impl EventDispatcher {
         self.player_a_prompter.as_ref()
     }
 
+    #[cfg(test)]
+    pub fn set_player_a_prompter(&mut self, prompter: Box<dyn Prompter>) {
+        self.player_a_prompter = prompter;
+    }
+
     fn handle(&mut self, event: GameEvent, game_state: &mut GameState) {
         match event {
             GameEvent::Attack(e) => AttackEventHandler::default().handle(e, game_state, self),
@@ -77,45 +82,21 @@ impl EventDispatcher {
 
 #[cfg(test)]
 pub(crate) mod tests {
-    use crate::{
-        game_agent::game_agent::*,
-        game_state::{Deck, GameState, PlayerId},
-    };
+    use crate::game_agent::game_agent::*;
 
     use super::EventDispatcher;
 
-    pub fn make_default_test_state() -> (GameState, EventDispatcher) {
+    pub fn make_default_dispatcher() -> EventDispatcher {
         let prompt_a = MockPrompter::new();
         let prompt_b = MockPrompter::new();
 
-        make_test_state(prompt_a, prompt_b)
+        make_dispatcher(prompt_a, prompt_b)
     }
 
-    pub fn make_test_state(
-        prompt_a: impl Prompter + 'static,
-        prompt_b: impl Prompter + 'static,
-    ) -> (GameState, EventDispatcher) {
-        let state = {
-            let player_a_deck = Deck::new(Vec::new());
-            let player_b_deck = Deck::new(Vec::new());
-
-            let mut state = GameState::initial_state(
-                PlayerId::new(),
-                player_a_deck,
-                PlayerId::new(),
-                player_b_deck,
-            );
-
-            state.raise_mana_limit(state.player_a_id(), 10);
-            state.raise_mana_limit(state.player_b_id(), 10);
-            state.refresh_player_mana(state.player_a_id());
-            state.refresh_player_mana(state.player_b_id());
-
-            state
-        };
-
-        let dispatcher = EventDispatcher::new(Box::new(prompt_a), Box::new(prompt_b));
-
-        (state, dispatcher)
+    pub fn make_dispatcher(
+        prompter_a: impl Prompter + 'static,
+        prompter_b: impl Prompter + 'static,
+    ) -> EventDispatcher {
+        EventDispatcher::new(Box::new(prompter_a), Box::new(prompter_b))
     }
 }

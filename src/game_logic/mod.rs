@@ -12,4 +12,4 @@ pub use events::*;
 pub use passive_effect::{PassiveEffectDefinition, PassiveEffectInstance};
 
 #[cfg(test)]
-pub use event_dispatch::*;
+pub use event_dispatch::tests::*;
