@@ -1,7 +1,8 @@
 use crate::{
     game_logic::{
         buff::{Buff, BuffSourceId},
-        BuffInstanceId,
+        passive_effect::{PassiveCompanionBuff, PassiveEffectInstanceId},
+        BuffBuilder, BuffInstanceId,
     },
     game_state::{board::RowId, UnitCardInstanceId},
     id::Id,
@@ -62,6 +63,9 @@ impl UnitCardDefinition for PopcornVendor {
     }
 
     fn passive_effect(&self) -> Option<Box<dyn PassiveEffectDefinition>> {
+        let source = BuffSourceId::Passive(PassiveEffectInstanceId::new());
+        let buff = BuffBuilder::new(source, Id::new()).build();
+        let buff = PassiveCompanionBuff::new(Id::new(), Box::new(buff));
         Some(Box::new(buff_other::PopcornVendorPassive))
     }
 
@@ -137,11 +141,15 @@ mod buff_other {
             Box::new(move |instance_id, originator_id, game_state| {
                 let instance_pos = game_state.board().position_with_creature(originator_id);
 
+                if !instance_pos.row().is_back() {
+                    // Card text says this is only applicable in the back row.
+                    return;
+                }
+
                 if let Some(companion) = game_state.board().companion_creature(instance_pos) {
-                    game_state.update_by_id(companion.id(), |c| {
-                        println!("Applying buff to companion of popcorn vendor.");
-                        c.add_buff(Box::new(PopcornVendorBuff::new(instance_id)));
-                    });
+                    let companion_id = companion.id();
+                    let companion_mut = game_state.board_mut().creature_instance_mut(companion_id);
+                    companion_mut.add_buff(Box::new(PopcornVendorBuff::new(instance_id)));
                 }
             })
         }

@@ -1,7 +1,7 @@
 use crate::{
     game_logic::{
         buff::{Buff, BuffSourceId},
-        BuffInstanceId,
+        BuffBuilder, BuffInstanceId,
     },
     game_state::{board::RowId, UnitCardInstanceId},
     id::Id,
@@ -38,7 +38,8 @@ impl CardDefinition for EmotionalSupportDog {
     }
 
     fn text(&self) -> &str {
-        "Frontbuff: +1/+1"
+        "Back
+Companion has +1/+1."
     }
 }
 
@@ -61,43 +62,6 @@ impl UnitCardDefinition for EmotionalSupportDog {
 
     fn placeable_at(&self) -> Position {
         Position::Back
-    }
-}
-
-#[derive(Debug)]
-struct EmotionalSupportDogBuff {
-    instance_id: BuffInstanceId,
-    source_id: BuffSourceId,
-}
-
-impl EmotionalSupportDogBuff {
-    pub fn new(source_id: PassiveEffectInstanceId) -> Self {
-        Self {
-            instance_id: BuffInstanceId::new(),
-            source_id: BuffSourceId::Passive(source_id),
-        }
-    }
-}
-
-impl Buff for EmotionalSupportDogBuff {
-    fn attack_amount(&self) -> i32 {
-        1
-    }
-
-    fn health_amount(&self) -> i32 {
-        1
-    }
-
-    fn instance_id(&self) -> BuffInstanceId {
-        self.instance_id
-    }
-
-    fn source_id(&self) -> BuffSourceId {
-        self.source_id
-    }
-
-    fn definition_id(&self) -> Id {
-        todo!()
     }
 }
 
@@ -126,19 +90,16 @@ impl PassiveEffectDefinition for EmotionalSupportDogPassiveDefinition {
         Box::new(move |instance_id, originator_id, game_state| {
             let doggy_pos = game_state.board().position_with_creature(originator_id);
 
-            if doggy_pos.row_id != RowId::BackRow {
-                return;
-            }
+            if let Some(companion) = game_state.board().companion_creature(doggy_pos) {
+                let id = companion.id();
 
-            let mut front_pos = doggy_pos.clone();
-            front_pos.row_id = RowId::FrontRow;
+                let buff = BuffBuilder::new(BuffSourceId::Passive(instance_id), Id::new())
+                    .attack(1)
+                    .health(1)
+                    .build();
 
-            let front_card = game_state.board().creature_at_pos(front_pos);
-
-            if let Some(front_card) = front_card {
-                let id = front_card.id();
                 game_state.update_by_id(id, |c| {
-                    c.add_buff(Box::new(EmotionalSupportDogBuff::new(instance_id)));
+                    c.add_buff(Box::new(buff));
                 });
             }
         })

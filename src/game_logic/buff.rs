@@ -32,3 +32,68 @@ pub trait Buff: std::fmt::Debug {
         }
     }
 }
+
+pub struct BuffBuilder {
+    attack_amount: i32,
+    health_amount: i32,
+    source: BuffSourceId,
+    instance_id: BuffInstanceId,
+    definition_id: Id,
+}
+
+impl BuffBuilder {
+    pub fn new(source: BuffSourceId, definition_id: Id) -> Self {
+        Self {
+            attack_amount: 0,
+            health_amount: 0,
+            instance_id: BuffInstanceId::new(),
+            source,
+            definition_id,
+        }
+    }
+
+    pub fn attack(mut self, attack_buff_amount: i32) -> Self {
+        self.attack_amount = attack_buff_amount;
+        self
+    }
+
+    pub fn health(mut self, health_buff_amount: i32) -> Self {
+        self.health_amount = health_buff_amount;
+        self
+    }
+
+    pub fn build(self) -> impl Buff {
+        BuiltBuff {
+            attack_amount: self.attack_amount,
+            health_amount: self.health_amount,
+        }
+    }
+}
+
+#[derive(Debug)]
+struct BuiltBuff {
+    attack_amount: i32,
+    health_amount: i32,
+}
+
+impl Buff for BuiltBuff {
+    fn attack_amount(&self) -> i32 {
+        self.attack_amount
+    }
+
+    fn health_amount(&self) -> i32 {
+        self.health_amount
+    }
+
+    fn source_id(&self) -> BuffSourceId {
+        todo!()
+    }
+
+    fn instance_id(&self) -> BuffInstanceId {
+        todo!()
+    }
+
+    fn definition_id(&self) -> Id {
+        todo!()
+    }
+}

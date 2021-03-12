@@ -54,6 +54,29 @@ pub enum RowId {
     Hero,
 }
 
+impl RowId {
+    pub fn is_back(&self) -> bool {
+        match self {
+            RowId::BackRow => true,
+            _ => false,
+        }
+    }
+
+    pub fn is_front(&self) -> bool {
+        match self {
+            RowId::FrontRow => true,
+            _ => false,
+        }
+    }
+
+    pub fn is_hero(&self) -> bool {
+        match self {
+            RowId::Hero => true,
+            _ => false,
+        }
+    }
+}
+
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct BoardPos {
     pub player_id: PlayerId,

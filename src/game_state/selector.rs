@@ -42,14 +42,6 @@ impl<'a> BoardSelector<'a> {
         self
     }
 
-    pub fn opponent_of(mut self, player_id: PlayerId) -> Self {
-        assert!(self.player_id.is_none());
-        let opponent_id = self.game_state.other_player(player_id);
-        self.player_id = Some(opponent_id);
-
-        self
-    }
-
     pub fn with_creature(mut self) -> Self {
         self.with_creature = true;
         self
