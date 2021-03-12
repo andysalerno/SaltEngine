@@ -7,8 +7,8 @@ use crate::{
     id::Id,
 };
 use crate::{
-    game_logic::{CreatureHealedEvent, EventDispatcher},
-    game_state::{board::BoardPos, GameState, InstanceState, UnitCardInstance},
+    game_logic::{EventDispatcher, PassiveEffectDefinition},
+    game_state::{board::BoardPos, GameState, UnitCardInstance},
 };
 
 use super::{CardDefinition, Position, UnitCardDefinition};
@@ -61,62 +61,18 @@ impl UnitCardDefinition for PopcornVendor {
         Position::Either
     }
 
+    fn passive_effect(&self) -> Option<Box<dyn PassiveEffectDefinition>> {
+        Some(Box::new(buff_other::PopcornVendorPassive))
+    }
+
     fn upon_summon(
         &self,
     ) -> Box<dyn FnOnce(&mut UnitCardInstance, BoardPos, &mut GameState, &mut EventDispatcher)>
     {
-        Box::new(|instance, pos, game_state, dispatcher| {
+        Box::new(|instance, pos, _game_state, _dispatcher| {
             if pos.row() == RowId::FrontRow {
                 // Front: buffs self
                 instance.add_buff(Box::new(buff_self::PopcornVendorBuff::new(instance.id())));
-            } else {
-                // Back: buffs another
-                if !game_state.player_has_any_creature(pos.player_id) {
-                    return;
-                }
-
-                let other_pos = dispatcher
-                    .player_prompter()
-                    .prompt_player_creature_pos(game_state);
-                let slot = game_state.board_mut().slot_at_pos_mut(other_pos);
-
-                let creature = slot.maybe_creature_mut().expect(
-                    "Slot must have a creature, since player was prompted for a creature slot.",
-                );
-                creature.add_buff(Box::new(buff_other::PopcornVendorBuff::new(instance.id())));
-
-                instance.set_state(Some(InstanceState::CreatureInstanceId(creature.id())));
-            }
-        })
-    }
-
-    fn upon_turn_end(
-        &self,
-    ) -> Box<dyn FnOnce(UnitCardInstanceId, &mut GameState, &mut EventDispatcher)> {
-        Box::new(|id, game_state, dispatcher| {
-            let instance = game_state.board().creature_instance(id);
-
-            // Front row has no turn-end action.
-            if game_state.board().position_with_creature(id).row() == RowId::FrontRow {
-                return;
-            }
-
-            let state = instance.state();
-
-            if let Some(InstanceState::CreatureInstanceId(target_id)) = state {
-                // Heal the target for 3
-                let heal_amount = 3;
-                let heal_event = CreatureHealedEvent::new(*target_id, heal_amount);
-
-                {
-                    let target_creature = game_state.board().creature_instance(*target_id);
-                    println!(
-                        "Popcorn Vendor heals {} for 3",
-                        target_creature.definition().title()
-                    );
-                }
-
-                dispatcher.dispatch(heal_event, game_state);
             }
         })
     }
@@ -165,6 +121,31 @@ mod buff_self {
 
 mod buff_other {
     use super::*;
+    use crate::game_logic::passive_effect::PassiveEffectInstanceId;
+
+    #[derive(Debug)]
+    pub struct PopcornVendorPassive;
+
+    impl PassiveEffectDefinition for PopcornVendorPassive {
+        fn definition_id(&self) -> Id {
+            todo!()
+        }
+
+        fn update(
+            &self,
+        ) -> Box<dyn FnOnce(PassiveEffectInstanceId, UnitCardInstanceId, &mut GameState)> {
+            Box::new(move |instance_id, originator_id, game_state| {
+                let instance_pos = game_state.board().position_with_creature(originator_id);
+
+                if let Some(companion) = game_state.board().companion_creature(instance_pos) {
+                    game_state.update_by_id(companion.id(), |c| {
+                        println!("Applying buff to companion of popcorn vendor.");
+                        c.add_buff(Box::new(PopcornVendorBuff::new(instance_id)));
+                    });
+                }
+            })
+        }
+    }
 
     #[derive(Debug)]
     pub struct PopcornVendorBuff {
@@ -173,21 +154,21 @@ mod buff_other {
     }
 
     impl PopcornVendorBuff {
-        pub fn new(source_id: UnitCardInstanceId) -> Self {
+        pub fn new(source_id: PassiveEffectInstanceId) -> Self {
             Self {
                 instance_id: BuffInstanceId::new(),
-                source_id: BuffSourceId::CreatureInstance(source_id),
+                source_id: BuffSourceId::Passive(source_id),
             }
         }
     }
 
     impl Buff for PopcornVendorBuff {
         fn attack_amount(&self) -> i32 {
-            3
+            2
         }
 
         fn health_amount(&self) -> i32 {
-            0
+            2
         }
 
         fn instance_id(&self) -> BuffInstanceId {
