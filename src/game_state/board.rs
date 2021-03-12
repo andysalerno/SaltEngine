@@ -244,6 +244,24 @@ impl Board {
         self.slot_with_creature_mut(id).take_creature()
     }
 
+    pub fn companion_slot(&self, pos: BoardPos) -> &BoardSlot {
+        let mut companion_pos = pos.clone();
+
+        let companion_row = match pos.row() {
+            RowId::BackRow => RowId::FrontRow,
+            RowId::FrontRow => RowId::BackRow,
+            RowId::Hero => panic!("Hero slot has no companion."),
+        };
+
+        companion_pos.row_id = companion_row;
+
+        self.slot_at_pos(companion_pos)
+    }
+
+    pub fn companion_creature(&self, pos: BoardPos) -> Option<&UnitCardInstance> {
+        self.companion_slot(pos).maybe_creature()
+    }
+
     pub fn creature_at_pos(&self, pos: BoardPos) -> Option<&UnitCardInstance> {
         if pos.row() == RowId::Hero {
             let player_offset = match self.player_ab(pos.player_id) {

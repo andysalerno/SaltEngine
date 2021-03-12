@@ -453,30 +453,30 @@ fn say(message: impl AsRef<str>) {
 fn display_card(card: &dyn UnitCardDefinition, playable: bool, tag: usize) -> String {
     let text_lines = card.text().lines().collect::<Vec<_>>();
 
-    let _width = 23;
+    const WIDTH: usize = 26;
 
     let border = match playable {
         true => '+',
         false => '-',
     };
 
-    let border = std::iter::repeat(border).take(23).collect::<String>();
+    let border = std::iter::repeat(border).take(WIDTH).collect::<String>();
 
     format!(
         r#"{}
-|{:<18} {} |
+|{:<21} {} |
 |{}|
-|{:^21}|
-|{:^21}|
-|{:^21}|
-|{:^21}|
-|{:^21}|
-|{:^21}|
-|{:^21}|
-|{:^21}|
-|W: {}            {}/{}  |
+|{:^24}|
+|{:^24}|
+|{:^24}|
+|{:^24}|
+|{:^24}|
+|{:^24}|
+|{:^24}|
+|{:^24}|
+| W: {}              {}/{}  |
 {}
-{:^23}"#,
+{:^26}"#,
         border,
         card.title(),
         card.cost(),

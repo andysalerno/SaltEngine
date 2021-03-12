@@ -32,6 +32,7 @@ impl GameRunner {
                         AttackDog.make_instance(),
                         SleepingDog.make_instance(),
                         PopcornVendor.make_instance(),
+                        PriestOfTheLowland.make_instance(),
                     ];
 
                     cards
@@ -52,6 +53,7 @@ impl GameRunner {
                         AttackDog.make_instance(),
                         SleepingDog.make_instance(),
                         PopcornVendor.make_instance(),
+                        PriestOfTheLowland.make_instance(),
                     ];
 
                     cards

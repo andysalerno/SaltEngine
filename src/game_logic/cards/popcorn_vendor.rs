@@ -39,11 +39,8 @@ impl CardDefinition for PopcornVendor {
     fn text(&self) -> &str {
         "Front or Back
 Front: +3 attack
-Back: Give another
-friendly creature +2
-attack, and heal it
-for 3 each time your
-turn ends."
+Back: Companion
+has +2/+2."
     }
 }
 
