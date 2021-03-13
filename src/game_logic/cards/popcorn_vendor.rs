@@ -63,10 +63,13 @@ impl UnitCardDefinition for PopcornVendor {
     }
 
     fn passive_effect(&self) -> Option<Box<dyn PassiveEffectDefinition>> {
-        let source = BuffSourceId::Passive(PassiveEffectInstanceId::new());
-        let buff = BuffBuilder::new(source, Id::new()).build();
-        let buff = PassiveCompanionBuff::new(Id::new(), Box::new(buff));
-        Some(Box::new(buff_other::PopcornVendorPassive))
+        let buff = BuffBuilder::new(PassiveEffectInstanceId::new(), Id::new())
+            .attack(2)
+            .health(2)
+            .build();
+
+        let passive = PassiveCompanionBuff::new(Id::new(), Box::new(buff));
+        Some(Box::new(passive))
     }
 
     fn upon_summon(
@@ -76,120 +79,11 @@ impl UnitCardDefinition for PopcornVendor {
         Box::new(|instance, pos, _game_state, _dispatcher| {
             if pos.row() == RowId::FrontRow {
                 // Front: buffs self
-                instance.add_buff(Box::new(buff_self::PopcornVendorBuff::new(instance.id())));
+                let buff = BuffBuilder::new(instance.id(), Id::new()).attack(3).build();
+
+                instance.add_buff(Box::new(buff));
             }
         })
-    }
-}
-
-mod buff_self {
-    use super::*;
-
-    #[derive(Debug)]
-    pub struct PopcornVendorBuff {
-        instance_id: BuffInstanceId,
-        source_id: BuffSourceId,
-    }
-
-    impl PopcornVendorBuff {
-        pub fn new(source_id: UnitCardInstanceId) -> Self {
-            Self {
-                instance_id: BuffInstanceId::new(),
-                source_id: BuffSourceId::CreatureInstance(source_id),
-            }
-        }
-    }
-
-    impl Buff for PopcornVendorBuff {
-        fn attack_amount(&self) -> i32 {
-            3
-        }
-
-        fn health_amount(&self) -> i32 {
-            0
-        }
-
-        fn instance_id(&self) -> BuffInstanceId {
-            self.instance_id
-        }
-
-        fn source_id(&self) -> BuffSourceId {
-            self.source_id
-        }
-
-        fn definition_id(&self) -> Id {
-            todo!()
-        }
-    }
-}
-
-mod buff_other {
-    use super::*;
-    use crate::game_logic::passive_effect::PassiveEffectInstanceId;
-
-    #[derive(Debug)]
-    pub struct PopcornVendorPassive;
-
-    impl PassiveEffectDefinition for PopcornVendorPassive {
-        fn definition_id(&self) -> Id {
-            todo!()
-        }
-
-        fn update(
-            &self,
-        ) -> Box<dyn FnOnce(PassiveEffectInstanceId, UnitCardInstanceId, &mut GameState)> {
-            Box::new(move |instance_id, originator_id, game_state| {
-                let instance_pos = game_state.board().position_with_creature(originator_id);
-
-                if !instance_pos.row().is_back() {
-                    // Card text says this is only applicable in the back row.
-                    return;
-                }
-
-                if let Some(companion) = game_state.board().companion_creature(instance_pos) {
-                    let companion_id = companion.id();
-                    let companion_mut = game_state.board_mut().creature_instance_mut(companion_id);
-                    companion_mut.add_buff(Box::new(PopcornVendorBuff::new(instance_id)));
-                }
-            })
-        }
-    }
-
-    #[derive(Debug)]
-    pub struct PopcornVendorBuff {
-        instance_id: BuffInstanceId,
-        source_id: BuffSourceId,
-    }
-
-    impl PopcornVendorBuff {
-        pub fn new(source_id: PassiveEffectInstanceId) -> Self {
-            Self {
-                instance_id: BuffInstanceId::new(),
-                source_id: BuffSourceId::Passive(source_id),
-            }
-        }
-    }
-
-    impl Buff for PopcornVendorBuff {
-        fn attack_amount(&self) -> i32 {
-            2
-        }
-
-        fn health_amount(&self) -> i32 {
-            2
-        }
-
-        fn instance_id(&self) -> BuffInstanceId {
-            self.instance_id
-        }
-
-        fn source_id(&self) -> BuffSourceId {
-            self.source_id
-        }
-
-        fn definition_id(&self) -> Id {
-            todo!()
-        }
     }
 }
 

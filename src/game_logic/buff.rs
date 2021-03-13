@@ -18,6 +18,18 @@ pub enum BuffSourceId {
     Other(Id),
 }
 
+impl From<PassiveEffectInstanceId> for BuffSourceId {
+    fn from(id: PassiveEffectInstanceId) -> Self {
+        BuffSourceId::Passive(id)
+    }
+}
+
+impl From<UnitCardInstanceId> for BuffSourceId {
+    fn from(id: UnitCardInstanceId) -> Self {
+        BuffSourceId::CreatureInstance(id)
+    }
+}
+
 pub trait Buff: std::fmt::Debug {
     fn attack_amount(&self) -> i32;
     fn health_amount(&self) -> i32;
@@ -42,12 +54,12 @@ pub struct BuffBuilder {
 }
 
 impl BuffBuilder {
-    pub fn new(source: BuffSourceId, definition_id: Id) -> Self {
+    pub fn new(source: impl Into<BuffSourceId>, definition_id: Id) -> Self {
         Self {
             attack_amount: 0,
             health_amount: 0,
             instance_id: BuffInstanceId::new(),
-            source,
+            source: source.into(),
             definition_id,
         }
     }
@@ -62,7 +74,7 @@ impl BuffBuilder {
         self
     }
 
-    pub fn build(self) -> impl Buff {
+    pub fn build(self) -> BuiltBuff {
         BuiltBuff {
             attack_amount: self.attack_amount,
             health_amount: self.health_amount,
@@ -70,8 +82,8 @@ impl BuffBuilder {
     }
 }
 
-#[derive(Debug)]
-struct BuiltBuff {
+#[derive(Debug, Clone)]
+pub struct BuiltBuff {
     attack_amount: i32,
     health_amount: i32,
 }

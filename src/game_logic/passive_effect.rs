@@ -1,12 +1,13 @@
-use std::borrow::Borrow;
-
+use super::Buff;
 use crate::{
     game_state::{GameState, UnitCardInstanceId},
     id::Id,
 };
+use std::borrow::Borrow;
 
-use super::Buff;
-
+/// A definition of a passive effect, including
+/// an ID and the update logic that will be re-executed
+// whenever the gamestate changes.
 pub trait PassiveEffectDefinition: std::fmt::Debug {
     fn definition_id(&self) -> Id;
     fn update(
@@ -14,6 +15,7 @@ pub trait PassiveEffectDefinition: std::fmt::Debug {
     ) -> Box<dyn FnOnce(PassiveEffectInstanceId, UnitCardInstanceId, &mut GameState)>;
 }
 
+/// An ID representing a unique instance of a passive effect.
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct PassiveEffectInstanceId(Id);
 
@@ -23,10 +25,18 @@ impl PassiveEffectInstanceId {
     }
 }
 
+/// An instance of a passive effect in the game.
+/// Passive effects are continuously re-evaluated
+/// whenever the game state changes.
 #[derive(Debug)]
 pub struct PassiveEffectInstance {
+    /// The definition of the passive effect.
     definition: Box<dyn PassiveEffectDefinition>,
+
+    /// The unique ID of this instance of the passive effect.
     instance_id: PassiveEffectInstanceId,
+
+    /// The ID of the card instance that originated this passive effect.
     originator_id: UnitCardInstanceId,
 }
 
@@ -42,24 +52,24 @@ impl PassiveEffectInstance {
         }
     }
 
+    /// The unique ID of this instance of the passive effect.
     pub fn instance_id(&self) -> PassiveEffectInstanceId {
         self.instance_id
     }
 
+    /// The ID of the card instance that originated this passive effect.
     pub fn originator_id(&self) -> UnitCardInstanceId {
         self.originator_id
     }
 
+    /// The definition of the passive effect.
     pub fn definition(&self) -> &dyn PassiveEffectDefinition {
         self.definition.borrow()
     }
 }
 
-// #[derive(Debug)]
-// struct PassiveCompanionBuff {
-//     definition_id: Id,
-//     buff: Box<dyn Buff>,
-// }
+/// An implementation of `PassiveEffectDefinition`
+/// that buffs the companion of the card with the passive effect.
 #[derive(Debug)]
 pub struct PassiveCompanionBuff<T: Buff + Clone> {
     definition_id: Id,
