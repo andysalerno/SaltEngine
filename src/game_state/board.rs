@@ -287,7 +287,7 @@ impl Board {
 
     pub fn creature_at_pos(&self, pos: BoardPos) -> Option<&UnitCardInstance> {
         if pos.row() == RowId::Hero {
-            let player_offset = match self.player_ab(pos.player_id) {
+            let _player_offset = match self.player_ab(pos.player_id) {
                 PlayerAB::PlayerA => 0,
                 PlayerAB::PlayerB => 2,
             };
