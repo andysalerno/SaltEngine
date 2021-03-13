@@ -88,7 +88,7 @@ impl PassiveEffectDefinition for EmotionalSupportDogPassiveDefinition {
         &self,
     ) -> Box<dyn FnOnce(PassiveEffectInstanceId, UnitCardInstanceId, &mut GameState)> {
         Box::new(move |instance_id, originator_id, game_state| {
-            let doggy_pos = game_state.board().position_with_creature(originator_id);
+            let doggy_pos = game_state.board().pos_with_creature(originator_id);
 
             if let Some(companion) = game_state.board().companion_creature(doggy_pos) {
                 let id = companion.id();

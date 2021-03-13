@@ -58,7 +58,7 @@ impl UnitCardDefinition for PriestOfTheLowland {
         &self,
     ) -> Box<dyn FnOnce(UnitCardInstanceId, &mut GameState, &mut EventDispatcher)> {
         Box::new(|id, game_state, dispatcher| {
-            let instance_pos = game_state.board().position_with_creature(id);
+            let instance_pos = game_state.board().pos_with_creature(id);
 
             if let Some(companion) = game_state.board().companion_creature(instance_pos) {
                 // Heal the target for 2

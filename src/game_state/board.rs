@@ -383,7 +383,7 @@ impl Board {
             .expect("The position was not a valid board slot.")
     }
 
-    pub fn position_with_creature(&self, id: UnitCardInstanceId) -> BoardPos {
+    pub fn pos_with_creature(&self, id: UnitCardInstanceId) -> BoardPos {
         self.slot_with_creature(id).pos()
     }
 

@@ -15,9 +15,7 @@ impl EventHandler for CreatureDestroyedEventHandler {
         game_state: &mut GameState,
         dispatcher: &mut EventDispatcher,
     ) {
-        let pos = game_state
-            .board()
-            .position_with_creature(event.creature_id());
+        let pos = game_state.board().pos_with_creature(event.creature_id());
         let mut creature_instance = game_state
             .board_mut()
             .take_creature_by_id(event.creature_id());

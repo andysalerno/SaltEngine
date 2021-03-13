@@ -77,7 +77,7 @@ impl PassiveEffectInstance {
 /// An implementation of `PassiveEffectDefinition`
 /// that buffs the companion of the card with the passive effect.
 #[derive(Debug)]
-pub struct PassiveCompanionBuff<T: Buff + Clone> {
+pub struct PassiveCompanionBuff<T: Buff> {
     definition_id: Id,
     buff: Box<T>,
 }
@@ -100,10 +100,10 @@ impl<T: Buff + Clone + 'static> PassiveEffectDefinition for PassiveCompanionBuff
         &self,
     ) -> Box<dyn FnOnce(PassiveEffectInstanceId, UnitCardInstanceId, &mut GameState)> {
         let buff = self.buff.clone();
-        Box::new(move |instance_id, originator_id, game_state| {
-            let doggy_pos = game_state.board().position_with_creature(originator_id);
+        Box::new(move |_instance_id, originator_id, game_state| {
+            let originator_pos = game_state.board().pos_with_creature(originator_id);
 
-            if let Some(companion) = game_state.board().companion_creature(doggy_pos) {
+            if let Some(companion) = game_state.board().companion_creature(originator_pos) {
                 let id = companion.id();
 
                 game_state.update_by_id(id, |c| {

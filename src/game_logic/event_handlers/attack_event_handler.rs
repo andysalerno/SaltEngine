@@ -7,7 +7,7 @@ use crate::{
 pub struct AttackEventHandler;
 
 fn validate(event: &AttackEvent, game_state: &GameState) {
-    let pos = game_state.board().position_with_creature(event.target());
+    let pos = game_state.board().pos_with_creature(event.target());
     if game_state.is_pos_defended(pos) {
         panic!("Cannot attack defended pos {:?}", pos);
     }
