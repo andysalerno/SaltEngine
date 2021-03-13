@@ -8,11 +8,17 @@ use std::borrow::Borrow;
 /// A definition of a passive effect, including
 /// an ID and the update logic that will be re-executed
 // whenever the gamestate changes.
-pub trait PassiveEffectDefinition: std::fmt::Debug {
+pub trait PassiveEffectDefinition {
     fn definition_id(&self) -> Id;
     fn update(
         &self,
     ) -> Box<dyn FnOnce(PassiveEffectInstanceId, UnitCardInstanceId, &mut GameState)>;
+}
+
+impl std::fmt::Debug for dyn PassiveEffectDefinition {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{{PassiveEffectDefinition}}{:?}", self.definition_id())
+    }
 }
 
 /// An ID representing a unique instance of a passive effect.
