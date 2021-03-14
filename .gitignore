@@ -1,1 +1,4 @@
 /target
+/engine/target
+/client/target
+/server/target
