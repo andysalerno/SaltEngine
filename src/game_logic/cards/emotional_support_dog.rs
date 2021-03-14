@@ -1,15 +1,9 @@
+use super::{CardDefinition, Position, UnitCardDefinition};
 use crate::game_logic::{passive_effect::PassiveEffectInstanceId, PassiveEffectDefinition};
 use crate::{
-    game_logic::{
-        buff::{Buff, BuffSourceId},
-        passive_effect::PassiveCompanionBuff,
-        BuffBuilder, BuffInstanceId,
-    },
-    game_state::{board::RowId, UnitCardInstanceId},
+    game_logic::{passive_effect::PassiveCompanionBuff, BuffBuilder},
     id::Id,
 };
-
-use super::{CardDefinition, Position, UnitCardDefinition};
 
 #[derive(Debug, Clone)]
 pub struct EmotionalSupportDog;

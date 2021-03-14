@@ -1,13 +1,9 @@
+use super::{CardDefinition, Position, UnitCardDefinition};
 use crate::{
-    game_logic::{event_handlers::PosTakesDamageHandler, EventDispatcher, PosTakesDamageEvent},
-    game_state::{
-        board::{BoardPos, RowId},
-        GameState, InstanceState, UnitCardInstance, UnitCardInstanceId,
-    },
+    game_logic::{EventDispatcher, PosTakesDamageEvent},
+    game_state::{board::BoardPos, GameState, InstanceState, UnitCardInstance, UnitCardInstanceId},
     id::Id,
 };
-
-use super::{CardDefinition, Position, UnitCardDefinition};
 
 #[derive(Debug, Clone)]
 pub struct RicketyCannon;

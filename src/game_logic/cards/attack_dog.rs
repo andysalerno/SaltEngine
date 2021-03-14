@@ -1,6 +1,5 @@
-use crate::id::Id;
-
 use super::{CardDefinition, Position, UnitCardDefinition};
+use crate::id::Id;
 
 #[derive(Debug, Clone)]
 pub struct AttackDog;

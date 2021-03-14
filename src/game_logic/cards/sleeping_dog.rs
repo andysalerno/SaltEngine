@@ -1,3 +1,4 @@
+use super::{CardDefinition, Position, UnitCardDefinition};
 use crate::game_state::GameState;
 use crate::{
     game_logic::{
@@ -7,8 +8,6 @@ use crate::{
     game_state::{board::RowId, UnitCardInstanceId},
     id::Id,
 };
-
-use super::{CardDefinition, Position, UnitCardDefinition};
 
 #[derive(Debug, Clone)]
 pub struct SleepingDog;

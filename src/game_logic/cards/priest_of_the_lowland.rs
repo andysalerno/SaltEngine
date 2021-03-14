@@ -1,10 +1,9 @@
+use super::{CardDefinition, Position, UnitCardDefinition};
 use crate::{
     game_logic::{CreatureHealedEvent, EventDispatcher},
     game_state::GameState,
 };
 use crate::{game_state::UnitCardInstanceId, id::Id};
-
-use super::{CardDefinition, Position, UnitCardDefinition};
 
 #[derive(Debug, Clone)]
 pub struct PriestOfTheLowland;

@@ -1,13 +1,12 @@
+use super::{CardDefinition, Position, UnitCardDefinition};
 use crate::{
-    game_logic::{GameEvent, PosTakesDamageEvent},
+    game_logic::PosTakesDamageEvent,
     game_state::{
         board::{BoardPos, RowId},
-        GameState, UnitCardInstanceId,
+        GameState,
     },
     id::Id,
 };
-
-use super::{CardDefinition, Position, UnitCardDefinition};
 
 #[derive(Debug, Clone)]
 pub struct ReallyBigRock;
