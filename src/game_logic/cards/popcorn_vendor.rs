@@ -68,7 +68,7 @@ impl UnitCardDefinition for PopcornVendor {
             .health(2)
             .build();
 
-        let passive = PassiveCompanionBuff::new(Id::new(), Box::new(buff));
+        let passive = PassiveCompanionBuff::new_for_row(Id::new(), Box::new(buff), RowId::BackRow);
         Some(Box::new(passive))
     }
 

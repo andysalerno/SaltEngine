@@ -1,6 +1,6 @@
 use super::Buff;
 use crate::{
-    game_state::{GameState, UnitCardInstanceId},
+    game_state::{board::RowId, GameState, UnitCardInstanceId},
     id::Id,
 };
 use std::borrow::Borrow;
@@ -77,21 +77,40 @@ impl PassiveEffectInstance {
 /// An implementation of `PassiveEffectDefinition`
 /// that buffs the companion of the card with the passive effect.
 #[derive(Debug)]
-pub struct PassiveCompanionBuff<T: Buff> {
+pub struct PassiveCompanionBuff<T>
+where
+    T: Buff,
+{
     definition_id: Id,
     buff: Box<T>,
+    for_row: Option<RowId>,
 }
 
-impl<T: Buff + Clone> PassiveCompanionBuff<T> {
+impl<T> PassiveCompanionBuff<T>
+where
+    T: Buff + Clone,
+{
     pub fn new(definition_id: Id, buff: Box<T>) -> Self {
         Self {
             definition_id,
             buff,
+            for_row: None,
+        }
+    }
+
+    pub fn new_for_row(definition_id: Id, buff: Box<T>, row: RowId) -> Self {
+        Self {
+            definition_id,
+            buff,
+            for_row: Some(row),
         }
     }
 }
 
-impl<T: Buff + Clone + 'static> PassiveEffectDefinition for PassiveCompanionBuff<T> {
+impl<T> PassiveEffectDefinition for PassiveCompanionBuff<T>
+where
+    T: Buff + Clone + 'static,
+{
     fn definition_id(&self) -> Id {
         self.definition_id
     }
@@ -100,8 +119,16 @@ impl<T: Buff + Clone + 'static> PassiveEffectDefinition for PassiveCompanionBuff
         &self,
     ) -> Box<dyn FnOnce(PassiveEffectInstanceId, UnitCardInstanceId, &mut GameState)> {
         let buff = self.buff.clone();
-        Box::new(move |_instance_id, originator_id, game_state| {
+        let for_row = self.for_row.clone();
+
+        Box::new(move |_, originator_id, game_state| {
             let originator_pos = game_state.board().pos_with_creature(originator_id);
+
+            if let Some(row) = for_row {
+                if row != originator_pos.row() {
+                    return;
+                }
+            }
 
             if let Some(companion) = game_state.board().companion_creature(originator_pos) {
                 let id = companion.id();
