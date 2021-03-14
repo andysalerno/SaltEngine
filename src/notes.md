@@ -31,3 +31,6 @@ front cards are attack-oriented
 back cards are support/defense oriented
 
 hero power: summon a 1/1 bug; then, class cards: only summonable while you control a bug
+
+
+hidden cards are bucketed in costs 3/6/9

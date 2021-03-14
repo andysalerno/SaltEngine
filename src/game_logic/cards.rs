@@ -1,5 +1,8 @@
 mod attack_dog;
 mod emotional_support_dog;
+mod fraidy_cat;
+mod indoor_cat;
+mod outdoor_cat;
 mod pawn;
 mod popcorn_vendor;
 mod priest_of_the_lowland;
@@ -9,6 +12,9 @@ mod sleeping_dog;
 
 pub use attack_dog::AttackDog;
 pub use emotional_support_dog::EmotionalSupportDog;
+pub use fraidy_cat::FraidyCat;
+pub use indoor_cat::IndoorCat;
+pub use outdoor_cat::OutdoorCat;
 pub use pawn::Pawn;
 pub use popcorn_vendor::PopcornVendor;
 pub use priest_of_the_lowland::PriestOfTheLowland;
@@ -91,6 +97,10 @@ pub trait UnitCardDefinition: CardDefinition {
 
     // TODO: or naming "guardian"?
     fn is_defender(&self) -> bool {
+        false
+    }
+
+    fn is_hidden(&self) -> bool {
         false
     }
 
