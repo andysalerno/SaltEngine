@@ -2,8 +2,8 @@ mod console_display;
 mod game_agent;
 mod game_logic;
 mod game_runner;
-mod game_state;
-mod id;
+pub mod game_state;
+pub mod id;
 
 use console_display::ConsoleDisplay;
 use game_agent::console_agent::ConsoleAgent;
