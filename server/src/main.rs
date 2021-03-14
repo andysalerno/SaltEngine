@@ -32,11 +32,21 @@ fn with_queue(
 }
 
 mod handlers {
+    use crate::models::PlayerQueue;
+    use salt_engine::{game_state::PlayerId, id::Id};
+    use serde::Serialize;
     use std::convert::Infallible;
 
-    use salt_engine::game_state::PlayerId;
+    #[derive(Serialize)]
+    struct NewGameResponse {
+        game_id: Id,
+    }
 
-    use crate::models::PlayerQueue;
+    impl NewGameResponse {
+        fn new(game_id: Id) -> Self {
+            Self { game_id }
+        }
+    }
 
     pub async fn new_game(queue: PlayerQueue) -> Result<impl warp::Reply, Infallible> {
         // First, try to pop from the queue if possible.
@@ -44,7 +54,13 @@ mod handlers {
         queue.push_front(PlayerId::new());
         let player_count = queue.len();
 
-        let message = format!("There are currently {} players in the queue.", player_count);
+        let r = NewGameResponse::new(Id::new());
+        let s = serde_json::to_string(&r).unwrap();
+
+        let message = format!(
+            "There are currently {} players in the queue. Your ID is: {}",
+            player_count, s
+        );
         Ok(message)
     }
 }
