@@ -8,5 +8,6 @@ edition = "2018"
 
 [dependencies]
 salt_engine = { path = "../engine" }
+server = { path = "../server" }
 reqwest = { version = "0.11", features = ["json"] }
 tokio = { version = "1", features = ["full"] }

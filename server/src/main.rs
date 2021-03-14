@@ -1,4 +1,5 @@
 mod matchmaking_queue;
+pub mod messages;
 
 use models::{new_queue, PlayerQueue};
 use warp::Filter;
@@ -32,36 +33,19 @@ fn with_queue(
 }
 
 mod handlers {
-    use crate::models::PlayerQueue;
+    use crate::{messages::NewGameResponse, models::PlayerQueue};
     use salt_engine::{game_state::PlayerId, id::Id};
-    use serde::Serialize;
     use std::convert::Infallible;
-
-    #[derive(Serialize)]
-    struct NewGameResponse {
-        game_id: Id,
-    }
-
-    impl NewGameResponse {
-        fn new(game_id: Id) -> Self {
-            Self { game_id }
-        }
-    }
 
     pub async fn new_game(queue: PlayerQueue) -> Result<impl warp::Reply, Infallible> {
         // First, try to pop from the queue if possible.
         let mut queue = queue.lock().await;
         queue.push_front(PlayerId::new());
-        let player_count = queue.len();
 
-        let r = NewGameResponse::new(Id::new());
-        let s = serde_json::to_string(&r).unwrap();
+        let mut r = NewGameResponse::new(Id::new());
+        r.players_in_queue = queue.len();
 
-        let message = format!(
-            "There are currently {} players in the queue. Your ID is: {}",
-            player_count, s
-        );
-        Ok(message)
+        Ok(warp::reply::json(&r))
     }
 }
 
