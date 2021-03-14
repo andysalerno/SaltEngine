@@ -78,6 +78,8 @@ impl BuffBuilder {
         BuiltBuff {
             attack_amount: self.attack_amount,
             health_amount: self.health_amount,
+            source_id: self.source,
+            instance_id: self.instance_id,
         }
     }
 }
@@ -86,6 +88,8 @@ impl BuffBuilder {
 pub struct BuiltBuff {
     attack_amount: i32,
     health_amount: i32,
+    source_id: BuffSourceId,
+    instance_id: BuffInstanceId,
 }
 
 impl Buff for BuiltBuff {
@@ -98,11 +102,11 @@ impl Buff for BuiltBuff {
     }
 
     fn source_id(&self) -> BuffSourceId {
-        todo!()
+        self.source_id
     }
 
     fn instance_id(&self) -> BuffInstanceId {
-        todo!()
+        self.instance_id
     }
 
     fn definition_id(&self) -> Id {

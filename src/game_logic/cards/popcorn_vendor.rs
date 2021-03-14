@@ -90,7 +90,6 @@ impl UnitCardDefinition for PopcornVendor {
 #[cfg(test)]
 mod tests {
     use super::PopcornVendor;
-    use crate::game_agent::game_agent::*;
     use crate::game_logic::cards::Pawn;
     use crate::game_logic::*;
     use crate::{
@@ -105,35 +104,24 @@ mod tests {
         let mut dispatcher = make_default_dispatcher();
         let player_id = state.player_a_id();
 
-        // Pawn will be summoned here.
-        let pawn_pos = BoardPos::new(player_id, RowId::FrontRow, 0);
-
-        // When prompted, player will pick the pawn
-        // to receive the buff
-        {
-            let mut prompter_a = Box::new(MockPrompter::new());
-            prompter_a
-                .expect_prompt_player_creature_pos()
-                .returning(move |_| pawn_pos);
-            dispatcher.set_player_a_prompter(prompter_a);
-        }
-
         // Summon a pawn to receive the buff
-        let hand = state.hand_mut(player_id);
         let pawn = Pawn.make_instance();
         let pawn_id = pawn.id();
         {
+            let hand = state.hand_mut(player_id);
             hand.add_card(pawn);
+
+            let pawn_pos = BoardPos::new(player_id, RowId::FrontRow, 0);
             let summon_event = SummonCreatureFromHandEvent::new(player_id, pawn_pos, pawn_id);
             dispatcher.dispatch(summon_event, &mut state);
         }
 
         // Summon the popcorn vendor and target the Pawn with the buff
-        let hand = state.hand_mut(player_id);
-        let pop_vend_pos = BoardPos::new(player_id, RowId::BackRow, 0);
-        let pop_vend = PopcornVendor.make_instance();
-        let pop_vend_id = pop_vend.id();
         {
+            let pop_vend = PopcornVendor.make_instance();
+            let pop_vend_id = pop_vend.id();
+            let hand = state.hand_mut(player_id);
+            let pop_vend_pos = BoardPos::new(player_id, RowId::BackRow, 0);
             hand.add_card(pop_vend);
             let summon_event =
                 SummonCreatureFromHandEvent::new(player_id, pop_vend_pos, pop_vend_id);
@@ -141,38 +129,11 @@ mod tests {
         }
 
         let pawn_instance = state.board().creature_instance(pawn_id);
+
         assert!(
             !pawn_instance.buffs().is_empty(),
             "Expected the pawn to receive the buff."
         );
-    }
-
-    #[test]
-    fn when_summoned_back_empty_board_expects_no_prompt() {
-        let mut state = make_test_state();
-        let mut dispatcher = make_default_dispatcher();
-        let player_id = state.player_a_id();
-
-        {
-            let mut prompter_a = Box::new(MockPrompter::new());
-            prompter_a.expect_prompt_player_creature_pos().never();
-            dispatcher.set_player_a_prompter(prompter_a);
-        }
-
-        // Summon the popcorn vendor alone in the back row
-        let hand = state.hand_mut(player_id);
-        let pop_vend_pos = BoardPos::new(player_id, RowId::BackRow, 0);
-        let pop_vend = PopcornVendor.make_instance();
-        let pop_vend_id = pop_vend.id();
-        {
-            hand.add_card(pop_vend);
-            let summon_event =
-                SummonCreatureFromHandEvent::new(player_id, pop_vend_pos, pop_vend_id);
-            dispatcher.dispatch(summon_event, &mut state);
-        }
-
-        // assertion: we would have panicked if the prompter was called,
-        // since the mock is configured with `never()`
     }
 
     #[test]

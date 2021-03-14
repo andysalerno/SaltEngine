@@ -1,6 +1,7 @@
 use crate::{
     game_logic::{
         buff::{Buff, BuffSourceId},
+        passive_effect::PassiveCompanionBuff,
         BuffBuilder, BuffInstanceId,
     },
     game_state::{board::RowId, UnitCardInstanceId},
@@ -57,52 +58,17 @@ impl UnitCardDefinition for EmotionalSupportDog {
     }
 
     fn passive_effect(&self) -> Option<Box<dyn PassiveEffectDefinition>> {
-        Some(Box::new(EmotionalSupportDogPassiveDefinition::new()))
+        let buff = BuffBuilder::new(PassiveEffectInstanceId::new(), Id::new())
+            .attack(1)
+            .health(1)
+            .build();
+
+        let passive = PassiveCompanionBuff::new(Id::new(), Box::new(buff));
+        Some(Box::new(passive))
     }
 
     fn placeable_at(&self) -> Position {
         Position::Back
-    }
-}
-
-#[derive(Debug)]
-struct EmotionalSupportDogPassiveDefinition {
-    definition_id: Id,
-}
-
-impl EmotionalSupportDogPassiveDefinition {
-    pub fn new() -> Self {
-        Self {
-            // TODO: replace with constant
-            definition_id: Id::new(),
-        }
-    }
-}
-
-impl PassiveEffectDefinition for EmotionalSupportDogPassiveDefinition {
-    fn definition_id(&self) -> Id {
-        todo!()
-    }
-
-    fn update(
-        &self,
-    ) -> Box<dyn FnOnce(PassiveEffectInstanceId, UnitCardInstanceId, &mut GameState)> {
-        Box::new(move |instance_id, originator_id, game_state| {
-            let doggy_pos = game_state.board().pos_with_creature(originator_id);
-
-            if let Some(companion) = game_state.board().companion_creature(doggy_pos) {
-                let id = companion.id();
-
-                let buff = BuffBuilder::new(BuffSourceId::Passive(instance_id), Id::new())
-                    .attack(1)
-                    .health(1)
-                    .build();
-
-                game_state.update_by_id(id, |c| {
-                    c.add_buff(Box::new(buff));
-                });
-            }
-        })
     }
 }
 
