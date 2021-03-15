@@ -1,20 +1,25 @@
 mod matchmaking_queue;
 pub mod messages;
+mod websocker_server;
 
 use models::{new_queue, GameQueue};
 use warp::Filter;
 
-#[tokio::main]
-async fn main() {
-    let hello = warp::path!("hello" / String).map(|name| format!("Hello, {}!", name));
-    let goodbye = warp::path!("goodbye" / String).map(|name| format!("goodbye, {}!", name));
-
-    let player_queue = new_queue();
-
-    let api = hello.or(goodbye).or(new_game(player_queue));
-
-    warp::serve(api).run(([127, 0, 0, 1], 3030)).await;
+fn main() {
+    websocker_server::run();
 }
+
+// #[tokio::main]
+// async fn main() {
+//     let hello = warp::path!("hello" / String).map(|name| format!("Hello, {}!", name));
+//     let goodbye = warp::path!("goodbye" / String).map(|name| format!("goodbye, {}!", name));
+
+//     let player_queue = new_queue();
+
+//     let api = hello.or(goodbye).or(new_game(player_queue));
+
+//     warp::serve(api).run(([127, 0, 0, 1], 3030)).await;
+// }
 
 pub fn new_game(
     queue: GameQueue,
