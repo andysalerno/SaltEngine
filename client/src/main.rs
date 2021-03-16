@@ -1,17 +1,19 @@
+use async_tungstenite::tungstenite::{self, client::connect_with_config, Message};
+use futures::SinkExt;
 use salt_engine::id::Id;
-use server::messages::NewGameResponse;
+use server::messages::{from_client::*, from_server::*};
 
-#[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let game_id = join_game().await?;
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    smol::block_on(async {
+        let (mut connection, _) =
+            async_tungstenite::async_std::connect_async("ws://localhost:9000")
+                .await
+                .expect("failed to connect");
 
+        connection
+            .send(Message::Text("yoooo!!".to_string()))
+            .await
+            .expect("failed to send message");
+    });
     Ok(())
-}
-
-async fn join_game() -> Result<Id, Box<dyn std::error::Error>> {
-    let resp = reqwest::get("http://localhost:3030/newgame").await?;
-    let resp = resp.json::<NewGameResponse>().await?;
-
-    println!("Joining game: {:#?}", resp.game_id);
-    Ok(resp.game_id)
 }

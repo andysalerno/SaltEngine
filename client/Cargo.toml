@@ -7,7 +7,10 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-salt_engine = { path = "../engine" }
 server = { path = "../server" }
-reqwest = { version = "0.11", features = ["json"] }
-tokio = { version = "1", features = ["full"] }
+salt_engine = { path = "../engine" }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+async-tungstenite = { version = "0.13.0", features = ["async-std-runtime"] }
+smol = "1.2.5"
+futures = "0.3"

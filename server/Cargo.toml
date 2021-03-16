@@ -8,8 +8,6 @@ edition = "2018"
 
 [dependencies]
 salt_engine = { path = "../engine" }
-tokio = { version = "1", features = ["full"] }
-warp = "0.3"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 async-tungstenite = "0.13.0"

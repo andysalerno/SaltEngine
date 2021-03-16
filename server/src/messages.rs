@@ -1,17 +1,16 @@
 use salt_engine::id::Id;
 use serde::{Deserialize, Serialize};
 
-#[derive(Serialize, Deserialize, Debug)]
-pub struct NewGameResponse {
-    pub game_id: Id,
-    pub players_in_queue: usize,
+pub mod from_client {
+    use super::*;
+
+    #[derive(Serialize, Deserialize, Debug)]
+    pub struct JoinGame;
 }
 
-impl NewGameResponse {
-    pub(crate) fn new(game_id: Id) -> Self {
-        Self {
-            game_id,
-            players_in_queue: 0,
-        }
-    }
+pub mod from_server {
+    use super::*;
+
+    #[derive(Serialize, Deserialize, Debug)]
+    pub struct GameId(Id);
 }
