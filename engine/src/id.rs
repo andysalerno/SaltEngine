@@ -1,4 +1,4 @@
-use serde::{de::Visitor, Deserialize, Serialize, Serializer};
+use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 #[derive(Copy, Clone, Debug, PartialEq, Serialize, Deserialize)]

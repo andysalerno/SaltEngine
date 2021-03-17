@@ -1,8 +1,9 @@
-use async_tungstenite::tungstenite::Message;
+use async_tungstenite::{tungstenite::Message, WebSocketStream};
+use futures::{AsyncRead, AsyncWrite, SinkExt, StreamExt};
 use salt_engine::{game_state::PlayerId, id::Id};
-use serde::{Deserialize, Serialize};
+use serde::{de::DeserializeOwned, Deserialize, Serialize};
 
-pub trait GameMessage {}
+pub trait GameMessage: Serialize + DeserializeOwned {}
 
 #[derive(Serialize, Deserialize, Debug)]
 pub enum FromClient {
@@ -18,38 +19,42 @@ pub enum FromServer {
 }
 impl GameMessage for FromServer {}
 
-pub trait IntoJson {
-    fn json(self) -> String;
+pub struct Connection<S>
+where
+    S: AsyncRead + AsyncWrite + Unpin,
+{
+    stream: WebSocketStream<S>,
 }
 
-impl<T> IntoJson for T
+impl<S> Connection<S>
 where
-    T: GameMessage + Serialize,
+    S: AsyncRead + AsyncWrite + Unpin,
 {
-    fn json(self) -> String {
-        serde_json::to_string(&self).expect("failed to serialize")
+    pub fn new(stream: WebSocketStream<S>) -> Self {
+        Self { stream }
     }
-}
 
-pub trait FromJson<T> {
-    fn from_json(self) -> T;
-}
-
-impl<'a, T> FromJson<T> for &'a str
-where
-    T: GameMessage + Deserialize<'a>,
-{
-    fn from_json(self) -> T {
-        serde_json::from_str(self).expect("failed to deserialize")
+    pub async fn send<M>(&mut self, message: M) -> Result<(), Box<dyn std::error::Error>>
+    where
+        M: GameMessage,
+    {
+        let json = serde_json::to_string(&message)?;
+        self.stream.send(Message::Text(json)).await?;
+        Ok(())
     }
-}
 
-impl<'a, T> FromJson<T> for &'a Message
-where
-    T: GameMessage + Deserialize<'a>,
-{
-    fn from_json(self) -> T {
-        let s = self.to_text().expect("Expected a websocket text message");
-        serde_json::from_str(s).expect("failed to deserialize")
+    pub async fn recv<'a, T>(&mut self) -> Option<T>
+    where
+        T: GameMessage + DeserializeOwned,
+    {
+        let response = self.stream.next().await.expect("Connection died").ok()?;
+
+        let s = response
+            .to_text()
+            .expect("Expected a websocket text message");
+
+        let t: T = serde_json::from_str(s).expect("failed to deserialize");
+
+        Some(t)
     }
 }
