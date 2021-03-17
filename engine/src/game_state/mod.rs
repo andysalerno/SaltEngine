@@ -11,10 +11,11 @@ pub use deck::Deck;
 pub use game_state::GameState;
 pub use hand::Hand;
 pub use selector::*;
+use serde::{Deserialize, Serialize};
 
 use crate::id::Id;
 
-#[derive(Debug, Copy, Clone, PartialEq)]
+#[derive(Debug, Copy, Clone, PartialEq, Serialize, Deserialize)]
 pub struct PlayerId(Id);
 
 impl PlayerId {
