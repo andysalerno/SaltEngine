@@ -3,7 +3,7 @@ use std::borrow::Borrow;
 use crate::game_logic::{cards::UnitCardDefinition, BuffInstanceId, PassiveEffectInstance};
 use crate::{game_logic::Buff, id::Id};
 
-use super::board::BoardPos;
+use super::{board::BoardPos, MakePlayerView};
 
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct UnitCardInstanceId(Id);
@@ -112,5 +112,26 @@ impl UnitCardInstance {
 
     pub fn set_state(&mut self, state: Option<InstanceState>) {
         self.state = state;
+    }
+}
+
+pub struct UnitCardInstancePlayerView {
+    definition: Box<dyn UnitCardDefinition>,
+    buffs: Vec<Box<dyn Buff>>,
+    passive_effect: Option<PassiveEffectInstance>,
+    id: UnitCardInstanceId,
+    attack: i32,
+    health: i32,
+    width: usize,
+    state: Option<InstanceState>,
+}
+
+impl MakePlayerView for UnitCardInstance {
+    type TOut = UnitCardInstancePlayerView;
+
+    fn player_view(&self) -> UnitCardInstancePlayerView {
+        let def_player_view = self.definition.player_view();
+
+        todo!()
     }
 }

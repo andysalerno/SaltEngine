@@ -22,7 +22,9 @@ pub use really_big_rock::ReallyBigRock;
 pub use rickety_cannon::RicketyCannon;
 pub use sleeping_dog::SleepingDog;
 
-use crate::game_state::{board::BoardPos, GameState, UnitCardInstance, UnitCardInstanceId};
+use crate::game_state::{
+    board::BoardPos, GameState, MakePlayerView, UnitCardInstance, UnitCardInstanceId,
+};
 
 use super::{EventDispatcher, PassiveEffectDefinition};
 
@@ -117,5 +119,33 @@ pub trait UnitCardDefinition: CardDefinition {
     {
         let boxed: Box<dyn UnitCardDefinition> = self.boxed();
         UnitCardInstance::new(boxed)
+    }
+}
+
+pub struct UnitCardDefinitionPlayerView {
+    title: String,
+    cost: i32,
+    text: String,
+    flavor_text: String,
+    attack: i32,
+    health: i32,
+    row_width: usize,
+    placeable_at: Position,
+}
+
+impl MakePlayerView for Box<dyn UnitCardDefinition> {
+    type TOut = UnitCardDefinitionPlayerView;
+
+    fn player_view(&self) -> UnitCardDefinitionPlayerView {
+        UnitCardDefinitionPlayerView {
+            title: self.title().to_string(),
+            cost: self.cost(),
+            text: self.text().to_string(),
+            flavor_text: self.flavor_text().to_string(),
+            attack: self.attack(),
+            health: self.health(),
+            row_width: self.row_width(),
+            placeable_at: self.placeable_at(),
+        }
     }
 }

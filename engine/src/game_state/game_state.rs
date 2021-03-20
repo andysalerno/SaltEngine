@@ -266,6 +266,53 @@ impl GameState {
     }
 }
 
+pub mod player_view {
+    use crate::game_state::{
+        board::player_view::BoardPlayerView, hand::HandPlayerView, MakePlayerView,
+    };
+
+    use super::*;
+
+    pub struct GameStatePlayerView {
+        player_id: PlayerId,
+        opponent_id: PlayerId,
+        cur_player_turn: PlayerId,
+
+        player_hand: HandPlayerView,
+        player_deck_len: usize,
+
+        opponent_hand_len: usize,
+        opponent_deck_len: usize,
+
+        player_mana: u32,
+        player_mana_limit: u32,
+        opponent_mana: u32,
+        opponent_mana_limit: u32,
+
+        board: BoardPlayerView,
+    }
+
+    impl GameStatePlayerView {
+        pub fn from_gamestate(game_state: &GameState, player_view: PlayerId) -> Self {
+            let enemy_id = game_state.other_player(player_view);
+            GameStatePlayerView {
+                player_id: player_view,
+                opponent_id: enemy_id,
+                cur_player_turn: game_state.cur_player_turn,
+                player_hand: game_state.hand(player_view).player_view(),
+                player_deck_len: game_state.deck(player_view).len(),
+                opponent_hand_len: game_state.hand(enemy_id).len(),
+                opponent_deck_len: game_state.deck(enemy_id).len(),
+                player_mana: game_state.player_mana(player_view),
+                player_mana_limit: game_state.player_mana_limit(player_view),
+                opponent_mana: game_state.player_mana(enemy_id),
+                opponent_mana_limit: game_state.player_mana_limit(enemy_id),
+                board: game_state.board().player_view(),
+            }
+        }
+    }
+}
+
 #[cfg(test)]
 pub(crate) mod tests {
     use super::*;

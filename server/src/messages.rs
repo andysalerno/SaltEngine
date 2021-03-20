@@ -15,7 +15,7 @@ impl GameMessage for FromClient {}
 #[derive(Serialize, Deserialize, Debug)]
 pub enum FromServer {
     Hello(PlayerId),
-    GameId(Id),
+    Session(GameSession),
 }
 impl GameMessage for FromServer {}
 
@@ -57,4 +57,11 @@ where
 
         Some(t)
     }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct GameSession {
+    pub session_id: Id,
+    pub player_a_id: PlayerId,
+    pub player_b_id: PlayerId,
 }

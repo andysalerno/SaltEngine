@@ -106,6 +106,7 @@ impl BoardPos {
     }
 }
 
+#[derive(Debug)]
 pub struct Board {
     player_a_id: PlayerId,
     player_b_id: PlayerId,
@@ -418,4 +419,20 @@ fn end_half(ops: std::ops::Range<usize>) -> std::ops::Range<usize> {
 
     // 10 + (10 / 2) .. 20 => 15..20
     ops.start + len / 2..ops.end
+}
+
+pub mod player_view {
+    use crate::game_state::MakePlayerView;
+
+    use super::*;
+
+    pub struct BoardPlayerView {}
+
+    impl MakePlayerView for Board {
+        type TOut = BoardPlayerView;
+
+        fn player_view(&self) -> BoardPlayerView {
+            todo!()
+        }
+    }
 }

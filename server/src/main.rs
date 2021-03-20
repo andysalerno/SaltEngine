@@ -1,4 +1,3 @@
-mod matchmaking_queue;
 pub mod messages;
 mod websocker_server;
 

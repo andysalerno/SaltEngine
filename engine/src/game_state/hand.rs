@@ -1,4 +1,6 @@
-use super::{UnitCardInstance, UnitCardInstanceId};
+use super::{
+    card_instance::UnitCardInstancePlayerView, MakePlayerView, UnitCardInstance, UnitCardInstanceId,
+};
 
 #[derive(Debug, Default)]
 pub struct Hand {
@@ -56,5 +58,19 @@ impl Hand {
         assert!(card.id() == id);
 
         card
+    }
+}
+
+pub struct HandPlayerView {
+    cards: Vec<UnitCardInstancePlayerView>,
+}
+
+impl MakePlayerView for Hand {
+    type TOut = HandPlayerView;
+
+    fn player_view(&self) -> HandPlayerView {
+        let cards = self.cards().iter().map(|c| c.player_view()).collect();
+
+        HandPlayerView { cards }
     }
 }
