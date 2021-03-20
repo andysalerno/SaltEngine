@@ -1,5 +1,6 @@
 use super::{
-    card_instance::UnitCardInstancePlayerView, MakePlayerView, UnitCardInstance, UnitCardInstanceId,
+    card_instance::UnitCardInstancePlayerView, MakePlayerView, PlayerId, UnitCardInstance,
+    UnitCardInstanceId,
 };
 
 #[derive(Debug, Default)]
@@ -68,8 +69,12 @@ pub struct HandPlayerView {
 impl MakePlayerView for Hand {
     type TOut = HandPlayerView;
 
-    fn player_view(&self) -> HandPlayerView {
-        let cards = self.cards().iter().map(|c| c.player_view()).collect();
+    fn player_view(&self, player_viewing: PlayerId) -> HandPlayerView {
+        let cards = self
+            .cards()
+            .iter()
+            .map(|c| c.player_view(player_viewing))
+            .collect();
 
         HandPlayerView { cards }
     }

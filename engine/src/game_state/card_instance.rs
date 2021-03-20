@@ -1,9 +1,12 @@
 use std::borrow::Borrow;
 
-use crate::game_logic::{cards::UnitCardDefinition, BuffInstanceId, PassiveEffectInstance};
+use crate::game_logic::{
+    cards::{UnitCardDefinition, UnitCardDefinitionPlayerView},
+    BuffInstanceId, BuffPlayerView, PassiveEffectInstance, PassiveEffectInstancePlayerView,
+};
 use crate::{game_logic::Buff, id::Id};
 
-use super::{board::BoardPos, MakePlayerView};
+use super::{board::BoardPos, MakePlayerView, PlayerId};
 
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct UnitCardInstanceId(Id);
@@ -116,9 +119,9 @@ impl UnitCardInstance {
 }
 
 pub struct UnitCardInstancePlayerView {
-    definition: Box<dyn UnitCardDefinition>,
-    buffs: Vec<Box<dyn Buff>>,
-    passive_effect: Option<PassiveEffectInstance>,
+    definition: UnitCardDefinitionPlayerView,
+    buffs: Vec<BuffPlayerView>,
+    passive_effect: Option<PassiveEffectInstancePlayerView>,
     id: UnitCardInstanceId,
     attack: i32,
     health: i32,
@@ -129,9 +132,28 @@ pub struct UnitCardInstancePlayerView {
 impl MakePlayerView for UnitCardInstance {
     type TOut = UnitCardInstancePlayerView;
 
-    fn player_view(&self) -> UnitCardInstancePlayerView {
-        let def_player_view = self.definition.player_view();
+    fn player_view(&self, player_viewing: PlayerId) -> UnitCardInstancePlayerView {
+        let definition = self.definition.player_view(player_viewing);
+        let buffs = self
+            .buffs
+            .iter()
+            .map(|b| b.player_view(player_viewing))
+            .collect();
 
-        todo!()
+        let passive_effect = self
+            .passive_effect
+            .as_ref()
+            .map(|p| p.player_view(player_viewing));
+
+        UnitCardInstancePlayerView {
+            definition,
+            buffs,
+            passive_effect,
+            id: self.id(),
+            attack: self.attack(),
+            health: self.health(),
+            width: self.width(),
+            state: self.state.clone(),
+        }
     }
 }

@@ -140,3 +140,22 @@ where
         })
     }
 }
+
+pub mod player_view {
+    use crate::game_state::MakePlayerView;
+
+    use super::PassiveEffectInstance;
+
+    pub struct PassiveEffectInstancePlayerView {}
+
+    impl MakePlayerView for PassiveEffectInstance {
+        type TOut = PassiveEffectInstancePlayerView;
+
+        fn player_view(
+            &self,
+            player_viewing: crate::game_state::PlayerId,
+        ) -> PassiveEffectInstancePlayerView {
+            todo!()
+        }
+    }
+}

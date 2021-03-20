@@ -37,7 +37,7 @@ trait PlayerView {
 /// and not info invisible to them (such as the content of the opponent's hand).
 pub(crate) trait MakePlayerView {
     type TOut;
-    fn player_view(&self) -> <Self as MakePlayerView>::TOut;
+    fn player_view(&self, player_viewing: PlayerId) -> <Self as MakePlayerView>::TOut;
 }
 
 #[cfg(test)]

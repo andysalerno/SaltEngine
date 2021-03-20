@@ -426,12 +426,16 @@ pub mod player_view {
 
     use super::*;
 
-    pub struct BoardPlayerView {}
+    pub struct BoardPlayerView {
+        player_a_id: PlayerId,
+        player_b_id: PlayerId,
+        slots: Vec<BoardSlot>,
+    }
 
     impl MakePlayerView for Board {
         type TOut = BoardPlayerView;
 
-        fn player_view(&self) -> BoardPlayerView {
+        fn player_view(&self, player_viewing: PlayerId) -> BoardPlayerView {
             todo!()
         }
     }

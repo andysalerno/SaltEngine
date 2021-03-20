@@ -23,7 +23,7 @@ pub use rickety_cannon::RicketyCannon;
 pub use sleeping_dog::SleepingDog;
 
 use crate::game_state::{
-    board::BoardPos, GameState, MakePlayerView, UnitCardInstance, UnitCardInstanceId,
+    board::BoardPos, GameState, MakePlayerView, PlayerId, UnitCardInstance, UnitCardInstanceId,
 };
 
 use super::{EventDispatcher, PassiveEffectDefinition};
@@ -136,7 +136,7 @@ pub struct UnitCardDefinitionPlayerView {
 impl MakePlayerView for Box<dyn UnitCardDefinition> {
     type TOut = UnitCardDefinitionPlayerView;
 
-    fn player_view(&self) -> UnitCardDefinitionPlayerView {
+    fn player_view(&self, _player_viewing: PlayerId) -> UnitCardDefinitionPlayerView {
         UnitCardDefinitionPlayerView {
             title: self.title().to_string(),
             cost: self.cost(),

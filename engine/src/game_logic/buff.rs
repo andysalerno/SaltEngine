@@ -113,3 +113,32 @@ impl Buff for BuiltBuff {
         todo!()
     }
 }
+
+pub mod player_view {
+    use super::*;
+    use crate::game_state::MakePlayerView;
+
+    pub struct BuffPlayerView {
+        attack_amount: i32,
+        health_amount: i32,
+        source_id: BuffSourceId,
+        instance_id: BuffInstanceId,
+        definition_id: Id,
+        is_from_passive: bool,
+    }
+
+    impl MakePlayerView for Box<dyn Buff> {
+        type TOut = BuffPlayerView;
+
+        fn player_view(&self, player_viewing: crate::game_state::PlayerId) -> BuffPlayerView {
+            BuffPlayerView {
+                attack_amount: self.attack_amount(),
+                health_amount: self.health_amount(),
+                source_id: self.source_id(),
+                instance_id: self.instance_id(),
+                definition_id: self.definition_id(),
+                is_from_passive: self.is_from_passive(),
+            }
+        }
+    }
+}
