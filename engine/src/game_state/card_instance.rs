@@ -1,14 +1,13 @@
-use std::borrow::Borrow;
-
+use super::{board::BoardPos, MakePlayerView, PlayerId};
 use crate::game_logic::{
     cards::{UnitCardDefinition, UnitCardDefinitionPlayerView},
     BuffInstanceId, BuffPlayerView, PassiveEffectInstance, PassiveEffectInstancePlayerView,
 };
 use crate::{game_logic::Buff, id::Id};
+use serde::{Deserialize, Serialize};
+use std::borrow::Borrow;
 
-use super::{board::BoardPos, MakePlayerView, PlayerId};
-
-#[derive(Debug, Copy, Clone, PartialEq)]
+#[derive(Debug, Copy, Clone, PartialEq, Serialize, Deserialize)]
 pub struct UnitCardInstanceId(Id);
 
 impl UnitCardInstanceId {
@@ -17,7 +16,7 @@ impl UnitCardInstanceId {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum InstanceState {
     Pos(BoardPos),
     CreatureInstanceId(UnitCardInstanceId),
@@ -118,6 +117,7 @@ impl UnitCardInstance {
     }
 }
 
+#[derive(Debug, Serialize, Deserialize)]
 pub struct UnitCardInstancePlayerView {
     definition: UnitCardDefinitionPlayerView,
     buffs: Vec<BuffPlayerView>,

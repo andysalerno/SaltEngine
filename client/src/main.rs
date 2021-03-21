@@ -32,5 +32,9 @@ where
     let response = connection.recv::<FromServer>().await;
     println!("response: {:?}", response);
 
+    // Expect the game state
+    let response = connection.recv::<FromServer>().await;
+    println!("response: {:?}", response);
+
     Ok(())
 }

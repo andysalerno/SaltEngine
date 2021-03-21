@@ -2,6 +2,7 @@ use super::{
     card_instance::UnitCardInstancePlayerView, MakePlayerView, PlayerId, UnitCardInstance,
     UnitCardInstanceId,
 };
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Default)]
 pub struct Hand {
@@ -62,6 +63,7 @@ impl Hand {
     }
 }
 
+#[derive(Debug, Serialize, Deserialize)]
 pub struct HandPlayerView {
     cards: Vec<UnitCardInstancePlayerView>,
 }

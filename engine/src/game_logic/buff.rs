@@ -1,8 +1,8 @@
-use crate::{game_state::UnitCardInstanceId, id::Id};
-
 use super::passive_effect::PassiveEffectInstanceId;
+use crate::{game_state::UnitCardInstanceId, id::Id};
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Copy, Clone, PartialEq)]
+#[derive(Debug, Copy, Clone, PartialEq, Serialize, Deserialize)]
 pub struct BuffInstanceId(Id);
 
 impl BuffInstanceId {
@@ -11,7 +11,7 @@ impl BuffInstanceId {
     }
 }
 
-#[derive(Debug, Copy, Clone, PartialEq)]
+#[derive(Debug, Copy, Clone, PartialEq, Serialize, Deserialize)]
 pub enum BuffSourceId {
     Passive(PassiveEffectInstanceId),
     CreatureInstance(UnitCardInstanceId),
@@ -30,7 +30,7 @@ impl From<UnitCardInstanceId> for BuffSourceId {
     }
 }
 
-pub trait Buff: std::fmt::Debug {
+pub trait Buff: Sync + Send + std::fmt::Debug {
     fn attack_amount(&self) -> i32;
     fn health_amount(&self) -> i32;
     fn source_id(&self) -> BuffSourceId;
@@ -118,6 +118,7 @@ pub mod player_view {
     use super::*;
     use crate::game_state::MakePlayerView;
 
+    #[derive(Debug, Serialize, Deserialize)]
     pub struct BuffPlayerView {
         attack_amount: i32,
         health_amount: i32,
@@ -130,7 +131,7 @@ pub mod player_view {
     impl MakePlayerView for Box<dyn Buff> {
         type TOut = BuffPlayerView;
 
-        fn player_view(&self, player_viewing: crate::game_state::PlayerId) -> BuffPlayerView {
+        fn player_view(&self, _player_viewing: crate::game_state::PlayerId) -> BuffPlayerView {
             BuffPlayerView {
                 attack_amount: self.attack_amount(),
                 health_amount: self.health_amount(),

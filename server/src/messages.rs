@@ -1,6 +1,9 @@
 use async_tungstenite::{tungstenite::Message, WebSocketStream};
 use futures::{AsyncRead, AsyncWrite, SinkExt, StreamExt};
-use salt_engine::{game_state::PlayerId, id::Id};
+use salt_engine::{
+    game_state::{GameStatePlayerView, PlayerId},
+    id::Id,
+};
 use serde::{de::DeserializeOwned, Deserialize, Serialize};
 
 pub trait GameMessage: Serialize + DeserializeOwned {}
@@ -16,6 +19,7 @@ impl GameMessage for FromClient {}
 pub enum FromServer {
     Hello(PlayerId),
     Session(GameSession),
+    State(GameStatePlayerView),
 }
 impl GameMessage for FromServer {}
 

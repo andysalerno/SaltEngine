@@ -873,6 +873,7 @@ dependencies = [
  "mockall",
  "rand",
  "serde",
+ "serde_json",
  "thiserror",
  "uuid",
 ]

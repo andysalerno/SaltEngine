@@ -1,5 +1,9 @@
 use futures::{AsyncRead, AsyncWrite};
-use salt_engine::{game_state::PlayerId, id::Id};
+use salt_engine::{
+    cards::*,
+    game_state::{Deck, GameState, MakePlayerView, PlayerId, UnitCardInstance},
+    id::Id,
+};
 use server::messages::{Connection, FromClient, FromServer, GameSession};
 use smol::{lock::Mutex, Async};
 use std::{collections::HashMap, net::TcpListener, sync::Arc, time::Duration};
@@ -75,8 +79,69 @@ where
         session = found_session;
     }
 
+    let player_a = session.player_a_id;
+    let player_b = session.player_b_id;
+
+    let mut player_a_deck = {
+        let cards: Vec<UnitCardInstance> = (0..8)
+            .flat_map(|_| {
+                let cards = vec![
+                    RicketyCannon.make_instance(),
+                    Pawn.make_instance(),
+                    EmotionalSupportDog.make_instance(),
+                    ReallyBigRock.make_instance(),
+                    AttackDog.make_instance(),
+                    SleepingDog.make_instance(),
+                    PopcornVendor.make_instance(),
+                    PriestOfTheLowland.make_instance(),
+                    FraidyCat.make_instance(),
+                    OutdoorCat.make_instance(),
+                    IndoorCat.make_instance(),
+                ];
+
+                cards
+            })
+            .collect();
+
+        Deck::new(cards)
+    };
+
+    let mut player_b_deck = {
+        let cards: Vec<UnitCardInstance> = (0..8)
+            .flat_map(|_| {
+                let cards = vec![
+                    RicketyCannon.make_instance(),
+                    Pawn.make_instance(),
+                    EmotionalSupportDog.make_instance(),
+                    ReallyBigRock.make_instance(),
+                    AttackDog.make_instance(),
+                    SleepingDog.make_instance(),
+                    PopcornVendor.make_instance(),
+                    PriestOfTheLowland.make_instance(),
+                    FraidyCat.make_instance(),
+                    OutdoorCat.make_instance(),
+                    IndoorCat.make_instance(),
+                ];
+
+                cards
+            })
+            .collect();
+
+        Deck::new(cards)
+    };
+
+    player_a_deck.shuffle();
+    player_b_deck.shuffle();
+
+    // Send session
     println!("Returning session: {:?}", session);
     connection.send(FromServer::Session(session)).await?;
+
+    // Send game state
+    let game_state = GameState::initial_state(player_a, player_a_deck, player_b, player_b_deck);
+    connection
+        .send(FromServer::State(game_state.player_view(player_a)))
+        .await?;
 
     println!("Connection closed.");
     Ok(())

@@ -1,4 +1,5 @@
 use super::{card_instance::UnitCardInstance, PlayerId, UnitCardInstanceId};
+use serde::{Deserialize, Serialize};
 
 const BOARD_WIDTH: usize = 6;
 const SLOTS_COUNT: usize = BOARD_WIDTH * 4;
@@ -47,7 +48,7 @@ impl BoardSlot {
     }
 }
 
-#[derive(Debug, Copy, Clone, PartialEq)]
+#[derive(Debug, Copy, Clone, PartialEq, Serialize, Deserialize)]
 pub enum RowId {
     FrontRow,
     BackRow,
@@ -77,7 +78,7 @@ impl RowId {
     }
 }
 
-#[derive(Debug, Copy, Clone, PartialEq)]
+#[derive(Debug, Copy, Clone, PartialEq, Serialize, Deserialize)]
 pub struct BoardPos {
     pub player_id: PlayerId,
     pub row_id: RowId,
@@ -422,21 +423,49 @@ fn end_half(ops: std::ops::Range<usize>) -> std::ops::Range<usize> {
 }
 
 pub mod player_view {
-    use crate::game_state::MakePlayerView;
-
     use super::*;
+    use crate::game_state::{card_instance::UnitCardInstancePlayerView, MakePlayerView};
 
+    #[derive(Debug, Serialize, Deserialize)]
+    pub struct BoardSlotPlayerView {
+        pos: BoardPos,
+        creature: Option<UnitCardInstancePlayerView>,
+    }
+
+    impl MakePlayerView for BoardSlot {
+        type TOut = BoardSlotPlayerView;
+
+        fn player_view(&self, player_viewing: PlayerId) -> BoardSlotPlayerView {
+            BoardSlotPlayerView {
+                pos: self.pos,
+                creature: self
+                    .creature
+                    .as_ref()
+                    .map(|c| c.player_view(player_viewing)),
+            }
+        }
+    }
+
+    #[derive(Debug, Serialize, Deserialize)]
     pub struct BoardPlayerView {
         player_a_id: PlayerId,
         player_b_id: PlayerId,
-        slots: Vec<BoardSlot>,
+        slots: Vec<BoardSlotPlayerView>,
     }
 
     impl MakePlayerView for Board {
         type TOut = BoardPlayerView;
 
         fn player_view(&self, player_viewing: PlayerId) -> BoardPlayerView {
-            todo!()
+            BoardPlayerView {
+                player_a_id: self.player_a_id,
+                player_b_id: self.player_b_id,
+                slots: self
+                    .slots
+                    .iter()
+                    .map(|s| s.player_view(player_viewing))
+                    .collect(),
+            }
         }
     }
 }

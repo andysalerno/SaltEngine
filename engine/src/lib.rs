@@ -8,6 +8,8 @@ pub mod id;
 use console_display::ConsoleDisplay;
 use game_agent::console_agent::ConsoleAgent;
 
+pub use game_logic::cards;
+
 fn main() {
     let player_a = Box::new(ConsoleAgent::new());
     let player_b = Box::new(ConsoleAgent::new());

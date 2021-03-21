@@ -25,12 +25,13 @@ pub use sleeping_dog::SleepingDog;
 use crate::game_state::{
     board::BoardPos, GameState, MakePlayerView, PlayerId, UnitCardInstance, UnitCardInstanceId,
 };
+use serde::{Deserialize, Serialize};
 
 use super::{EventDispatcher, PassiveEffectDefinition};
 
 /// Describes which board positions
 /// this creature card may occupy.
-#[derive(Debug, Copy, Clone, PartialEq)]
+#[derive(Debug, Copy, Clone, PartialEq, Serialize, Deserialize)]
 pub enum Position {
     /// The front side of the board.
     Front,
@@ -43,7 +44,7 @@ pub enum Position {
 }
 
 /// The most general definition that cards of all types must implement.
-pub trait CardDefinition: std::fmt::Debug {
+pub trait CardDefinition: std::fmt::Debug + Send + Sync {
     fn title(&self) -> &str;
     fn cost(&self) -> i32;
     fn text(&self) -> &str;
@@ -122,6 +123,7 @@ pub trait UnitCardDefinition: CardDefinition {
     }
 }
 
+#[derive(Debug, Serialize, Deserialize)]
 pub struct UnitCardDefinitionPlayerView {
     title: String,
     cost: i32,

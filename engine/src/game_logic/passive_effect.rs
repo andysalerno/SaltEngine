@@ -3,12 +3,13 @@ use crate::{
     game_state::{board::RowId, GameState, UnitCardInstanceId},
     id::Id,
 };
+use serde::{Deserialize, Serialize};
 use std::borrow::Borrow;
 
 /// A definition of a passive effect, including
 /// an ID and the update logic that will be re-executed
 // whenever the gamestate changes.
-pub trait PassiveEffectDefinition {
+pub trait PassiveEffectDefinition: Send + Sync {
     fn definition_id(&self) -> Id;
     fn update(
         &self,
@@ -22,7 +23,7 @@ impl std::fmt::Debug for dyn PassiveEffectDefinition {
 }
 
 /// An ID representing a unique instance of a passive effect.
-#[derive(Debug, Copy, Clone, PartialEq)]
+#[derive(Debug, Copy, Clone, PartialEq, Serialize, Deserialize)]
 pub struct PassiveEffectInstanceId(Id);
 
 impl PassiveEffectInstanceId {
@@ -109,7 +110,7 @@ where
 
 impl<T> PassiveEffectDefinition for PassiveCompanionBuff<T>
 where
-    T: Buff + Clone + 'static,
+    T: Buff + Sync + Clone + Send + 'static,
 {
     fn definition_id(&self) -> Id {
         self.definition_id
@@ -142,11 +143,38 @@ where
 }
 
 pub mod player_view {
+    use super::*;
     use crate::game_state::MakePlayerView;
 
-    use super::PassiveEffectInstance;
+    #[derive(Debug, Serialize, Deserialize)]
+    pub struct PassiveEffectDefinitionPlayerView {
+        definition_id: Id,
+    }
 
-    pub struct PassiveEffectInstancePlayerView {}
+    impl MakePlayerView for dyn PassiveEffectDefinition {
+        type TOut = PassiveEffectDefinitionPlayerView;
+
+        fn player_view(
+            &self,
+            _player_viewing: crate::game_state::PlayerId,
+        ) -> PassiveEffectDefinitionPlayerView {
+            PassiveEffectDefinitionPlayerView {
+                definition_id: self.definition_id(),
+            }
+        }
+    }
+
+    #[derive(Debug, Serialize, Deserialize)]
+    pub struct PassiveEffectInstancePlayerView {
+        /// The definition of the passive effect.
+        definition: PassiveEffectDefinitionPlayerView,
+
+        /// The unique ID of this instance of the passive effect.
+        instance_id: PassiveEffectInstanceId,
+
+        /// The ID of the card instance that originated this passive effect.
+        originator_id: UnitCardInstanceId,
+    }
 
     impl MakePlayerView for PassiveEffectInstance {
         type TOut = PassiveEffectInstancePlayerView;
@@ -155,7 +183,13 @@ pub mod player_view {
             &self,
             player_viewing: crate::game_state::PlayerId,
         ) -> PassiveEffectInstancePlayerView {
-            todo!()
+            let definition = self.definition.player_view(player_viewing);
+
+            PassiveEffectInstancePlayerView {
+                definition,
+                instance_id: self.instance_id(),
+                originator_id: self.originator_id(),
+            }
         }
     }
 }
