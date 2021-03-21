@@ -6,7 +6,9 @@ mod events;
 mod keywords;
 mod passive_effect;
 
-pub use buff::{player_view::BuffPlayerView, Buff, BuffBuilder, BuffInstanceId, BuffSourceId};
+pub use buff::{
+    player_view::BuffPlayerView, Buff, BuffBuilder, BuffInstanceId, BuffSourceId, BuffView,
+};
 pub use event_dispatch::EventDispatcher;
 pub use events::*;
 pub use passive_effect::{

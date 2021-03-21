@@ -30,6 +30,41 @@ impl From<UnitCardInstanceId> for BuffSourceId {
     }
 }
 
+pub trait BuffView {
+    fn attack_amount(&self) -> i32;
+    fn health_amount(&self) -> i32;
+    fn source_id(&self) -> BuffSourceId;
+    fn instance_id(&self) -> BuffInstanceId;
+    fn definition_id(&self) -> Id;
+    fn is_from_passive(&self) -> bool;
+}
+
+impl BuffView for dyn Buff {
+    fn attack_amount(&self) -> i32 {
+        self.attack_amount()
+    }
+
+    fn health_amount(&self) -> i32 {
+        self.health_amount()
+    }
+
+    fn source_id(&self) -> BuffSourceId {
+        self.source_id()
+    }
+
+    fn instance_id(&self) -> BuffInstanceId {
+        self.instance_id()
+    }
+
+    fn definition_id(&self) -> Id {
+        self.definition_id()
+    }
+
+    fn is_from_passive(&self) -> bool {
+        self.is_from_passive()
+    }
+}
+
 pub trait Buff: Sync + Send + std::fmt::Debug {
     fn attack_amount(&self) -> i32;
     fn health_amount(&self) -> i32;

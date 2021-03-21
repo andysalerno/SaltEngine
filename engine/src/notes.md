@@ -34,3 +34,10 @@ hero power: summon a 1/1 bug; then, class cards: only summonable while you contr
 
 
 hidden cards are bucketed in costs 3/6/9
+
+impl notes:
+for game entities such as "Hand", "Board", "Deck" etc,
+there will be a top-level trait like "HandView".
+then there will be a struct for the internal game engine representation, like "Hand".
+and a simple/flat/serializable struct like "HandPlayerView".
+Both internal and external will implement HandView their own way.

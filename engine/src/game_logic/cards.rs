@@ -10,8 +10,6 @@ mod really_big_rock;
 mod rickety_cannon;
 mod sleeping_dog;
 
-use std::borrow::Borrow;
-
 pub use attack_dog::AttackDog;
 pub use emotional_support_dog::EmotionalSupportDog;
 pub use fraidy_cat::FraidyCat;

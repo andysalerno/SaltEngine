@@ -1,4 +1,6 @@
 use super::{board::BoardPos, MakePlayerView, PlayerId};
+use crate::game_logic::{Buff, BuffView};
+use crate::id::Id;
 use crate::{
     cards::UnitCardDefinitionView,
     game_logic::{
@@ -6,21 +8,34 @@ use crate::{
         BuffInstanceId, BuffPlayerView, PassiveEffectInstance, PassiveEffectInstancePlayerView,
     },
 };
-use crate::{game_logic::Buff, id::Id};
 use serde::{Deserialize, Serialize};
 use std::borrow::Borrow;
 
 pub trait UnitCardInstanceView<'a> {
     type DefinitionView: ?Sized + UnitCardDefinitionView;
+    type BuffView: Iterator<Item: BuffView>;
 
     fn definition(&'a self) -> &'a Self::DefinitionView;
+    fn buffs(&'a self) -> &'a [&'a Self::BuffView];
+    // buffs: Vec<Box<dyn Buff>>,
+    // passive_effect: Option<PassiveEffectInstance>,
+    // id: UnitCardInstanceId,
+    // attack: i32,
+    // health: i32,
+    // width: usize,
+    // state: Option<InstanceState>,
 }
 
 impl<'a> UnitCardInstanceView<'a> for UnitCardInstance {
     type DefinitionView = dyn UnitCardDefinition;
+    type BuffView = dyn Buff;
 
     fn definition(&'a self) -> &'a (dyn UnitCardDefinition + 'static) {
         self.definition.as_ref()
+    }
+
+    fn buffs(&'a self) -> &'a [&'a Self::BuffView] {
+        self.buffs.as_slice().as_ref()
     }
 }
 
@@ -172,5 +187,13 @@ impl MakePlayerView for UnitCardInstance {
             width: self.width(),
             state: self.state.clone(),
         }
+    }
+}
+
+impl<'a> UnitCardInstanceView<'a> for UnitCardInstancePlayerView {
+    type DefinitionView = UnitCardDefinitionPlayerView;
+
+    fn definition(&self) -> &Self::DefinitionView {
+        &self.definition
     }
 }
