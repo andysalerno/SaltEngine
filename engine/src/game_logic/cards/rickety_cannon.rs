@@ -1,7 +1,10 @@
 use super::{CardDefinition, Position, UnitCardDefinition};
 use crate::{
     game_logic::{EventDispatcher, PosTakesDamageEvent},
-    game_state::{board::BoardPos, GameState, InstanceState, UnitCardInstance, UnitCardInstanceId},
+    game_state::{
+        board::BoardPos, GameState, InstanceState, MakePlayerView, UnitCardInstance,
+        UnitCardInstanceId,
+    },
     id::Id,
 };
 
@@ -54,8 +57,13 @@ impl UnitCardDefinition for RicketyCannon {
         &self,
     ) -> Box<dyn FnOnce(&mut UnitCardInstance, BoardPos, &mut GameState, &mut EventDispatcher)>
     {
-        Box::new(|instance, _summoned_to_pos, game_state, dispatcher| {
-            let pos = dispatcher.player_prompter().prompt_slot(game_state);
+        Box::new(|instance, summoned_to_pos, game_state, dispatcher| {
+            let summoner = summoned_to_pos.player_id;
+
+            let pos = dispatcher
+                .player_prompter()
+                .prompt_slot(&game_state.player_view(summoner));
+
             instance.set_state(Some(InstanceState::Pos(pos)));
         })
     }

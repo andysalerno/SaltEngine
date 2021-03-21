@@ -315,6 +315,16 @@ pub mod player_view {
             }
         }
     }
+
+    impl GameStatePlayerView {
+        pub fn board(&self) -> &BoardPlayerView {
+            &self.board
+        }
+
+        pub fn hand(&self) -> &HandPlayerView {
+            &self.player_hand
+        }
+    }
 }
 
 #[cfg(test)]

@@ -1,8 +1,15 @@
 use super::{
-    card_instance::UnitCardInstancePlayerView, MakePlayerView, PlayerId, UnitCardInstance,
-    UnitCardInstanceId,
+    card_instance::{UnitCardInstancePlayerView, UnitCardInstanceView},
+    MakePlayerView, PlayerId, UnitCardInstance, UnitCardInstanceId,
 };
 use serde::{Deserialize, Serialize};
+
+pub trait HandView<'a, TCard: UnitCardInstanceView<'a>> {
+    fn len(&self) -> usize;
+    fn cards(&self) -> &[TCard];
+    fn card(&self) -> &TCard;
+    fn nth_card(&self) -> &TCard;
+}
 
 #[derive(Debug, Default)]
 pub struct Hand {

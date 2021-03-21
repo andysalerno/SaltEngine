@@ -107,6 +107,12 @@ impl BoardPos {
     }
 }
 
+pub trait BoardView {
+    fn player_a_id(&self) -> PlayerId;
+    fn player_b_id(&self) -> PlayerId;
+    //fn slots(&self) ->
+}
+
 #[derive(Debug)]
 pub struct Board {
     player_a_id: PlayerId,

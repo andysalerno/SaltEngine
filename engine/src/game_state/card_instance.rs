@@ -1,11 +1,28 @@
 use super::{board::BoardPos, MakePlayerView, PlayerId};
-use crate::game_logic::{
-    cards::{UnitCardDefinition, UnitCardDefinitionPlayerView},
-    BuffInstanceId, BuffPlayerView, PassiveEffectInstance, PassiveEffectInstancePlayerView,
+use crate::{
+    cards::UnitCardDefinitionView,
+    game_logic::{
+        cards::{player_view::UnitCardDefinitionPlayerView, UnitCardDefinition},
+        BuffInstanceId, BuffPlayerView, PassiveEffectInstance, PassiveEffectInstancePlayerView,
+    },
 };
 use crate::{game_logic::Buff, id::Id};
 use serde::{Deserialize, Serialize};
 use std::borrow::Borrow;
+
+pub trait UnitCardInstanceView<'a> {
+    type DefinitionView: ?Sized + UnitCardDefinitionView;
+
+    fn definition(&'a self) -> &'a Self::DefinitionView;
+}
+
+impl<'a> UnitCardInstanceView<'a> for UnitCardInstance {
+    type DefinitionView = dyn UnitCardDefinition;
+
+    fn definition(&'a self) -> &'a (dyn UnitCardDefinition + 'static) {
+        self.definition.as_ref()
+    }
+}
 
 #[derive(Debug, Copy, Clone, PartialEq, Serialize, Deserialize)]
 pub struct UnitCardInstanceId(Id);

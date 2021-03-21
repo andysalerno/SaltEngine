@@ -1,6 +1,6 @@
 use super::{
     board::{BoardSlot, RowId},
-    GameState, PlayerId, UnitCardInstance, UnitCardInstanceId,
+    GameState, GameStatePlayerView, PlayerId, UnitCardInstance, UnitCardInstanceId,
 };
 
 pub trait AsSelector<'a> {
@@ -10,6 +10,12 @@ pub trait AsSelector<'a> {
 impl<'a> AsSelector<'a> for GameState {
     fn selector(&'a self) -> BoardSelector<'a> {
         self.into()
+    }
+}
+
+impl<'a> AsSelector<'a> for GameStatePlayerView {
+    fn selector(&'a self) -> BoardSelector<'a> {
+        todo!()
     }
 }
 

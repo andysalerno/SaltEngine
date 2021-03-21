@@ -10,6 +10,8 @@ mod really_big_rock;
 mod rickety_cannon;
 mod sleeping_dog;
 
+use std::borrow::Borrow;
+
 pub use attack_dog::AttackDog;
 pub use emotional_support_dog::EmotionalSupportDog;
 pub use fraidy_cat::FraidyCat;
@@ -123,31 +125,115 @@ pub trait UnitCardDefinition: CardDefinition {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize)]
-pub struct UnitCardDefinitionPlayerView {
-    title: String,
-    cost: i32,
-    text: String,
-    flavor_text: String,
-    attack: i32,
-    health: i32,
-    row_width: usize,
-    placeable_at: Position,
+pub trait UnitCardDefinitionView {
+    fn title(&self) -> &str;
+    fn cost(&self) -> i32;
+    fn text(&self) -> &str;
+    fn flavor_text(&self) -> &str;
+    fn attack(&self) -> i32;
+    fn health(&self) -> i32;
+    fn row_width(&self) -> usize;
+    fn placeable_at(&self) -> Position;
 }
 
-impl MakePlayerView for Box<dyn UnitCardDefinition> {
-    type TOut = UnitCardDefinitionPlayerView;
+// impl<T: Borrow<dyn UnitCardDefinition>> UnitCardDefinitionView for T {
+impl UnitCardDefinitionView for dyn UnitCardDefinition {
+    fn title(&self) -> &str {
+        self.title()
+    }
 
-    fn player_view(&self, _player_viewing: PlayerId) -> UnitCardDefinitionPlayerView {
-        UnitCardDefinitionPlayerView {
-            title: self.title().to_string(),
-            cost: self.cost(),
-            text: self.text().to_string(),
-            flavor_text: self.flavor_text().to_string(),
-            attack: self.attack(),
-            health: self.health(),
-            row_width: self.row_width(),
-            placeable_at: self.placeable_at(),
+    fn cost(&self) -> i32 {
+        self.cost()
+    }
+
+    fn text(&self) -> &str {
+        self.text()
+    }
+
+    fn flavor_text(&self) -> &str {
+        self.flavor_text()
+    }
+
+    fn attack(&self) -> i32 {
+        self.attack()
+    }
+
+    fn health(&self) -> i32 {
+        self.health()
+    }
+
+    fn row_width(&self) -> usize {
+        self.row_width()
+    }
+
+    fn placeable_at(&self) -> Position {
+        self.placeable_at()
+    }
+}
+
+pub mod player_view {
+    use super::*;
+
+    #[derive(Debug, Serialize, Deserialize)]
+    pub struct UnitCardDefinitionPlayerView {
+        title: String,
+        cost: i32,
+        text: String,
+        flavor_text: String,
+        attack: i32,
+        health: i32,
+        row_width: usize,
+        placeable_at: Position,
+    }
+
+    impl MakePlayerView for Box<dyn UnitCardDefinition> {
+        type TOut = UnitCardDefinitionPlayerView;
+
+        fn player_view(&self, _player_viewing: PlayerId) -> UnitCardDefinitionPlayerView {
+            UnitCardDefinitionPlayerView {
+                title: self.title().to_string(),
+                cost: self.cost(),
+                text: self.text().to_string(),
+                flavor_text: self.flavor_text().to_string(),
+                attack: self.attack(),
+                health: self.health(),
+                row_width: self.row_width(),
+                placeable_at: self.placeable_at(),
+            }
+        }
+    }
+
+    impl UnitCardDefinitionView for UnitCardDefinitionPlayerView {
+        fn title(&self) -> &str {
+            self.title.as_str()
+        }
+
+        fn cost(&self) -> i32 {
+            self.cost
+        }
+
+        fn text(&self) -> &str {
+            self.text.as_str()
+        }
+
+        fn flavor_text(&self) -> &str {
+            self.flavor_text.as_str()
+        }
+
+        fn attack(&self) -> i32 {
+            self.attack
+        }
+
+        fn health(&self) -> i32 {
+            self.health
+        }
+
+        fn row_width(&self) -> usize {
+            self.row_width
+        }
+
+        fn placeable_at(&self) -> Position {
+            self.placeable_at
         }
     }
 }

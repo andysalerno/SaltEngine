@@ -2,7 +2,7 @@ use super::game_agent::{GameAgent, Prompter};
 use crate::{
     console_display::ConsoleDisplay,
     game_runner::GameDisplay,
-    game_state::{board::RowId, AsSelector},
+    game_state::{board::RowId, AsSelector, GameStatePlayerView},
 };
 use crate::{game_logic::Event, game_state::board::BoardPos};
 use crate::{
@@ -11,7 +11,7 @@ use crate::{
 };
 use crate::{
     game_logic::{AttackEvent, EndTurnEvent},
-    game_state::{GameState, UnitCardInstance},
+    game_state::UnitCardInstance,
 };
 use std::{collections::VecDeque, io::stdin};
 use thiserror::Error;
@@ -35,7 +35,7 @@ impl ConsoleAgent {
 }
 
 impl GameAgent for ConsoleAgent {
-    fn get_action(&self, game_state: &GameState) -> GameEvent {
+    fn get_action(&self, game_state: &GameStatePlayerView) -> GameEvent {
         let prompter = ConsolePrompter::new(self.id());
         prompter.show_hand(game_state);
 
@@ -64,7 +64,7 @@ struct ConsolePrompter {
 }
 
 impl Prompter for ConsolePrompter {
-    fn prompt_slot(&self, game_state: &GameState) -> BoardPos {
+    fn prompt_slot(&self, game_state: &GameStatePlayerView) -> BoardPos {
         let mut empty_queue = VecDeque::new();
 
         say("Enter the letter of any board slot.");
@@ -77,7 +77,7 @@ impl Prompter for ConsolePrompter {
         }
     }
 
-    fn prompt_player_slot(&self, game_state: &GameState) -> BoardPos {
+    fn prompt_player_slot(&self, game_state: &GameStatePlayerView) -> BoardPos {
         let mut empty_queue = VecDeque::new();
 
         say("Enter the letter of a slot you control.");
@@ -90,7 +90,7 @@ impl Prompter for ConsolePrompter {
         }
     }
 
-    fn prompt_opponent_slot(&self, game_state: &GameState) -> BoardPos {
+    fn prompt_opponent_slot(&self, game_state: &GameStatePlayerView) -> BoardPos {
         let mut empty_queue = VecDeque::new();
 
         say("Enter the letter of a slot your opponent controls.");
@@ -103,7 +103,7 @@ impl Prompter for ConsolePrompter {
         }
     }
 
-    fn prompt_creature_pos(&self, game_state: &GameState) -> BoardPos {
+    fn prompt_creature_pos(&self, game_state: &GameStatePlayerView) -> BoardPos {
         let mut empty_queue = VecDeque::new();
 
         say("Enter the letter of any slot containing a creature.");
@@ -116,7 +116,7 @@ impl Prompter for ConsolePrompter {
         }
     }
 
-    fn prompt_player_creature_pos(&self, game_state: &GameState) -> BoardPos {
+    fn prompt_player_creature_pos(&self, game_state: &GameStatePlayerView) -> BoardPos {
         let mut empty_queue = VecDeque::new();
 
         if !game_state.player_has_any_creature(self.id()) {
@@ -154,7 +154,7 @@ impl Prompter for ConsolePrompter {
         friendly_creature_pos
     }
 
-    fn prompt_opponent_creature_pos(&self, game_state: &GameState) -> BoardPos {
+    fn prompt_opponent_creature_pos(&self, game_state: &GameStatePlayerView) -> BoardPos {
         let mut empty_queue = VecDeque::new();
 
         say("Enter the letter of a slot containing a creature your opponent controls.");
@@ -198,7 +198,7 @@ impl ConsolePrompter {
         self.id
     }
 
-    fn prompt(&self, game_state: &GameState) -> Result<GameEvent, ConsoleError> {
+    fn prompt(&self, game_state: &GameStatePlayerView) -> Result<GameEvent, ConsoleError> {
         let mut input_queue = VecDeque::new();
 
         let mut event = None;
@@ -237,7 +237,7 @@ impl ConsolePrompter {
 
     fn summon(
         &self,
-        game_state: &GameState,
+        game_state: &GameStatePlayerView,
         input_queue: &mut VecDeque<String>,
     ) -> Result<GameEvent, ConsoleError> {
         let player_id = game_state.cur_player_id();
@@ -275,7 +275,7 @@ impl ConsolePrompter {
 
     fn attack(
         &self,
-        game_state: &GameState,
+        game_state: &GameStatePlayerView,
         input_queue: &mut VecDeque<String>,
     ) -> Result<GameEvent, ConsoleError> {
         let attacker_pos = self.prompt_pos(game_state, input_queue)?;
@@ -323,21 +323,21 @@ impl ConsolePrompter {
             .map_err(|e| ConsoleError::UserInputError(format!("{:?}", e)))
     }
 
-    fn info(&self, game_state: &GameState, input_queue: &mut VecDeque<String>) {
+    fn info(&self, game_state: &GameStatePlayerView, input_queue: &mut VecDeque<String>) {
         let _selected = self.select(game_state, "Select for info.", input_queue);
     }
 
-    fn show_board(&self, game_state: &GameState) {
+    fn show_board(&self, game_state: &GameStatePlayerView) {
         ConsoleDisplay.display(game_state);
     }
 
-    fn show_hand(&self, game_state: &GameState) {
+    fn show_hand(&self, game_state: &GameStatePlayerView) {
         let mut result = String::new();
 
         let available_mana = game_state.player_mana(self.id());
 
         let mut all_cards = game_state
-            .hand(self.id())
+            .hand()
             .cards()
             .iter()
             .enumerate()
@@ -369,7 +369,7 @@ impl ConsolePrompter {
 
     fn select<'a>(
         &self,
-        game_state: &'a GameState,
+        game_state: &'a GameStatePlayerView,
         ask: &str,
         input_queue: &mut VecDeque<String>,
     ) -> Option<&'a UnitCardInstance> {
@@ -384,7 +384,7 @@ impl ConsolePrompter {
 
     fn prompt_pos(
         &self,
-        game_state: &GameState,
+        game_state: &GameStatePlayerView,
         input_queue: &mut VecDeque<String>,
     ) -> Result<BoardPos, ConsoleError> {
         let c = self.ask("Letter position: ", input_queue);
