@@ -10,7 +10,7 @@ pub trait GameStateView<'a> {
 
     // fn player_a_id(&self) -> PlayerId;
     // fn player_b_id(&self) -> PlayerId;
-    // fn cur_player_turn(&self) -> PlayerId;
+    fn cur_player_turn(&self) -> PlayerId;
 
     // fn player_a_hand(&self) -> &Self::HandView;
     // fn player_b_hand(&self) -> &Self::HandView;
@@ -28,6 +28,10 @@ impl<'a> GameStateView<'a> for GameState {
 
     fn board(&self) -> &Self::BoardView {
         self.board.as_ref()
+    }
+
+    fn cur_player_turn(&self) -> PlayerId {
+        self.cur_player_turn
     }
 }
 
@@ -395,6 +399,10 @@ pub mod player_view {
 
         fn board(&self) -> &Self::BoardView {
             &self.board
+        }
+
+        fn cur_player_turn(&self) -> PlayerId {
+            self.cur_player_turn
         }
     }
 }

@@ -20,12 +20,18 @@ impl<'a> AsSelector<'a, GameState> for GameState {
 
 impl<'a> AsSelector<'a, GameStatePlayerView> for GameStatePlayerView {
     fn selector(&'a self) -> BoardSelector<'a, GameStatePlayerView> {
-        todo!()
+        self.into()
     }
 }
 
 impl<'a> From<&'a GameState> for BoardSelector<'a, GameState> {
     fn from(game_state: &'a GameState) -> Self {
+        BoardSelector::new(game_state)
+    }
+}
+
+impl<'a> From<&'a GameStatePlayerView> for BoardSelector<'a, GameStatePlayerView> {
+    fn from(game_state: &'a GameStatePlayerView) -> Self {
         BoardSelector::new(game_state)
     }
 }
@@ -73,7 +79,6 @@ where
         self,
     ) -> impl Iterator<Item = &'a <<TState as GameStateView<'a>>::BoardView as BoardView<'a>>::SlotView>
     {
-        //pub fn slots(self) -> impl Iterator<Item = &'a <BoardSelector<'a, TState> as Trait>::TState> {
         let player_id_filter = self.player_id.clone();
         let with_creature = self.with_creature;
         let include_heroes = self.include_heroes;
