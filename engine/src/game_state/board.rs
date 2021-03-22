@@ -135,6 +135,10 @@ pub trait BoardView<'a> {
     fn player_a_id(&self) -> PlayerId;
     fn player_b_id(&self) -> PlayerId;
     fn slots(&self) -> &[Self::SlotView];
+
+    fn slots_iter(&self) -> std::slice::Iter<'_, <Self as BoardView<'a>>::SlotView> {
+        self.slots().iter()
+    }
 }
 
 impl<'a> BoardView<'a> for Board {
@@ -531,15 +535,15 @@ pub mod player_view {
         type SlotView = BoardSlotPlayerView;
 
         fn player_a_id(&self) -> PlayerId {
-            todo!()
+            self.player_a_id
         }
 
         fn player_b_id(&self) -> PlayerId {
-            todo!()
+            self.player_b_id
         }
 
         fn slots(&self) -> &[Self::SlotView] {
-            todo!()
+            self.slots.as_slice()
         }
     }
 }

@@ -4,11 +4,12 @@ use super::{
 };
 use serde::{Deserialize, Serialize};
 
-pub trait HandView<'a, TCard: UnitCardInstanceView<'a>> {
+pub trait HandView<'a> {
+    type TCard: UnitCardInstanceView<'a>;
     fn len(&self) -> usize;
-    fn cards(&self) -> &[TCard];
-    fn card(&self, id: UnitCardInstanceId) -> &TCard;
-    fn nth_card(&self, n: usize) -> &TCard;
+    fn cards(&self) -> &[Self::TCard];
+    fn card(&self, id: UnitCardInstanceId) -> &Self::TCard;
+    fn nth_card(&self, n: usize) -> &Self::TCard;
 }
 
 #[derive(Debug, Default)]
@@ -70,7 +71,9 @@ impl Hand {
     }
 }
 
-impl<'a> HandView<'a, UnitCardInstance> for Hand {
+impl<'a> HandView<'a> for Hand {
+    type TCard = UnitCardInstance;
+
     fn len(&self) -> usize {
         self.len()
     }
@@ -107,7 +110,9 @@ impl MakePlayerView for Hand {
     }
 }
 
-impl<'a> HandView<'a, UnitCardInstancePlayerView> for HandPlayerView {
+impl<'a> HandView<'a> for HandPlayerView {
+    type TCard = UnitCardInstancePlayerView;
+
     fn len(&self) -> usize {
         todo!()
     }

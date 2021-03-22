@@ -1,8 +1,35 @@
 use super::{
-    board::{Board, BoardPos, RowId},
+    board::{Board, BoardPos, BoardView, RowId},
     AsSelector, Deck, Hand, PlayerId, UnitCardInstance, UnitCardInstanceId,
 };
 use serde::{Deserialize, Serialize};
+
+pub trait GameStateView<'a> {
+    // type HandView: HandView<'a>;
+    type BoardView: BoardView<'a>;
+
+    // fn player_a_id(&self) -> PlayerId;
+    // fn player_b_id(&self) -> PlayerId;
+    // fn cur_player_turn(&self) -> PlayerId;
+
+    // fn player_a_hand(&self) -> &Self::HandView;
+    // fn player_b_hand(&self) -> &Self::HandView;
+
+    // fn player_a_mana(&self) -> u32;
+    // fn player_a_mana_limit(&self) -> u32;
+    // fn player_b_mana(&self) -> u32;
+    // fn player_b_mana_limit(&self) -> u32;
+
+    fn board(&self) -> &Self::BoardView;
+}
+
+impl<'a> GameStateView<'a> for GameState {
+    type BoardView = Board;
+
+    fn board(&self) -> &Self::BoardView {
+        self.board.as_ref()
+    }
+}
 
 pub struct GameState {
     player_b_id: PlayerId,
@@ -323,6 +350,51 @@ pub mod player_view {
 
         pub fn hand(&self) -> &HandPlayerView {
             &self.player_hand
+        }
+    }
+
+    impl<'a> GameStateView<'a> for GameStatePlayerView {
+        // type HandView = HandPlayerView;
+        type BoardView = BoardPlayerView;
+
+        // fn player_a_id(&self) -> PlayerId {
+        //     todo!()
+        // }
+
+        // fn player_b_id(&self) -> PlayerId {
+        //     todo!()
+        // }
+
+        // fn cur_player_turn(&self) -> PlayerId {
+        //     self.cur_player_turn
+        // }
+
+        // fn player_a_hand(&self) -> &Self::HandView {
+        //     todo!()
+        // }
+
+        // fn player_b_hand(&self) -> &Self::HandView {
+        //     todo!()
+        // }
+
+        // fn player_a_mana(&self) -> u32 {
+        //     todo!()
+        // }
+
+        // fn player_a_mana_limit(&self) -> u32 {
+        //     todo!()
+        // }
+
+        // fn player_b_mana(&self) -> u32 {
+        //     todo!()
+        // }
+
+        // fn player_b_mana_limit(&self) -> u32 {
+        //     todo!()
+        // }
+
+        fn board(&self) -> &Self::BoardView {
+            &self.board
         }
     }
 }
