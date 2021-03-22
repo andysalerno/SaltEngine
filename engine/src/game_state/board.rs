@@ -1,4 +1,7 @@
-use super::{card_instance::UnitCardInstance, PlayerId, UnitCardInstanceId};
+use super::{
+    card_instance::{UnitCardInstance, UnitCardInstanceView},
+    PlayerId, UnitCardInstanceId,
+};
 use serde::{Deserialize, Serialize};
 
 const BOARD_WIDTH: usize = 6;
@@ -7,6 +10,25 @@ const SLOTS_COUNT: usize = BOARD_WIDTH * 4;
 enum PlayerAB {
     PlayerA,
     PlayerB,
+}
+
+pub trait BoardSlotView<'a> {
+    type CardInstanceView: UnitCardInstanceView<'a>;
+
+    fn pos(&self) -> BoardPos;
+    fn maybe_creature(&self) -> Option<&Self::CardInstanceView>;
+}
+
+impl<'a> BoardSlotView<'a> for BoardSlot {
+    type CardInstanceView = UnitCardInstance;
+
+    fn pos(&self) -> BoardPos {
+        self.pos()
+    }
+
+    fn maybe_creature(&self) -> Option<&Self::CardInstanceView> {
+        self.maybe_creature()
+    }
 }
 
 #[derive(Debug)]
@@ -107,10 +129,28 @@ impl BoardPos {
     }
 }
 
-pub trait BoardView {
+pub trait BoardView<'a> {
+    type SlotView: BoardSlotView<'a>;
+
     fn player_a_id(&self) -> PlayerId;
     fn player_b_id(&self) -> PlayerId;
-    //fn slots(&self) ->
+    fn slots(&self) -> &[Self::SlotView];
+}
+
+impl<'a> BoardView<'a> for Board {
+    type SlotView = BoardSlot;
+
+    fn player_a_id(&self) -> PlayerId {
+        self.player_a_id
+    }
+
+    fn player_b_id(&self) -> PlayerId {
+        self.player_b_id
+    }
+
+    fn slots(&self) -> &[BoardSlot] {
+        self.slots.as_slice()
+    }
 }
 
 #[derive(Debug)]
@@ -472,6 +512,34 @@ pub mod player_view {
                     .map(|s| s.player_view(player_viewing))
                     .collect(),
             }
+        }
+    }
+
+    impl<'a> BoardSlotView<'a> for BoardSlotPlayerView {
+        type CardInstanceView = UnitCardInstancePlayerView;
+
+        fn pos(&self) -> BoardPos {
+            self.pos
+        }
+
+        fn maybe_creature(&self) -> Option<&Self::CardInstanceView> {
+            self.creature.as_ref()
+        }
+    }
+
+    impl<'a> BoardView<'a> for BoardPlayerView {
+        type SlotView = BoardSlotPlayerView;
+
+        fn player_a_id(&self) -> PlayerId {
+            todo!()
+        }
+
+        fn player_b_id(&self) -> PlayerId {
+            todo!()
+        }
+
+        fn slots(&self) -> &[Self::SlotView] {
+            todo!()
         }
     }
 }

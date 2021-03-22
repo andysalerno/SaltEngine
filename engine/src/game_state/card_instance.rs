@@ -1,5 +1,5 @@
 use super::{board::BoardPos, MakePlayerView, PlayerId};
-use crate::game_logic::{Buff, BuffView};
+use crate::game_logic::{Buff, BuffView, PassiveEffectView};
 use crate::id::Id;
 use crate::{
     cards::UnitCardDefinitionView,
@@ -13,29 +13,54 @@ use std::borrow::Borrow;
 
 pub trait UnitCardInstanceView<'a> {
     type DefinitionView: ?Sized + UnitCardDefinitionView;
-    type BuffView: Iterator<Item: BuffView>;
+    type Buffs: BuffView;
+    type PassiveEffect: PassiveEffectView;
 
     fn definition(&'a self) -> &'a Self::DefinitionView;
-    fn buffs(&'a self) -> &'a [&'a Self::BuffView];
-    // buffs: Vec<Box<dyn Buff>>,
-    // passive_effect: Option<PassiveEffectInstance>,
-    // id: UnitCardInstanceId,
-    // attack: i32,
-    // health: i32,
-    // width: usize,
-    // state: Option<InstanceState>,
+    fn buffs(&'a self) -> &'a Vec<Self::Buffs>;
+    fn passive_effect(&self) -> Option<&Self::PassiveEffect>;
+    fn id(&self) -> UnitCardInstanceId;
+    fn attack(&self) -> i32;
+    fn health(&self) -> i32;
+    fn width(&self) -> usize;
+    fn state(&self) -> Option<InstanceState>;
 }
 
 impl<'a> UnitCardInstanceView<'a> for UnitCardInstance {
     type DefinitionView = dyn UnitCardDefinition;
-    type BuffView = dyn Buff;
+    type Buffs = Box<dyn Buff>;
+    type PassiveEffect = PassiveEffectInstance;
 
     fn definition(&'a self) -> &'a (dyn UnitCardDefinition + 'static) {
         self.definition.as_ref()
     }
 
-    fn buffs(&'a self) -> &'a [&'a Self::BuffView] {
-        self.buffs.as_slice().as_ref()
+    fn buffs(&'a self) -> &'a Vec<Box<dyn Buff>> {
+        &self.buffs
+    }
+
+    fn passive_effect(&self) -> Option<&PassiveEffectInstance> {
+        self.passive_effect.as_ref()
+    }
+
+    fn id(&self) -> UnitCardInstanceId {
+        self.id()
+    }
+
+    fn attack(&self) -> i32 {
+        self.attack()
+    }
+
+    fn health(&self) -> i32 {
+        self.health()
+    }
+
+    fn width(&self) -> usize {
+        self.width()
+    }
+
+    fn state(&self) -> Option<InstanceState> {
+        self.state()
     }
 }
 
@@ -48,7 +73,7 @@ impl UnitCardInstanceId {
     }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub enum InstanceState {
     Pos(BoardPos),
     CreatureInstanceId(UnitCardInstanceId),
@@ -140,8 +165,8 @@ impl UnitCardInstance {
         self.id
     }
 
-    pub fn state(&self) -> Option<&InstanceState> {
-        self.state.as_ref()
+    pub fn state(&self) -> Option<InstanceState> {
+        self.state
     }
 
     pub fn set_state(&mut self, state: Option<InstanceState>) {
@@ -192,8 +217,38 @@ impl MakePlayerView for UnitCardInstance {
 
 impl<'a> UnitCardInstanceView<'a> for UnitCardInstancePlayerView {
     type DefinitionView = UnitCardDefinitionPlayerView;
+    type Buffs = BuffPlayerView;
+    type PassiveEffect = PassiveEffectInstancePlayerView;
 
     fn definition(&self) -> &Self::DefinitionView {
         &self.definition
+    }
+
+    fn buffs(&'a self) -> &'a Vec<Self::Buffs> {
+        &self.buffs
+    }
+
+    fn passive_effect(&self) -> Option<&Self::PassiveEffect> {
+        self.passive_effect.as_ref()
+    }
+
+    fn id(&self) -> UnitCardInstanceId {
+        self.id
+    }
+
+    fn attack(&self) -> i32 {
+        self.attack
+    }
+
+    fn health(&self) -> i32 {
+        self.health
+    }
+
+    fn width(&self) -> usize {
+        self.width
+    }
+
+    fn state(&self) -> Option<InstanceState> {
+        self.state
     }
 }

@@ -39,7 +39,7 @@ pub trait BuffView {
     fn is_from_passive(&self) -> bool;
 }
 
-impl BuffView for dyn Buff {
+impl BuffView for Box<dyn Buff> {
     fn attack_amount(&self) -> i32 {
         self.attack_amount()
     }
@@ -175,6 +175,32 @@ pub mod player_view {
                 definition_id: self.definition_id(),
                 is_from_passive: self.is_from_passive(),
             }
+        }
+    }
+
+    impl BuffView for BuffPlayerView {
+        fn attack_amount(&self) -> i32 {
+            self.attack_amount()
+        }
+
+        fn health_amount(&self) -> i32 {
+            todo!()
+        }
+
+        fn source_id(&self) -> BuffSourceId {
+            todo!()
+        }
+
+        fn instance_id(&self) -> BuffInstanceId {
+            todo!()
+        }
+
+        fn definition_id(&self) -> Id {
+            todo!()
+        }
+
+        fn is_from_passive(&self) -> bool {
+            todo!()
         }
     }
 }

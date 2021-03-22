@@ -32,6 +32,26 @@ impl PassiveEffectInstanceId {
     }
 }
 
+pub trait PassiveEffectView {
+    fn definition_id(&self) -> Id;
+    fn instance_id(&self) -> PassiveEffectInstanceId;
+    fn originator_id(&self) -> UnitCardInstanceId;
+}
+
+impl PassiveEffectView for PassiveEffectInstance {
+    fn definition_id(&self) -> Id {
+        self.definition.definition_id()
+    }
+
+    fn instance_id(&self) -> PassiveEffectInstanceId {
+        self.instance_id
+    }
+
+    fn originator_id(&self) -> UnitCardInstanceId {
+        self.originator_id
+    }
+}
+
 /// An instance of a passive effect in the game.
 /// Passive effects are continuously re-evaluated
 /// whenever the game state changes.
@@ -190,6 +210,20 @@ pub mod player_view {
                 instance_id: self.instance_id(),
                 originator_id: self.originator_id(),
             }
+        }
+    }
+
+    impl PassiveEffectView for PassiveEffectInstancePlayerView {
+        fn definition_id(&self) -> Id {
+            self.definition.definition_id
+        }
+
+        fn instance_id(&self) -> PassiveEffectInstanceId {
+            self.instance_id
+        }
+
+        fn originator_id(&self) -> UnitCardInstanceId {
+            self.originator_id
         }
     }
 }

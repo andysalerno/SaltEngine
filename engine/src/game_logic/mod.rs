@@ -13,6 +13,7 @@ pub use event_dispatch::EventDispatcher;
 pub use events::*;
 pub use passive_effect::{
     player_view::PassiveEffectInstancePlayerView, PassiveEffectDefinition, PassiveEffectInstance,
+    PassiveEffectView,
 };
 
 #[cfg(test)]
