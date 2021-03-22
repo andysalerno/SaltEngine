@@ -1,6 +1,7 @@
 use super::{
     board::{Board, BoardPos, BoardView, RowId},
-    AsSelector, Deck, Hand, PlayerId, UnitCardInstance, UnitCardInstanceId,
+    iter_helpers::{IterAddons, IteratorAny},
+    Deck, Hand, PlayerId, UnitCardInstance, UnitCardInstanceId,
 };
 use serde::{Deserialize, Serialize};
 
@@ -21,6 +22,13 @@ pub trait GameStateView<'a> {
     // fn player_b_mana_limit(&self) -> u32;
 
     fn board(&self) -> &Self::BoardView;
+
+    fn iter(
+        &'a self,
+    ) -> std::slice::Iter<'_, <<Self as GameStateView<'a>>::BoardView as BoardView<'a>>::SlotView>
+    {
+        self.board().slots_iter()
+    }
 }
 
 impl<'a> GameStateView<'a> for GameState {
@@ -238,16 +246,21 @@ impl GameState {
     }
 
     pub fn player_has_any_creature(&self, player_id: PlayerId) -> bool {
-        self.selector()
+        self.board()
+            .slots_iter()
             .for_player(player_id)
             .creatures()
-            .next()
-            .is_some()
+            .has_any()
     }
 
-    /// A Vector of the creatures on the board, controlled by player_id, that are able to attack.
-    pub fn active_attackers(&self, player_id: PlayerId) -> Vec<UnitCardInstanceId> {
-        self.selector().for_player(player_id).creature_ids()
+    pub fn active_attackers(
+        &self,
+        player_id: PlayerId,
+    ) -> impl Iterator<Item = UnitCardInstanceId> + '_ {
+        self.board()
+            .slots_iter()
+            .for_player(player_id)
+            .creature_ids()
     }
 
     pub fn evaluate_passives(&mut self) {

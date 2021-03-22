@@ -2,7 +2,11 @@ use super::game_agent::{GameAgent, Prompter};
 use crate::{
     console_display::ConsoleDisplay,
     game_runner::GameDisplay,
-    game_state::{board::RowId, AsSelector, GameStatePlayerView},
+    game_state::{
+        board::{BoardView, RowId},
+        iter_helpers::{IterAddons, IteratorAny},
+        GameStatePlayerView,
+    },
 };
 use crate::{game_logic::Event, game_state::board::BoardPos};
 use crate::{
@@ -119,7 +123,13 @@ impl Prompter for ConsolePrompter {
     fn prompt_player_creature_pos(&self, game_state: &GameStatePlayerView) -> BoardPos {
         let mut empty_queue = VecDeque::new();
 
-        if !game_state.player_has_any_creature(self.id()) {
+        if !game_state
+            .board()
+            .slots_iter()
+            .for_player(self.id())
+            .creatures()
+            .has_any()
+        {
             panic!("Can't prompt for a friendly creature if there is none.");
         }
 
