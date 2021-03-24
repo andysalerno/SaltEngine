@@ -6,11 +6,13 @@ mod hand;
 mod hero;
 mod selector;
 
-pub use card_instance::{InstanceState, UnitCardInstance, UnitCardInstanceId};
+pub use card_instance::{
+    InstanceState, UnitCardInstance, UnitCardInstanceId, UnitCardInstancePlayerView,
+};
 pub use deck::Deck;
-pub use game_state::{player_view::GameStatePlayerView, GameState};
+pub use game_state::{player_view::GameStatePlayerView, GameState, GameStateView};
 pub use hand::Hand;
-pub use selector::*;
+pub use selector::iter_helpers::{IterAddons, IteratorAny};
 use serde::{de::DeserializeOwned, Deserialize, Serialize};
 
 use crate::id::Id;

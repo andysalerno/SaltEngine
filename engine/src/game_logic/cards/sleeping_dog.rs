@@ -5,7 +5,10 @@ use crate::{
         buff::{Buff, BuffSourceId},
         BuffInstanceId,
     },
-    game_state::{board::RowId, UnitCardInstanceId},
+    game_state::{
+        board::{BoardView, RowId},
+        UnitCardInstanceId,
+    },
     id::Id,
 };
 

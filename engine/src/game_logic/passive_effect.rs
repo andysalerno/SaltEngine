@@ -1,6 +1,6 @@
 use super::Buff;
 use crate::{
-    game_state::{board::RowId, GameState, UnitCardInstanceId},
+    game_state::{board::BoardView, board::RowId, GameState, UnitCardInstanceId},
     id::Id,
 };
 use serde::{Deserialize, Serialize};

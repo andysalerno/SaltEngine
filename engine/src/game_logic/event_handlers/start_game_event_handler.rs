@@ -3,7 +3,7 @@ use crate::{
         event_handlers::EventHandler, DrawCardEvent, EventDispatcher, StartGameEvent,
         TurnStartEvent,
     },
-    game_state::GameState,
+    game_state::{GameState, GameStateView},
 };
 
 #[derive(Default)]

@@ -2,7 +2,7 @@ use crate::{
     game_logic::{
         event_handlers::EventHandler, events::EndTurnEvent, EventDispatcher, TurnStartEvent,
     },
-    game_state::GameState,
+    game_state::{GameState, GameStateView, IterAddons},
 };
 
 #[derive(Default)]
@@ -21,8 +21,8 @@ impl EventHandler for EndTurnEventHandler {
 
         // Trigger 'upon turn end' events
         game_state
-            .board()
-            .creatures_iter()
+            .iter()
+            .creatures()
             .map(|c| (c.id(), c.definition().upon_turn_end()))
             .collect::<Vec<_>>()
             .into_iter()

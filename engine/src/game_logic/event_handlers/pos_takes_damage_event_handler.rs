@@ -3,6 +3,7 @@ use crate::{
         event_handlers::EventHandler, CreatureTakesDamageEvent, EventDispatcher,
         PosTakesDamageEvent,
     },
+    game_state::board::BoardView,
     game_state::GameState,
 };
 

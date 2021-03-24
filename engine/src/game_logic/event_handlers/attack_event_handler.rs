@@ -1,5 +1,6 @@
 use crate::{
     game_logic::{event_handlers::EventHandler, events::*, EventDispatcher},
+    game_state::board::BoardView,
     game_state::GameState,
 };
 

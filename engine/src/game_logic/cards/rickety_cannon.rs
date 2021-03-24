@@ -2,8 +2,8 @@ use super::{CardDefinition, Position, UnitCardDefinition};
 use crate::{
     game_logic::{EventDispatcher, PosTakesDamageEvent},
     game_state::{
-        board::BoardPos, GameState, InstanceState, MakePlayerView, UnitCardInstance,
-        UnitCardInstanceId,
+        board::{BoardPos, BoardView},
+        GameState, InstanceState, MakePlayerView, UnitCardInstance, UnitCardInstanceId,
     },
     id::Id,
 };

@@ -1,6 +1,7 @@
 use super::{CardDefinition, Position, UnitCardDefinition};
 use crate::{
     game_logic::{CreatureHealedEvent, EventDispatcher},
+    game_state::board::BoardView,
     game_state::GameState,
 };
 use crate::{game_state::UnitCardInstanceId, id::Id};

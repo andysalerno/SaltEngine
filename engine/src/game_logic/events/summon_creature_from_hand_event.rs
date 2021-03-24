@@ -1,12 +1,11 @@
+use super::{Event, GameEvent};
 use crate::{
     game_logic::cards::Position,
     game_state::{
-        board::{BoardPos, RowId},
-        GameState, PlayerId, UnitCardInstanceId,
+        board::{BoardPos, BoardView, RowId},
+        GameStateView, PlayerId, UnitCardInstanceId,
     },
 };
-
-use super::{Event, GameEvent};
 
 #[derive(Debug)]
 pub struct SummonCreatureFromHandEvent {
@@ -38,7 +37,10 @@ impl SummonCreatureFromHandEvent {
 }
 
 impl Event for SummonCreatureFromHandEvent {
-    fn validate(&self, game_state: &GameState) -> super::Result {
+    fn validate<'a, G>(&self, game_state: &G) -> super::Result
+    where
+        G: GameStateView<'a>,
+    {
         validate_is_players_side(self, game_state)?;
         validate_slots_available(self, game_state)?;
         validate_respects_placeableat(self, game_state)?;
@@ -54,10 +56,13 @@ impl Into<GameEvent> for SummonCreatureFromHandEvent {
     }
 }
 
-fn validate_slots_available(
+fn validate_slots_available<'a, G>(
     event: &SummonCreatureFromHandEvent,
-    game_state: &GameState,
-) -> super::Result {
+    game_state: &G,
+) -> super::Result
+where
+    G: GameStateView<'a>,
+{
     let creature_width = game_state
         .hand(event.player_id())
         .card(event.hand_card_id())
@@ -92,10 +97,13 @@ fn validate_slots_available(
     return Ok(());
 }
 
-fn validate_is_players_side(
+fn validate_is_players_side<'a, G>(
     event: &SummonCreatureFromHandEvent,
-    _game_state: &GameState,
-) -> super::Result {
+    game_state: &G,
+) -> super::Result
+where
+    G: GameStateView<'a>,
+{
     let player_id = event.player_id();
     let requested_pos = event.board_pos();
 
@@ -110,10 +118,13 @@ fn validate_is_players_side(
     }
 }
 
-fn validate_player_has_enough_mana(
+fn validate_player_has_enough_mana<'a, G>(
     event: &SummonCreatureFromHandEvent,
-    game_state: &GameState,
-) -> super::Result {
+    game_state: &G,
+) -> super::Result
+where
+    G: GameStateView<'a>,
+{
     let card = game_state
         .hand(event.player_id())
         .card(event.hand_card_id());
@@ -131,9 +142,9 @@ fn validate_player_has_enough_mana(
     }
 }
 
-fn validate_respects_placeableat(
+fn validate_respects_placeableat<'a>(
     event: &SummonCreatureFromHandEvent,
-    game_state: &GameState,
+    game_state: &impl GameStateView<'a>,
 ) -> super::Result {
     let player_id = event.player_id();
     let card_id = event.hand_card_id();

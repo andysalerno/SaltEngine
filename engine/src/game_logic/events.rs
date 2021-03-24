@@ -30,12 +30,15 @@ pub use start_game_event::StartGameEvent;
 pub use summon_creature_from_hand_event::SummonCreatureFromHandEvent;
 pub use turn_start_event::TurnStartEvent;
 
-use crate::game_state::GameState;
+use crate::game_state::{GameState, GameStateView};
 
 pub type Result = std::result::Result<(), Box<dyn std::error::Error>>;
 
 pub trait Event: Into<GameEvent> {
-    fn validate(&self, _game_state: &GameState) -> Result {
+    fn validate<'a, G>(&self, _game_state: &G) -> Result
+    where
+        G: GameStateView<'a>,
+    {
         Ok(())
     }
 }

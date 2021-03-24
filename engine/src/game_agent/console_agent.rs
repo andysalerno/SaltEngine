@@ -1,21 +1,17 @@
 use super::game_agent::{GameAgent, Prompter};
+use crate::game_logic::{AttackEvent, EndTurnEvent};
 use crate::{
     console_display::ConsoleDisplay,
     game_runner::GameDisplay,
     game_state::{
         board::{BoardView, RowId},
-        iter_helpers::{IterAddons, IteratorAny},
-        GameStatePlayerView,
+        GameStatePlayerView, GameStateView, IterAddons, IteratorAny, UnitCardInstancePlayerView,
     },
 };
 use crate::{game_logic::Event, game_state::board::BoardPos};
 use crate::{
     game_logic::{cards::UnitCardDefinition, GameEvent, SummonCreatureFromHandEvent},
     game_state::PlayerId,
-};
-use crate::{
-    game_logic::{AttackEvent, EndTurnEvent},
-    game_state::UnitCardInstance,
 };
 use std::{collections::VecDeque, io::stdin};
 use thiserror::Error;
@@ -124,8 +120,7 @@ impl Prompter for ConsolePrompter {
         let mut empty_queue = VecDeque::new();
 
         if !game_state
-            .board()
-            .slots_iter()
+            .iter()
             .for_player(self.id())
             .creatures()
             .has_any()
@@ -250,7 +245,7 @@ impl ConsolePrompter {
         game_state: &GameStatePlayerView,
         input_queue: &mut VecDeque<String>,
     ) -> Result<GameEvent, ConsoleError> {
-        let player_id = game_state.cur_player_id();
+        let player_id = game_state.cur_player_turn();
 
         let selected_card_id = {
             self.show_hand(game_state);
@@ -291,10 +286,9 @@ impl ConsolePrompter {
         let attacker_pos = self.prompt_pos(game_state, input_queue)?;
 
         if !game_state
-            .selector()
+            .iter()
             .for_player(self.id())
             .with_creature()
-            .slots()
             .any(|s| s.pos() == attacker_pos)
         {
             return Err(ConsoleError::UserInputError(
@@ -305,8 +299,8 @@ impl ConsolePrompter {
         let target_pos = self.prompt_pos(game_state, input_queue)?;
 
         if !game_state
-            .selector()
-            .for_player(game_state.other_player(self.id()))
+            .iter()
+            .for_player(game_state.opponent_of(self.id()))
             .include_heroes()
             .with_creature()
             .slots()
@@ -382,7 +376,7 @@ impl ConsolePrompter {
         game_state: &'a GameStatePlayerView,
         ask: &str,
         input_queue: &mut VecDeque<String>,
-    ) -> Option<&'a UnitCardInstance> {
+    ) -> Option<&'a UnitCardInstancePlayerView> {
         say(ask);
         let pos = self.prompt_pos(game_state, input_queue).ok()?;
         let item_at = game_state.board().creature_at_pos(pos);

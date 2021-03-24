@@ -1,7 +1,7 @@
 use crate::{
     game_agent::game_agent::GameAgent,
     game_logic::{cards::*, EventDispatcher, StartGameEvent},
-    game_state::{Deck, GameState, MakePlayerView, UnitCardInstance},
+    game_state::{Deck, GameState, GameStateView, MakePlayerView, UnitCardInstance},
 };
 
 pub trait GameDisplay {

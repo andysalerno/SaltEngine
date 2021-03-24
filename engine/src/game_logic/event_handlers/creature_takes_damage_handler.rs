@@ -3,6 +3,7 @@ use crate::{
         event_handlers::EventHandler, CreatureDestroyedEvent, CreatureTakesDamageEvent,
         EventDispatcher,
     },
+    game_state::board::BoardView,
     game_state::GameState,
 };
 

@@ -69,8 +69,8 @@ mod tests {
         game_logic::cards::UnitCardDefinition,
         game_logic::*,
         game_logic::{cards::ReallyBigRock, CreatureSetEvent},
-        game_state::board::{BoardPos, RowId},
-        game_state::make_test_state,
+        game_state::board::{BoardPos, BoardView, RowId},
+        game_state::{make_test_state, GameStateView},
     };
 
     use super::EmotionalSupportDog;

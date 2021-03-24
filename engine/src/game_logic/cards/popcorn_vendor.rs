@@ -93,8 +93,8 @@ mod tests {
     use crate::game_logic::*;
     use crate::{
         game_logic::{cards::UnitCardDefinition, SummonCreatureFromHandEvent},
-        game_state::board::{BoardPos, RowId},
-        game_state::make_test_state,
+        game_state::board::{BoardPos, BoardView, RowId},
+        game_state::{make_test_state, GameStateView},
     };
 
     #[test]

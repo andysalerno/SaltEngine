@@ -2,7 +2,7 @@ use crate::{
     game_runner::GameDisplay,
     game_state::{
         board::{BoardSlot, RowId},
-        GameState,
+        GameState, GameStateView,
     },
 };
 

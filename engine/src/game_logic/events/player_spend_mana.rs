@@ -1,4 +1,4 @@
-use crate::game_state::PlayerId;
+use crate::game_state::{GameStateView, PlayerId};
 
 use super::{Event, GameEvent};
 
@@ -32,7 +32,10 @@ impl Into<GameEvent> for PlayerSpendManaEvent {
 }
 
 impl Event for PlayerSpendManaEvent {
-    fn validate(&self, game_state: &crate::game_state::GameState) -> super::Result {
+    fn validate<'a, G>(&self, game_state: &G) -> super::Result
+    where
+        G: GameStateView<'a>,
+    {
         let mana_count = game_state.player_mana(self.player_id());
 
         if mana_count >= self.mana_count() {

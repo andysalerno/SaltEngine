@@ -1,33 +1,61 @@
 use super::{
     board::{Board, BoardPos, BoardView, RowId},
-    iter_helpers::{IterAddons, IteratorAny},
-    Deck, Hand, PlayerId, UnitCardInstance, UnitCardInstanceId,
+    Deck, Hand, IterAddons, IteratorAny, PlayerId, UnitCardInstance, UnitCardInstanceId,
 };
 use serde::{Deserialize, Serialize};
+use std::slice::Iter;
 
 pub trait GameStateView<'a> {
     // type HandView: HandView<'a>;
     type BoardView: BoardView<'a>;
 
-    // fn player_a_id(&self) -> PlayerId;
-    // fn player_b_id(&self) -> PlayerId;
+    fn player_a_id(&self) -> PlayerId;
+    fn player_b_id(&self) -> PlayerId;
     fn cur_player_turn(&self) -> PlayerId;
 
     // fn player_a_hand(&self) -> &Self::HandView;
     // fn player_b_hand(&self) -> &Self::HandView;
 
-    // fn player_a_mana(&self) -> u32;
-    // fn player_a_mana_limit(&self) -> u32;
-    // fn player_b_mana(&self) -> u32;
-    // fn player_b_mana_limit(&self) -> u32;
+    fn player_a_mana(&self) -> u32;
+    fn player_a_mana_limit(&self) -> u32;
+    fn player_b_mana(&self) -> u32;
+    fn player_b_mana_limit(&self) -> u32;
 
     fn board(&self) -> &Self::BoardView;
 
-    fn iter(
-        &'a self,
-    ) -> std::slice::Iter<'_, <<Self as GameStateView<'a>>::BoardView as BoardView<'a>>::SlotView>
-    {
+    fn iter(&'a self) -> Iter<'_, <Self::BoardView as BoardView<'a>>::SlotView> {
         self.board().slots_iter()
+    }
+
+    fn opponent_of(&self, player_id: PlayerId) -> PlayerId {
+        match self.player_ab(player_id) {
+            PlayerAB::PlayerA => self.player_b_id(),
+            PlayerAB::PlayerB => self.player_a_id(),
+        }
+    }
+
+    fn player_ab(&self, player_id: PlayerId) -> PlayerAB {
+        if player_id == self.player_a_id() {
+            PlayerAB::PlayerA
+        } else if player_id == self.player_b_id() {
+            PlayerAB::PlayerB
+        } else {
+            panic!("Unknown player id: {:?}", player_id)
+        }
+    }
+
+    fn player_mana(&self, player_id: PlayerId) -> u32 {
+        match self.player_ab(player_id) {
+            PlayerAB::PlayerA => self.player_a_mana(),
+            PlayerAB::PlayerB => self.player_b_mana(),
+        }
+    }
+
+    fn player_mana_limit(&self, player_id: PlayerId) -> u32 {
+        match self.player_ab(player_id) {
+            PlayerAB::PlayerA => self.player_a_mana_limit(),
+            PlayerAB::PlayerB => self.player_b_mana_limit(),
+        }
     }
 }
 
@@ -40,6 +68,30 @@ impl<'a> GameStateView<'a> for GameState {
 
     fn cur_player_turn(&self) -> PlayerId {
         self.cur_player_turn
+    }
+
+    fn player_a_mana(&self) -> u32 {
+        self.player_a_mana
+    }
+
+    fn player_a_mana_limit(&self) -> u32 {
+        self.player_a_mana_limit
+    }
+
+    fn player_b_mana(&self) -> u32 {
+        self.player_b_mana
+    }
+
+    fn player_b_mana_limit(&self) -> u32 {
+        self.player_b_mana_limit
+    }
+
+    fn player_a_id(&self) -> PlayerId {
+        self.player_a_id
+    }
+
+    fn player_b_id(&self) -> PlayerId {
+        self.player_b_id
     }
 }
 
@@ -129,13 +181,13 @@ impl GameState {
         &mut self.board
     }
 
-    pub fn player_a_id(&self) -> PlayerId {
-        self.player_a_id
-    }
+    // pub fn player_a_id(&self) -> PlayerId {
+    //     self.player_a_id
+    // }
 
-    pub fn player_b_id(&self) -> PlayerId {
-        self.player_b_id
-    }
+    // pub fn player_b_id(&self) -> PlayerId {
+    //     self.player_b_id
+    // }
 
     /// Given the ID of a player, returns the ID of the other player.
     pub fn other_player(&self, player_id: PlayerId) -> PlayerId {
@@ -265,8 +317,8 @@ impl GameState {
 
     pub fn evaluate_passives(&mut self) {
         // clear out all passive buffs
-        self.board()
-            .creatures_iter()
+        self.iter()
+            .creatures()
             .flat_map(|i| {
                 let id = i.id();
 
@@ -284,8 +336,8 @@ impl GameState {
             });
 
         let effects = self
-            .board()
-            .creatures_iter()
+            .iter()
+            .creatures()
             .filter_map(|i| {
                 let passive_instance = i.passive_effect_instance();
                 passive_instance
@@ -298,16 +350,6 @@ impl GameState {
             .for_each(|(instance_id, originator_id, updater)| {
                 (updater)(instance_id, originator_id, self);
             });
-    }
-
-    fn player_ab(&self, player_id: PlayerId) -> PlayerAB {
-        if player_id == self.player_a_id() {
-            PlayerAB::PlayerA
-        } else if player_id == self.player_b_id() {
-            PlayerAB::PlayerB
-        } else {
-            panic!("Unknown player id: {:?}", player_id)
-        }
     }
 }
 
@@ -374,48 +416,36 @@ pub mod player_view {
         // type HandView = HandPlayerView;
         type BoardView = BoardPlayerView;
 
-        // fn player_a_id(&self) -> PlayerId {
-        //     todo!()
-        // }
-
-        // fn player_b_id(&self) -> PlayerId {
-        //     todo!()
-        // }
-
-        // fn cur_player_turn(&self) -> PlayerId {
-        //     self.cur_player_turn
-        // }
-
-        // fn player_a_hand(&self) -> &Self::HandView {
-        //     todo!()
-        // }
-
-        // fn player_b_hand(&self) -> &Self::HandView {
-        //     todo!()
-        // }
-
-        // fn player_a_mana(&self) -> u32 {
-        //     todo!()
-        // }
-
-        // fn player_a_mana_limit(&self) -> u32 {
-        //     todo!()
-        // }
-
-        // fn player_b_mana(&self) -> u32 {
-        //     todo!()
-        // }
-
-        // fn player_b_mana_limit(&self) -> u32 {
-        //     todo!()
-        // }
-
         fn board(&self) -> &Self::BoardView {
             &self.board
         }
 
         fn cur_player_turn(&self) -> PlayerId {
             self.cur_player_turn
+        }
+
+        fn player_a_id(&self) -> PlayerId {
+            self.player_id
+        }
+
+        fn player_b_id(&self) -> PlayerId {
+            self.opponent_id
+        }
+
+        fn player_a_mana(&self) -> u32 {
+            self.player_mana
+        }
+
+        fn player_a_mana_limit(&self) -> u32 {
+            self.player_mana_limit
+        }
+
+        fn player_b_mana(&self) -> u32 {
+            self.opponent_mana
+        }
+
+        fn player_b_mana_limit(&self) -> u32 {
+            self.opponent_mana_limit
         }
     }
 }
