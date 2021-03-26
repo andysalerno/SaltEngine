@@ -30,7 +30,7 @@ pub use start_game_event::StartGameEvent;
 pub use summon_creature_from_hand_event::SummonCreatureFromHandEvent;
 pub use turn_start_event::TurnStartEvent;
 
-use crate::game_state::{GameState, GameStateView};
+use crate::game_state::GameStateView;
 
 pub type Result = std::result::Result<(), Box<dyn std::error::Error>>;
 

@@ -1,5 +1,5 @@
 use super::{
-    board::{BoardSlotView, BoardView, RowId},
+    board::{BoardSlotView, RowId},
     card_instance::UnitCardInstanceView,
     game_state::GameStateView,
     PlayerId, UnitCardInstanceId,

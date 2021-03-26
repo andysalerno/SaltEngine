@@ -115,7 +115,7 @@ impl<'a> HandView<'a> for HandPlayerView {
         self.cards.as_slice()
     }
 
-    fn card(&self, id: UnitCardInstanceId) -> &UnitCardInstancePlayerView {
+    fn card(&self, _id: UnitCardInstanceId) -> &UnitCardInstancePlayerView {
         todo!()
     }
 }

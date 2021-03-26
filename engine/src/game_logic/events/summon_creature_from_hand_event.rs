@@ -97,7 +97,7 @@ fn validate_slots_available<'a>(
 
 fn validate_is_players_side<'a>(
     event: &SummonCreatureFromHandEvent,
-    game_state: &'a impl GameStateView<'a>,
+    _game_state: &'a impl GameStateView<'a>,
 ) -> super::Result {
     let player_id = event.player_id();
     let requested_pos = event.board_pos();
