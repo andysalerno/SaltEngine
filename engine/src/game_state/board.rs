@@ -129,8 +129,25 @@ impl BoardPos {
     }
 }
 
+fn player_ab<'a, B>(board: &B, player_id: PlayerId) -> PlayerAB
+where
+    B: BoardView<'a> + ?Sized,
+{
+    if player_id == board.player_a_id() {
+        PlayerAB::PlayerA
+    } else if player_id == board.player_b_id() {
+        PlayerAB::PlayerB
+    } else {
+        panic!("Player is was neither player A nor player B, and therefore is not valid")
+    }
+}
+
 pub trait BoardView<'a> {
     type SlotView: BoardSlotView<'a>;
+
+    fn player_a_id(&self) -> PlayerId;
+    fn player_b_id(&self) -> PlayerId;
+    fn slots(&self) -> &[Self::SlotView];
 
     /// True if there are 'n_slots' starting at 'pos' within one row.
     /// Does not consider whether the slots are occupied or not.
@@ -139,10 +156,6 @@ pub trait BoardView<'a> {
         let space_in_row = row.len() - pos.row_index;
         space_in_row >= n_slots
     }
-
-    fn player_a_id(&self) -> PlayerId;
-    fn player_b_id(&self) -> PlayerId;
-    fn slots(&self) -> &[Self::SlotView];
 
     fn slots_iter(&self) -> std::slice::Iter<'_, <Self as BoardView<'a>>::SlotView> {
         self.slots().iter()
@@ -195,27 +208,21 @@ pub trait BoardView<'a> {
 
     /// The range for the given player.
     fn player_range(&self, player_id: PlayerId) -> std::ops::Range<usize> {
-        match self.player_ab(player_id) {
+        match player_ab(self, player_id) {
             PlayerAB::PlayerB => front_half(0..SLOTS_COUNT),
             PlayerAB::PlayerA => end_half(0..SLOTS_COUNT),
         }
-    }
-
-    fn player_ab(&self, player_id: PlayerId) -> PlayerAB {
-        if player_id == self.player_a_id() {
-            PlayerAB::PlayerA
-        } else if player_id == self.player_b_id() {
-            PlayerAB::PlayerB
-        } else {
-            panic!("Unknown player id: {:?}", player_id)
-        }
+        // match self.player_ab(player_id) {
+        //     PlayerAB::PlayerB => front_half(0..SLOTS_COUNT),
+        //     PlayerAB::PlayerA => end_half(0..SLOTS_COUNT),
+        // }
     }
 
     /// The range for the given player's row.
     fn row_range(&self, player_id: PlayerId, row_id: RowId) -> std::ops::Range<usize> {
         // Hero row is a special case
         if row_id == RowId::Hero {
-            let player_offset = match self.player_ab(player_id) {
+            let player_offset = match player_ab(self, player_id) {
                 PlayerAB::PlayerA => 0,
                 PlayerAB::PlayerB => 2,
             };
@@ -228,7 +235,7 @@ pub trait BoardView<'a> {
 
         let player_range = self.player_range(player_id);
 
-        match self.player_ab(player_id) {
+        match player_ab(self, player_id) {
             PlayerAB::PlayerB => match row_id {
                 RowId::BackRow => front_half(player_range),
                 RowId::FrontRow => end_half(player_range),
@@ -244,6 +251,14 @@ pub trait BoardView<'a> {
 
     fn player_row(&self, player_id: PlayerId, row: RowId) -> &[<Self as BoardView<'a>>::SlotView] {
         &self.slots()[self.row_range(player_id, row)]
+    }
+
+    fn hero(
+        &'a self,
+        player_id: PlayerId,
+    ) -> &<<Self as BoardView<'a>>::SlotView as BoardSlotView<'a>>::CardInstanceView {
+        let pos = BoardPos::hero_pos(player_id);
+        self.creature_at_pos(pos).expect("must have a hero")
     }
 
     fn creature_at_pos(
@@ -298,7 +313,7 @@ impl Board {
     pub fn new(_size: usize, player_a_id: PlayerId, player_b_id: PlayerId) -> Self {
         let mut slots = Vec::with_capacity(SLOTS_COUNT + 4);
 
-        // playber b
+        // player b
         for i in 0..BOARD_WIDTH {
             let pos = BoardPos::new(player_b_id, RowId::BackRow, i);
             slots.push(BoardSlot::new(pos));
@@ -308,7 +323,7 @@ impl Board {
             slots.push(BoardSlot::new(pos));
         }
 
-        // playber a
+        // player a
         for i in 0..BOARD_WIDTH {
             let pos = BoardPos::new(player_a_id, RowId::FrontRow, i);
             slots.push(BoardSlot::new(pos));
@@ -334,6 +349,16 @@ impl Board {
             player_a_id,
             player_b_id,
             slots,
+        }
+    }
+
+    fn player_ab(&self, player_id: PlayerId) -> PlayerAB {
+        if player_id == self.player_a_id() {
+            PlayerAB::PlayerA
+        } else if player_id == self.player_b_id() {
+            PlayerAB::PlayerB
+        } else {
+            panic!("Unknown player id: {:?}", player_id)
         }
     }
 
@@ -452,8 +477,7 @@ impl Board {
     }
 
     pub fn hero(&self, player_id: PlayerId) -> &UnitCardInstance {
-        let pos = BoardPos::hero_pos(player_id);
-        self.creature_at_pos(pos).expect("must have a hero")
+        BoardView::hero(self, player_id)
     }
 
     pub fn set_creature_at_pos(&mut self, pos: BoardPos, card_instance: UnitCardInstance) {

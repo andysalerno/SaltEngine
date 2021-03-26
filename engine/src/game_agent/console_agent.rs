@@ -304,9 +304,7 @@ impl ConsolePrompter {
         if !game_state
             .iter()
             .for_player(game_state.opponent_id())
-            .include_heroes()
             .with_creature()
-            .slots()
             .any(|s| s.pos() == target_pos)
         {
             return Err(ConsoleError::UserInputError(

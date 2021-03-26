@@ -49,10 +49,7 @@ pub mod iter_helpers {
         type Item = UnitCardInstanceId;
 
         fn next(&mut self) -> Option<Self::Item> {
-            self.iter
-                .filter_map(|s| s.maybe_creature())
-                .map(|c| c.id())
-                .next()
+            self.iter.find_map(|s| s.maybe_creature()).map(|c| c.id())
         }
     }
 
@@ -72,7 +69,7 @@ pub mod iter_helpers {
         type Item = &'a <S as BoardSlotView<'a>>::CardInstanceView;
 
         fn next(&mut self) -> Option<Self::Item> {
-            self.iter.filter_map(|s| s.maybe_creature()).next()
+            self.iter.find_map(|s| s.maybe_creature())
         }
     }
 
@@ -113,7 +110,28 @@ pub mod iter_helpers {
         type Item = I::Item;
 
         fn next(&mut self) -> Option<Self::Item> {
-            self.iter.find(|s| s.pos().player_id == self.player_id)
+            let id = self.player_id;
+            self.iter.find(|s| s.pos().player_id == id)
+        }
+    }
+
+    pub struct ExcludeHeroesFilter<'a, I, S: 'a>
+    where
+        I: Iterator<Item = &'a S>,
+        S: BoardSlotView<'a>,
+    {
+        iter: I,
+    }
+
+    impl<'a, I, S: 'a> Iterator for ExcludeHeroesFilter<'a, I, S>
+    where
+        I: Iterator<Item = &'a S>,
+        S: BoardSlotView<'a>,
+    {
+        type Item = I::Item;
+
+        fn next(&mut self) -> Option<Self::Item> {
+            self.iter.find(|s| s.pos().row() != RowId::Hero)
         }
     }
 
@@ -126,6 +144,7 @@ pub mod iter_helpers {
         fn with_creature(self) -> SlotCreatureFilter<'a, I, S>;
         fn creatures(self) -> SlotCreatureMap<'a, I, S>;
         fn creature_ids(self) -> SlotCreatureIdMap<'a, I, S>;
+        fn exclude_heroes(self) -> ExcludeHeroesFilter<'a, I, S>;
     }
 
     impl<'a, I, S: 'a> IterAddons<'a, I, S> for I
@@ -151,14 +170,18 @@ pub mod iter_helpers {
         fn creature_ids(self) -> SlotCreatureIdMap<'a, I, S> {
             SlotCreatureIdMap { iter: self }
         }
+
+        fn exclude_heroes(self) -> ExcludeHeroesFilter<'a, I, S> {
+            ExcludeHeroesFilter { iter: self }
+        }
     }
 
     pub trait IteratorAny {
-        fn has_any(&self) -> bool;
+        fn has_any(self) -> bool;
     }
 
     impl<T: IntoIterator> IteratorAny for T {
-        fn has_any(&self) -> bool {
+        fn has_any(self) -> bool {
             self.into_iter().next().is_some()
         }
     }

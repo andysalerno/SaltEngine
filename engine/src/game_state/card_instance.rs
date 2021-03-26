@@ -189,6 +189,34 @@ impl UnitCardInstancePlayerView {
     pub fn id(&self) -> UnitCardInstanceId {
         self.id
     }
+
+    pub fn definition(&self) -> &UnitCardDefinitionPlayerView {
+        &self.definition
+    }
+
+    pub fn buffs(&self) -> &Vec<BuffPlayerView> {
+        &self.buffs
+    }
+
+    pub fn passive_effect(&self) -> Option<&PassiveEffectInstancePlayerView> {
+        self.passive_effect.as_ref()
+    }
+
+    pub fn attack(&self) -> i32 {
+        self.attack
+    }
+
+    pub fn health(&self) -> i32 {
+        self.health
+    }
+
+    pub fn width(&self) -> usize {
+        self.width
+    }
+
+    pub fn state(&self) -> Option<InstanceState> {
+        self.state
+    }
 }
 
 impl MakePlayerView for UnitCardInstance {
@@ -226,15 +254,15 @@ impl<'a> UnitCardInstanceView<'a> for UnitCardInstancePlayerView {
     type PassiveEffect = PassiveEffectInstancePlayerView;
 
     fn definition(&self) -> &UnitCardDefinitionPlayerView {
-        &self.definition
+        UnitCardInstancePlayerView::definition(self)
     }
 
     fn buffs(&'a self) -> &'a Vec<Self::Buffs> {
-        &self.buffs
+        UnitCardInstancePlayerView::buffs(self)
     }
 
     fn passive_effect(&self) -> Option<&Self::PassiveEffect> {
-        self.passive_effect.as_ref()
+        UnitCardInstancePlayerView::passive_effect(self)
     }
 
     fn id(&self) -> UnitCardInstanceId {
@@ -242,18 +270,18 @@ impl<'a> UnitCardInstanceView<'a> for UnitCardInstancePlayerView {
     }
 
     fn attack(&self) -> i32 {
-        self.attack
+        UnitCardInstancePlayerView::attack(self)
     }
 
     fn health(&self) -> i32 {
-        self.health
+        UnitCardInstancePlayerView::health(self)
     }
 
     fn width(&self) -> usize {
-        self.width
+        UnitCardInstancePlayerView::width(self)
     }
 
     fn state(&self) -> Option<InstanceState> {
-        self.state
+        UnitCardInstancePlayerView::state(self)
     }
 }
