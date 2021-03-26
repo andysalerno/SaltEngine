@@ -1,13 +1,12 @@
 use super::{board::BoardPos, MakePlayerView, PlayerId};
+use crate::game_logic::{
+    cards::{
+        player_view::UnitCardDefinitionPlayerView, UnitCardDefinition, UnitCardDefinitionView,
+    },
+    BuffInstanceId, BuffPlayerView, PassiveEffectInstance, PassiveEffectInstancePlayerView,
+};
 use crate::game_logic::{Buff, BuffView, PassiveEffectView};
 use crate::id::Id;
-use crate::{
-    cards::UnitCardDefinitionView,
-    game_logic::{
-        cards::{player_view::UnitCardDefinitionPlayerView, UnitCardDefinition},
-        BuffInstanceId, BuffPlayerView, PassiveEffectInstance, PassiveEffectInstancePlayerView,
-    },
-};
 use serde::{Deserialize, Serialize};
 use std::borrow::Borrow;
 
@@ -186,6 +185,12 @@ pub struct UnitCardInstancePlayerView {
     state: Option<InstanceState>,
 }
 
+impl UnitCardInstancePlayerView {
+    pub fn id(&self) -> UnitCardInstanceId {
+        self.id
+    }
+}
+
 impl MakePlayerView for UnitCardInstance {
     type TOut = UnitCardInstancePlayerView;
 
@@ -220,7 +225,7 @@ impl<'a> UnitCardInstanceView<'a> for UnitCardInstancePlayerView {
     type Buffs = BuffPlayerView;
     type PassiveEffect = PassiveEffectInstancePlayerView;
 
-    fn definition(&self) -> &Self::DefinitionView {
+    fn definition(&self) -> &UnitCardDefinitionPlayerView {
         &self.definition
     }
 
@@ -233,7 +238,7 @@ impl<'a> UnitCardInstanceView<'a> for UnitCardInstancePlayerView {
     }
 
     fn id(&self) -> UnitCardInstanceId {
-        self.id
+        UnitCardInstancePlayerView::id(self)
     }
 
     fn attack(&self) -> i32 {

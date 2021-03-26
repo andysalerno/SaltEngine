@@ -1,44 +1,44 @@
 use crate::{
     game_runner::GameDisplay,
     game_state::{
-        board::{BoardSlot, RowId},
-        GameState, GameStateView,
+        board::{player_view::BoardSlotPlayerView, BoardSlot, BoardView, RowId},
+        GameState, GameStatePlayerView, GameStateView,
     },
 };
 
 pub struct ConsoleDisplay;
 
 impl GameDisplay for ConsoleDisplay {
-    fn display(&mut self, game_state: &GameState) {
+    fn display(&mut self, game_state: &GameStatePlayerView) {
         let s = to_string(game_state);
 
         println!("{}", s);
     }
 }
 
-fn to_string(game_state: &GameState) -> String {
+fn to_string(game_state: &GameStatePlayerView) -> String {
     let mut result = String::new();
 
     result.push_str(&row_to_string(
         game_state
             .board()
-            .player_row(game_state.player_b_id(), RowId::BackRow),
+            .player_row(game_state.opponent_id(), RowId::BackRow),
         0,
         false,
     ));
-    let player_b_health = game_state.board().hero(game_state.player_b_id()).health();
+    let player_b_health = game_state.board().hero(game_state.opponent_id()).health();
     result.push_str(&format!("    (Y) Health: {}", player_b_health));
 
     result.push('\n');
     result.push_str(&row_to_string(
         game_state
             .board()
-            .player_row(game_state.player_b_id(), RowId::FrontRow),
+            .player_row(game_state.opponent_id(), RowId::FrontRow),
         6,
         true,
     ));
 
-    if game_state.cur_player_id() == game_state.player_b_id() {
+    if game_state.cur_player_turn() == game_state.opponent_id() {
         result.push_str("    <--- Player turn");
     }
 
@@ -47,33 +47,33 @@ fn to_string(game_state: &GameState) -> String {
     result.push_str(&row_to_string(
         game_state
             .board()
-            .player_row(game_state.player_a_id(), RowId::FrontRow),
+            .player_row(game_state.player_id(), RowId::FrontRow),
         12,
         false,
     ));
-    let player_a_health = game_state.board().hero(game_state.player_a_id()).health();
+    let player_a_health = game_state.board().hero(game_state.player_id()).health();
     result.push_str(&format!("    (Z) Health: {}", player_a_health));
 
     result.push('\n');
     result.push_str(&row_to_string(
         game_state
             .board()
-            .player_row(game_state.player_a_id(), RowId::BackRow),
+            .player_row(game_state.player_id(), RowId::BackRow),
         18,
         true,
     ));
-    if game_state.cur_player_id() == game_state.player_a_id() {
+    if game_state.cur_player_turn() == game_state.player_id() {
         result.push_str("    <--- Player turn");
     }
     result.push('\n');
 
-    let mana = game_state.player_mana(game_state.cur_player_id());
+    let mana = game_state.player_mana(game_state.cur_player_turn());
     result.push_str(&format!("Available mana: {}", mana));
 
     result
 }
 
-fn row_to_string(row: &[BoardSlot], start_index: usize, index_after: bool) -> String {
+fn row_to_string(row: &[BoardSlotPlayerView], start_index: usize, index_after: bool) -> String {
     let mut result = String::new();
 
     if !index_after {

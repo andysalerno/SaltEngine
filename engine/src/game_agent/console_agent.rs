@@ -1,4 +1,5 @@
 use super::game_agent::{GameAgent, Prompter};
+use crate::game_logic::cards::player_view::UnitCardDefinitionPlayerView;
 use crate::game_logic::{AttackEvent, EndTurnEvent};
 use crate::{
     console_display::ConsoleDisplay,
@@ -6,11 +7,13 @@ use crate::{
     game_state::{
         board::{BoardView, RowId},
         GameStatePlayerView, GameStateView, IterAddons, IteratorAny, UnitCardInstancePlayerView,
+        UnitCardInstanceView,
     },
 };
 use crate::{game_logic::Event, game_state::board::BoardPos};
 use crate::{
-    game_logic::{cards::UnitCardDefinition, GameEvent, SummonCreatureFromHandEvent},
+    game_logic::{cards::UnitCardDefinitionView, GameEvent, SummonCreatureFromHandEvent},
+    game_state::HandView,
     game_state::PlayerId,
 };
 use std::{collections::VecDeque, io::stdin};
@@ -250,20 +253,20 @@ impl ConsolePrompter {
         let selected_card_id = {
             self.show_hand(game_state);
 
-            let hand_size = game_state.hand(player_id).len();
+            let hand_size = game_state.hand().len();
 
             let card_index: usize = self
                 .ask(&format!("which card? (0..={})", hand_size - 1), input_queue)
                 .parse()
                 .map_err(|_| ConsoleError::UserInputError("Not a valid input.".to_owned()))?;
 
-            if card_index > game_state.hand(player_id).len() {
+            if card_index > game_state.hand().len() {
                 return Err(ConsoleError::UserInputError(
                     "That index is out of range.".into(),
                 ));
             }
 
-            let selected_card = game_state.hand(player_id).nth(card_index);
+            let selected_card = game_state.hand().nth(card_index);
 
             selected_card.id()
         };
@@ -300,7 +303,7 @@ impl ConsolePrompter {
 
         if !game_state
             .iter()
-            .for_player(game_state.opponent_of(self.id()))
+            .for_player(game_state.opponent_id())
             .include_heroes()
             .with_creature()
             .slots()
@@ -398,10 +401,10 @@ impl ConsolePrompter {
 
         // special case for Y/Z as hero pos
         if input_c == 'Y' {
-            let player_id = game_state.player_b_id();
+            let player_id = game_state.player_id();
             return Ok(BoardPos::hero_pos(player_id));
-        } else if input_c == 'X' {
-            let player_id = game_state.player_a_id();
+        } else if input_c == 'Z' {
+            let player_id = game_state.opponent_id();
             return Ok(BoardPos::hero_pos(player_id));
         }
 
@@ -413,14 +416,14 @@ impl ConsolePrompter {
         let board_pos = if let Some((index, _)) =
             enemy_back_chars.enumerate().find(|&(_, c)| c == input_c)
         {
-            BoardPos::new(game_state.player_b_id(), RowId::BackRow, index)
+            BoardPos::new(game_state.opponent_id(), RowId::BackRow, index)
         } else if let Some((index, _)) = enemy_front_chars.enumerate().find(|&(_, c)| c == input_c)
         {
-            BoardPos::new(game_state.player_b_id(), RowId::FrontRow, index)
+            BoardPos::new(game_state.opponent_id(), RowId::FrontRow, index)
         } else if let Some((index, _)) = my_front_chars.enumerate().find(|&(_, c)| c == input_c) {
-            BoardPos::new(game_state.player_a_id(), RowId::FrontRow, index)
+            BoardPos::new(game_state.player_id(), RowId::FrontRow, index)
         } else if let Some((index, _)) = my_back_chars.enumerate().find(|&(_, c)| c == input_c) {
-            BoardPos::new(game_state.player_a_id(), RowId::BackRow, index)
+            BoardPos::new(game_state.player_id(), RowId::BackRow, index)
         } else {
             return Err(ConsoleError::UserInputError(
                 format!("The input char {} did not match any position", input_c).into(),
@@ -454,7 +457,8 @@ fn say(message: impl AsRef<str>) {
     println!("{}", message.as_ref());
 }
 
-fn display_card(card: &dyn UnitCardDefinition, playable: bool, tag: usize) -> String {
+// fn display_card(card: &dyn UnitCardDefinition, playable: bool, tag: usize) -> String {
+fn display_card(card: &UnitCardDefinitionPlayerView, playable: bool, tag: usize) -> String {
     let text_lines = card.text().lines().collect::<Vec<_>>();
 
     const WIDTH: usize = 26;

@@ -1,9 +1,10 @@
 use super::{Event, GameEvent};
 use crate::{
+    cards::UnitCardDefinitionView,
     game_logic::cards::Position,
     game_state::{
         board::{BoardPos, BoardView, RowId},
-        GameStateView, PlayerId, UnitCardInstanceId,
+        GameStateView, HandView, PlayerId, UnitCardInstanceId, UnitCardInstanceView,
     },
 };
 
@@ -37,7 +38,7 @@ impl SummonCreatureFromHandEvent {
 }
 
 impl Event for SummonCreatureFromHandEvent {
-    fn validate<'a, G>(&self, game_state: &G) -> super::Result
+    fn validate<'a, G>(&self, game_state: &'a G) -> super::Result
     where
         G: GameStateView<'a>,
     {
@@ -56,13 +57,10 @@ impl Into<GameEvent> for SummonCreatureFromHandEvent {
     }
 }
 
-fn validate_slots_available<'a, G>(
+fn validate_slots_available<'a>(
     event: &SummonCreatureFromHandEvent,
-    game_state: &G,
-) -> super::Result
-where
-    G: GameStateView<'a>,
-{
+    game_state: &'a impl GameStateView<'a>,
+) -> super::Result {
     let creature_width = game_state
         .hand(event.player_id())
         .card(event.hand_card_id())
@@ -72,7 +70,7 @@ where
 
     if !game_state
         .board()
-        .check_slots_row_boundary(requested_pos, creature_width)
+        .is_range_in_row(requested_pos, creature_width)
     {
         return Err(format!(
             "Creature has width {} and cannot be summoned at {:?}",
@@ -97,13 +95,10 @@ where
     return Ok(());
 }
 
-fn validate_is_players_side<'a, G>(
+fn validate_is_players_side<'a>(
     event: &SummonCreatureFromHandEvent,
-    game_state: &G,
-) -> super::Result
-where
-    G: GameStateView<'a>,
-{
+    game_state: &'a impl GameStateView<'a>,
+) -> super::Result {
     let player_id = event.player_id();
     let requested_pos = event.board_pos();
 
@@ -120,7 +115,7 @@ where
 
 fn validate_player_has_enough_mana<'a, G>(
     event: &SummonCreatureFromHandEvent,
-    game_state: &G,
+    game_state: &'a G,
 ) -> super::Result
 where
     G: GameStateView<'a>,
@@ -144,7 +139,7 @@ where
 
 fn validate_respects_placeableat<'a>(
     event: &SummonCreatureFromHandEvent,
-    game_state: &impl GameStateView<'a>,
+    game_state: &'a impl GameStateView<'a>,
 ) -> super::Result {
     let player_id = event.player_id();
     let card_id = event.hand_card_id();

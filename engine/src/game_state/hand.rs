@@ -6,10 +6,30 @@ use serde::{Deserialize, Serialize};
 
 pub trait HandView<'a> {
     type TCard: UnitCardInstanceView<'a>;
-    fn len(&self) -> usize;
+
     fn cards(&self) -> &[Self::TCard];
-    fn card(&self, id: UnitCardInstanceId) -> &Self::TCard;
-    fn nth_card(&self, n: usize) -> &Self::TCard;
+
+    fn card(&self, id: UnitCardInstanceId) -> &Self::TCard {
+        self.cards()
+            .iter()
+            .filter(|c| c.id() == id)
+            .next()
+            .expect(&format!(
+                "Attempted to find card with id {:?} in hand, but no such card was found.",
+                id
+            ))
+    }
+
+    fn nth(&self, n: usize) -> &Self::TCard {
+        self.cards()
+            .iter()
+            .nth(n)
+            .expect(&format!("No card at index {}", n))
+    }
+
+    fn len(&self) -> usize {
+        self.cards().len()
+    }
 }
 
 #[derive(Debug, Default)]
@@ -35,21 +55,7 @@ impl Hand {
     }
 
     pub fn card(&self, id: UnitCardInstanceId) -> &UnitCardInstance {
-        self.cards
-            .iter()
-            .filter(|c| c.id() == id)
-            .next()
-            .expect(&format!(
-                "Attempted to find card with id {:?} in hand, but no such card was found.",
-                id
-            ))
-    }
-
-    pub fn nth(&self, n: usize) -> &UnitCardInstance {
-        self.cards()
-            .iter()
-            .nth(n)
-            .expect(&format!("No card at index {}", n))
+        HandView::card(self, id)
     }
 
     pub fn take_card(&mut self, id: UnitCardInstanceId) -> UnitCardInstance {
@@ -74,20 +80,12 @@ impl Hand {
 impl<'a> HandView<'a> for Hand {
     type TCard = UnitCardInstance;
 
-    fn len(&self) -> usize {
-        self.len()
-    }
-
     fn cards(&self) -> &[UnitCardInstance] {
-        self.cards()
+        Hand::cards(self)
     }
 
     fn card(&self, id: UnitCardInstanceId) -> &UnitCardInstance {
-        self.card(id)
-    }
-
-    fn nth_card(&self, n: usize) -> &UnitCardInstance {
-        self.nth(n)
+        Hand::card(self, id)
     }
 }
 
@@ -113,19 +111,11 @@ impl MakePlayerView for Hand {
 impl<'a> HandView<'a> for HandPlayerView {
     type TCard = UnitCardInstancePlayerView;
 
-    fn len(&self) -> usize {
-        todo!()
-    }
-
     fn cards(&self) -> &[UnitCardInstancePlayerView] {
-        todo!()
+        self.cards.as_slice()
     }
 
     fn card(&self, id: UnitCardInstanceId) -> &UnitCardInstancePlayerView {
-        todo!()
-    }
-
-    fn nth_card(&self, n: usize) -> &UnitCardInstancePlayerView {
         todo!()
     }
 }

@@ -1,7 +1,7 @@
 use crate::game_logic::events::Event;
 use crate::{
     game_logic::{event_handlers::EventHandler, EventDispatcher, PlayerSpendManaEvent},
-    game_state::GameState,
+    game_state::{GameState, GameStateView},
 };
 
 #[derive(Default)]

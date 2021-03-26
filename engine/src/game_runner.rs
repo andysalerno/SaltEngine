@@ -1,11 +1,13 @@
 use crate::{
     game_agent::game_agent::GameAgent,
     game_logic::{cards::*, EventDispatcher, StartGameEvent},
-    game_state::{Deck, GameState, GameStateView, MakePlayerView, UnitCardInstance},
+    game_state::{
+        Deck, GameState, GameStatePlayerView, GameStateView, MakePlayerView, UnitCardInstance,
+    },
 };
 
 pub trait GameDisplay {
-    fn display(&mut self, game_state: &GameState);
+    fn display(&mut self, game_state: &GameStatePlayerView);
 }
 
 pub struct GameRunner {
@@ -109,7 +111,8 @@ impl GameRunner {
                 self.game_state.player_mana(cur_player_id)
             );
 
-            self.display.display(&mut self.game_state);
+            self.display
+                .display(&self.game_state.player_view(cur_player_id));
 
             let cur_player = self.cur_player();
             let action = cur_player.get_action(&self.game_state.player_view(cur_player.id()));

@@ -35,7 +35,7 @@ use crate::game_state::{GameState, GameStateView};
 pub type Result = std::result::Result<(), Box<dyn std::error::Error>>;
 
 pub trait Event: Into<GameEvent> {
-    fn validate<'a, G>(&self, _game_state: &G) -> Result
+    fn validate<'a, G>(&self, _game_state: &'a G) -> Result
     where
         G: GameStateView<'a>,
     {

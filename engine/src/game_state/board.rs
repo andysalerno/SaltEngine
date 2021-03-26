@@ -132,6 +132,14 @@ impl BoardPos {
 pub trait BoardView<'a> {
     type SlotView: BoardSlotView<'a>;
 
+    /// True if there are 'n_slots' starting at 'pos' within one row.
+    /// Does not consider whether the slots are occupied or not.
+    fn is_range_in_row(&self, pos: BoardPos, n_slots: usize) -> bool {
+        let row = self.player_row(pos.player_id, pos.row());
+        let space_in_row = row.len() - pos.row_index;
+        space_in_row >= n_slots
+    }
+
     fn player_a_id(&self) -> PlayerId;
     fn player_b_id(&self) -> PlayerId;
     fn slots(&self) -> &[Self::SlotView];
@@ -383,14 +391,6 @@ impl Board {
     //     }
     // }
 
-    /// True if there are 'n_slots' starting at 'pos' within one row.
-    /// Does not consider whether the slots are occupied or not.
-    pub fn check_slots_row_boundary(&self, pos: BoardPos, n_slots: usize) -> bool {
-        let row = self.player_row(pos.player_id, pos.row());
-        let space_in_row = row.len() - pos.row_index;
-        space_in_row >= n_slots
-    }
-
     /// An iterator over all slots on the entire board (even empty ones).
     // pub fn slots_iter(&self) -> impl Iterator<Item = &BoardSlot> {
     //     self.slots.iter()
@@ -568,6 +568,16 @@ pub mod player_view {
         creature: Option<UnitCardInstancePlayerView>,
     }
 
+    impl BoardSlotPlayerView {
+        pub fn pos(&self) -> BoardPos {
+            self.pos
+        }
+
+        pub fn maybe_creature(&self) -> Option<&UnitCardInstancePlayerView> {
+            self.creature.as_ref()
+        }
+    }
+
     impl MakePlayerView for BoardSlot {
         type TOut = BoardSlotPlayerView;
 
@@ -609,11 +619,11 @@ pub mod player_view {
         type CardInstanceView = UnitCardInstancePlayerView;
 
         fn pos(&self) -> BoardPos {
-            self.pos
+            BoardSlotPlayerView::pos(self)
         }
 
         fn maybe_creature(&self) -> Option<&Self::CardInstanceView> {
-            self.creature.as_ref()
+            BoardSlotPlayerView::maybe_creature(self)
         }
     }
 

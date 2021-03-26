@@ -1,97 +1,59 @@
 use super::{
     board::{Board, BoardPos, BoardView, RowId},
+    hand::HandView,
     Deck, Hand, IterAddons, IteratorAny, PlayerId, UnitCardInstance, UnitCardInstanceId,
 };
 use serde::{Deserialize, Serialize};
 use std::slice::Iter;
 
 pub trait GameStateView<'a> {
-    // type HandView: HandView<'a>;
+    type HandView: HandView<'a>;
     type BoardView: BoardView<'a>;
 
-    fn player_a_id(&self) -> PlayerId;
-    fn player_b_id(&self) -> PlayerId;
     fn cur_player_turn(&self) -> PlayerId;
 
-    // fn player_a_hand(&self) -> &Self::HandView;
-    // fn player_b_hand(&self) -> &Self::HandView;
-
-    fn player_a_mana(&self) -> u32;
-    fn player_a_mana_limit(&self) -> u32;
-    fn player_b_mana(&self) -> u32;
-    fn player_b_mana_limit(&self) -> u32;
+    fn player_mana(&self, player_id: PlayerId) -> u32;
+    fn player_mana_limit(&self, player_id: PlayerId) -> u32;
 
     fn board(&self) -> &Self::BoardView;
+    fn hand(&self, player_id: PlayerId) -> &Self::HandView;
 
     fn iter(&'a self) -> Iter<'_, <Self::BoardView as BoardView<'a>>::SlotView> {
         self.board().slots_iter()
     }
 
-    fn opponent_of(&self, player_id: PlayerId) -> PlayerId {
-        match self.player_ab(player_id) {
-            PlayerAB::PlayerA => self.player_b_id(),
-            PlayerAB::PlayerB => self.player_a_id(),
-        }
-    }
-
-    fn player_ab(&self, player_id: PlayerId) -> PlayerAB {
-        if player_id == self.player_a_id() {
-            PlayerAB::PlayerA
-        } else if player_id == self.player_b_id() {
-            PlayerAB::PlayerB
-        } else {
-            panic!("Unknown player id: {:?}", player_id)
-        }
-    }
-
-    fn player_mana(&self, player_id: PlayerId) -> u32 {
-        match self.player_ab(player_id) {
-            PlayerAB::PlayerA => self.player_a_mana(),
-            PlayerAB::PlayerB => self.player_b_mana(),
-        }
-    }
-
-    fn player_mana_limit(&self, player_id: PlayerId) -> u32 {
-        match self.player_ab(player_id) {
-            PlayerAB::PlayerA => self.player_a_mana_limit(),
-            PlayerAB::PlayerB => self.player_b_mana_limit(),
-        }
-    }
+    fn opponent_id(&self, player_id: PlayerId) -> PlayerId;
 }
 
 impl<'a> GameStateView<'a> for GameState {
     type BoardView = Board;
+    type HandView = Hand;
 
-    fn board(&self) -> &Self::BoardView {
+    fn board(&self) -> &Board {
         self.board.as_ref()
+    }
+
+    fn hand(&self, player_id: PlayerId) -> &Hand {
+        match self.player_ab(player_id) {
+            PlayerAB::PlayerA => &self.player_a_hand,
+            PlayerAB::PlayerB => &self.player_b_hand,
+        }
     }
 
     fn cur_player_turn(&self) -> PlayerId {
         self.cur_player_turn
     }
 
-    fn player_a_mana(&self) -> u32 {
-        self.player_a_mana
+    fn player_mana(&self, player_id: PlayerId) -> u32 {
+        GameState::player_mana(self, player_id)
     }
 
-    fn player_a_mana_limit(&self) -> u32 {
-        self.player_a_mana_limit
+    fn player_mana_limit(&self, player_id: PlayerId) -> u32 {
+        GameState::player_mana_limit(self, player_id)
     }
 
-    fn player_b_mana(&self) -> u32 {
-        self.player_b_mana
-    }
-
-    fn player_b_mana_limit(&self) -> u32 {
-        self.player_b_mana_limit
-    }
-
-    fn player_a_id(&self) -> PlayerId {
-        self.player_a_id
-    }
-
-    fn player_b_id(&self) -> PlayerId {
-        self.player_b_id
+    fn opponent_id(&self, player_id: PlayerId) -> PlayerId {
+        GameState::opponent_id(self, player_id)
     }
 }
 
@@ -125,6 +87,30 @@ impl GameState {
     pub fn is_game_over(&self) -> bool {
         self.board().hero(self.player_a_id).health() <= 0
             || self.board().hero(self.player_b_id).health() <= 0
+    }
+
+    fn player_ab(&self, player_id: PlayerId) -> PlayerAB {
+        if player_id == self.player_a_id() {
+            PlayerAB::PlayerA
+        } else if player_id == self.player_b_id() {
+            PlayerAB::PlayerB
+        } else {
+            panic!("Unknown player id: {:?}", player_id)
+        }
+    }
+
+    fn player_mana(&self, player_id: PlayerId) -> u32 {
+        match self.player_ab(player_id) {
+            PlayerAB::PlayerA => self.player_a_mana(),
+            PlayerAB::PlayerB => self.player_b_mana(),
+        }
+    }
+
+    fn player_mana_limit(&self, player_id: PlayerId) -> u32 {
+        match self.player_ab(player_id) {
+            PlayerAB::PlayerA => self.player_a_mana_limit,
+            PlayerAB::PlayerB => self.player_b_mana_limit,
+        }
     }
 
     pub fn initial_state(
@@ -181,13 +167,13 @@ impl GameState {
         &mut self.board
     }
 
-    // pub fn player_a_id(&self) -> PlayerId {
-    //     self.player_a_id
-    // }
+    pub fn player_a_id(&self) -> PlayerId {
+        self.player_a_id
+    }
 
-    // pub fn player_b_id(&self) -> PlayerId {
-    //     self.player_b_id
-    // }
+    pub fn player_b_id(&self) -> PlayerId {
+        self.player_b_id
+    }
 
     /// Given the ID of a player, returns the ID of the other player.
     pub fn other_player(&self, player_id: PlayerId) -> PlayerId {
@@ -225,25 +211,11 @@ impl GameState {
         }
     }
 
-    pub fn player_mana(&self, player_id: PlayerId) -> u32 {
-        match self.player_ab(player_id) {
-            PlayerAB::PlayerA => self.player_a_mana,
-            PlayerAB::PlayerB => self.player_b_mana,
-        }
-    }
-
     /// Resets a player's mana count back to their limit.
     pub fn refresh_player_mana(&mut self, player_id: PlayerId) {
         match self.player_ab(player_id) {
             PlayerAB::PlayerA => self.player_a_mana = self.player_a_mana_limit,
             PlayerAB::PlayerB => self.player_b_mana = self.player_a_mana_limit,
-        }
-    }
-
-    pub fn player_mana_limit(&self, player_id: PlayerId) -> u32 {
-        match self.player_ab(player_id) {
-            PlayerAB::PlayerA => self.player_a_mana_limit,
-            PlayerAB::PlayerB => self.player_b_mana_limit,
         }
     }
 
@@ -351,6 +323,16 @@ impl GameState {
                 (updater)(instance_id, originator_id, self);
             });
     }
+
+    /// Get a reference to the game state's player a mana.
+    pub fn player_a_mana(&self) -> u32 {
+        self.player_a_mana
+    }
+
+    /// Get a reference to the game state's player b mana.
+    pub fn player_b_mana(&self) -> u32 {
+        self.player_b_mana
+    }
 }
 
 pub mod player_view {
@@ -378,6 +360,23 @@ pub mod player_view {
         opponent_mana_limit: u32,
 
         board: BoardPlayerView,
+    }
+
+    impl GameStatePlayerView {
+        /// Get the game state player view's player id.
+        pub fn player_id(&self) -> PlayerId {
+            self.player_id
+        }
+
+        /// Get the game state player view's opponent id.
+        pub fn opponent_id(&self) -> PlayerId {
+            self.opponent_id
+        }
+    }
+
+    enum PlayerOpponent {
+        Player,
+        Opponent,
     }
 
     impl MakePlayerView for GameState {
@@ -410,42 +409,57 @@ pub mod player_view {
         pub fn hand(&self) -> &HandPlayerView {
             &self.player_hand
         }
+
+        fn player_or_opponent(&self, player_id: PlayerId) -> PlayerOpponent {
+            if player_id == self.player_id {
+                PlayerOpponent::Player
+            } else if player_id == self.opponent_id {
+                PlayerOpponent::Opponent
+            } else {
+                panic!("Provided player_id is for neither the player nor the opponent, and therefore is not valid")
+            }
+        }
     }
 
     impl<'a> GameStateView<'a> for GameStatePlayerView {
-        // type HandView = HandPlayerView;
+        type HandView = HandPlayerView;
         type BoardView = BoardPlayerView;
 
         fn board(&self) -> &Self::BoardView {
             &self.board
         }
 
+        fn hand(&self, player_id: PlayerId) -> &HandPlayerView {
+            if player_id == self.player_id {
+                return &self.player_hand;
+            }
+
+            panic!("Player view cannot show another player's hand");
+        }
+
         fn cur_player_turn(&self) -> PlayerId {
             self.cur_player_turn
         }
 
-        fn player_a_id(&self) -> PlayerId {
-            self.player_id
+        fn player_mana(&self, player_id: PlayerId) -> u32 {
+            match self.player_or_opponent(player_id) {
+                PlayerOpponent::Player => self.player_mana,
+                PlayerOpponent::Opponent => self.opponent_mana,
+            }
         }
 
-        fn player_b_id(&self) -> PlayerId {
-            self.opponent_id
+        fn player_mana_limit(&self, player_id: PlayerId) -> u32 {
+            match self.player_or_opponent(player_id) {
+                PlayerOpponent::Player => self.player_mana_limit,
+                PlayerOpponent::Opponent => self.opponent_mana_limit,
+            }
         }
 
-        fn player_a_mana(&self) -> u32 {
-            self.player_mana
-        }
-
-        fn player_a_mana_limit(&self) -> u32 {
-            self.player_mana_limit
-        }
-
-        fn player_b_mana(&self) -> u32 {
-            self.opponent_mana
-        }
-
-        fn player_b_mana_limit(&self) -> u32 {
-            self.opponent_mana_limit
+        fn opponent_id(&self, player_id: PlayerId) -> PlayerId {
+            match self.player_or_opponent(player_id) {
+                PlayerOpponent::Player => self.opponent_id,
+                PlayerOpponent::Opponent => self.player_id,
+            }
         }
     }
 }

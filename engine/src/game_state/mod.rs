@@ -8,10 +8,11 @@ mod selector;
 
 pub use card_instance::{
     InstanceState, UnitCardInstance, UnitCardInstanceId, UnitCardInstancePlayerView,
+    UnitCardInstanceView,
 };
 pub use deck::Deck;
 pub use game_state::{player_view::GameStatePlayerView, GameState, GameStateView};
-pub use hand::Hand;
+pub use hand::{Hand, HandView};
 pub use selector::iter_helpers::{IterAddons, IteratorAny};
 use serde::{de::DeserializeOwned, Deserialize, Serialize};
 
