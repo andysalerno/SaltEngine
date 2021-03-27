@@ -4,6 +4,7 @@ use serde::de::DeserializeOwned;
 use smol::net::TcpStream;
 
 use crate::messages::GameMessage;
+use crate::Result;
 
 /// A connection to a player.
 #[derive(Debug)]
@@ -11,12 +12,31 @@ pub struct Connection {
     stream: WebSocketStream<TcpStream>,
 }
 
+// pub enum ConnectionError {
+//     SendFailure(String),
+// }
+
+// impl From<(dyn std::error::Error + 'static)> for ConnectionError {
+//     fn from(_: Box<dyn std::error::Error>) -> Self {
+//         todo!()
+//     }
+// }
+
+// impl<T> From<T> for ConnectionError
+// where
+//     T: std::error::Error,
+// {
+//     fn from(_: T) -> Self {
+//         todo!()
+//     }
+// }
+
 impl Connection {
     pub fn new(stream: WebSocketStream<TcpStream>) -> Self {
         Self { stream }
     }
 
-    pub async fn send<M>(&mut self, message: M) -> Result<(), Box<dyn std::error::Error>>
+    pub async fn send<M>(&mut self, message: M) -> Result<()>
     where
         M: GameMessage,
     {

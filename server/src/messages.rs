@@ -1,16 +1,16 @@
-use async_tungstenite::{tungstenite::Message, WebSocketStream};
-use futures::{AsyncRead, AsyncWrite, SinkExt, StreamExt};
 use salt_engine::{
     game_state::{GameStatePlayerView, PlayerId},
     id::Id,
 };
 use serde::{de::DeserializeOwned, Deserialize, Serialize};
 
+/// A marker trait to indicate a type is a GameMessage.
 pub trait GameMessage: Serialize + DeserializeOwned {}
 
 #[derive(Serialize, Deserialize, Debug)]
 pub enum FromClient {
     JoinGame,
+    Ready,
     GameId(Id),
 }
 impl GameMessage for FromClient {}
@@ -18,14 +18,8 @@ impl GameMessage for FromClient {}
 #[derive(Serialize, Deserialize, Debug)]
 pub enum FromServer {
     Hello(PlayerId),
-    Session(GameSession),
+    GameStart { opponent_id: PlayerId },
     State(GameStatePlayerView),
+    TurnStart,
 }
 impl GameMessage for FromServer {}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct GameSession {
-    pub session_id: Id,
-    pub player_a_id: PlayerId,
-    pub player_b_id: PlayerId,
-}

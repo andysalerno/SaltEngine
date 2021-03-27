@@ -6,6 +6,52 @@ use crate::{
     },
 };
 
+pub trait GameRunnerHandler: Send + Sync {
+    fn on_turn_start(&self, game_state: &GameState);
+    fn has_ended_turn(&self) -> bool;
+}
+
+pub struct GameRunnerZ {
+    player_a_handler: Box<dyn GameRunnerHandler>,
+    player_b_handler: Box<dyn GameRunnerHandler>,
+    game_state: GameState,
+}
+
+impl GameRunnerZ {
+    pub fn new(
+        player_a_handler: Box<dyn GameRunnerHandler>,
+        player_b_handler: Box<dyn GameRunnerHandler>,
+        game_state: GameState,
+    ) -> Self {
+        Self {
+            player_a_handler,
+            player_b_handler,
+            game_state,
+        }
+    }
+
+    pub async fn run_game(self) {
+        while !self.game_state.is_game_over() {
+            let handler = if self.game_state.cur_player_turn() == self.game_state.player_a_id() {
+                self.player_a_handler.as_ref()
+            } else {
+                self.player_b_handler.as_ref()
+            };
+
+            GameRunnerZ::player_take_turn_stage(handler, &self.game_state).await;
+        }
+    }
+
+    async fn player_take_turn_stage(handler: &dyn GameRunnerHandler, game_state: &GameState) {
+        let cur_player_id = game_state.cur_player_id();
+        println!("Turn starts for player: {:?}", cur_player_id);
+
+        handler.on_turn_start(game_state);
+
+        while !handler.has_ended_turn() {}
+    }
+}
+
 pub trait GameDisplay {
     fn display(&mut self, game_state: &GameStatePlayerView);
 }

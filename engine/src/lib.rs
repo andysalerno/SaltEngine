@@ -1,7 +1,7 @@
 mod console_display;
 mod game_agent;
 mod game_logic;
-mod game_runner;
+pub mod game_runner;
 pub mod game_state;
 pub mod id;
 
