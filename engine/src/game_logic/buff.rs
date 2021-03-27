@@ -41,27 +41,27 @@ pub trait BuffView {
 
 impl BuffView for Box<dyn Buff> {
     fn attack_amount(&self) -> i32 {
-        self.attack_amount()
+        Buff::attack_amount(self.as_ref())
     }
 
     fn health_amount(&self) -> i32 {
-        self.health_amount()
+        Buff::health_amount(self.as_ref())
     }
 
     fn source_id(&self) -> BuffSourceId {
-        self.source_id()
+        Buff::source_id(self.as_ref())
     }
 
     fn instance_id(&self) -> BuffInstanceId {
-        self.instance_id()
+        Buff::instance_id(self.as_ref())
     }
 
     fn definition_id(&self) -> Id {
-        self.definition_id()
+        Buff::definition_id(self.as_ref())
     }
 
     fn is_from_passive(&self) -> bool {
-        self.is_from_passive()
+        Buff::is_from_passive(self.as_ref())
     }
 }
 
@@ -180,27 +180,27 @@ pub mod player_view {
 
     impl BuffView for BuffPlayerView {
         fn attack_amount(&self) -> i32 {
-            self.attack_amount()
+            self.attack_amount
         }
 
         fn health_amount(&self) -> i32 {
-            todo!()
+            self.health_amount
         }
 
         fn source_id(&self) -> BuffSourceId {
-            todo!()
+            self.source_id
         }
 
         fn instance_id(&self) -> BuffInstanceId {
-            todo!()
+            self.instance_id
         }
 
         fn definition_id(&self) -> Id {
-            todo!()
+            self.definition_id
         }
 
         fn is_from_passive(&self) -> bool {
-            todo!()
+            self.is_from_passive
         }
     }
 }

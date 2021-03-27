@@ -1,6 +1,9 @@
+mod connection;
+mod matchmaker;
 pub mod messages;
-mod websocker_server;
+mod play_game;
+mod websocket_server;
 
 fn main() {
-    websocker_server::run().expect("server execution failed");
+    websocket_server::run().expect("server execution failed");
 }

@@ -1,10 +1,14 @@
-use futures::{AsyncRead, AsyncWrite};
-use server::messages::{Connection, FromClient, FromServer};
+use server::{
+    connection::Connection,
+    messages::{FromClient, FromServer},
+};
+use smol::net::TcpStream;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     smol::block_on(async {
+        let stream = TcpStream::connect("localhost:9000").await?;
         let (connection, _) =
-            async_tungstenite::async_std::connect_async("ws://localhost:9000").await?;
+            async_tungstenite::client_async("ws://localhost:9000", stream).await?;
 
         let connection = Connection::new(connection);
 
@@ -12,12 +16,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     })
 }
 
-async fn handle_connection<S>(
-    mut connection: Connection<S>,
-) -> Result<(), Box<dyn std::error::Error>>
-where
-    S: AsyncRead + AsyncWrite + Unpin,
-{
+async fn handle_connection(mut connection: Connection) -> Result<(), Box<dyn std::error::Error>> {
     // Expect a Hello
     let my_id = match connection.recv::<FromServer>().await {
         Some(FromServer::Hello(my_id)) => my_id,
