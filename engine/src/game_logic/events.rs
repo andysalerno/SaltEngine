@@ -26,6 +26,7 @@ pub use end_turn::EndTurnEvent;
 pub use player_gain_mana::PlayerGainManaEvent;
 pub use player_spend_mana::PlayerSpendManaEvent;
 pub use pos_takes_damage_event::PosTakesDamageEvent;
+use serde::{Deserialize, Serialize};
 pub use start_game_event::StartGameEvent;
 pub use summon_creature_from_hand_event::SummonCreatureFromHandEvent;
 pub use turn_start_event::TurnStartEvent;
@@ -43,6 +44,7 @@ pub trait Event: Into<GameEvent> {
     }
 }
 
+/// All possible game events.
 #[derive(Debug)]
 pub enum GameEvent {
     Attack(AttackEvent),
@@ -60,4 +62,24 @@ pub enum GameEvent {
     SummonCreatureFromHand(SummonCreatureFromHandEvent),
     PosTakesDamage(PosTakesDamageEvent),
     CreatureHealed(CreatureHealedEvent),
+}
+
+/// The subset of game events that clients can
+/// provide the server over the course of the game.
+/// For example, a client can legally provide a TurnEnd event
+/// (they are allowed to end their own turn), but a client cannot
+/// directly provide a CreatureDestroyed event.
+#[derive(Debug, Serialize, Deserialize)]
+pub enum ClientGameEvent {
+    EndTurn(EndTurnEvent),
+    SummonCreatureFromHand(SummonCreatureFromHandEvent),
+}
+
+impl From<ClientGameEvent> for GameEvent {
+    fn from(e: ClientGameEvent) -> Self {
+        match e {
+            ClientGameEvent::EndTurn(e) => GameEvent::EndTurn(e),
+            ClientGameEvent::SummonCreatureFromHand(e) => GameEvent::SummonCreatureFromHand(e),
+        }
+    }
 }

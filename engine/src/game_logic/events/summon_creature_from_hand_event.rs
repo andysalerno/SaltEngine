@@ -7,8 +7,9 @@ use crate::{
         GameStateView, HandView, PlayerId, UnitCardInstanceId, UnitCardInstanceView,
     },
 };
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct SummonCreatureFromHandEvent {
     player_id: PlayerId,
     board_pos: BoardPos,

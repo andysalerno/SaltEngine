@@ -1,6 +1,7 @@
 use super::{Event, GameEvent};
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct EndTurnEvent;
 
 impl Event for EndTurnEvent {}

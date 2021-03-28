@@ -1,4 +1,5 @@
 use salt_engine::{
+    game_logic::ClientGameEvent,
     game_state::{GameStatePlayerView, PlayerId},
     id::Id,
 };
@@ -12,6 +13,7 @@ pub enum FromClient {
     JoinGame,
     Ready,
     GameId(Id),
+    ClientAction(ClientGameEvent),
 }
 impl GameMessage for FromClient {}
 
@@ -21,5 +23,6 @@ pub enum FromServer {
     GameStart { opponent_id: PlayerId },
     State(GameStatePlayerView),
     TurnStart,
+    WaitingForAction,
 }
 impl GameMessage for FromServer {}

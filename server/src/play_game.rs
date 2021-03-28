@@ -3,10 +3,10 @@ use crate::websocket_server::SharedContext;
 use crate::{connection::Connection, Result};
 use async_trait::async_trait;
 use futures::{join, try_join};
-use log::info;
+use log::{info, trace};
 use salt_engine::{
     cards::*,
-    game_logic::{EndTurnEvent, GameEvent},
+    game_logic::{ClientGameEvent, EndTurnEvent, GameEvent},
     game_runner::{GameRunnerHandler, GameRunnerZ},
     game_state::{Deck, GameState, GameStateView, MakePlayerView, PlayerId, UnitCardInstance},
 };
@@ -27,29 +27,31 @@ impl NetworkGameRunner {
 
 #[async_trait]
 impl GameRunnerHandler for NetworkGameRunner {
-    async fn on_turn_start(&self, game_state: &GameState) {
+    async fn on_turn_start(&mut self, _game_state: &GameState) {
         info!("Player controller: on turn start");
-        // let player_turn_connection = {
-        //     if whose_turn == game_state.player_a_id() {
-        //         player_a_connection
-        //     } else if whose_turn == game_state.player_b_id() {
-        //         player_b_connection
-        //     } else {
-        //         panic!("Unknown player ID")
-        //     }
-        // };
 
-        // // Send the TurnStart message.
-        // player_turn_connection
-        //     .send(FromServer::TurnStart)
-        //     .await
-        //     .expect("Sending TurnStart failed.");
+        self.connection
+            .send(FromServer::TurnStart)
+            .await
+            .expect("failed to send turnstart");
     }
 
-    async fn next_action(&self) -> GameEvent {
-        info!("Ending turn");
+    async fn next_action(&mut self) -> ClientGameEvent {
+        // Awaiting response from the client.
 
-        EndTurnEvent.into()
+        let _ping = self.connection.send(FromServer::WaitingForAction).await;
+        info!("Waiting for the player's next action...");
+        let from_client = self
+            .connection
+            .recv::<FromClient>()
+            .await
+            .expect("no response from the client.");
+        info!("Action received from player.");
+
+        match from_client {
+            FromClient::ClientAction(e) => e,
+            _ => panic!("Unexpected response from client; expected ClientGameEvent"),
+        }
     }
 }
 

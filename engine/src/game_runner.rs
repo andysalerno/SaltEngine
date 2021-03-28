@@ -1,6 +1,6 @@
 use crate::{
     game_agent::game_agent::GameAgent,
-    game_logic::{cards::*, EventDispatcher, GameEvent, StartGameEvent},
+    game_logic::{cards::*, ClientGameEvent, EventDispatcher, GameEvent, StartGameEvent},
     game_state::{
         Deck, GameState, GameStatePlayerView, GameStateView, MakePlayerView, UnitCardInstance,
     },
@@ -15,8 +15,8 @@ use log::info;
 /// to events, and to receive input from the player client.
 #[async_trait]
 pub trait GameRunnerHandler: Send + Sync {
-    async fn on_turn_start(&self, game_state: &GameState);
-    async fn next_action(&self) -> GameEvent;
+    async fn on_turn_start(&mut self, game_state: &GameState);
+    async fn next_action(&mut self) -> ClientGameEvent;
 }
 
 pub struct GameRunnerZ {
@@ -43,9 +43,9 @@ impl GameRunnerZ {
 
         while !self.game_state.is_game_over() {
             let handler = if self.game_state.cur_player_turn() == self.game_state.player_a_id() {
-                self.player_a_handler.as_ref()
+                self.player_a_handler.as_mut()
             } else {
-                self.player_b_handler.as_ref()
+                self.player_b_handler.as_mut()
             };
 
             GameRunnerZ::player_take_turn_stage(handler, &mut self.game_state, &mut dispatcher)
@@ -54,7 +54,7 @@ impl GameRunnerZ {
     }
 
     async fn player_take_turn_stage(
-        handler: &dyn GameRunnerHandler,
+        handler: &mut dyn GameRunnerHandler,
         game_state: &mut GameState,
         dispatcher: &mut EventDispatcher,
     ) {
@@ -65,11 +65,18 @@ impl GameRunnerZ {
 
         loop {
             let action = handler.next_action().await;
+            let action: GameEvent = action.into();
 
-            if let GameEvent::EndTurn(end_turn_event) = action {
-                info!("Player has ended their turn.");
-                dispatcher.dispatch(end_turn_event, game_state);
-                break;
+            let turn_is_over = match action {
+                GameEvent::EndTurn(_) => true,
+                _ => false,
+            };
+
+            dispatcher.dispatch(action, game_state);
+
+            if turn_is_over {
+                info!("Turn ends for player: {:?}", cur_player_id);
+                return;
             }
         }
     }

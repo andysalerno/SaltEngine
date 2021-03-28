@@ -1,4 +1,5 @@
 use log::info;
+use salt_engine::game_logic::{ClientGameEvent, EndTurnEvent};
 use server::{
     connection::Connection,
     messages::{FromClient, FromServer},
@@ -40,12 +41,61 @@ async fn handle_connection(mut connection: Connection) -> Result<()> {
     info!("My opponent's ID is {:?}", opponent_id);
 
     // Expect the game state
-
     let gamestate_view = match connection.recv::<FromServer>().await {
         Some(FromServer::State(view)) => view,
         _ => panic!("unexpected response from server"),
     };
     info!("My starting hand is: {:?}", gamestate_view.hand());
 
+    // Expect the turn start message
+    // match connection.recv::<FromServer>().await {
+    //     Some(FromServer::TurnStart) => {}
+    //     Some(other) => panic!("Expected TurnStart, saw {:?}", other),
+    //     None => panic!("No response from server."),
+    // };
+    // info!("Got the TurnStart message.");
+
+    loop {
+        // Wait for signal from server that we can send an action
+        let msg = connection
+            .recv::<FromServer>()
+            .await
+            .expect("failed to get a response from the server");
+
+        match msg {
+            FromServer::TurnStart => handle_turn_start(&mut connection).await?,
+            _ => panic!("expected a TurnStart message, but received: {:?}", msg),
+        }
+    }
+
     Ok(())
+}
+
+async fn handle_turn_start(connection: &mut Connection) -> Result<()> {
+    // Continuously receive actions from the client, until they end their turn.
+    loop {
+        // Wait for signal from server that we can send an action
+        let msg = connection
+            .recv::<FromServer>()
+            .await
+            .expect("failed to get a response from the server");
+
+        match msg {
+            FromServer::WaitingForAction => {}
+            _ => panic!(
+                "expected a WaitingForAction message, but received: {:?}",
+                msg
+            ),
+        }
+
+        // Get the action from the player ...
+        // For now, just end the turn.
+        connection
+            .send(FromClient::ClientAction(ClientGameEvent::EndTurn(
+                EndTurnEvent,
+            )))
+            .await?;
+
+        return Ok(());
+    }
 }
