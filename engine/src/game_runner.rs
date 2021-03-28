@@ -5,16 +5,18 @@ use crate::{
         Deck, GameState, GameStatePlayerView, GameStateView, MakePlayerView, UnitCardInstance,
     },
 };
+use async_trait::async_trait;
+use log::info;
 
 /// A trait that defines the interaction between the GameRunner
 /// and the client.
 /// The GameRunner is the rules engine, and it will use the
 /// GameRunnerHandler for each player client to alert that client
 /// to events, and to receive input from the player client.
+#[async_trait]
 pub trait GameRunnerHandler: Send + Sync {
-    fn on_turn_start(&self, game_state: &GameState);
-    //fn has_ended_turn(&self) -> bool;
-    fn next_action(&self) -> GameEvent;
+    async fn on_turn_start(&self, game_state: &GameState);
+    async fn next_action(&self) -> GameEvent;
 }
 
 pub struct GameRunnerZ {
@@ -36,9 +38,8 @@ impl GameRunnerZ {
         }
     }
 
-    pub async fn run_game(self) {
-        // let dispatcher = EventDispatcher::new(player_a_prompter, player_b_prompter)
-        let dispatcher = EventDispatcher::new();
+    pub async fn run_game(mut self) {
+        let mut dispatcher = EventDispatcher::new();
 
         while !self.game_state.is_game_over() {
             let handler = if self.game_state.cur_player_turn() == self.game_state.player_a_id() {
@@ -47,21 +48,27 @@ impl GameRunnerZ {
                 self.player_b_handler.as_ref()
             };
 
-            GameRunnerZ::player_take_turn_stage(handler, &self.game_state).await;
+            GameRunnerZ::player_take_turn_stage(handler, &mut self.game_state, &mut dispatcher)
+                .await;
         }
     }
 
-    async fn player_take_turn_stage(handler: &dyn GameRunnerHandler, game_state: &GameState) {
+    async fn player_take_turn_stage(
+        handler: &dyn GameRunnerHandler,
+        game_state: &mut GameState,
+        dispatcher: &mut EventDispatcher,
+    ) {
         let cur_player_id = game_state.cur_player_id();
-        println!("Turn starts for player: {:?}", cur_player_id);
+        info!("Turn starts for player: {:?}", cur_player_id);
 
-        handler.on_turn_start(game_state);
+        handler.on_turn_start(game_state).await;
 
         loop {
-            let action = handler.next_action();
+            let action = handler.next_action().await;
 
-            if let GameEvent::EndTurn(__) = action {
-                println!("Player has ended their turn.");
+            if let GameEvent::EndTurn(end_turn_event) = action {
+                info!("Player has ended their turn.");
+                dispatcher.dispatch(end_turn_event, game_state);
                 break;
             }
         }
@@ -148,8 +155,8 @@ impl GameRunner {
     }
 
     pub fn run_game(&mut self) {
-        let a_prompter = self.player_a.make_prompter();
-        let b_prompter = self.player_b.make_prompter();
+        // let a_prompter = self.player_a.make_prompter();
+        // let b_prompter = self.player_b.make_prompter();
         //let mut dispatcher = EventDispatcher::new(a_prompter, b_prompter);
         let mut dispatcher = EventDispatcher::new();
 
@@ -158,7 +165,7 @@ impl GameRunner {
         {
             let player_a_id = self.game_state.player_a_id();
             let player_b_id = self.game_state.player_b_id();
-            println!(
+            info!(
                 "PlayerA starts with {} cards.\nPlayerB starts wtih {} cards.",
                 self.game_state.deck(player_a_id).len(),
                 self.game_state.deck(player_b_id).len()
@@ -168,8 +175,8 @@ impl GameRunner {
         while !self.game_state.is_game_over() {
             let cur_player_id = self.game_state.cur_player_id();
 
-            println!("Player {:?} to take an action.", cur_player_id);
-            println!(
+            info!("Player {:?} to take an action.", cur_player_id);
+            info!(
                 "Available mana: {:?}",
                 self.game_state.player_mana(cur_player_id)
             );

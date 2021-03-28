@@ -1,6 +1,7 @@
 use crate::Result;
 use crate::{connection::Connection, matchmaker::MatchMaker};
 use crate::{messages::FromServer, play_game::play_game};
+use log::info;
 use salt_engine::game_state::PlayerId;
 use smol::net::TcpListener;
 use std::sync::Arc;
@@ -44,13 +45,13 @@ async fn queue_player_and_play(connection: Connection, context: SharedContext) -
 
 pub fn run() -> Result<()> {
     smol::block_on(async {
-        println!("Listening on {}", SERVER_ADDRESS);
+        info!("Listening on {}", SERVER_ADDRESS);
         let listener = TcpListener::bind(SERVER_ADDRESS).await?;
 
         let context: SharedContext = Arc::new(GlobalContext::default());
 
         while let Ok((stream, addr)) = listener.accept().await {
-            println!("New connection from {}", addr);
+            info!("New connection from {}", addr);
 
             let ws_stream = async_tungstenite::accept_async(stream).await?;
             let connection = Connection::new(ws_stream);

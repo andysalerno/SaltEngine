@@ -1,4 +1,5 @@
 use crate::connection::Connection;
+use log::info;
 use smol::lock::Mutex;
 
 #[derive(Default, Debug)]
@@ -14,16 +15,16 @@ impl MatchMaker {
         &self,
         player_connection: Connection,
     ) -> Option<(Connection, Connection)> {
-        println!("Trying to match a player...");
+        info!("Trying to match a player...");
         let mut waiting_players = self.waiting_players.lock().await;
 
         if let Some(other_player_connection) = waiting_players.pop() {
             // Found someone already waiting.
-            println!("Found a player already waiting.");
+            info!("Found a player already waiting.");
             Some((player_connection, other_player_connection))
         } else {
             // No one else here. We'll queue up, and get signaled when someone else joins.
-            println!("No player was found. Queueing up.");
+            info!("No player was found. Queueing up.");
             waiting_players.push(player_connection);
             None
         }

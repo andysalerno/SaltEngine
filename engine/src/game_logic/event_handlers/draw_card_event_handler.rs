@@ -1,6 +1,9 @@
+use log::info;
+
 use crate::{
     game_logic::{
-        event_handlers::EventHandler, AddCardToHandEvent, DrawCardEvent, EventDispatcher,
+        event_handlers::EventHandler, events::CreatureTakesDamageEvent, AddCardToHandEvent,
+        DrawCardEvent, EventDispatcher,
     },
     game_state::GameState,
 };
@@ -18,7 +21,7 @@ impl EventHandler for DrawCardEventHandler {
         dispatcher: &mut EventDispatcher,
     ) {
         let player_id = event.player_id();
-        println!(
+        info!(
             "Player {:?} draws a card. Deck size before draw: {}",
             player_id,
             game_state.deck(player_id).len()
@@ -30,10 +33,14 @@ impl EventHandler for DrawCardEventHandler {
             let add_to_hand_event = AddCardToHandEvent::new(player_id, card);
             dispatcher.dispatch(add_to_hand_event, game_state);
         } else {
-            println!(
+            info!(
                 "Player {:?} had no cards in deck, so drew nothing.",
                 player_id
             );
+
+            let hero_id = game_state.board().hero(player_id).id();
+            let hero_damaged_event = CreatureTakesDamageEvent::new(hero_id, 1);
+            dispatcher.dispatch(hero_damaged_event, game_state);
         }
     }
 }

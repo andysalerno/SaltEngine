@@ -1,3 +1,4 @@
+use log::info;
 use server::{
     connection::Connection,
     messages::{FromClient, FromServer},
@@ -7,6 +8,8 @@ use smol::net::TcpStream;
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error + Send + Sync>>;
 
 fn main() -> Result<()> {
+    env_logger::init();
+
     smol::block_on(async {
         let stream = TcpStream::connect("localhost:9000").await?;
         let (connection, _) =
@@ -24,7 +27,7 @@ async fn handle_connection(mut connection: Connection) -> Result<()> {
         Some(FromServer::Hello(my_id)) => my_id,
         _ => panic!("unexpected response from server"),
     };
-    println!("Saw a hello - my id is: {:?}", my_id);
+    info!("Saw a hello - my id is: {:?}", my_id);
 
     // Send Ready
     connection.send(FromClient::Ready).await?;
@@ -34,7 +37,7 @@ async fn handle_connection(mut connection: Connection) -> Result<()> {
         Some(FromServer::GameStart { opponent_id }) => opponent_id,
         _ => panic!("unexpected response from server"),
     };
-    println!("My opponent's ID is {:?}", opponent_id);
+    info!("My opponent's ID is {:?}", opponent_id);
 
     // Expect the game state
 
@@ -42,7 +45,7 @@ async fn handle_connection(mut connection: Connection) -> Result<()> {
         Some(FromServer::State(view)) => view,
         _ => panic!("unexpected response from server"),
     };
-    println!("My starting hand is: {:?}", gamestate_view.hand());
+    info!("My starting hand is: {:?}", gamestate_view.hand());
 
     Ok(())
 }

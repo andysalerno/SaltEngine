@@ -1,20 +1,22 @@
 use crate::messages::{FromClient, FromServer};
 use crate::websocket_server::SharedContext;
 use crate::{connection::Connection, Result};
+use async_trait::async_trait;
 use futures::{join, try_join};
+use log::info;
 use salt_engine::{
     cards::*,
-    game_logic::GameEvent,
+    game_logic::{EndTurnEvent, GameEvent},
     game_runner::{GameRunnerHandler, GameRunnerZ},
     game_state::{Deck, GameState, GameStateView, MakePlayerView, PlayerId, UnitCardInstance},
 };
 
-struct PlayerGameRunner {
+struct NetworkGameRunner {
     player_id: PlayerId,
     connection: Connection,
 }
 
-impl PlayerGameRunner {
+impl NetworkGameRunner {
     fn new(player_id: PlayerId, connection: Connection) -> Self {
         Self {
             player_id,
@@ -23,9 +25,10 @@ impl PlayerGameRunner {
     }
 }
 
-impl GameRunnerHandler for PlayerGameRunner {
-    fn on_turn_start(&self, game_state: &GameState) {
-        todo!()
+#[async_trait]
+impl GameRunnerHandler for NetworkGameRunner {
+    async fn on_turn_start(&self, game_state: &GameState) {
+        info!("Player controller: on turn start");
         // let player_turn_connection = {
         //     if whose_turn == game_state.player_a_id() {
         //         player_a_connection
@@ -43,8 +46,10 @@ impl GameRunnerHandler for PlayerGameRunner {
         //     .expect("Sending TurnStart failed.");
     }
 
-    fn next_action(&self) -> GameEvent {
-        todo!()
+    async fn next_action(&self) -> GameEvent {
+        info!("Ending turn");
+
+        EndTurnEvent.into()
     }
 }
 
@@ -63,12 +68,12 @@ pub(crate) async fn play_game(
         let (resp_a, resp_b) = join!(task_a, task_b);
 
         match resp_a {
-            Some(FromClient::Ready) => println!("Received Ready message from player a."),
+            Some(FromClient::Ready) => info!("Received Ready message from player a."),
             _ => panic!("Expected Ready from client"),
         }
 
         match resp_b {
-            Some(FromClient::Ready) => println!("Received Ready message from player b."),
+            Some(FromClient::Ready) => info!("Received Ready message from player b."),
             _ => panic!("Expected Ready from client"),
         }
     }
@@ -103,15 +108,13 @@ pub(crate) async fn play_game(
             .await?;
     }
 
-    let player_a_runner = Box::new(PlayerGameRunner::new(player_a_id, player_a_connection));
-    let player_b_runner = Box::new(PlayerGameRunner::new(player_b_id, player_b_connection));
+    let player_a_runner = Box::new(NetworkGameRunner::new(player_a_id, player_a_connection));
+    let player_b_runner = Box::new(NetworkGameRunner::new(player_b_id, player_b_connection));
     let runner = GameRunnerZ::new(player_a_runner, player_b_runner, game_state);
     runner.run_game().await;
 
-    //game_loop(game_state, player_a_connection, player_b_connection).await;
-
-    println!(
-        "Game with player {:?} and player {:?} has ended.",
+    info!(
+        "[play_game] Game with player {:?} and player {:?} has ended.",
         player_a_id, player_b_id
     );
     Ok(())
@@ -144,7 +147,7 @@ async fn player_take_turn(
     player_a_connection: &mut Connection,
     player_b_connection: &mut Connection,
 ) {
-    println!("Player {:?} starts their turn.", whose_turn);
+    info!("Player {:?} starts their turn.", whose_turn);
 
     let player_turn_connection = {
         if whose_turn == game_state.player_a_id() {

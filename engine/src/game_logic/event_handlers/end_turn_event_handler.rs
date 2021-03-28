@@ -1,3 +1,5 @@
+use log::info;
+
 use crate::{
     game_logic::{
         event_handlers::EventHandler, events::EndTurnEvent, EventDispatcher, TurnStartEvent,
@@ -17,7 +19,7 @@ impl EventHandler for EndTurnEventHandler {
         game_state: &mut GameState,
         dispatcher: &mut EventDispatcher,
     ) {
-        println!("Player {:?} ends turn", game_state.cur_player_id());
+        info!("Player {:?} ends turn", game_state.cur_player_id());
 
         // Trigger 'upon turn end' events
         game_state

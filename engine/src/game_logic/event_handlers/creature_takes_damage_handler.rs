@@ -1,3 +1,5 @@
+use log::info;
+
 use crate::{
     game_logic::{
         event_handlers::EventHandler, CreatureDestroyedEvent, CreatureTakesDamageEvent,
@@ -25,7 +27,7 @@ impl EventHandler for CreatureTakesDamageHandler {
             .definition()
             .title();
 
-        println!("{} takes {} damage", title, event.damage_amount());
+        info!("{} takes {} damage", title, event.damage_amount());
 
         game_state.update_by_id(event.creature_id(), |c| {
             c.take_damage(event.damage_amount());

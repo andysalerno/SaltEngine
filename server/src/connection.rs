@@ -1,5 +1,6 @@
 use async_tungstenite::{tungstenite::Message, WebSocketStream};
 use futures::{SinkExt, StreamExt};
+use log::trace;
 use serde::de::DeserializeOwned;
 use smol::net::TcpStream;
 
@@ -41,6 +42,7 @@ impl Connection {
         M: GameMessage,
     {
         let json = serde_json::to_string(&message)?;
+        trace!("Sending raw json: {}", json);
         self.stream.send(Message::Text(json)).await?;
         Ok(())
     }
@@ -54,6 +56,8 @@ impl Connection {
         let s = response
             .to_text()
             .expect("Expected a websocket text message");
+
+        trace!("Received raw json response: {}", s);
 
         let t: T = serde_json::from_str(s).expect("failed to deserialize");
 
