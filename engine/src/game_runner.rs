@@ -1,14 +1,20 @@
 use crate::{
     game_agent::game_agent::GameAgent,
-    game_logic::{cards::*, EventDispatcher, StartGameEvent},
+    game_logic::{cards::*, EventDispatcher, GameEvent, StartGameEvent},
     game_state::{
         Deck, GameState, GameStatePlayerView, GameStateView, MakePlayerView, UnitCardInstance,
     },
 };
 
+/// A trait that defines the interaction between the GameRunner
+/// and the client.
+/// The GameRunner is the rules engine, and it will use the
+/// GameRunnerHandler for each player client to alert that client
+/// to events, and to receive input from the player client.
 pub trait GameRunnerHandler: Send + Sync {
     fn on_turn_start(&self, game_state: &GameState);
-    fn has_ended_turn(&self) -> bool;
+    //fn has_ended_turn(&self) -> bool;
+    fn next_action(&self) -> GameEvent;
 }
 
 pub struct GameRunnerZ {
@@ -31,6 +37,9 @@ impl GameRunnerZ {
     }
 
     pub async fn run_game(self) {
+        // let dispatcher = EventDispatcher::new(player_a_prompter, player_b_prompter)
+        let dispatcher = EventDispatcher::new();
+
         while !self.game_state.is_game_over() {
             let handler = if self.game_state.cur_player_turn() == self.game_state.player_a_id() {
                 self.player_a_handler.as_ref()
@@ -48,7 +57,14 @@ impl GameRunnerZ {
 
         handler.on_turn_start(game_state);
 
-        while !handler.has_ended_turn() {}
+        loop {
+            let action = handler.next_action();
+
+            if let GameEvent::EndTurn(__) = action {
+                println!("Player has ended their turn.");
+                break;
+            }
+        }
     }
 }
 
@@ -134,7 +150,8 @@ impl GameRunner {
     pub fn run_game(&mut self) {
         let a_prompter = self.player_a.make_prompter();
         let b_prompter = self.player_b.make_prompter();
-        let mut dispatcher = EventDispatcher::new(a_prompter, b_prompter);
+        //let mut dispatcher = EventDispatcher::new(a_prompter, b_prompter);
+        let mut dispatcher = EventDispatcher::new();
 
         dispatcher.dispatch(StartGameEvent, &mut self.game_state);
 

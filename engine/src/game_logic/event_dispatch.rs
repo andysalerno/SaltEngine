@@ -5,16 +5,17 @@ use super::{event_handlers::*, events::GameEvent};
 #[derive(Debug)]
 pub struct EventDispatcher {
     stack: Vec<GameEvent>,
-    player_a_prompter: Box<dyn Prompter>,
-    player_b_prompter: Box<dyn Prompter>,
+    // player_a_prompter: Box<dyn Prompter>,
+    // player_b_prompter: Box<dyn Prompter>,
 }
 
 impl EventDispatcher {
-    pub fn new(player_a_prompter: Box<dyn Prompter>, player_b_prompter: Box<dyn Prompter>) -> Self {
+    // pub fn new(player_a_prompter: Box<dyn Prompter>, player_b_prompter: Box<dyn Prompter>) -> Self {
+    pub fn new() -> Self {
         Self {
             stack: Vec::new(),
-            player_a_prompter,
-            player_b_prompter,
+            // player_a_prompter,
+            // player_b_prompter,
         }
     }
 
@@ -32,14 +33,14 @@ impl EventDispatcher {
         }
     }
 
-    pub fn player_prompter(&self) -> &dyn Prompter {
-        self.player_a_prompter.as_ref()
-    }
+    // pub fn player_prompter(&self) -> &dyn Prompter {
+    //     self.player_a_prompter.as_ref()
+    // }
 
-    #[cfg(test)]
-    pub fn set_player_a_prompter(&mut self, prompter: Box<dyn Prompter>) {
-        self.player_a_prompter = prompter;
-    }
+    // #[cfg(test)]
+    // pub fn set_player_a_prompter(&mut self, prompter: Box<dyn Prompter>) {
+    //     self.player_a_prompter = prompter;
+    // }
 
     fn handle(&mut self, event: GameEvent, game_state: &mut GameState) {
         match event {
@@ -97,6 +98,7 @@ pub(crate) mod tests {
         prompter_a: impl Prompter + 'static,
         prompter_b: impl Prompter + 'static,
     ) -> EventDispatcher {
-        EventDispatcher::new(Box::new(prompter_a), Box::new(prompter_b))
+        // EventDispatcher::new(Box::new(prompter_a), Box::new(prompter_b))
+        EventDispatcher::new()
     }
 }

@@ -4,6 +4,7 @@ use crate::{connection::Connection, Result};
 use futures::{join, try_join};
 use salt_engine::{
     cards::*,
+    game_logic::GameEvent,
     game_runner::{GameRunnerHandler, GameRunnerZ},
     game_state::{Deck, GameState, GameStateView, MakePlayerView, PlayerId, UnitCardInstance},
 };
@@ -42,7 +43,7 @@ impl GameRunnerHandler for PlayerGameRunner {
         //     .expect("Sending TurnStart failed.");
     }
 
-    fn has_ended_turn(&self) -> bool {
+    fn next_action(&self) -> GameEvent {
         todo!()
     }
 }

@@ -1,6 +1,6 @@
 mod console_display;
 mod game_agent;
-mod game_logic;
+pub mod game_logic;
 pub mod game_runner;
 pub mod game_state;
 pub mod id;
