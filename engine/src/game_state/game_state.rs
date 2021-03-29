@@ -3,6 +3,7 @@ use super::{
     hand::HandView,
     Deck, Hand, IterAddons, IteratorAny, PlayerId, UnitCardInstance, UnitCardInstanceId,
 };
+use log::debug;
 use serde::{Deserialize, Serialize};
 use std::slice::Iter;
 
@@ -198,6 +199,7 @@ impl GameState {
     }
 
     pub fn hand_mut(&mut self, player_id: PlayerId) -> &mut Hand {
+        debug!("Getting hand_mut reference.");
         match self.player_ab(player_id) {
             PlayerAB::PlayerA => &mut self.player_a_hand,
             PlayerAB::PlayerB => &mut self.player_b_hand,
@@ -423,7 +425,7 @@ pub mod player_view {
             } else if player_id == self.opponent_id {
                 PlayerOpponent::Opponent
             } else {
-                panic!("Provided player_id is for neither the player nor the opponent, and therefore is not valid")
+                panic!("Provided player_id {:?} is for neither the player nor the opponent, and therefore is not valid", player_id)
             }
         }
     }
@@ -437,6 +439,7 @@ pub mod player_view {
         }
 
         fn hand(&self, player_id: PlayerId) -> &HandPlayerView {
+            debug!("game state player view hand");
             if player_id == self.player_id {
                 return &self.player_hand;
             }

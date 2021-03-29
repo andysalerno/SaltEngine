@@ -29,9 +29,11 @@ pub struct ConsoleAgent {
 
 impl ConsoleAgent {
     pub fn new() -> Self {
-        Self {
-            id: PlayerId::new(),
-        }
+        Self::new_with_id(PlayerId::new())
+    }
+
+    pub fn new_with_id(id: PlayerId) -> Self {
+        Self { id }
     }
 }
 

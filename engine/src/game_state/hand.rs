@@ -2,6 +2,7 @@ use super::{
     card_instance::{UnitCardInstancePlayerView, UnitCardInstanceView},
     MakePlayerView, PlayerId, UnitCardInstance, UnitCardInstanceId,
 };
+use log::debug;
 use serde::{Deserialize, Serialize};
 
 pub trait HandView<'a> {
@@ -10,6 +11,7 @@ pub trait HandView<'a> {
     fn cards(&self) -> &[Self::TCard];
 
     fn card(&self, id: UnitCardInstanceId) -> &Self::TCard {
+        debug!("handview trait card default impl");
         self.cards()
             .iter()
             .filter(|c| c.id() == id)
@@ -21,6 +23,7 @@ pub trait HandView<'a> {
     }
 
     fn nth(&self, n: usize) -> &Self::TCard {
+        debug!("nth");
         self.cards()
             .iter()
             .nth(n)
@@ -43,10 +46,12 @@ impl Hand {
     }
 
     pub fn cards(&self) -> &[UnitCardInstance] {
+        debug!("hand cards impl");
         self.cards.as_slice()
     }
 
     pub fn cards_mut(&mut self) -> &mut [UnitCardInstance] {
+        debug!("cards mut");
         self.cards.as_mut_slice()
     }
 
@@ -55,10 +60,12 @@ impl Hand {
     }
 
     pub fn card(&self, id: UnitCardInstanceId) -> &UnitCardInstance {
+        debug!("hand card impl");
         HandView::card(self, id)
     }
 
     pub fn take_card(&mut self, id: UnitCardInstanceId) -> UnitCardInstance {
+        debug!("take_card impl.");
         let (index, _) = self
             .cards
             .iter()
@@ -70,7 +77,9 @@ impl Hand {
                 id
             ));
 
+        debug!("removing card from vector.");
         let card = self.cards.remove(index);
+        debug!("card removed from vector.");
         assert!(card.id() == id);
 
         card
@@ -81,11 +90,8 @@ impl<'a> HandView<'a> for Hand {
     type TCard = UnitCardInstance;
 
     fn cards(&self) -> &[UnitCardInstance] {
+        debug!("handview cards impl");
         Hand::cards(self)
-    }
-
-    fn card(&self, id: UnitCardInstanceId) -> &UnitCardInstance {
-        Hand::card(self, id)
     }
 }
 
@@ -98,6 +104,7 @@ impl MakePlayerView for Hand {
     type TOut = HandPlayerView;
 
     fn player_view(&self, player_viewing: PlayerId) -> HandPlayerView {
+        debug!("player view");
         let cards = self
             .cards()
             .iter()
@@ -112,6 +119,7 @@ impl<'a> HandView<'a> for HandPlayerView {
     type TCard = UnitCardInstancePlayerView;
 
     fn cards(&self) -> &[UnitCardInstancePlayerView] {
+        debug!("handplayerview cards impl");
         self.cards.as_slice()
     }
 }

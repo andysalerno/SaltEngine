@@ -1,3 +1,5 @@
+use log::{debug, info};
+
 use crate::{
     game_logic::{
         event_handlers::EventHandler, CreatureSetEvent, Event, EventDispatcher,
@@ -25,6 +27,7 @@ impl EventHandler for SummonCreatureFromHandEventHandler {
         let player_id = event.player_id();
 
         // Take the card out of the player's hand
+        debug!("Taking card from player's hand.");
         let mut card_from_hand = game_state
             .hand_mut(player_id)
             .take_card(event.hand_card_id());
@@ -33,7 +36,7 @@ impl EventHandler for SummonCreatureFromHandEventHandler {
         {
             let creature_name = card_from_hand.definition().title();
             let mana_amount = card_from_hand.definition().cost();
-            println!("Player {:?} summons {}", player_id, creature_name);
+            info!("Player {:?} summons {}", player_id, creature_name);
 
             dispatcher.dispatch(
                 PlayerSpendManaEvent::new(player_id, mana_amount as u32),

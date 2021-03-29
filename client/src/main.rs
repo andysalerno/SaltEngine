@@ -31,13 +31,14 @@ fn main() -> Result<()> {
 
 async fn handle_connection(mut connection: Connection) -> Result<()> {
     // Expect a Hello
-    let mut agent: Box<dyn GameAgent> = Box::new(ConsoleAgent::new());
 
     let my_id = match connection.recv::<FromServer>().await {
         Some(FromServer::Hello(my_id)) => my_id,
         _ => panic!("unexpected response from server"),
     };
     info!("Saw a hello - my id is: {:?}", my_id);
+
+    let mut agent: Box<dyn GameAgent> = Box::new(ConsoleAgent::new_with_id(my_id));
 
     // Send Ready
     connection.send(FromClient::Ready).await?;

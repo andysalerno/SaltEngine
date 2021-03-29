@@ -1,3 +1,5 @@
+use log::{debug, trace};
+
 use crate::{game_agent::game_agent::Prompter, game_state::GameState};
 
 use super::{event_handlers::*, events::GameEvent};
@@ -43,6 +45,8 @@ impl EventDispatcher {
     // }
 
     fn handle(&mut self, event: GameEvent, game_state: &mut GameState) {
+        debug!("Dispatching event: {:?}", event);
+
         match event {
             GameEvent::Attack(e) => AttackEventHandler::default().handle(e, game_state, self),
             GameEvent::EndTurn(e) => EndTurnEventHandler::default().handle(e, game_state, self),

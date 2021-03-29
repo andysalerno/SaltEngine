@@ -6,7 +6,7 @@ use crate::{
     },
 };
 use async_trait::async_trait;
-use log::info;
+use log::{info, trace};
 
 /// A trait that defines the interaction between the GameRunner
 /// and the client.
@@ -64,6 +64,7 @@ impl GameRunnerZ {
         handler.on_turn_start(game_state).await;
 
         loop {
+            info!("Getting next action from client.");
             let action = handler
                 .next_action(game_state.player_view(cur_player_id))
                 .await;

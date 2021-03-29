@@ -7,6 +7,7 @@ use crate::{
         GameStateView, HandView, PlayerId, UnitCardInstanceId, UnitCardInstanceView,
     },
 };
+use log::debug;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -62,13 +63,16 @@ fn validate_slots_available<'a>(
     event: &SummonCreatureFromHandEvent,
     game_state: &'a impl GameStateView<'a>,
 ) -> super::Result {
+    debug!("Validating the slots for the summon are not already occupied.");
     let creature_width = game_state
         .hand(event.player_id())
         .card(event.hand_card_id())
         .width();
 
+    debug!("board pos?");
     let requested_pos = event.board_pos();
 
+    debug!("is range in row?");
     if !game_state
         .board()
         .is_range_in_row(requested_pos, creature_width)
@@ -79,6 +83,7 @@ fn validate_slots_available<'a>(
         )
         .into());
     }
+    debug!("is range in row finished");
 
     for i in 0..creature_width {
         let mut look_pos = requested_pos;
@@ -100,6 +105,7 @@ fn validate_is_players_side<'a>(
     event: &SummonCreatureFromHandEvent,
     _game_state: &'a impl GameStateView<'a>,
 ) -> super::Result {
+    debug!("Validating the summon is from the player's own side.");
     let player_id = event.player_id();
     let requested_pos = event.board_pos();
 
@@ -121,6 +127,7 @@ fn validate_player_has_enough_mana<'a, G>(
 where
     G: GameStateView<'a>,
 {
+    debug!("Validating the player has enough mana for the summon.");
     let card = game_state
         .hand(event.player_id())
         .card(event.hand_card_id());
@@ -142,6 +149,7 @@ fn validate_respects_placeableat<'a>(
     event: &SummonCreatureFromHandEvent,
     game_state: &'a impl GameStateView<'a>,
 ) -> super::Result {
+    debug!("Validating the slots are in the card's placable positions.");
     let player_id = event.player_id();
     let card_id = event.hand_card_id();
 
