@@ -14,7 +14,7 @@ pub trait GameAgent {
 }
 
 #[cfg_attr(test, automock)]
-pub trait Prompter {
+pub trait Prompter: Send + Sync {
     /// Prompt the player for for any position (slot) on the board.
     fn prompt_slot(&self, game_state: &GameStatePlayerView) -> BoardPos;
 

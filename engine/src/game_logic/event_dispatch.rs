@@ -7,17 +7,16 @@ use super::{event_handlers::*, events::GameEvent};
 #[derive(Debug)]
 pub struct EventDispatcher {
     stack: Vec<GameEvent>,
-    // player_a_prompter: Box<dyn Prompter>,
-    // player_b_prompter: Box<dyn Prompter>,
+    player_a_prompter: Box<dyn Prompter>,
+    player_b_prompter: Box<dyn Prompter>,
 }
 
 impl EventDispatcher {
-    // pub fn new(player_a_prompter: Box<dyn Prompter>, player_b_prompter: Box<dyn Prompter>) -> Self {
-    pub fn new() -> Self {
+    pub fn new(player_a_prompter: Box<dyn Prompter>, player_b_prompter: Box<dyn Prompter>) -> Self {
         Self {
             stack: Vec::new(),
-            // player_a_prompter,
-            // player_b_prompter,
+            player_a_prompter,
+            player_b_prompter,
         }
     }
 
@@ -102,7 +101,6 @@ pub(crate) mod tests {
         prompter_a: impl Prompter + 'static,
         prompter_b: impl Prompter + 'static,
     ) -> EventDispatcher {
-        // EventDispatcher::new(Box::new(prompter_a), Box::new(prompter_b))
-        EventDispatcher::new()
+        EventDispatcher::new(Box::new(prompter_a), Box::new(prompter_b))
     }
 }

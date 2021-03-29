@@ -1,3 +1,5 @@
+use log::info;
+
 use super::{CardDefinition, Position, UnitCardDefinition};
 use crate::{
     game_logic::{EventDispatcher, PosTakesDamageEvent},
@@ -77,7 +79,7 @@ impl UnitCardDefinition for RicketyCannon {
             let cannon_target = instance.state();
 
             if let Some(InstanceState::Pos(pos)) = cannon_target {
-                println!("Rickety Cannon fires a shot at {:?}", pos);
+                info!("Rickety Cannon fires a shot at {:?}", pos);
                 let damage_event = PosTakesDamageEvent::new(pos, 1);
                 dispatcher.dispatch(damage_event, game_state);
             }

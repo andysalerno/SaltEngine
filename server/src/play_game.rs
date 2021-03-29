@@ -6,11 +6,12 @@ use futures::{join, try_join};
 use log::{info, trace};
 use salt_engine::{
     cards::*,
+    game_agent::game_agent::Prompter,
     game_logic::{ClientGameEvent, EndTurnEvent, GameEvent},
     game_runner::{GameRunnerHandler, GameRunnerZ},
     game_state::{
-        Deck, GameState, GameStatePlayerView, GameStateView, MakePlayerView, PlayerId,
-        UnitCardInstance,
+        board::BoardPos, Deck, GameState, GameStatePlayerView, GameStateView, MakePlayerView,
+        PlayerId, UnitCardInstance,
     },
 };
 
@@ -58,6 +59,10 @@ impl GameRunnerHandler for NetworkGameRunner {
             FromClient::ClientAction(e) => e,
             _ => panic!("Unexpected response from client; expected ClientGameEvent"),
         }
+    }
+
+    async fn make_prompter(&self) -> Box<dyn Prompter> {
+        todo!()
     }
 }
 
@@ -126,52 +131,6 @@ pub(crate) async fn play_game(
         player_a_id, player_b_id
     );
     Ok(())
-}
-
-async fn game_loop(
-    mut game_state: GameState,
-    mut player_a_connection: Connection,
-    mut player_b_connection: Connection,
-) {
-    loop {
-        if game_state.is_game_over() {
-            return;
-        }
-
-        let whose_turn = game_state.cur_player_turn();
-        player_take_turn(
-            &mut game_state,
-            whose_turn,
-            &mut player_a_connection,
-            &mut player_b_connection,
-        )
-        .await;
-    }
-}
-
-async fn player_take_turn(
-    game_state: &mut GameState,
-    whose_turn: PlayerId,
-    player_a_connection: &mut Connection,
-    player_b_connection: &mut Connection,
-) {
-    info!("Player {:?} starts their turn.", whose_turn);
-
-    let player_turn_connection = {
-        if whose_turn == game_state.player_a_id() {
-            player_a_connection
-        } else if whose_turn == game_state.player_b_id() {
-            player_b_connection
-        } else {
-            panic!("Unknown player ID")
-        }
-    };
-
-    // Send the TurnStart message.
-    player_turn_connection
-        .send(FromServer::TurnStart)
-        .await
-        .expect("Sending TurnStart failed.");
 }
 
 fn get_deck() -> Deck {
