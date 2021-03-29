@@ -16,7 +16,7 @@ use log::info;
 #[async_trait]
 pub trait GameRunnerHandler: Send + Sync {
     async fn on_turn_start(&mut self, game_state: &GameState);
-    async fn next_action(&mut self) -> ClientGameEvent;
+    async fn next_action(&mut self, game_state_view: GameStatePlayerView) -> ClientGameEvent;
 }
 
 pub struct GameRunnerZ {
@@ -64,7 +64,9 @@ impl GameRunnerZ {
         handler.on_turn_start(game_state).await;
 
         loop {
-            let action = handler.next_action().await;
+            let action = handler
+                .next_action(game_state.player_view(cur_player_id))
+                .await;
             let action: GameEvent = action.into();
 
             let turn_is_over = match action {

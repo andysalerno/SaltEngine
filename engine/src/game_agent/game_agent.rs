@@ -1,11 +1,14 @@
-use crate::game_state::{GameStatePlayerView, PlayerId};
-use crate::{game_logic::GameEvent, game_state::board::BoardPos};
+use crate::game_state::board::BoardPos;
+use crate::{
+    game_logic::ClientGameEvent,
+    game_state::{GameStatePlayerView, PlayerId},
+};
 
 #[cfg(test)]
 use mockall::{automock, predicate::*};
 
 pub trait GameAgent {
-    fn get_action(&self, game_state: &GameStatePlayerView) -> GameEvent;
+    fn get_action(&self, game_state: &GameStatePlayerView) -> ClientGameEvent;
     fn id(&self) -> PlayerId;
     fn make_prompter(&self) -> Box<dyn Prompter>;
 }

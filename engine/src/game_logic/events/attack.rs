@@ -1,8 +1,9 @@
 use crate::game_state::UnitCardInstanceId;
+use serde::{Deserialize, Serialize};
 
 use super::{Event, GameEvent};
 
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct AttackEvent {
     attacker: UnitCardInstanceId,
     target: UnitCardInstanceId,

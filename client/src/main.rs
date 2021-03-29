@@ -1,5 +1,12 @@
+mod console_agent;
+mod console_display;
+
+use console_agent::ConsoleAgent;
 use log::info;
-use salt_engine::game_logic::{ClientGameEvent, EndTurnEvent};
+use salt_engine::{
+    game_agent::game_agent::GameAgent,
+    game_logic::{ClientGameEvent, EndTurnEvent},
+};
 use server::{
     connection::Connection,
     messages::{FromClient, FromServer},
@@ -24,6 +31,8 @@ fn main() -> Result<()> {
 
 async fn handle_connection(mut connection: Connection) -> Result<()> {
     // Expect a Hello
+    let mut agent: Box<dyn GameAgent> = Box::new(ConsoleAgent::new());
+
     let my_id = match connection.recv::<FromServer>().await {
         Some(FromServer::Hello(my_id)) => my_id,
         _ => panic!("unexpected response from server"),
@@ -47,14 +56,6 @@ async fn handle_connection(mut connection: Connection) -> Result<()> {
     };
     info!("My starting hand is: {:?}", gamestate_view.hand());
 
-    // Expect the turn start message
-    // match connection.recv::<FromServer>().await {
-    //     Some(FromServer::TurnStart) => {}
-    //     Some(other) => panic!("Expected TurnStart, saw {:?}", other),
-    //     None => panic!("No response from server."),
-    // };
-    // info!("Got the TurnStart message.");
-
     loop {
         // Wait for signal from server that we can send an action
         let msg = connection
@@ -63,7 +64,7 @@ async fn handle_connection(mut connection: Connection) -> Result<()> {
             .expect("failed to get a response from the server");
 
         match msg {
-            FromServer::TurnStart => handle_turn_start(&mut connection).await?,
+            FromServer::TurnStart => handle_turn_start(&mut connection, agent.as_mut()).await?,
             _ => panic!("expected a TurnStart message, but received: {:?}", msg),
         }
     }
@@ -71,7 +72,7 @@ async fn handle_connection(mut connection: Connection) -> Result<()> {
     Ok(())
 }
 
-async fn handle_turn_start(connection: &mut Connection) -> Result<()> {
+async fn handle_turn_start(connection: &mut Connection, agent: &dyn GameAgent) -> Result<()> {
     // Continuously receive actions from the client, until they end their turn.
     loop {
         // Wait for signal from server that we can send an action
@@ -80,20 +81,18 @@ async fn handle_turn_start(connection: &mut Connection) -> Result<()> {
             .await
             .expect("failed to get a response from the server");
 
-        match msg {
-            FromServer::WaitingForAction => {}
+        let game_state_view = match msg {
+            FromServer::WaitingForAction(state) => state,
             _ => panic!(
                 "expected a WaitingForAction message, but received: {:?}",
                 msg
             ),
-        }
+        };
 
-        // Get the action from the player ...
-        // For now, just end the turn.
+        let player_action = agent.get_action(&game_state_view);
+
         connection
-            .send(FromClient::ClientAction(ClientGameEvent::EndTurn(
-                EndTurnEvent,
-            )))
+            .send(FromClient::ClientAction(player_action))
             .await?;
 
         return Ok(());

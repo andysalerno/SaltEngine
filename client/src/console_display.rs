@@ -1,8 +1,8 @@
-use crate::{
+use salt_engine::{
     game_runner::GameDisplay,
     game_state::{
-        board::{player_view::BoardSlotPlayerView, BoardSlot, BoardView, RowId},
-        GameState, GameStatePlayerView, GameStateView,
+        board::{player_view::BoardSlotPlayerView, BoardView, RowId},
+        GameStatePlayerView, GameStateView,
     },
 };
 

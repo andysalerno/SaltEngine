@@ -23,6 +23,6 @@ pub enum FromServer {
     GameStart { opponent_id: PlayerId },
     State(GameStatePlayerView),
     TurnStart,
-    WaitingForAction,
+    WaitingForAction(GameStatePlayerView),
 }
 impl GameMessage for FromServer {}

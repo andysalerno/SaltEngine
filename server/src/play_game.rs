@@ -8,7 +8,10 @@ use salt_engine::{
     cards::*,
     game_logic::{ClientGameEvent, EndTurnEvent, GameEvent},
     game_runner::{GameRunnerHandler, GameRunnerZ},
-    game_state::{Deck, GameState, GameStateView, MakePlayerView, PlayerId, UnitCardInstance},
+    game_state::{
+        Deck, GameState, GameStatePlayerView, GameStateView, MakePlayerView, PlayerId,
+        UnitCardInstance,
+    },
 };
 
 struct NetworkGameRunner {
@@ -36,10 +39,13 @@ impl GameRunnerHandler for NetworkGameRunner {
             .expect("failed to send turnstart");
     }
 
-    async fn next_action(&mut self) -> ClientGameEvent {
+    async fn next_action(&mut self, game_state_view: GameStatePlayerView) -> ClientGameEvent {
         // Awaiting response from the client.
 
-        let _ping = self.connection.send(FromServer::WaitingForAction).await;
+        let _ping = self
+            .connection
+            .send(FromServer::WaitingForAction(game_state_view))
+            .await;
         info!("Waiting for the player's next action...");
         let from_client = self
             .connection

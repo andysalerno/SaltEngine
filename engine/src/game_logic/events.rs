@@ -73,6 +73,7 @@ pub enum GameEvent {
 pub enum ClientGameEvent {
     EndTurn(EndTurnEvent),
     SummonCreatureFromHand(SummonCreatureFromHandEvent),
+    Attack(AttackEvent),
 }
 
 impl From<ClientGameEvent> for GameEvent {
@@ -80,6 +81,7 @@ impl From<ClientGameEvent> for GameEvent {
         match e {
             ClientGameEvent::EndTurn(e) => GameEvent::EndTurn(e),
             ClientGameEvent::SummonCreatureFromHand(e) => GameEvent::SummonCreatureFromHand(e),
+            ClientGameEvent::Attack(e) => GameEvent::Attack(e),
         }
     }
 }
