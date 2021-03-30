@@ -1,6 +1,9 @@
-use crate::messages::{FromClient, FromServer};
-use crate::websocket_server::SharedContext;
 use crate::{connection::Connection, Result};
+use crate::{
+    messages::{FromClient, FromServer},
+    network_prompter,
+};
+use crate::{network_prompter::NewtorkPrompter, websocket_server::SharedContext};
 use async_trait::async_trait;
 use futures::{join, try_join};
 use log::{info, trace};
@@ -62,7 +65,7 @@ impl GameRunnerHandler for NetworkGameRunner {
     }
 
     async fn make_prompter(&self) -> Box<dyn Prompter> {
-        todo!()
+        Box::new(NewtorkPrompter::new())
     }
 }
 

@@ -301,16 +301,14 @@ impl ConsolePrompter {
 
         let target_pos = self.prompt_pos(game_state, input_queue)?;
 
-        if !game_state
-            .iter()
-            .for_player(game_state.opponent_id())
-            .with_creature()
-            .any(|s| s.pos() == target_pos)
-        {
-            return Err(ConsoleError::UserInputError(
-                "That's not a valid target.".to_owned(),
-            ));
-        }
+        let target_creature =
+            if let Some(target_creature) = game_state.board().creature_at_pos(target_pos) {
+                target_creature
+            } else {
+                return Err(ConsoleError::UserInputError(
+                    "That's not a valid target.".to_owned(),
+                ));
+            };
 
         let attacker_id = game_state
             .board()
@@ -318,7 +316,7 @@ impl ConsolePrompter {
             .unwrap()
             .id();
 
-        let target_id = game_state.board().creature_at_pos(target_pos).unwrap().id();
+        let target_id = target_creature.id();
 
         let event = AttackEvent::new(attacker_id, target_id);
 

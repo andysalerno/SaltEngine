@@ -1,6 +1,7 @@
 mod connection;
 mod matchmaker;
 pub mod messages;
+mod network_prompter;
 mod play_game;
 mod websocket_server;
 

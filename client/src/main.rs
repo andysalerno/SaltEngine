@@ -92,10 +92,14 @@ async fn handle_turn_start(connection: &mut Connection, agent: &dyn GameAgent) -
 
         let player_action = agent.get_action(&game_state_view);
 
+        let is_turn_ending = player_action.is_end_turn();
+
         connection
             .send(FromClient::ClientAction(player_action))
             .await?;
 
-        return Ok(());
+        if is_turn_ending {
+            return Ok(());
+        }
     }
 }

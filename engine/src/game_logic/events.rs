@@ -85,3 +85,12 @@ impl From<ClientGameEvent> for GameEvent {
         }
     }
 }
+
+impl ClientGameEvent {
+    pub fn is_end_turn(&self) -> bool {
+        match self {
+            ClientGameEvent::EndTurn(_) => true,
+            _ => false,
+        }
+    }
+}
