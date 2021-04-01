@@ -115,6 +115,7 @@ impl BuffBuilder {
             health_amount: self.health_amount,
             source_id: self.source,
             instance_id: self.instance_id,
+            definition_id: self.definition_id,
         }
     }
 }
@@ -125,6 +126,7 @@ pub struct BuiltBuff {
     health_amount: i32,
     source_id: BuffSourceId,
     instance_id: BuffInstanceId,
+    definition_id: Id,
 }
 
 impl Buff for BuiltBuff {
@@ -145,7 +147,7 @@ impl Buff for BuiltBuff {
     }
 
     fn definition_id(&self) -> Id {
-        todo!()
+        self.definition_id
     }
 }
 

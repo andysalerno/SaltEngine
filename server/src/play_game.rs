@@ -1,29 +1,25 @@
+use crate::messages::{FromClient, FromServer};
 use crate::{connection::Connection, Result};
-use crate::{
-    messages::{FromClient, FromServer},
-    network_prompter,
-};
 use crate::{network_prompter::NewtorkPrompter, websocket_server::SharedContext};
 use async_trait::async_trait;
 use futures::{join, try_join};
-use log::{info, trace};
+use log::info;
 use salt_engine::{
     cards::*,
     game_agent::game_agent::Prompter,
-    game_logic::{ClientGameEvent, EndTurnEvent, GameEvent},
-    game_runner::{GameRunnerHandler, GameRunnerZ},
+    game_logic::ClientGameEvent,
+    game_runner::{GameClient, GameRunner},
     game_state::{
-        board::BoardPos, Deck, GameState, GameStatePlayerView, GameStateView, MakePlayerView,
-        PlayerId, UnitCardInstance,
+        Deck, GameState, GameStatePlayerView, MakePlayerView, PlayerId, UnitCardInstance,
     },
 };
 
-struct NetworkGameRunner {
+struct NetworkGameClient {
     player_id: PlayerId,
     connection: Connection,
 }
 
-impl NetworkGameRunner {
+impl NetworkGameClient {
     fn new(player_id: PlayerId, connection: Connection) -> Self {
         Self {
             player_id,
@@ -33,7 +29,7 @@ impl NetworkGameRunner {
 }
 
 #[async_trait]
-impl GameRunnerHandler for NetworkGameRunner {
+impl GameClient for NetworkGameClient {
     async fn on_turn_start(&mut self, _game_state: &GameState) {
         info!("Player controller: on turn start");
 
@@ -124,9 +120,9 @@ pub(crate) async fn play_game(
             .await?;
     }
 
-    let player_a_runner = Box::new(NetworkGameRunner::new(player_a_id, player_a_connection));
-    let player_b_runner = Box::new(NetworkGameRunner::new(player_b_id, player_b_connection));
-    let runner = GameRunnerZ::new(player_a_runner, player_b_runner, game_state);
+    let player_a_runner = Box::new(NetworkGameClient::new(player_a_id, player_a_connection));
+    let player_b_runner = Box::new(NetworkGameClient::new(player_b_id, player_b_connection));
+    let runner = GameRunner::new(player_a_runner, player_b_runner, game_state);
     runner.run_game().await;
 
     info!(

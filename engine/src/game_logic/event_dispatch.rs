@@ -34,9 +34,9 @@ impl EventDispatcher {
         }
     }
 
-    // pub fn player_prompter(&self) -> &dyn Prompter {
-    //     self.player_a_prompter.as_ref()
-    // }
+    pub fn player_prompter(&self) -> &dyn Prompter {
+        self.player_a_prompter.as_ref()
+    }
 
     // #[cfg(test)]
     // pub fn set_player_a_prompter(&mut self, prompter: Box<dyn Prompter>) {

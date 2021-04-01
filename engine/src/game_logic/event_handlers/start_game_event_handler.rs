@@ -1,3 +1,5 @@
+use log::info;
+
 use crate::{
     game_logic::{
         event_handlers::EventHandler, DrawCardEvent, EventDispatcher, StartGameEvent,
@@ -23,7 +25,7 @@ impl EventHandler for StartGameEventHandler {
         let player_a_id = game_state.player_a_id();
         let player_b_id = game_state.player_b_id();
 
-        println!(
+        info!(
             "Game start.\nPlayer A: {:?}\nPlayer B: {:?}",
             player_a_id, player_b_id
         );

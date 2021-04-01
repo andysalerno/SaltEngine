@@ -20,11 +20,8 @@ pub trait HandView<'a> {
             ))
     }
 
-    fn nth(&self, n: usize) -> &Self::TCard {
-        self.cards()
-            .iter()
-            .nth(n)
-            .expect(&format!("No card at index {}", n))
+    fn nth(&self, n: usize) -> Option<&Self::TCard> {
+        self.cards().get(n)
     }
 
     fn len(&self) -> usize {

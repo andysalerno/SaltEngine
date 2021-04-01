@@ -64,6 +64,15 @@ pub enum GameEvent {
     CreatureHealed(CreatureHealedEvent),
 }
 
+impl GameEvent {
+    pub fn is_end_turn(&self) -> bool {
+        match self {
+            GameEvent::EndTurn(_) => true,
+            _ => false,
+        }
+    }
+}
+
 /// The subset of game events that clients can
 /// provide the server over the course of the game.
 /// For example, a client can legally provide a TurnEnd event

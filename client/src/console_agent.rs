@@ -23,6 +23,10 @@ enum ConsoleError {
     UserInputError(String),
 }
 
+fn user_input_err<T: ToString>(msg: T) -> ConsoleError {
+    ConsoleError::UserInputError(msg.to_string())
+}
+
 pub struct ConsoleAgent {
     id: PlayerId,
 }
@@ -261,12 +265,13 @@ impl ConsolePrompter {
                 .map_err(|_| ConsoleError::UserInputError("Not a valid input.".to_owned()))?;
 
             if card_index > game_state.hand().len() {
-                return Err(ConsoleError::UserInputError(
-                    "That index is out of range.".into(),
-                ));
+                return Err(user_input_err("That index is out of range."));
             }
 
-            let selected_card = game_state.hand().nth(card_index);
+            let selected_card = game_state
+                .hand()
+                .nth(card_index)
+                .ok_or(user_input_err("Not a valid card index."))?;
 
             selected_card.id()
         };

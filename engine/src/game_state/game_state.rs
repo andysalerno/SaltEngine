@@ -224,7 +224,7 @@ impl GameState {
     pub fn refresh_player_mana(&mut self, player_id: PlayerId) {
         match self.player_ab(player_id) {
             PlayerAB::PlayerA => self.player_a_mana = self.player_a_mana_limit,
-            PlayerAB::PlayerB => self.player_b_mana = self.player_a_mana_limit,
+            PlayerAB::PlayerB => self.player_b_mana = self.player_b_mana_limit,
         }
     }
 

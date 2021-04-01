@@ -62,12 +62,11 @@ impl UnitCardDefinition for RicketyCannon {
         Box::new(|instance, summoned_to_pos, game_state, dispatcher| {
             let summoner = summoned_to_pos.player_id;
 
-            todo!("Prompting still busted");
-            // let pos = dispatcher
-            //     .player_prompter()
-            //     .prompt_slot(&game_state.player_view(summoner));
+            let pos = dispatcher
+                .player_prompter()
+                .prompt_slot(&game_state.player_view(summoner));
 
-            //instance.set_state(Some(InstanceState::Pos(pos)));
+            instance.set_state(Some(InstanceState::Pos(pos)));
         })
     }
 
