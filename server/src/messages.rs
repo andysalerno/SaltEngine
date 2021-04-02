@@ -1,4 +1,3 @@
-use crate::network_prompter::PromptMessage;
 use salt_engine::{
     game_logic::ClientGameEvent,
     game_state::{board::BoardPos, GameStatePlayerView, PlayerId},
@@ -29,3 +28,13 @@ pub enum FromServer {
     Prompt(PromptMessage),
 }
 impl GameMessage for FromServer {}
+
+#[derive(Serialize, Deserialize, Debug, Copy, Clone)]
+pub enum PromptMessage {
+    PromptSlot,
+    PromptPlayerSlot,
+    PromptOpponentSlot,
+    PromptCreaturePos,
+    PromptPlayerCreaturePos,
+    PromptOpponentCreaturePos,
+}

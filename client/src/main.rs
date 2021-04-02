@@ -9,7 +9,7 @@ use salt_engine::{
 };
 use server::{
     connection::Connection,
-    messages::{FromClient, FromServer},
+    messages::{FromClient, FromServer, PromptMessage},
 };
 use smol::net::TcpStream;
 
@@ -82,24 +82,28 @@ async fn handle_turn_start(connection: &mut Connection, agent: &dyn GameAgent) -
             .await
             .expect("failed to get a response from the server");
 
-        let game_state_view = match msg {
-            FromServer::WaitingForAction(state) => state,
-            _ => panic!(
-                "expected a WaitingForAction message, but received: {:?}",
-                msg
-            ),
-        };
+        match msg {
+            FromServer::WaitingForAction(state) => {
+                let player_action = agent.get_action(&state);
 
-        let player_action = agent.get_action(&game_state_view);
+                let is_turn_ending = player_action.is_end_turn();
 
-        let is_turn_ending = player_action.is_end_turn();
+                connection
+                    .send(FromClient::ClientAction(player_action))
+                    .await?;
 
-        connection
-            .send(FromClient::ClientAction(player_action))
-            .await?;
-
-        if is_turn_ending {
-            return Ok(());
+                if is_turn_ending {
+                    return Ok(());
+                }
+            }
+            FromServer::Prompt(prompt_msg) => {
+                let prompter = agent.make_prompter();
+                let thing = match prompt_msg {
+                    PromptMessage::PromptSlot => prompter.prompt_slot(game_state)
+                    _ => {}
+                };
+            }
+            _ => panic!("Unexpected message from server: {:?}", msg),
         }
     }
 }

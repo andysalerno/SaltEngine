@@ -1,22 +1,11 @@
-use crate::connection::Connection;
 use crate::messages::FromClient;
 use crate::messages::FromServer;
+use crate::{connection::Connection, messages::PromptMessage};
 use log::info;
 use salt_engine::{
     game_agent::game_agent::Prompter,
     game_state::{board::BoardPos, GameStatePlayerView},
 };
-use serde::{Deserialize, Serialize};
-
-#[derive(Serialize, Deserialize, Debug, Copy, Clone)]
-pub enum PromptMessage {
-    PromptSlot,
-    PromptPlayerSlot,
-    PromptOpponentSlot,
-    PromptCreaturePos,
-    PromptPlayerCreaturePos,
-    PromptOpponentCreaturePos,
-}
 
 pub(crate) struct NewtorkPrompter {
     connection: Connection,
