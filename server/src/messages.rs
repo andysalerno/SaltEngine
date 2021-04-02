@@ -1,6 +1,7 @@
+use crate::network_prompter::PromptMessage;
 use salt_engine::{
     game_logic::ClientGameEvent,
-    game_state::{GameStatePlayerView, PlayerId},
+    game_state::{board::BoardPos, GameStatePlayerView, PlayerId},
     id::Id,
 };
 use serde::{de::DeserializeOwned, Deserialize, Serialize};
@@ -14,6 +15,7 @@ pub enum FromClient {
     Ready,
     GameId(Id),
     ClientAction(ClientGameEvent),
+    PosInput(BoardPos),
 }
 impl GameMessage for FromClient {}
 
@@ -24,5 +26,6 @@ pub enum FromServer {
     State(GameStatePlayerView),
     TurnStart,
     WaitingForAction(GameStatePlayerView),
+    Prompt(PromptMessage),
 }
 impl GameMessage for FromServer {}

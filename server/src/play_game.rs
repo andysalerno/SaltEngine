@@ -61,14 +61,14 @@ impl GameClient for NetworkGameClient {
     }
 
     async fn make_prompter(&self) -> Box<dyn Prompter> {
-        Box::new(NewtorkPrompter::new())
+        Box::new(NewtorkPrompter::new(self.connection.clone()))
     }
 }
 
 pub(crate) async fn play_game(
-    mut player_a_connection: Connection,
+    player_a_connection: Connection,
     player_a_id: PlayerId,
-    mut player_b_connection: Connection,
+    player_b_connection: Connection,
     player_b_id: PlayerId,
     context: SharedContext,
 ) -> Result<()> {

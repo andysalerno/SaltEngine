@@ -1,45 +1,77 @@
+use crate::connection::Connection;
+use crate::messages::FromClient;
+use crate::messages::FromServer;
 use log::info;
 use salt_engine::{
     game_agent::game_agent::Prompter,
     game_state::{board::BoardPos, GameStatePlayerView},
 };
+use serde::{Deserialize, Serialize};
 
-pub(crate) struct NewtorkPrompter;
+#[derive(Serialize, Deserialize, Debug, Copy, Clone)]
+pub enum PromptMessage {
+    PromptSlot,
+    PromptPlayerSlot,
+    PromptOpponentSlot,
+    PromptCreaturePos,
+    PromptPlayerCreaturePos,
+    PromptOpponentCreaturePos,
+}
+
+pub(crate) struct NewtorkPrompter {
+    connection: Connection,
+}
 
 impl NewtorkPrompter {
-    pub fn new() -> Self {
-        NewtorkPrompter
+    pub(crate) fn new(connection: Connection) -> Self {
+        Self { connection }
+    }
+
+    fn send_prompt(&self, message: PromptMessage) -> BoardPos {
+        info!("Prompting for slot.");
+
+        smol::block_on(async {
+            self.connection
+                .send(FromServer::Prompt(message))
+                .await
+                .expect("failed to send prompt request");
+
+            let response = self
+                .connection
+                .recv::<FromClient>()
+                .await
+                .expect("no response from server");
+
+            match response {
+                FromClient::PosInput(pos) => pos,
+                _ => panic!("Expected PosInput from client"),
+            }
+        })
     }
 }
 
 impl Prompter for NewtorkPrompter {
-    fn prompt_slot(&self, game_state: &GameStatePlayerView) -> BoardPos {
-        info!("Prompting for slot.");
-        todo!()
+    fn prompt_slot(&self, _game_state: &GameStatePlayerView) -> BoardPos {
+        self.send_prompt(PromptMessage::PromptSlot)
     }
 
-    fn prompt_player_slot(&self, game_state: &GameStatePlayerView) -> BoardPos {
-        info!("Prompting for player slot.");
-        todo!()
+    fn prompt_player_slot(&self, _game_state: &GameStatePlayerView) -> BoardPos {
+        self.send_prompt(PromptMessage::PromptPlayerSlot)
     }
 
-    fn prompt_opponent_slot(&self, game_state: &GameStatePlayerView) -> BoardPos {
-        info!("Prompting for opponent slot.");
-        todo!()
+    fn prompt_opponent_slot(&self, _game_state: &GameStatePlayerView) -> BoardPos {
+        self.send_prompt(PromptMessage::PromptOpponentSlot)
     }
 
-    fn prompt_creature_pos(&self, game_state: &GameStatePlayerView) -> BoardPos {
-        info!("Prompting for creature pos.");
-        todo!()
+    fn prompt_creature_pos(&self, _game_state: &GameStatePlayerView) -> BoardPos {
+        self.send_prompt(PromptMessage::PromptCreaturePos)
     }
 
-    fn prompt_player_creature_pos(&self, game_state: &GameStatePlayerView) -> BoardPos {
-        info!("Prompting for player creature pos.");
-        todo!()
+    fn prompt_player_creature_pos(&self, _game_state: &GameStatePlayerView) -> BoardPos {
+        self.send_prompt(PromptMessage::PromptPlayerCreaturePos)
     }
 
-    fn prompt_opponent_creature_pos(&self, game_state: &GameStatePlayerView) -> BoardPos {
-        info!("Prompting for opponent creature pos.");
-        todo!()
+    fn prompt_opponent_creature_pos(&self, _game_state: &GameStatePlayerView) -> BoardPos {
+        self.send_prompt(PromptMessage::PromptOpponentCreaturePos)
     }
 }

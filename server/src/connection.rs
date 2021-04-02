@@ -1,57 +1,49 @@
+use std::sync::Arc;
+
 use async_tungstenite::{tungstenite::Message, WebSocketStream};
 use futures::{SinkExt, StreamExt};
-use log::{debug, trace};
+use log::debug;
 use serde::de::DeserializeOwned;
-use smol::net::TcpStream;
+use smol::{lock::Mutex, net::TcpStream};
 
 use crate::messages::GameMessage;
 use crate::Result;
 
 /// A connection to a player.
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Connection {
-    stream: WebSocketStream<TcpStream>,
+    stream: Arc<Mutex<WebSocketStream<TcpStream>>>,
 }
-
-// pub enum ConnectionError {
-//     SendFailure(String),
-// }
-
-// impl From<(dyn std::error::Error + 'static)> for ConnectionError {
-//     fn from(_: Box<dyn std::error::Error>) -> Self {
-//         todo!()
-//     }
-// }
-
-// impl<T> From<T> for ConnectionError
-// where
-//     T: std::error::Error,
-// {
-//     fn from(_: T) -> Self {
-//         todo!()
-//     }
-// }
 
 impl Connection {
     pub fn new(stream: WebSocketStream<TcpStream>) -> Self {
-        Self { stream }
+        Self {
+            stream: Arc::new(Mutex::new(stream)),
+        }
     }
 
-    pub async fn send<M>(&mut self, message: M) -> Result<()>
+    pub async fn send<M>(&self, message: M) -> Result<()>
     where
         M: GameMessage,
     {
         let json = serde_json::to_string(&message)?;
         debug!("Sending raw json: {}", json);
-        self.stream.send(Message::Text(json)).await?;
+        self.stream.lock().await.send(Message::Text(json)).await?;
         Ok(())
     }
 
-    pub async fn recv<T>(&mut self) -> Option<T>
+    pub async fn recv<T>(&self) -> Option<T>
     where
         T: GameMessage + DeserializeOwned,
     {
-        let response = self.stream.next().await.expect("Connection died").ok()?;
+        let response = self
+            .stream
+            .lock()
+            .await
+            .next()
+            .await
+            .expect("Connection died")
+            .ok()?;
 
         let s = response
             .to_text()
