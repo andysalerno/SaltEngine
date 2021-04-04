@@ -173,7 +173,7 @@ impl UnitCardInstance {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Clone, Deserialize)]
 pub struct UnitCardInstancePlayerView {
     definition: UnitCardDefinitionPlayerView,
     buffs: Vec<BuffPlayerView>,

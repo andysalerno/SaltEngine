@@ -351,7 +351,7 @@ pub mod player_view {
 
     use super::*;
 
-    #[derive(Debug, Serialize, Deserialize)]
+    #[derive(Debug, Serialize, Clone, Deserialize)]
     pub struct GameStatePlayerView {
         player_id: PlayerId,
         opponent_id: PlayerId,

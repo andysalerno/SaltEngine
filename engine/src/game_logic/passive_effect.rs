@@ -166,7 +166,7 @@ pub mod player_view {
     use super::*;
     use crate::game_state::MakePlayerView;
 
-    #[derive(Debug, Serialize, Deserialize)]
+    #[derive(Debug, Serialize, Deserialize, Clone)]
     pub struct PassiveEffectDefinitionPlayerView {
         definition_id: Id,
     }
@@ -184,7 +184,7 @@ pub mod player_view {
         }
     }
 
-    #[derive(Debug, Serialize, Deserialize)]
+    #[derive(Debug, Serialize, Clone, Deserialize)]
     pub struct PassiveEffectInstancePlayerView {
         /// The definition of the passive effect.
         definition: PassiveEffectDefinitionPlayerView,

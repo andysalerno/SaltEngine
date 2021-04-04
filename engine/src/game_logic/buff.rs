@@ -155,7 +155,7 @@ pub mod player_view {
     use super::*;
     use crate::game_state::MakePlayerView;
 
-    #[derive(Debug, Serialize, Deserialize)]
+    #[derive(Debug, Serialize, Clone, Deserialize)]
     pub struct BuffPlayerView {
         attack_amount: i32,
         health_amount: i32,

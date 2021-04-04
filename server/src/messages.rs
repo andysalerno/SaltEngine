@@ -14,7 +14,7 @@ pub enum FromClient {
     Ready,
     GameId(Id),
     ClientAction(ClientGameEvent),
-    PosInput(BoardPos),
+    PromptResponse(BoardPos),
 }
 impl GameMessage for FromClient {}
 
@@ -25,7 +25,7 @@ pub enum FromServer {
     State(GameStatePlayerView),
     TurnStart,
     WaitingForAction(GameStatePlayerView),
-    Prompt(PromptMessage),
+    Prompt(PromptMessage, GameStatePlayerView),
 }
 impl GameMessage for FromServer {}
 

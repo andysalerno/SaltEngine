@@ -82,7 +82,7 @@ impl<'a> HandView<'a> for Hand {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Clone, Deserialize)]
 pub struct HandPlayerView {
     cards: Vec<UnitCardInstancePlayerView>,
 }

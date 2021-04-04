@@ -4,7 +4,7 @@ mod console_display;
 use console_agent::ConsoleAgent;
 use log::info;
 use salt_engine::{
-    game_agent::game_agent::GameAgent,
+    game_agent::game_agent::{GameAgent, Prompter},
     game_logic::{ClientGameEvent, EndTurnEvent},
 };
 use server::{
@@ -96,12 +96,26 @@ async fn handle_turn_start(connection: &mut Connection, agent: &dyn GameAgent) -
                     return Ok(());
                 }
             }
-            FromServer::Prompt(prompt_msg) => {
+            FromServer::Prompt(prompt_msg, game_state) => {
+                info!("Received prompt request from server. Prompting player.");
                 let prompter = agent.make_prompter();
-                let thing = match prompt_msg {
-                    PromptMessage::PromptSlot => prompter.prompt_slot(game_state)
-                    _ => {}
+                let player_input = match prompt_msg {
+                    PromptMessage::PromptSlot => prompter.prompt_slot(&game_state),
+                    PromptMessage::PromptCreaturePos => prompter.prompt_creature_pos(&game_state),
+                    PromptMessage::PromptOpponentCreaturePos => {
+                        prompter.prompt_opponent_creature_pos(&game_state)
+                    }
+                    PromptMessage::PromptOpponentSlot => prompter.prompt_opponent_slot(&game_state),
+                    PromptMessage::PromptPlayerCreaturePos => {
+                        prompter.prompt_player_creature_pos(&game_state)
+                    }
+                    PromptMessage::PromptPlayerSlot => prompter.prompt_player_slot(&game_state),
                 };
+
+                info!("Responding to server with prompt result.");
+                connection
+                    .send(FromClient::PromptResponse(player_input))
+                    .await?;
             }
             _ => panic!("Unexpected message from server: {:?}", msg),
         }

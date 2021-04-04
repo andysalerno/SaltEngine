@@ -586,7 +586,7 @@ pub mod player_view {
     use super::*;
     use crate::game_state::{card_instance::UnitCardInstancePlayerView, MakePlayerView};
 
-    #[derive(Debug, Serialize, Deserialize)]
+    #[derive(Debug, Serialize, Clone, Deserialize)]
     pub struct BoardSlotPlayerView {
         pos: BoardPos,
         creature: Option<UnitCardInstancePlayerView>,
@@ -616,7 +616,7 @@ pub mod player_view {
         }
     }
 
-    #[derive(Debug, Serialize, Deserialize)]
+    #[derive(Debug, Serialize, Clone, Deserialize)]
     pub struct BoardPlayerView {
         player_a_id: PlayerId,
         player_b_id: PlayerId,

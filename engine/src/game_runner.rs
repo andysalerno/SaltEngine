@@ -41,7 +41,12 @@ impl GameRunner {
         let player_a_prompter = self.player_a_handler.make_prompter().await;
         let player_b_prompter = self.player_b_handler.make_prompter().await;
 
-        let mut dispatcher = EventDispatcher::new(player_a_prompter, player_b_prompter);
+        let mut dispatcher = EventDispatcher::new(
+            player_a_prompter,
+            self.game_state.player_a_id(),
+            player_b_prompter,
+            self.game_state.player_b_id(),
+        );
 
         let mut game_state = self.game_state;
 
