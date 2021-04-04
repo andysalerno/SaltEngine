@@ -1,3 +1,5 @@
+use log::info;
+
 use crate::{
     game_logic::{event_handlers::EventHandler, AddCardToHandEvent, EventDispatcher},
     game_state::GameState,
@@ -19,7 +21,7 @@ impl EventHandler for AddCardToHandEventHandler {
 
         game_state.hand_mut(player_id).add_card(event.take_card());
 
-        println!(
+        info!(
             "Player {:?} adds a card to hand. Next hand size: {}",
             player_id,
             game_state.hand(player_id).len()

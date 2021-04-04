@@ -1,3 +1,5 @@
+use log::info;
+
 use crate::{
     game_logic::{event_handlers::EventHandler, CreatureHealedEvent, EventDispatcher},
     game_state::GameState,
@@ -24,7 +26,7 @@ impl EventHandler for CreatureHealedEventHandler {
 
         let new_health = std::cmp::min(max_health, starting_health + event.heal_amount() as i32);
 
-        println!(
+        info!(
             "{} heals {} health, from {} to {}.",
             healed_creature.definition().title(),
             event.heal_amount(),

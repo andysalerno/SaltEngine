@@ -1,3 +1,5 @@
+use log::info;
+
 use crate::{
     game_logic::{event_handlers::EventHandler, events::*, EventDispatcher},
     game_state::board::BoardView,
@@ -21,7 +23,7 @@ impl EventHandler for CreatureDestroyedEventHandler {
             .board_mut()
             .take_creature_by_id(event.creature_id());
 
-        println!(
+        info!(
             "{} was destroyed (instance id: {:?})",
             creature_instance.definition().title(),
             creature_instance.id()

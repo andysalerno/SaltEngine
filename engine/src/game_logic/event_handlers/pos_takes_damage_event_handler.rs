@@ -1,3 +1,5 @@
+use log::info;
+
 use crate::{
     game_logic::{
         event_handlers::EventHandler, CreatureTakesDamageEvent, EventDispatcher,
@@ -19,7 +21,7 @@ impl EventHandler for PosTakesDamageHandler {
         game_state: &mut GameState,
         dispatcher: &mut EventDispatcher,
     ) {
-        println!(
+        info!(
             "Slot {:?} takes {} damage",
             event.pos(),
             event.damage_amount()

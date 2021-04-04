@@ -1,3 +1,5 @@
+use log::info;
+
 use crate::game_logic::events::Event;
 use crate::{
     game_logic::{event_handlers::EventHandler, EventDispatcher, PlayerSpendManaEvent},
@@ -22,7 +24,7 @@ impl EventHandler for PlayerSpendManaEventHandler {
 
         let player_id = event.player_id();
 
-        println!("Player {:?} spends {} mana.", player_id, event.mana_count());
+        info!("Player {:?} spends {} mana.", player_id, event.mana_count());
 
         let cur_mana = game_state.player_mana(player_id);
 

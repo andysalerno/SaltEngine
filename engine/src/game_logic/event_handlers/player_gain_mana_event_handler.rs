@@ -1,3 +1,5 @@
+use log::info;
+
 use crate::{
     game_logic::{event_handlers::EventHandler, EventDispatcher, PlayerGainManaEvent},
     game_state::GameState,
@@ -15,7 +17,7 @@ impl EventHandler for PlayerGainManaEventHandler {
         game_state: &mut GameState,
         _dispatcher: &mut EventDispatcher,
     ) {
-        println!(
+        info!(
             "Player {:?} gains {} mana.",
             event.player_id(),
             event.mana_count()

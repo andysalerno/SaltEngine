@@ -1,3 +1,5 @@
+use log::info;
+
 use crate::{
     game_logic::{event_handlers::EventHandler, CreatureDealsDamageEvent, EventDispatcher},
     game_state::board::BoardView,
@@ -22,6 +24,6 @@ impl EventHandler for CreatureDealsDamageHandler {
             .definition()
             .title();
 
-        println!("{} deals {} damage", title, event.damage_amount());
+        info!("{} deals {} damage", title, event.damage_amount());
     }
 }

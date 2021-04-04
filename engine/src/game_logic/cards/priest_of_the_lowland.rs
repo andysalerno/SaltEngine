@@ -1,3 +1,5 @@
+use log::info;
+
 use super::{CardDefinition, Position, UnitCardDefinition};
 use crate::{
     game_logic::{CreatureHealedEvent, EventDispatcher},
@@ -67,7 +69,7 @@ impl UnitCardDefinition for PriestOfTheLowland {
 
                 {
                     let target_creature = game_state.board().creature_instance(companion.id());
-                    println!(
+                    info!(
                         "Priest of the Lowland heals companion {} for 2",
                         target_creature.definition().title()
                     );

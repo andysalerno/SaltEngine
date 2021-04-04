@@ -1,3 +1,5 @@
+use log::info;
+
 use crate::{
     game_logic::{event_handlers::EventHandler, events::*, EventDispatcher},
     game_state::board::BoardView,
@@ -29,7 +31,7 @@ impl EventHandler for AttackEventHandler {
             let attacker_instance = game_state.board().creature_instance(event.attacker());
             let target_instance = game_state.board().creature_instance(event.target());
             let attack_amount = attacker_instance.attack() as usize;
-            println!(
+            info!(
                 "{} attacks {} for {} damage",
                 attacker_instance.definition().title(),
                 target_instance.definition().title(),

@@ -46,8 +46,14 @@ impl EventDispatcher {
         }
     }
 
-    pub fn player_prompter(&self) -> &dyn Prompter {
-        self.player_a_prompter.as_ref()
+    pub fn player_prompter(&self, player_id: PlayerId) -> &dyn Prompter {
+        if player_id == self.player_a_id {
+            self.player_a_prompter.as_ref()
+        } else if player_id == self.player_b_id {
+            self.player_b_prompter.as_ref()
+        } else {
+            panic!("Cannot get prompt for unknown player ID: {:?}", player_id)
+        }
     }
 
     // #[cfg(test)]

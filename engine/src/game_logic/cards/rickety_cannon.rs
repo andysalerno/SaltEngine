@@ -63,7 +63,7 @@ impl UnitCardDefinition for RicketyCannon {
             let summoner = summoned_to_pos.player_id;
 
             let pos = dispatcher
-                .player_prompter()
+                .player_prompter(summoned_to_pos.player_id)
                 .prompt_slot(&game_state.player_view(summoner));
 
             instance.set_state(Some(InstanceState::Pos(pos)));
