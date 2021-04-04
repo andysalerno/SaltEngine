@@ -41,3 +41,12 @@ there will be a top-level trait like "HandView".
 then there will be a struct for the internal game engine representation, like "Hand".
 and a simple/flat/serializable struct like "HandPlayerView".
 Both internal and external will implement HandView their own way.
+
+
+all cards get constructed from primitive basics, from a set of templates
+that form the basis for all possible cards in the game.
+"custom" cards can be created by any player and, a hash can be taken of the definition.
+players agree which cards they consider "legal" in the game by having a set of the thumbprints of the cards.
+the original set of cards will have hashes that are signed by myself that all clients trust (though allow blacklisting).
+
+iteractive automated tutorial to introduce players to the game, duh

@@ -402,10 +402,10 @@ impl ConsolePrompter {
 
         // special case for Y/Z as hero pos
         if input_c == 'Y' {
-            let player_id = game_state.player_id();
+            let player_id = game_state.opponent_id();
             return Ok(BoardPos::hero_pos(player_id));
         } else if input_c == 'Z' {
-            let player_id = game_state.opponent_id();
+            let player_id = game_state.player_id();
             return Ok(BoardPos::hero_pos(player_id));
         }
 

@@ -15,7 +15,7 @@ pub struct GlobalContext {
 }
 
 async fn queue_player_and_play(connection: Connection, context: SharedContext) -> Result<()> {
-    let (mut player_a_connection, mut player_b_connection) =
+    let (player_a_connection, player_b_connection) =
         match context.matchmaker.match_player(connection).await {
             Some((a, b)) => (a, b),
             _ => return Ok(()),
