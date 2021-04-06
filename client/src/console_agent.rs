@@ -3,9 +3,7 @@ use std::collections::VecDeque;
 use salt_engine::{
     cards::{player_view::UnitCardDefinitionPlayerView, UnitCardDefinitionView},
     game_agent::game_agent::{GameAgent, Prompter},
-    game_logic::{
-        AttackEvent, ClientGameEvent, EndTurnEvent, Event, GameEvent, SummonCreatureFromHandEvent,
-    },
+    game_logic::{AttackEvent, ClientGameEvent, EndTurnEvent, Event, SummonCreatureFromHandEvent},
     game_runner::GameDisplay,
     game_state::{
         board::{BoardPos, BoardView, RowId},

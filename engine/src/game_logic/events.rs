@@ -103,3 +103,28 @@ impl ClientGameEvent {
         }
     }
 }
+
+impl Event for GameEvent {
+    fn validate<'a, G>(&self, game_state: &'a G) -> Result
+    where
+        G: GameStateView<'a>,
+    {
+        match self {
+            GameEvent::Attack(e) => e.validate(game_state),
+            GameEvent::EndTurn(e) => e.validate(game_state),
+            GameEvent::Summon(e) => e.validate(game_state),
+            GameEvent::CreatureDealsDamage(e) => e.validate(game_state),
+            GameEvent::CreatureTakesDamage(e) => e.validate(game_state),
+            GameEvent::CreatureDestroyed(e) => e.validate(game_state),
+            GameEvent::TurnStart(e) => e.validate(game_state),
+            GameEvent::DrawCard(e) => e.validate(game_state),
+            GameEvent::AddCardToHand(e) => e.validate(game_state),
+            GameEvent::StartGame(e) => e.validate(game_state),
+            GameEvent::GainMana(e) => e.validate(game_state),
+            GameEvent::SpendMana(e) => e.validate(game_state),
+            GameEvent::SummonCreatureFromHand(e) => e.validate(game_state),
+            GameEvent::PosTakesDamage(e) => e.validate(game_state),
+            GameEvent::CreatureHealed(e) => e.validate(game_state),
+        }
+    }
+}

@@ -18,10 +18,6 @@ impl EventHandler for PlayerSpendManaEventHandler {
         game_state: &mut GameState,
         _dispatcher: &mut EventDispatcher,
     ) {
-        if let Err(e) = event.validate(game_state) {
-            panic!("Event failed validation: {}", e);
-        }
-
         let player_id = event.player_id();
 
         info!("Player {:?} spends {} mana.", player_id, event.mana_count());

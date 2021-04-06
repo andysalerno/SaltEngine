@@ -5,7 +5,7 @@ use crate::{
     game_state::{GameState, PlayerId},
 };
 
-use super::{event_handlers::*, events::GameEvent};
+use super::{event_handlers::*, events::GameEvent, Event};
 
 #[derive(Debug)]
 pub struct EventDispatcher {
@@ -32,7 +32,11 @@ impl EventDispatcher {
         }
     }
 
-    pub fn dispatch(&mut self, event: impl Into<GameEvent>, game_state: &mut GameState) {
+    pub fn dispatch(&mut self, event: impl Event, game_state: &mut GameState) {
+        event
+            .validate(game_state)
+            .expect("Validation failed for dispatched event.");
+
         let event = event.into();
 
         self.stack.push(event);
@@ -55,11 +59,6 @@ impl EventDispatcher {
             panic!("Cannot get prompt for unknown player ID: {:?}", player_id)
         }
     }
-
-    // #[cfg(test)]
-    // pub fn set_player_a_prompter(&mut self, prompter: Box<dyn Prompter>) {
-    //     self.player_a_prompter = prompter;
-    // }
 
     fn handle(&mut self, event: GameEvent, game_state: &mut GameState) {
         debug!("Dispatching event: {:?}", event);

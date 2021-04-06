@@ -3,10 +3,7 @@ mod console_display;
 
 use console_agent::ConsoleAgent;
 use log::info;
-use salt_engine::{
-    game_agent::game_agent::{GameAgent, Prompter},
-    game_logic::{ClientGameEvent, EndTurnEvent},
-};
+use salt_engine::game_agent::game_agent::GameAgent;
 use server::{
     connection::Connection,
     messages::{FromClient, FromServer, PromptMessage},
@@ -69,8 +66,6 @@ async fn handle_connection(mut connection: Connection) -> Result<()> {
             _ => panic!("expected a TurnStart message, but received: {:?}", msg),
         }
     }
-
-    Ok(())
 }
 
 async fn handle_turn_start(connection: &mut Connection, agent: &dyn GameAgent) -> Result<()> {

@@ -20,10 +20,6 @@ impl EventHandler for SummonCreatureFromHandEventHandler {
         game_state: &mut GameState,
         dispatcher: &mut EventDispatcher,
     ) {
-        if let Err(e) = event.validate(game_state) {
-            panic!("Event failed validation: {}", e);
-        }
-
         let player_id = event.player_id();
 
         // Take the card out of the player's hand
