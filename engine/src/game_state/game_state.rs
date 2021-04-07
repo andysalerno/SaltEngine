@@ -508,8 +508,6 @@ pub(crate) mod tests {
         let player_id = state.player_a_id();
         let player_view = state.player_view(player_id);
 
-        let json = serde_json::to_string(&player_view).unwrap();
-        println!("json: {}", json);
-        panic!()
+        let _json = serde_json::to_string(&player_view).unwrap();
     }
 }
