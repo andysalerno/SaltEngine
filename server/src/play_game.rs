@@ -63,6 +63,13 @@ impl GameClient for NetworkGameClient {
     async fn make_prompter(&self) -> Box<dyn Prompter> {
         Box::new(NewtorkPrompter::new(self.connection.clone()))
     }
+
+    async fn observe_state_update(&mut self, game_state_view: GameStatePlayerView) {
+        self.connection
+            .send(FromServer::State(game_state_view))
+            .await
+            .expect("Failed to send state update");
+    }
 }
 
 pub(crate) async fn play_game(

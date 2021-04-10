@@ -11,6 +11,10 @@ pub trait GameAgent {
     fn get_action(&self, game_state: &GameStatePlayerView) -> ClientGameEvent;
     fn id(&self) -> PlayerId;
     fn make_prompter(&self) -> Box<dyn Prompter>;
+
+    fn observe_state_update(&self, game_state: GameStatePlayerView) {
+        // no implementation by default
+    }
 }
 
 #[cfg_attr(test, automock)]

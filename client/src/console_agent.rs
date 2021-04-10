@@ -61,6 +61,11 @@ impl GameAgent for ConsoleAgent {
     fn make_prompter(&self) -> Box<dyn Prompter> {
         Box::new(ConsolePrompter::new(self.id()))
     }
+
+    fn observe_state_update(&self, game_state: GameStatePlayerView) {
+        let prompter = ConsolePrompter::new(self.id());
+        prompter.show_board(&game_state);
+    }
 }
 
 #[derive(Debug, Clone)]

@@ -16,6 +16,7 @@ pub trait GameClient: Send + Sync {
     async fn on_turn_start(&mut self, game_state: &GameState);
     async fn next_action(&mut self, game_state_view: GameStatePlayerView) -> ClientGameEvent;
     async fn make_prompter(&self) -> Box<dyn Prompter>;
+    async fn observe_state_update(&mut self, game_state_view: GameStatePlayerView);
 }
 
 pub struct GameRunner {
@@ -53,22 +54,31 @@ impl GameRunner {
         dispatcher.dispatch(StartGameEvent, &mut game_state);
 
         while !game_state.is_game_over() {
-            let client = if game_state.cur_player_turn() == game_state.player_a_id() {
-                self.player_a_handler.as_mut()
+            let (client, other) = if game_state.cur_player_turn() == game_state.player_a_id() {
+                (
+                    self.player_a_handler.as_mut(),
+                    self.player_b_handler.as_mut(),
+                )
             } else {
-                self.player_b_handler.as_mut()
+                (
+                    self.player_b_handler.as_mut(),
+                    self.player_a_handler.as_mut(),
+                )
             };
 
-            GameRunner::player_take_turn_stage(client, &mut game_state, &mut dispatcher).await;
+            GameRunner::player_take_turn_stage(client, other, &mut game_state, &mut dispatcher)
+                .await;
         }
     }
 
     async fn player_take_turn_stage(
         handler: &mut dyn GameClient,
+        handler_other: &mut dyn GameClient,
         game_state: &mut GameState,
         dispatcher: &mut EventDispatcher,
     ) {
         let cur_player_id = game_state.cur_player_id();
+        let opponent = game_state.other_player(cur_player_id);
         info!("Turn starts for player: {:?}", cur_player_id);
 
         handler.on_turn_start(game_state).await;
@@ -83,6 +93,10 @@ impl GameRunner {
             let turn_is_over = action.is_end_turn();
 
             dispatcher.dispatch(action, game_state);
+
+            handler_other
+                .observe_state_update(game_state.player_view(opponent))
+                .await;
 
             if turn_is_over {
                 info!("Turn ends for player: {:?}", cur_player_id);

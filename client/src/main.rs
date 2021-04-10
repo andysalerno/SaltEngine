@@ -63,6 +63,7 @@ async fn handle_connection(mut connection: Connection) -> Result<()> {
 
         match msg {
             FromServer::TurnStart => handle_turn_start(&mut connection, agent.as_mut()).await?,
+            FromServer::State(state) => agent.observe_state_update(state),
             _ => panic!("expected a TurnStart message, but received: {:?}", msg),
         }
     }
@@ -112,6 +113,7 @@ async fn handle_turn_start(connection: &mut Connection, agent: &dyn GameAgent) -
                     .send(FromClient::PromptResponse(player_input))
                     .await?;
             }
+            FromServer::State(state) => agent.observe_state_update(state),
             _ => panic!("Unexpected message from server: {:?}", msg),
         }
     }
