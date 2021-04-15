@@ -29,7 +29,7 @@ impl CardDefinition for PopcornVendor {
     }
 
     fn cost(&self) -> i32 {
-        1
+        3
     }
 
     fn flavor_text(&self) -> &str {
