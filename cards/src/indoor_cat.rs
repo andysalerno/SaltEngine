@@ -1,19 +1,24 @@
-use super::{CardDefinition, Position, UnitCardDefinition};
-use crate::id::Id;
+use salt_engine::{
+    cards::{CardDefinition, Position, UnitCardDefinition},
+    game_logic::{
+        BuffBuilder, PassiveCompanionBuff, PassiveEffectDefinition, PassiveEffectInstanceId,
+    },
+    id::Id,
+};
 
 #[derive(Debug, Clone)]
-pub struct OutdoorCat;
+pub struct IndoorCat;
 
-impl OutdoorCat {
+impl IndoorCat {
     fn id(&self) -> Id {
         // id::parse("...")
         todo!()
     }
 }
 
-impl CardDefinition for OutdoorCat {
+impl CardDefinition for IndoorCat {
     fn title(&self) -> &str {
-        "Outdoor Cat"
+        "Indoor Cat"
     }
 
     fn cost(&self) -> i32 {
@@ -28,18 +33,18 @@ impl CardDefinition for OutdoorCat {
         "Front.
 Hidden.
 If revealed during
-the enemy's turn, gains
+your turn, gains
 +1/+1."
     }
 }
 
-impl UnitCardDefinition for OutdoorCat {
+impl UnitCardDefinition for IndoorCat {
     fn attack(&self) -> i32 {
-        3
+        2
     }
 
     fn health(&self) -> i32 {
-        2
+        3
     }
 
     fn row_width(&self) -> usize {

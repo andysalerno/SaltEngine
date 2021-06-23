@@ -1,5 +1,10 @@
-use super::{CardDefinition, Position, UnitCardDefinition};
-use crate::id::Id;
+use salt_engine::{
+    cards::{CardDefinition, Position, UnitCardDefinition},
+    game_logic::{
+        BuffBuilder, PassiveCompanionBuff, PassiveEffectDefinition, PassiveEffectInstanceId,
+    },
+    id::Id,
+};
 
 #[derive(Debug, Clone)]
 pub struct FraidyCat;

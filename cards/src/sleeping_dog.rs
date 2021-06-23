@@ -1,14 +1,7 @@
-use super::{CardDefinition, Position, UnitCardDefinition};
-use crate::game_state::GameState;
-use crate::{
-    game_logic::{
-        buff::{Buff, BuffSourceId},
-        BuffInstanceId,
-    },
-    game_state::{
-        board::{BoardView, RowId},
-        UnitCardInstanceId,
-    },
+use salt_engine::{
+    cards::{CardDefinition, Position, UnitCardDefinition},
+    game_logic::{Buff, BuffInstanceId, BuffSourceId, EventDispatcher},
+    game_state::{board::BoardView, board::RowId, GameState, UnitCardInstanceId},
     id::Id,
 };
 
@@ -63,8 +56,7 @@ impl UnitCardDefinition for SleepingDog {
 
     fn upon_receive_damage(
         &self,
-    ) -> Box<dyn FnOnce(UnitCardInstanceId, &mut GameState, &mut crate::game_logic::EventDispatcher)>
-    {
+    ) -> Box<dyn FnOnce(UnitCardInstanceId, &mut GameState, &mut EventDispatcher)> {
         Box::new(|id, game_state, _dispatcher| {
             // can move to front row?
             let slots = game_state.board().slots_with_creature(id);

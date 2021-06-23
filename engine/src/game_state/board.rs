@@ -12,11 +12,23 @@ enum PlayerAB {
     PlayerB,
 }
 
+/// A view of a particular board pos.
 pub trait BoardSlotView<'a> {
     type CardInstanceView: UnitCardInstanceView<'a>;
 
+    /// The BoardPos this view represents.
     fn pos(&self) -> BoardPos;
+
+    /// The view of the creature on this pos, if there is one.
     fn maybe_creature(&self) -> Option<&Self::CardInstanceView>;
+}
+
+/// A slot on the board, which has a position
+/// and possibly a creature.
+#[derive(Debug)]
+pub struct BoardSlot {
+    pos: BoardPos,
+    creature: Option<UnitCardInstance>,
 }
 
 impl<'a> BoardSlotView<'a> for BoardSlot {
@@ -29,12 +41,6 @@ impl<'a> BoardSlotView<'a> for BoardSlot {
     fn maybe_creature(&self) -> Option<&Self::CardInstanceView> {
         self.maybe_creature()
     }
-}
-
-#[derive(Debug)]
-pub struct BoardSlot {
-    pos: BoardPos,
-    creature: Option<UnitCardInstance>,
 }
 
 impl BoardSlot {

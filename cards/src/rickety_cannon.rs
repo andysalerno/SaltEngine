@@ -1,7 +1,6 @@
 use log::info;
-
-use super::{CardDefinition, Position, UnitCardDefinition};
-use crate::{
+use salt_engine::{
+    cards::{CardDefinition, Position, UnitCardDefinition},
     game_logic::{EventDispatcher, PosTakesDamageEvent},
     game_state::{
         board::{BoardPos, BoardView},

@@ -1,11 +1,9 @@
-use log::{debug, trace};
-
+use super::{event_handlers::*, events::GameEvent, Event};
 use crate::{
     game_agent::game_agent::Prompter,
     game_state::{GameState, PlayerId},
 };
-
-use super::{event_handlers::*, events::GameEvent, Event};
+use log::{debug, trace};
 
 #[derive(Debug)]
 pub struct EventDispatcher {
@@ -98,33 +96,5 @@ impl EventDispatcher {
                 CreatureHealedEventHandler::default().handle(e, game_state, self)
             }
         }
-    }
-}
-
-#[cfg(test)]
-pub(crate) mod tests {
-    use crate::{game_agent::game_agent::*, game_state::PlayerId};
-
-    use super::EventDispatcher;
-
-    pub fn make_default_dispatcher() -> EventDispatcher {
-        let prompt_a = MockPrompter::new();
-        let prompt_b = MockPrompter::new();
-
-        make_dispatcher(prompt_a, PlayerId::new(), prompt_b, PlayerId::new())
-    }
-
-    pub fn make_dispatcher(
-        prompter_a: impl Prompter + 'static,
-        player_a_id: PlayerId,
-        prompter_b: impl Prompter + 'static,
-        player_b_id: PlayerId,
-    ) -> EventDispatcher {
-        EventDispatcher::new(
-            Box::new(prompter_a),
-            player_a_id,
-            Box::new(prompter_b),
-            player_b_id,
-        )
     }
 }

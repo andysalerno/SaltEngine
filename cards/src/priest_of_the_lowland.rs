@@ -1,12 +1,13 @@
 use log::info;
-
-use super::{CardDefinition, Position, UnitCardDefinition};
-use crate::{
-    game_logic::{CreatureHealedEvent, EventDispatcher},
-    game_state::board::BoardView,
-    game_state::GameState,
+use salt_engine::{
+    cards::{CardDefinition, Position, UnitCardDefinition},
+    game_logic::{
+        BuffBuilder, CreatureHealedEvent, EventDispatcher, PassiveCompanionBuff,
+        PassiveEffectDefinition, PassiveEffectInstanceId,
+    },
+    game_state::{board::BoardView, GameState, UnitCardInstanceId},
+    id::Id,
 };
-use crate::{game_state::UnitCardInstanceId, id::Id};
 
 #[derive(Debug, Clone)]
 pub struct PriestOfTheLowland;

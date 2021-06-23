@@ -7,6 +7,8 @@ use crate::{
 #[cfg(test)]
 use mockall::{automock, predicate::*};
 
+/// A trait representing an player agent that can decide what
+/// action to take for a given game state.
 pub trait GameAgent {
     fn get_action(&self, game_state: &GameStatePlayerView) -> ClientGameEvent;
     fn id(&self) -> PlayerId;

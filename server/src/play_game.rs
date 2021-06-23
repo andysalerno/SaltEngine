@@ -2,10 +2,11 @@ use crate::messages::{FromClient, FromServer};
 use crate::{connection::Connection, Result};
 use crate::{network_prompter::NewtorkPrompter, websocket_server::SharedContext};
 use async_trait::async_trait;
+use cards::*;
 use futures::{join, try_join};
 use log::info;
 use salt_engine::{
-    cards::*,
+    cards::UnitCardDefinition,
     game_agent::game_agent::Prompter,
     game_logic::ClientGameEvent,
     game_runner::{GameClient, GameRunner},

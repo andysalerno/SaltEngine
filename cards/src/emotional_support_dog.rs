@@ -1,7 +1,8 @@
-use super::{CardDefinition, Position, UnitCardDefinition};
-use crate::game_logic::{passive_effect::PassiveEffectInstanceId, PassiveEffectDefinition};
-use crate::{
-    game_logic::{passive_effect::PassiveCompanionBuff, BuffBuilder},
+use salt_engine::{
+    cards::{CardDefinition, Position, UnitCardDefinition},
+    game_logic::{
+        BuffBuilder, PassiveCompanionBuff, PassiveEffectDefinition, PassiveEffectInstanceId,
+    },
     id::Id,
 };
 
@@ -65,12 +66,15 @@ impl UnitCardDefinition for EmotionalSupportDog {
 
 #[cfg(test)]
 mod tests {
-    use crate::{
-        game_logic::cards::UnitCardDefinition,
-        game_logic::*,
-        game_logic::{cards::ReallyBigRock, CreatureSetEvent},
+    use salt_engine::{
+        cards::UnitCardDefinition,
+        game_logic::CreatureSetEvent,
         game_state::board::{BoardPos, BoardView, RowId},
-        game_state::{make_test_state, GameStateView},
+    };
+
+    use crate::{
+        tests::{make_default_dispatcher, make_test_state},
+        ReallyBigRock,
     };
 
     use super::EmotionalSupportDog;

@@ -1,17 +1,15 @@
-use crate::{
+use salt_engine::{
+    cards::{CardDefinition, Position, UnitCardDefinition},
     game_logic::{
-        passive_effect::{PassiveCompanionBuff, PassiveEffectInstanceId},
-        BuffBuilder,
+        BuffBuilder, EventDispatcher, PassiveCompanionBuff, PassiveEffectDefinition,
+        PassiveEffectInstanceId,
     },
-    game_state::board::RowId,
+    game_state::{
+        board::{BoardPos, RowId},
+        GameState, UnitCardInstance,
+    },
     id::Id,
 };
-use crate::{
-    game_logic::{EventDispatcher, PassiveEffectDefinition},
-    game_state::{board::BoardPos, GameState, UnitCardInstance},
-};
-
-use super::{CardDefinition, Position, UnitCardDefinition};
 
 #[derive(Debug, Clone)]
 pub struct PopcornVendor;
@@ -88,14 +86,12 @@ impl UnitCardDefinition for PopcornVendor {
 
 #[cfg(test)]
 mod tests {
-    use super::PopcornVendor;
-    use crate::game_logic::cards::Pawn;
-    use crate::game_logic::*;
+    use super::*;
     use crate::{
-        game_logic::{cards::UnitCardDefinition, SummonCreatureFromHandEvent},
-        game_state::board::{BoardPos, BoardView, RowId},
-        game_state::{make_test_state, GameStateView},
+        tests::{make_default_dispatcher, make_test_state},
+        Pawn,
     };
+    use salt_engine::{game_logic::SummonCreatureFromHandEvent, game_state::board::BoardView};
 
     #[test]
     fn when_summoned_back_gives_buff() {

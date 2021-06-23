@@ -1,42 +1,43 @@
-use crate::id::Id;
-
-use super::{CardDefinition, Position, UnitCardDefinition};
+use salt_engine::{
+    cards::{CardDefinition, Position, UnitCardDefinition},
+    id::Id,
+};
 
 #[derive(Debug, Clone)]
-pub struct Pawn;
+pub struct AttackDog;
 
-impl Pawn {
+impl AttackDog {
     fn id(&self) -> Id {
         // id::parse("...")
         todo!()
     }
 }
 
-impl CardDefinition for Pawn {
+impl CardDefinition for AttackDog {
     fn title(&self) -> &str {
-        "Pawn"
+        "Attack Dog"
     }
 
     fn cost(&self) -> i32 {
-        1
+        3
     }
 
     fn flavor_text(&self) -> &str {
-        "Just a lowly Pawn."
+        "todo"
     }
 
     fn text(&self) -> &str {
-        "Front"
+        ""
     }
 }
 
-impl UnitCardDefinition for Pawn {
+impl UnitCardDefinition for AttackDog {
     fn attack(&self) -> i32 {
-        1
+        5
     }
 
     fn health(&self) -> i32 {
-        1
+        3
     }
 
     fn row_width(&self) -> usize {

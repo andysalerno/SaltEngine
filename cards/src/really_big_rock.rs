@@ -1,9 +1,12 @@
-use super::{CardDefinition, Position, UnitCardDefinition};
-use crate::{
-    game_logic::PosTakesDamageEvent,
+use salt_engine::{
+    cards::{CardDefinition, Position, UnitCardDefinition},
+    game_logic::{
+        BuffBuilder, EventDispatcher, PassiveCompanionBuff, PassiveEffectDefinition,
+        PassiveEffectInstanceId, PosTakesDamageEvent,
+    },
     game_state::{
         board::{BoardPos, RowId},
-        GameState,
+        GameState, UnitCardInstance,
     },
     id::Id,
 };
@@ -60,14 +63,8 @@ impl UnitCardDefinition for ReallyBigRock {
 
     fn upon_death(
         &self,
-    ) -> Box<
-        dyn FnOnce(
-            &mut crate::game_state::UnitCardInstance,
-            BoardPos,
-            &mut GameState,
-            &mut crate::game_logic::EventDispatcher,
-        ),
-    > {
+    ) -> Box<dyn FnOnce(&mut UnitCardInstance, BoardPos, &mut GameState, &mut EventDispatcher)>
+    {
         Box::new(|instance, died_at_pos, game_state, dispatcher| {
             if died_at_pos.row_id != RowId::FrontRow {
                 return;

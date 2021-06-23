@@ -39,7 +39,7 @@ pub trait BuffView {
     fn is_from_passive(&self) -> bool;
 }
 
-impl BuffView for Box<dyn Buff> {
+impl<T: AsRef<dyn Buff>> BuffView for T {
     fn attack_amount(&self) -> i32 {
         Buff::attack_amount(self.as_ref())
     }
@@ -165,7 +165,7 @@ pub mod player_view {
         is_from_passive: bool,
     }
 
-    impl MakePlayerView for Box<dyn Buff> {
+    impl MakePlayerView for dyn Buff {
         type TOut = BuffPlayerView;
 
         fn player_view(&self, _player_viewing: crate::game_state::PlayerId) -> BuffPlayerView {
