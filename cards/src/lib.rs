@@ -24,11 +24,24 @@ pub use sleeping_dog::SleepingDog;
 
 #[cfg(test)]
 mod tests {
+    use mockall::{mock, predicate::*};
     use salt_engine::{
         game_agent::game_agent::Prompter,
         game_logic::EventDispatcher,
-        game_state::{Deck, GameState, PlayerId},
+        game_state::{board::BoardPos, Deck, GameState, GameStatePlayerView, PlayerId},
     };
+
+    mock! {
+        pub TestPrompter {}
+        impl Prompter for TestPrompter {
+            fn prompt_slot(&self, game_state: &GameStatePlayerView) -> BoardPos;
+            fn prompt_player_slot(&self, game_state: &GameStatePlayerView) -> BoardPos;
+            fn prompt_opponent_slot(&self, game_state: &GameStatePlayerView) -> BoardPos;
+            fn prompt_creature_pos(&self, game_state: &GameStatePlayerView) -> BoardPos;
+            fn prompt_player_creature_pos(&self, game_state: &GameStatePlayerView) -> BoardPos;
+            fn prompt_opponent_creature_pos(&self, game_state: &GameStatePlayerView) -> BoardPos;
+        }
+    }
 
     pub fn make_test_state() -> GameState {
         let player_a_deck = Deck::new(Vec::new());
@@ -50,8 +63,8 @@ mod tests {
     }
 
     pub fn make_default_dispatcher() -> EventDispatcher {
-        let prompt_a = MockPrompter::new();
-        let prompt_b = MockPrompter::new();
+        let prompt_a = MockTestPrompter::new();
+        let prompt_b = MockTestPrompter::new();
 
         make_dispatcher(prompt_a, PlayerId::new(), prompt_b, PlayerId::new())
     }

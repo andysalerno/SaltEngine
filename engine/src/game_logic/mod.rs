@@ -15,6 +15,3 @@ pub use passive_effect::{
     player_view::PassiveEffectInstancePlayerView, PassiveCompanionBuff, PassiveEffectDefinition,
     PassiveEffectInstance, PassiveEffectInstanceId, PassiveEffectView,
 };
-
-#[cfg(test)]
-pub use event_dispatch::tests::*;
