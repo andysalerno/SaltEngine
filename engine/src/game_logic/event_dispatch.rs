@@ -3,7 +3,7 @@ use crate::{
     game_agent::game_agent::Prompter,
     game_state::{GameState, PlayerId},
 };
-use log::{debug, trace};
+use log::{debug};
 
 #[derive(Debug)]
 pub struct EventDispatcher {

@@ -14,7 +14,7 @@ pub trait GameAgent {
     fn id(&self) -> PlayerId;
     fn make_prompter(&self) -> Box<dyn Prompter>;
 
-    fn observe_state_update(&self, game_state: GameStatePlayerView) {
+    fn observe_state_update(&self, _game_state: GameStatePlayerView) {
         // no implementation by default
     }
 }

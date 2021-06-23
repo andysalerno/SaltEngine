@@ -78,7 +78,7 @@ pub(crate) async fn play_game(
     player_a_id: PlayerId,
     player_b_connection: Connection,
     player_b_id: PlayerId,
-    context: SharedContext,
+    _context: SharedContext,
 ) -> Result<()> {
     // Expect a Ready from both players
     {
