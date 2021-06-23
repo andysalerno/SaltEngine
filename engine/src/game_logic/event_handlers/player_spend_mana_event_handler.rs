@@ -1,6 +1,5 @@
 use log::info;
 
-
 use crate::{
     game_logic::{event_handlers::EventHandler, EventDispatcher, PlayerSpendManaEvent},
     game_state::{GameState, GameStateView},
