@@ -1,9 +1,6 @@
 use salt_engine::{
     cards::{CardDefinition, Position, UnitCardDefinition},
-    game_logic::{
-        BuffBuilder, EventDispatcher, PassiveCompanionBuff, PassiveEffectDefinition,
-        PassiveEffectInstanceId, PosTakesDamageEvent,
-    },
+    game_logic::{EventDispatcher, PosTakesDamageEvent},
     game_state::{
         board::{BoardPos, RowId},
         GameState, UnitCardInstance,

@@ -109,7 +109,6 @@ pub trait UnitCardDefinitionView {
     fn placeable_at(&self) -> Position;
 }
 
-// impl<T: Borrow<dyn UnitCardDefinition>> UnitCardDefinitionView for T {
 impl UnitCardDefinitionView for dyn UnitCardDefinition {
     fn title(&self) -> &str {
         self.title()

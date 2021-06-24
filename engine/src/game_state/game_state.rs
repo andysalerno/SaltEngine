@@ -480,7 +480,7 @@ pub(crate) mod tests {
 
     use super::*;
 
-    pub fn make_test_statez() -> GameState {
+    fn make_test_state() -> GameState {
         let player_a_deck = Deck::new(Vec::new());
         let player_b_deck = Deck::new(Vec::new());
 
@@ -500,10 +500,10 @@ pub(crate) mod tests {
     }
 
     #[test]
-    pub fn make_player_view_no_panicz() {
+    pub fn make_player_view_no_panic() {
         use serde_json;
 
-        let state = make_test_statez();
+        let state = make_test_state();
 
         let player_id = state.player_a_id();
         let player_view = state.player_view(player_id);
