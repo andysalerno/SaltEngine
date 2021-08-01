@@ -2,6 +2,7 @@ mod console_agent;
 mod console_display;
 
 use console_agent::ConsoleAgent;
+use env_logger::Env;
 use log::info;
 use salt_engine::game_agent::game_agent::GameAgent;
 use server::{
@@ -13,7 +14,7 @@ use smol::net::TcpStream;
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error + Send + Sync>>;
 
 fn main() -> Result<()> {
-    env_logger::init();
+    env_logger::Builder::from_env(Env::default().default_filter_or("info")).init();
 
     smol::block_on(async {
         let stream = TcpStream::connect("localhost:9000").await?;
