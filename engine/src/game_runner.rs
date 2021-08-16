@@ -19,6 +19,10 @@ pub trait GameClient: Send + Sync {
     async fn observe_state_update(&mut self, game_state_view: GameStatePlayerView);
 }
 
+/// A runner for a game.
+/// Maintains the current `GameState` at any given moment,
+/// accepts inputs from `GameClient`s, and alerts `GameClient`s about events
+/// throughout the duration of the game.
 pub struct GameRunner {
     player_a_handler: Box<dyn GameClient>,
     player_b_handler: Box<dyn GameClient>,
@@ -72,8 +76,8 @@ impl GameRunner {
     }
 
     async fn player_take_turn_stage(
-        handler: &mut dyn GameClient,
-        handler_other: &mut dyn GameClient,
+        handler_player: &mut dyn GameClient,
+        handler_opponent: &mut dyn GameClient,
         game_state: &mut GameState,
         dispatcher: &mut EventDispatcher,
     ) {
@@ -81,11 +85,11 @@ impl GameRunner {
         let opponent = game_state.other_player(cur_player_id);
         info!("Turn starts for player: {:?}", cur_player_id);
 
-        handler.on_turn_start(game_state).await;
+        handler_player.on_turn_start(game_state).await;
 
         loop {
             info!("Getting next action from client.");
-            let action = handler
+            let action = handler_player
                 .next_action(game_state.player_view(cur_player_id))
                 .await;
             let action: GameEvent = action.into();
@@ -94,7 +98,7 @@ impl GameRunner {
 
             dispatcher.dispatch(action, game_state);
 
-            handler_other
+            handler_opponent
                 .observe_state_update(game_state.player_view(opponent))
                 .await;
 

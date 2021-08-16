@@ -3,6 +3,7 @@ use env_logger::Env;
 mod connection;
 mod matchmaker;
 pub mod messages;
+mod network_game_client;
 mod network_prompter;
 mod play_game;
 mod websocket_server;

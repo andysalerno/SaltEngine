@@ -1,78 +1,19 @@
 use crate::messages::{FromClient, FromServer};
+use crate::network_game_client::NetworkGameClient;
+use crate::websocket_server::SharedContext;
 use crate::{connection::Connection, Result};
-use crate::{network_prompter::NewtorkPrompter, websocket_server::SharedContext};
-use async_trait::async_trait;
 use cards::*;
 use futures::{join, try_join};
 use log::info;
 use salt_engine::{
     cards::UnitCardDefinition,
-    game_agent::game_agent::Prompter,
-    game_logic::ClientGameEvent,
-    game_runner::{GameClient, GameRunner},
-    game_state::{
-        Deck, GameState, GameStatePlayerView, MakePlayerView, PlayerId, UnitCardInstance,
-    },
+    game_runner::GameRunner,
+    game_state::{Deck, GameState, MakePlayerView, PlayerId, UnitCardInstance},
 };
 
-struct NetworkGameClient {
-    player_id: PlayerId,
-    connection: Connection,
-}
-
-impl NetworkGameClient {
-    fn new(player_id: PlayerId, connection: Connection) -> Self {
-        Self {
-            player_id,
-            connection,
-        }
-    }
-}
-
-#[async_trait]
-impl GameClient for NetworkGameClient {
-    async fn on_turn_start(&mut self, _game_state: &GameState) {
-        info!("Player controller: on turn start");
-
-        self.connection
-            .send(FromServer::TurnStart)
-            .await
-            .expect("failed to send turnstart");
-    }
-
-    async fn next_action(&mut self, game_state_view: GameStatePlayerView) -> ClientGameEvent {
-        // Awaiting response from the client.
-
-        let _ping = self
-            .connection
-            .send(FromServer::WaitingForAction(game_state_view))
-            .await;
-        info!("Waiting for the player's next action...");
-        let from_client = self
-            .connection
-            .recv::<FromClient>()
-            .await
-            .expect("no response from the client.");
-        info!("Action received from player.");
-
-        match from_client {
-            FromClient::ClientAction(e) => e,
-            _ => panic!("Unexpected response from client; expected ClientGameEvent"),
-        }
-    }
-
-    async fn make_prompter(&self) -> Box<dyn Prompter> {
-        Box::new(NewtorkPrompter::new(self.connection.clone()))
-    }
-
-    async fn observe_state_update(&mut self, game_state_view: GameStatePlayerView) {
-        self.connection
-            .send(FromServer::State(game_state_view))
-            .await
-            .expect("Failed to send state update");
-    }
-}
-
+/// Plays a game to completion.
+/// Requires a `Connection` for each player,
+/// each player's `PlayerId`, and a `SharedContext`.
 pub(crate) async fn play_game(
     player_a_connection: Connection,
     player_a_id: PlayerId,
