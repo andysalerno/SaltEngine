@@ -1,8 +1,10 @@
+use async_trait::async_trait;
+use log::info;
 use std::collections::VecDeque;
 
 use salt_engine::{
     cards::{player_view::UnitCardDefinitionPlayerView, UnitCardDefinitionView},
-    game_agent::game_agent::{GameAgent, Prompter},
+    game_agent::game_agent::{ClientNotifier, GameAgent, Prompter},
     game_logic::{AttackEvent, ClientGameEvent, EndTurnEvent, Event, SummonCreatureFromHandEvent},
     game_runner::GameDisplay,
     game_state::{
@@ -65,6 +67,10 @@ impl GameAgent for ConsoleAgent {
     fn observe_state_update(&self, game_state: GameStatePlayerView) {
         let prompter = ConsolePrompter::new(self.id());
         prompter.show_board(&game_state);
+    }
+
+    fn make_client_notifier(&self) -> Box<dyn ClientNotifier> {
+        Box::new(ConsoleNotifier)
     }
 }
 
@@ -518,5 +524,14 @@ fn retry_until_ok<TOut, TErr>(
             Ok(ok) => return ok,
             Err(e) => (on_err)(e),
         }
+    }
+}
+
+struct ConsoleNotifier;
+
+#[async_trait]
+impl ClientNotifier for ConsoleNotifier {
+    async fn notify(&self, _event: salt_engine::game_logic::GameEvent) {
+        // No-op for the console client
     }
 }

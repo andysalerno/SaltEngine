@@ -92,6 +92,7 @@ impl GameRunner {
             let action = handler_player
                 .next_action(game_state.player_view(cur_player_id))
                 .await;
+
             let action: GameEvent = action.into();
 
             let turn_is_over = action.is_end_turn();

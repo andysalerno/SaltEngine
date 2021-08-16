@@ -1,8 +1,10 @@
+use crate::game_logic::GameEvent;
 use crate::game_state::board::BoardPos;
 use crate::{
     game_logic::ClientGameEvent,
     game_state::{GameStatePlayerView, PlayerId},
 };
+use async_trait::async_trait;
 
 #[cfg(test)]
 use mockall::{automock, predicate::*};
@@ -13,6 +15,7 @@ pub trait GameAgent {
     fn get_action(&self, game_state: &GameStatePlayerView) -> ClientGameEvent;
     fn id(&self) -> PlayerId;
     fn make_prompter(&self) -> Box<dyn Prompter>;
+    fn make_client_notifier(&self) -> Box<dyn ClientNotifier>;
 
     fn observe_state_update(&self, _game_state: GameStatePlayerView) {
         // no implementation by default
@@ -43,5 +46,18 @@ pub trait Prompter: Send + Sync {
 impl std::fmt::Debug for dyn Prompter {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{{Prompter}}")
+    }
+}
+
+/// A trait for notifying game clients about game events so they can update their visual state.
+/// Every `GameAgent` will be able to provide one of these.
+#[async_trait]
+pub trait ClientNotifier: Send + Sync {
+    async fn notify(&self, event: GameEvent);
+}
+
+impl std::fmt::Debug for dyn ClientNotifier {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{{ClientNotifier}}")
     }
 }
