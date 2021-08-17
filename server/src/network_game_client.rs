@@ -5,7 +5,7 @@ use async_trait::async_trait;
 use log::info;
 use salt_engine::{
     game_agent::game_agent::Prompter,
-    game_logic::ClientGameEvent,
+    game_logic::ClientActionEvent,
     game_runner::GameClient,
     game_state::{GameState, GameStatePlayerView, PlayerId},
 };
@@ -35,7 +35,7 @@ impl GameClient for NetworkGameClient {
             .expect("failed to send turnstart");
     }
 
-    async fn next_action(&mut self, game_state_view: GameStatePlayerView) -> ClientGameEvent {
+    async fn next_action(&mut self, game_state_view: GameStatePlayerView) -> ClientActionEvent {
         // Awaiting response from the client.
 
         let _ping = self

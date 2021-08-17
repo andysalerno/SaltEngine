@@ -1,6 +1,6 @@
 use crate::{
     game_agent::game_agent::{ClientNotifier, Prompter},
-    game_logic::{ClientGameEvent, EventDispatcher, GameEvent, StartGameEvent},
+    game_logic::{ClientActionEvent, EventDispatcher, GameEvent, StartGameEvent},
     game_state::{GameState, GameStatePlayerView, GameStateView, MakePlayerView},
 };
 use async_trait::async_trait;
@@ -14,7 +14,7 @@ use log::info;
 #[async_trait]
 pub trait GameClient: Send + Sync {
     async fn on_turn_start(&mut self, game_state: &GameState);
-    async fn next_action(&mut self, game_state_view: GameStatePlayerView) -> ClientGameEvent;
+    async fn next_action(&mut self, game_state_view: GameStatePlayerView) -> ClientActionEvent;
     async fn make_prompter(&self) -> Box<dyn Prompter>;
     async fn make_notifier(&self) -> Box<dyn ClientNotifier>;
     async fn observe_state_update(&mut self, game_state_view: GameStatePlayerView);

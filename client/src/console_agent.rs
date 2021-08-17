@@ -5,7 +5,9 @@ use std::collections::VecDeque;
 use salt_engine::{
     cards::{player_view::UnitCardDefinitionPlayerView, UnitCardDefinitionView},
     game_agent::game_agent::{ClientNotifier, GameAgent, Prompter},
-    game_logic::{AttackEvent, ClientGameEvent, EndTurnEvent, Event, SummonCreatureFromHandEvent},
+    game_logic::{
+        AttackEvent, ClientActionEvent, EndTurnEvent, Event, SummonCreatureFromHandEvent,
+    },
     game_runner::GameDisplay,
     game_state::{
         board::{BoardPos, BoardView, RowId},
@@ -42,7 +44,7 @@ impl ConsoleAgent {
 }
 
 impl GameAgent for ConsoleAgent {
-    fn get_action(&self, game_state: &GameStatePlayerView) -> ClientGameEvent {
+    fn get_action(&self, game_state: &GameStatePlayerView) -> ClientActionEvent {
         let prompter = ConsolePrompter::new(self.id());
         prompter.show_hand(game_state);
 
@@ -219,7 +221,7 @@ impl ConsolePrompter {
         self.id
     }
 
-    fn prompt(&self, game_state: &GameStatePlayerView) -> Result<ClientGameEvent, ConsoleError> {
+    fn prompt(&self, game_state: &GameStatePlayerView) -> Result<ClientActionEvent, ConsoleError> {
         let mut input_queue = VecDeque::new();
 
         let mut event = None;
@@ -247,7 +249,7 @@ impl ConsolePrompter {
                     None
                 }
                 "attack" => Some(self.attack(game_state, &mut input_queue)),
-                "end" => Some(Ok(ClientGameEvent::EndTurn(EndTurnEvent))),
+                "end" => Some(Ok(ClientActionEvent::EndTurn(EndTurnEvent))),
                 "quit" => panic!(),
                 _ => None,
             };
@@ -260,7 +262,7 @@ impl ConsolePrompter {
         &self,
         game_state: &GameStatePlayerView,
         input_queue: &mut VecDeque<String>,
-    ) -> Result<ClientGameEvent, ConsoleError> {
+    ) -> Result<ClientActionEvent, ConsoleError> {
         let player_id = game_state.cur_player_turn();
 
         let selected_card_id = {
@@ -291,7 +293,7 @@ impl ConsolePrompter {
 
         event
             .validate(game_state)
-            .map(|_| ClientGameEvent::SummonCreatureFromHand(event))
+            .map(|_| ClientActionEvent::SummonCreatureFromHand(event))
             .map_err(|e| ConsoleError::UserInputError(format!("{:?}", e)))
     }
 
@@ -299,7 +301,7 @@ impl ConsolePrompter {
         &self,
         game_state: &GameStatePlayerView,
         input_queue: &mut VecDeque<String>,
-    ) -> Result<ClientGameEvent, ConsoleError> {
+    ) -> Result<ClientActionEvent, ConsoleError> {
         let attacker_pos = self.prompt_pos(game_state, input_queue)?;
 
         if !game_state
@@ -336,7 +338,7 @@ impl ConsolePrompter {
 
         event
             .validate(game_state)
-            .map(|_| ClientGameEvent::Attack(event))
+            .map(|_| ClientActionEvent::Attack(event))
             .map_err(|e| ConsoleError::UserInputError(format!("{:?}", e)))
     }
 

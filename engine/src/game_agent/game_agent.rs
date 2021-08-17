@@ -1,7 +1,7 @@
 use crate::game_logic::GameEvent;
 use crate::game_state::board::BoardPos;
 use crate::{
-    game_logic::ClientGameEvent,
+    game_logic::ClientActionEvent,
     game_state::{GameStatePlayerView, PlayerId},
 };
 use async_trait::async_trait;
@@ -12,7 +12,7 @@ use mockall::{automock, predicate::*};
 /// A trait representing an player agent that can decide what
 /// action to take for a given game state.
 pub trait GameAgent {
-    fn get_action(&self, game_state: &GameStatePlayerView) -> ClientGameEvent;
+    fn get_action(&self, game_state: &GameStatePlayerView) -> ClientActionEvent;
     fn id(&self) -> PlayerId;
     fn make_prompter(&self) -> Box<dyn Prompter>;
     fn make_client_notifier(&self) -> Box<dyn ClientNotifier>;

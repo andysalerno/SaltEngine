@@ -44,6 +44,10 @@ pub trait Event: Into<GameEvent> {
     {
         Ok(())
     }
+
+    fn maybe_client_event(&self) -> Option<ClientEventView> {
+        None
+    }
 }
 
 /// All possible game events.
@@ -71,8 +75,11 @@ impl GameEvent {
         matches!(self, GameEvent::EndTurn(_))
     }
 
-    pub fn maybe_client_event(&self) -> Option<ClientGameEvent> {
-        todo!()
+    pub fn maybe_client_event(&self) -> Option<ClientEventView> {
+        match self {
+            GameEvent::AddCardToHand(e) => e.maybe_client_event(),
+            _ => None,
+        }
     }
 }
 
@@ -82,27 +89,33 @@ impl GameEvent {
 /// (they are allowed to end their own turn), but a client cannot
 /// directly provide a CreatureDestroyed event.
 #[derive(Debug, Serialize, Deserialize, Clone)]
-pub enum ClientGameEvent {
+pub enum ClientActionEvent {
     EndTurn(EndTurnEvent),
     SummonCreatureFromHand(SummonCreatureFromHandEvent),
     Attack(AttackEvent),
     DrawCard(DrawCardEvent),
 }
 
-impl From<ClientGameEvent> for GameEvent {
-    fn from(e: ClientGameEvent) -> Self {
+/// Views of events that can be sent to clients.
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub enum ClientEventView {
+    AddCardToHand(AddCardToHandClientEvent),
+}
+
+impl From<ClientActionEvent> for GameEvent {
+    fn from(e: ClientActionEvent) -> Self {
         match e {
-            ClientGameEvent::EndTurn(e) => e.into(),
-            ClientGameEvent::SummonCreatureFromHand(e) => e.into(),
-            ClientGameEvent::Attack(e) => e.into(),
-            ClientGameEvent::DrawCard(e) => e.into(),
+            ClientActionEvent::EndTurn(e) => e.into(),
+            ClientActionEvent::SummonCreatureFromHand(e) => e.into(),
+            ClientActionEvent::Attack(e) => e.into(),
+            ClientActionEvent::DrawCard(e) => e.into(),
         }
     }
 }
 
-impl ClientGameEvent {
+impl ClientActionEvent {
     pub fn is_end_turn(&self) -> bool {
-        matches!(self, ClientGameEvent::EndTurn(_))
+        matches!(self, ClientActionEvent::EndTurn(_))
     }
 }
 

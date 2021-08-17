@@ -63,10 +63,11 @@ mod tests {
     }
 
     pub fn make_default_dispatcher() -> EventDispatcher {
-        let prompt_a = MockTestPrompter::new();
-        let prompt_b = MockTestPrompter::new();
+        todo!()
+        // let prompt_a = MockTestPrompter::new();
+        // let prompt_b = MockTestPrompter::new();
 
-        make_dispatcher(prompt_a, PlayerId::new(), prompt_b, PlayerId::new())
+        // make_dispatcher(prompt_a, PlayerId::new(), prompt_b, PlayerId::new())
     }
 
     pub fn make_dispatcher(
@@ -75,11 +76,12 @@ mod tests {
         prompter_b: impl ClientNotifier + 'static,
         player_b_id: PlayerId,
     ) -> EventDispatcher {
-        EventDispatcher::new(
-            Box::new(prompter_a),
-            player_a_id,
-            Box::new(prompter_b),
-            player_b_id,
-        )
+        todo!()
+        // EventDispatcher::new(
+        //     Box::new(prompter_a),
+        //     player_a_id,
+        //     Box::new(prompter_b),
+        //     player_b_id,
+        // )
     }
 }
