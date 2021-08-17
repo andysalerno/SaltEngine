@@ -1,8 +1,9 @@
 use crate::game_state::PlayerId;
+use serde::{Deserialize, Serialize};
 
 use super::{Event, GameEvent};
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct DrawCardEvent {
     player_id: PlayerId,
 }
@@ -17,9 +18,9 @@ impl DrawCardEvent {
     }
 }
 
-impl Into<GameEvent> for DrawCardEvent {
-    fn into(self) -> GameEvent {
-        GameEvent::DrawCard(self)
+impl From<DrawCardEvent> for GameEvent {
+    fn from(val: DrawCardEvent) -> Self {
+        GameEvent::DrawCard(val)
     }
 }
 

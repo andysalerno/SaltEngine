@@ -2,7 +2,7 @@ use crate::game_state::board::BoardPos;
 
 use super::{Event, GameEvent};
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct PosTakesDamageEvent {
     pos: BoardPos,
     damage_amount: usize,
@@ -24,8 +24,8 @@ impl PosTakesDamageEvent {
 
 impl Event for PosTakesDamageEvent {}
 
-impl Into<GameEvent> for PosTakesDamageEvent {
-    fn into(self) -> GameEvent {
-        GameEvent::PosTakesDamage(self)
+impl From<PosTakesDamageEvent> for GameEvent {
+    fn from(val: PosTakesDamageEvent) -> Self {
+        GameEvent::PosTakesDamage(val)
     }
 }

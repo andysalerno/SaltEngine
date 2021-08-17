@@ -1,4 +1,8 @@
-use crate::game_state::{PlayerId, UnitCardInstance};
+use crate::{
+    cards::player_view::UnitCardDefinitionPlayerView,
+    game_state::{PlayerId, UnitCardInstance},
+};
+use serde::{Deserialize, Serialize};
 
 use super::{Event, GameEvent};
 
@@ -24,8 +28,14 @@ impl AddCardToHandEvent {
 
 impl Event for AddCardToHandEvent {}
 
-impl Into<GameEvent> for AddCardToHandEvent {
-    fn into(self) -> GameEvent {
-        GameEvent::AddCardToHand(self)
+impl From<AddCardToHandEvent> for GameEvent {
+    fn from(val: AddCardToHandEvent) -> Self {
+        GameEvent::AddCardToHand(val)
     }
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct AddCardToHandClientEvent {
+    player_id: PlayerId,
+    card: UnitCardDefinitionPlayerView,
 }

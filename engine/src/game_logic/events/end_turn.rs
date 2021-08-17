@@ -1,13 +1,13 @@
 use super::{Event, GameEvent};
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct EndTurnEvent;
 
 impl Event for EndTurnEvent {}
 
-impl Into<GameEvent> for EndTurnEvent {
-    fn into(self) -> GameEvent {
-        GameEvent::EndTurn(self)
+impl From<EndTurnEvent> for GameEvent {
+    fn from(val: EndTurnEvent) -> Self {
+        GameEvent::EndTurn(val)
     }
 }

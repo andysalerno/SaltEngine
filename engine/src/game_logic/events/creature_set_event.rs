@@ -1,4 +1,4 @@
-use crate::game_state::{board::BoardPos, PlayerId, UnitCardInstance};
+use crate::game_state::{board::BoardPos, PlayerId, UnitCardInstance, UnitCardInstanceId};
 
 use super::{Event, GameEvent};
 
@@ -37,8 +37,8 @@ impl CreatureSetEvent {
 
 impl Event for CreatureSetEvent {}
 
-impl Into<GameEvent> for CreatureSetEvent {
-    fn into(self) -> GameEvent {
-        GameEvent::Summon(self)
+impl From<CreatureSetEvent> for GameEvent {
+    fn from(val: CreatureSetEvent) -> Self {
+        GameEvent::Summon(val)
     }
 }

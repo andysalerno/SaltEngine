@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 
 use super::{Event, GameEvent};
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct AttackEvent {
     attacker: UnitCardInstanceId,
     target: UnitCardInstanceId,
@@ -25,8 +25,8 @@ impl AttackEvent {
 
 impl Event for AttackEvent {}
 
-impl Into<GameEvent> for AttackEvent {
-    fn into(self) -> GameEvent {
-        GameEvent::Attack(self)
+impl From<AttackEvent> for GameEvent {
+    fn from(val: AttackEvent) -> Self {
+        GameEvent::Attack(val)
     }
 }

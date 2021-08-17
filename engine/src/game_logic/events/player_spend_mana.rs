@@ -2,7 +2,7 @@ use crate::game_state::{GameStateView, PlayerId};
 
 use super::{Event, GameEvent};
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct PlayerSpendManaEvent {
     player_id: PlayerId,
     mana_count: u32,
@@ -25,9 +25,9 @@ impl PlayerSpendManaEvent {
     }
 }
 
-impl Into<GameEvent> for PlayerSpendManaEvent {
-    fn into(self) -> GameEvent {
-        GameEvent::SpendMana(self)
+impl From<PlayerSpendManaEvent> for GameEvent {
+    fn from(val: PlayerSpendManaEvent) -> Self {
+        GameEvent::SpendMana(val)
     }
 }
 

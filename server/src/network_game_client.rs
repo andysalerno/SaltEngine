@@ -66,4 +66,8 @@ impl GameClient for NetworkGameClient {
             .await
             .expect("Failed to send state update");
     }
+
+    async fn make_notifier(&self) -> Box<dyn salt_engine::game_agent::game_agent::ClientNotifier> {
+        todo!()
+    }
 }

@@ -33,6 +33,8 @@ pub use turn_start_event::TurnStartEvent;
 
 use crate::game_state::GameStateView;
 
+use self::add_card_to_hand_event::AddCardToHandClientEvent;
+
 pub type Result = std::result::Result<(), Box<dyn std::error::Error>>;
 
 pub trait Event: Into<GameEvent> {
@@ -66,10 +68,11 @@ pub enum GameEvent {
 
 impl GameEvent {
     pub fn is_end_turn(&self) -> bool {
-        match self {
-            GameEvent::EndTurn(_) => true,
-            _ => false,
-        }
+        matches!(self, GameEvent::EndTurn(_))
+    }
+
+    pub fn maybe_client_event(&self) -> Option<ClientGameEvent> {
+        todo!()
     }
 }
 
@@ -78,29 +81,28 @@ impl GameEvent {
 /// For example, a client can legally provide a TurnEnd event
 /// (they are allowed to end their own turn), but a client cannot
 /// directly provide a CreatureDestroyed event.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub enum ClientGameEvent {
     EndTurn(EndTurnEvent),
     SummonCreatureFromHand(SummonCreatureFromHandEvent),
     Attack(AttackEvent),
+    DrawCard(DrawCardEvent),
 }
 
 impl From<ClientGameEvent> for GameEvent {
     fn from(e: ClientGameEvent) -> Self {
         match e {
-            ClientGameEvent::EndTurn(e) => GameEvent::EndTurn(e),
-            ClientGameEvent::SummonCreatureFromHand(e) => GameEvent::SummonCreatureFromHand(e),
-            ClientGameEvent::Attack(e) => GameEvent::Attack(e),
+            ClientGameEvent::EndTurn(e) => e.into(),
+            ClientGameEvent::SummonCreatureFromHand(e) => e.into(),
+            ClientGameEvent::Attack(e) => e.into(),
+            ClientGameEvent::DrawCard(e) => e.into(),
         }
     }
 }
 
 impl ClientGameEvent {
     pub fn is_end_turn(&self) -> bool {
-        match self {
-            ClientGameEvent::EndTurn(_) => true,
-            _ => false,
-        }
+        matches!(self, ClientGameEvent::EndTurn(_))
     }
 }
 

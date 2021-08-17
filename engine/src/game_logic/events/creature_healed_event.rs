@@ -2,7 +2,7 @@ use crate::game_state::UnitCardInstanceId;
 
 use super::{Event, GameEvent};
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct CreatureHealedEvent {
     creature_id: UnitCardInstanceId,
     heal_amount: usize,
@@ -27,8 +27,8 @@ impl CreatureHealedEvent {
 
 impl Event for CreatureHealedEvent {}
 
-impl Into<GameEvent> for CreatureHealedEvent {
-    fn into(self) -> GameEvent {
-        GameEvent::CreatureHealed(self)
+impl From<CreatureHealedEvent> for GameEvent {
+    fn from(val: CreatureHealedEvent) -> Self {
+        GameEvent::CreatureHealed(val)
     }
 }

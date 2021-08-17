@@ -1,12 +1,12 @@
 use super::{Event, GameEvent};
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct StartGameEvent;
 
 impl Event for StartGameEvent {}
 
-impl Into<GameEvent> for StartGameEvent {
-    fn into(self) -> GameEvent {
-        GameEvent::StartGame(self)
+impl From<StartGameEvent> for GameEvent {
+    fn from(val: StartGameEvent) -> Self {
+        GameEvent::StartGame(val)
     }
 }

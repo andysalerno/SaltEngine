@@ -1,6 +1,6 @@
 use super::{event_handlers::*, events::GameEvent, Event};
 use crate::{
-    game_agent::game_agent::Prompter,
+    game_agent::game_agent::{ClientNotifier, Prompter},
     game_state::{GameState, PlayerId},
 };
 use log::debug;
@@ -8,23 +8,29 @@ use log::debug;
 #[derive(Debug)]
 pub struct EventDispatcher {
     stack: Vec<GameEvent>,
+    player_a_notifier: Box<dyn ClientNotifier>,
     player_a_prompter: Box<dyn Prompter>,
     player_a_id: PlayerId,
+    player_b_notifier: Box<dyn ClientNotifier>,
     player_b_prompter: Box<dyn Prompter>,
     player_b_id: PlayerId,
 }
 
 impl EventDispatcher {
     pub fn new(
+        player_a_notifier: Box<dyn ClientNotifier>,
         player_a_prompter: Box<dyn Prompter>,
         player_a_id: PlayerId,
+        player_b_notifier: Box<dyn ClientNotifier>,
         player_b_prompter: Box<dyn Prompter>,
         player_b_id: PlayerId,
     ) -> Self {
         Self {
             stack: Vec::new(),
+            player_a_notifier,
             player_a_prompter,
             player_a_id,
+            player_b_notifier,
             player_b_prompter,
             player_b_id,
         }
@@ -48,18 +54,30 @@ impl EventDispatcher {
         }
     }
 
+    pub fn player_notifier(&self, player_id: PlayerId) -> &dyn ClientNotifier {
+        if player_id == self.player_a_id {
+            self.player_a_notifier.as_ref()
+        } else if player_id == self.player_b_id {
+            self.player_b_notifier.as_ref()
+        } else {
+            panic!("Cannot get notifier for unknown player ID: {:?}", player_id)
+        }
+    }
+
     pub fn player_prompter(&self, player_id: PlayerId) -> &dyn Prompter {
         if player_id == self.player_a_id {
             self.player_a_prompter.as_ref()
         } else if player_id == self.player_b_id {
             self.player_b_prompter.as_ref()
         } else {
-            panic!("Cannot get prompt for unknown player ID: {:?}", player_id)
+            panic!("Cannot get notifier for unknown player ID: {:?}", player_id)
         }
     }
 
     fn handle(&mut self, event: GameEvent, game_state: &mut GameState) {
         debug!("Dispatching event: {:?}", event);
+
+        let maybe_client_event = event.maybe_client_event();
 
         match event {
             GameEvent::Attack(e) => AttackEventHandler::default().handle(e, game_state, self),

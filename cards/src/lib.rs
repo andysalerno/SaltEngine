@@ -26,7 +26,7 @@ pub use sleeping_dog::SleepingDog;
 mod tests {
     use mockall::{mock, predicate::*};
     use salt_engine::{
-        game_agent::game_agent::Prompter,
+        game_agent::game_agent::{ClientNotifier, Prompter},
         game_logic::EventDispatcher,
         game_state::{board::BoardPos, Deck, GameState, GameStatePlayerView, PlayerId},
     };
@@ -70,9 +70,9 @@ mod tests {
     }
 
     pub fn make_dispatcher(
-        prompter_a: impl Prompter + 'static,
+        prompter_a: impl ClientNotifier + 'static,
         player_a_id: PlayerId,
-        prompter_b: impl Prompter + 'static,
+        prompter_b: impl ClientNotifier + 'static,
         player_b_id: PlayerId,
     ) -> EventDispatcher {
         EventDispatcher::new(

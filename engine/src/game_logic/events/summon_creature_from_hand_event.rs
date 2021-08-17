@@ -10,7 +10,7 @@ use crate::{
 use log::debug;
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct SummonCreatureFromHandEvent {
     player_id: PlayerId,
     board_pos: BoardPos,
@@ -53,9 +53,9 @@ impl Event for SummonCreatureFromHandEvent {
     }
 }
 
-impl Into<GameEvent> for SummonCreatureFromHandEvent {
-    fn into(self) -> GameEvent {
-        GameEvent::SummonCreatureFromHand(self)
+impl From<SummonCreatureFromHandEvent> for GameEvent {
+    fn from(val: SummonCreatureFromHandEvent) -> Self {
+        GameEvent::SummonCreatureFromHand(val)
     }
 }
 

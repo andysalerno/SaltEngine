@@ -1,5 +1,5 @@
 use crate::{
-    game_agent::game_agent::Prompter,
+    game_agent::game_agent::{ClientNotifier, Prompter},
     game_logic::{ClientGameEvent, EventDispatcher, GameEvent, StartGameEvent},
     game_state::{GameState, GameStatePlayerView, GameStateView, MakePlayerView},
 };
@@ -16,6 +16,7 @@ pub trait GameClient: Send + Sync {
     async fn on_turn_start(&mut self, game_state: &GameState);
     async fn next_action(&mut self, game_state_view: GameStatePlayerView) -> ClientGameEvent;
     async fn make_prompter(&self) -> Box<dyn Prompter>;
+    async fn make_notifier(&self) -> Box<dyn ClientNotifier>;
     async fn observe_state_update(&mut self, game_state_view: GameStatePlayerView);
 }
 
@@ -43,12 +44,17 @@ impl GameRunner {
     }
 
     pub async fn run_game(mut self) {
+        let player_a_notifier = self.player_a_handler.make_notifier().await;
+        let player_b_notifier = self.player_b_handler.make_notifier().await;
+
         let player_a_prompter = self.player_a_handler.make_prompter().await;
         let player_b_prompter = self.player_b_handler.make_prompter().await;
 
         let mut dispatcher = EventDispatcher::new(
+            player_a_notifier,
             player_a_prompter,
             self.game_state.player_a_id(),
+            player_b_notifier,
             player_b_prompter,
             self.game_state.player_b_id(),
         );
