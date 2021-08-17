@@ -1,4 +1,4 @@
-use crate::game_logic::GameEvent;
+use crate::game_logic::{ClientEventView, GameEvent};
 use crate::game_state::board::BoardPos;
 use crate::{
     game_logic::ClientActionEvent,
@@ -53,7 +53,7 @@ impl std::fmt::Debug for dyn Prompter {
 /// Every `GameAgent` will be able to provide one of these.
 #[async_trait]
 pub trait ClientNotifier: Send + Sync {
-    async fn notify(&self, event: GameEvent);
+    async fn notify(&self, event: ClientEventView);
 }
 
 impl std::fmt::Debug for dyn ClientNotifier {

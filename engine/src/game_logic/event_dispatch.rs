@@ -114,5 +114,11 @@ impl EventDispatcher {
                 CreatureHealedEventHandler::default().handle(e, game_state, self)
             }
         }
+
+        if let Some(event_view) = maybe_client_event {
+            smol::block_on(async {
+                self.player_a_notifier.notify(event_view).await;
+            });
+        }
     }
 }

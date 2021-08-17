@@ -1,8 +1,10 @@
 use crate::connection::Connection;
 use crate::messages::{FromClient, FromServer};
+use crate::network_client_notifier::NetworkClientNotifier;
 use crate::network_prompter::NewtorkPrompter;
 use async_trait::async_trait;
 use log::info;
+use salt_engine::game_agent::game_agent::ClientNotifier;
 use salt_engine::{
     game_agent::game_agent::Prompter,
     game_logic::ClientActionEvent,
@@ -67,7 +69,7 @@ impl GameClient for NetworkGameClient {
             .expect("Failed to send state update");
     }
 
-    async fn make_notifier(&self) -> Box<dyn salt_engine::game_agent::game_agent::ClientNotifier> {
-        todo!()
+    async fn make_notifier(&self) -> Box<dyn ClientNotifier> {
+        Box::new(NetworkClientNotifier::new())
     }
 }

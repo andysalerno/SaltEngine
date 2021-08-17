@@ -6,7 +6,8 @@ use salt_engine::{
     cards::{player_view::UnitCardDefinitionPlayerView, UnitCardDefinitionView},
     game_agent::game_agent::{ClientNotifier, GameAgent, Prompter},
     game_logic::{
-        AttackEvent, ClientActionEvent, EndTurnEvent, Event, SummonCreatureFromHandEvent,
+        AttackEvent, ClientActionEvent, ClientEventView, EndTurnEvent, Event,
+        SummonCreatureFromHandEvent,
     },
     game_runner::GameDisplay,
     game_state::{
@@ -533,7 +534,7 @@ struct ConsoleNotifier;
 
 #[async_trait]
 impl ClientNotifier for ConsoleNotifier {
-    async fn notify(&self, _event: salt_engine::game_logic::GameEvent) {
+    async fn notify(&self, _event: ClientEventView) {
         // No-op for the console client
     }
 }
