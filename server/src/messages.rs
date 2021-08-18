@@ -1,5 +1,5 @@
 use salt_engine::{
-    game_logic::ClientActionEvent,
+    game_logic::{ClientActionEvent, ClientEventView},
     game_state::{board::BoardPos, GameStatePlayerView, PlayerId, UnitCardInstanceId},
     id::Id,
 };
@@ -45,6 +45,9 @@ pub enum FromServer {
 
     /// Indicates the client should prompt for some value (board slot, card, etc).
     Prompt(PromptMessage, GameStatePlayerView),
+
+    /// A message from the server notifying the game client about some event.
+    NotifyEvent(ClientEventView),
 }
 impl GameMessage for FromServer {}
 

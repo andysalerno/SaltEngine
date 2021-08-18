@@ -70,6 +70,6 @@ impl GameClient for NetworkGameClient {
     }
 
     async fn make_notifier(&self) -> Box<dyn ClientNotifier> {
-        Box::new(NetworkClientNotifier::new())
+        Box::new(NetworkClientNotifier::new(self.connection.clone()))
     }
 }

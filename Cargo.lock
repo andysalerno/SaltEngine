@@ -289,17 +289,13 @@ checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
 name = "client"
 version = "0.1.0"
 dependencies = [
- "async-trait",
  "async-tungstenite",
- "env_logger",
- "futures",
  "log",
  "salt_engine",
  "serde",
  "serde_json",
  "server",
  "smol",
- "thiserror",
 ]
 
 [[package]]
@@ -309,6 +305,17 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "30ed07550be01594c6026cff2a1d7fe9c8f683caa798e12b68694ac9e88286a3"
 dependencies = [
  "cache-padded",
+]
+
+[[package]]
+name = "console_client"
+version = "0.1.0"
+dependencies = [
+ "async-trait",
+ "env_logger",
+ "log",
+ "salt_engine",
+ "thiserror",
 ]
 
 [[package]]

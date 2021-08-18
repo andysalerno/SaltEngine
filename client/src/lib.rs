@@ -1,8 +1,3 @@
-mod console_agent;
-mod console_display;
-
-use console_agent::ConsoleAgent;
-use env_logger::Env;
 use log::info;
 use salt_engine::game_agent::game_agent::GameAgent;
 use server::{
@@ -13,21 +8,19 @@ use smol::net::TcpStream;
 
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error + Send + Sync>>;
 
-fn main() -> Result<()> {
-    env_logger::Builder::from_env(Env::default().default_filter_or("info")).init();
+pub async fn start(agent: Box<dyn GameAgent>) -> Result<()> {
+    let stream = TcpStream::connect("localhost:9000").await?;
+    let (connection, _) = async_tungstenite::client_async("ws://localhost:9000", stream).await?;
 
-    smol::block_on(async {
-        let stream = TcpStream::connect("localhost:9000").await?;
-        let (connection, _) =
-            async_tungstenite::client_async("ws://localhost:9000", stream).await?;
+    let connection = Connection::new(connection);
 
-        let connection = Connection::new(connection);
-
-        handle_connection(connection).await
-    })
+    handle_connection(connection, agent).await
 }
 
-async fn handle_connection(mut connection: Connection) -> Result<()> {
+async fn handle_connection(
+    mut connection: Connection,
+    mut agent: Box<dyn GameAgent>,
+) -> Result<()> {
     // Expect a Hello
 
     let my_id = match connection.recv::<FromServer>().await {
@@ -35,8 +28,6 @@ async fn handle_connection(mut connection: Connection) -> Result<()> {
         _ => panic!("unexpected response from server"),
     };
     info!("Saw a hello - my id is: {:?}", my_id);
-
-    let mut agent: Box<dyn GameAgent> = Box::new(ConsoleAgent::new_with_id(my_id));
 
     // Send Ready
     connection.send(FromClient::Ready).await?;
