@@ -9,6 +9,7 @@ use smol::net::TcpStream;
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error + Send + Sync>>;
 
 pub async fn start(agent: Box<dyn GameAgent>) -> Result<()> {
+    info!("Salt client starting.");
     let stream = TcpStream::connect("localhost:9000").await?;
     let (connection, _) = async_tungstenite::client_async("ws://localhost:9000", stream).await?;
 
