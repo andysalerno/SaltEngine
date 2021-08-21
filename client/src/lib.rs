@@ -1,5 +1,5 @@
 use log::info;
-use salt_engine::game_agent::game_agent::GameAgent;
+use salt_engine::{game_agent::game_agent::GameAgent, game_state::PlayerId};
 use server::{
     connection::Connection,
     messages::{FromClient, FromServer, PromptMessage},
@@ -8,19 +8,19 @@ use smol::net::TcpStream;
 
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error + Send + Sync>>;
 
-pub async fn start(agent: Box<dyn GameAgent>) -> Result<()> {
+pub async fn start(make_agent: impl FnOnce(PlayerId) -> Box<dyn GameAgent>) -> Result<()> {
     info!("Salt client starting.");
     let stream = TcpStream::connect("localhost:9000").await?;
     let (connection, _) = async_tungstenite::client_async("ws://localhost:9000", stream).await?;
 
     let connection = Connection::new(connection);
 
-    handle_connection(connection, agent).await
+    handle_connection(connection, make_agent).await
 }
 
 async fn handle_connection(
     mut connection: Connection,
-    mut agent: Box<dyn GameAgent>,
+    make_agent: impl FnOnce(PlayerId) -> Box<dyn GameAgent>,
 ) -> Result<()> {
     // Expect a Hello
 
@@ -29,6 +29,8 @@ async fn handle_connection(
         _ => panic!("unexpected response from server"),
     };
     info!("Saw a hello - my id is: {:?}", my_id);
+
+    let mut agent = make_agent(my_id);
 
     // Send Ready
     connection.send(FromClient::Ready).await?;
@@ -49,10 +51,7 @@ async fn handle_connection(
 
     loop {
         // Wait for signal from server that we can send an action
-        let msg = connection
-            .recv::<FromServer>()
-            .await
-            .expect("failed to get a response from the server");
+        let msg = connection.recv::<FromServer>().await.unwrap();
 
         match msg {
             FromServer::TurnStart => handle_turn_start(&mut connection, agent.as_mut()).await?,

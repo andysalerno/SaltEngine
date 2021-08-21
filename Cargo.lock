@@ -312,9 +312,11 @@ name = "console_client"
 version = "0.1.0"
 dependencies = [
  "async-trait",
+ "client",
  "env_logger",
  "log",
  "salt_engine",
+ "smol",
  "thiserror",
 ]
 
