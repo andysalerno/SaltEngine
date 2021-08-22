@@ -286,19 +286,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
 
 [[package]]
-name = "client"
-version = "0.1.0"
-dependencies = [
- "async-tungstenite",
- "log",
- "salt_engine",
- "serde",
- "serde_json",
- "server",
- "smol",
-]
-
-[[package]]
 name = "concurrent-queue"
 version = "1.2.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -312,12 +299,12 @@ name = "console_client"
 version = "0.1.0"
 dependencies = [
  "async-trait",
- "client",
  "env_logger",
  "log",
  "salt_engine",
  "smol",
  "thiserror",
+ "websocket_client",
 ]
 
 [[package]]
@@ -967,22 +954,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "server"
-version = "0.1.0"
-dependencies = [
- "async-trait",
- "async-tungstenite",
- "cards",
- "env_logger",
- "futures",
- "log",
- "salt_engine",
- "serde",
- "serde_json",
- "smol",
-]
-
-[[package]]
 name = "sha-1"
 version = "0.9.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1289,6 +1260,35 @@ checksum = "e828417b379f3df7111d3a2a9e5753706cae29c41f7c4029ee9fd77f3e09e582"
 dependencies = [
  "js-sys",
  "wasm-bindgen",
+]
+
+[[package]]
+name = "websocket_client"
+version = "0.1.0"
+dependencies = [
+ "async-tungstenite",
+ "log",
+ "salt_engine",
+ "serde",
+ "serde_json",
+ "smol",
+ "websocket_server",
+]
+
+[[package]]
+name = "websocket_server"
+version = "0.1.0"
+dependencies = [
+ "async-trait",
+ "async-tungstenite",
+ "cards",
+ "env_logger",
+ "futures",
+ "log",
+ "salt_engine",
+ "serde",
+ "serde_json",
+ "smol",
 ]
 
 [[package]]

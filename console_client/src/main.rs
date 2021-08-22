@@ -12,7 +12,7 @@ fn main() {
         let make_agent =
             |player_id| Box::new(ConsoleAgent::new_with_id(player_id)) as Box<dyn GameAgent>;
 
-        client::start(make_agent)
+        websocket_client::start(make_agent)
             .await
             .expect("Failed to start client.");
     })

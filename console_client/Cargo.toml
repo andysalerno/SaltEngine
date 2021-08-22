@@ -8,7 +8,7 @@ edition = "2018"
 [dependencies]
 env_logger = "0.8"
 salt_engine = { path = "../engine" }
-client = { path = "../client" }
+websocket_client = { path = "../websocket_client" }
 thiserror = "1.0"
 log = "0.4"
 async-trait = "0.1"
