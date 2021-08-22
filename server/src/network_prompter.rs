@@ -3,7 +3,7 @@ use crate::messages::FromServer;
 use crate::{connection::Connection, messages::PromptMessage};
 use log::info;
 use salt_engine::{
-    game_agent::game_agent::Prompter,
+    game_agent::Prompter,
     game_state::{board::BoardPos, GameStatePlayerView},
 };
 

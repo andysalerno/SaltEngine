@@ -4,9 +4,9 @@ use crate::network_client_notifier::NetworkClientNotifier;
 use crate::network_prompter::NewtorkPrompter;
 use async_trait::async_trait;
 use log::info;
-use salt_engine::game_agent::game_agent::ClientNotifier;
+use salt_engine::game_agent::ClientNotifier;
 use salt_engine::{
-    game_agent::game_agent::Prompter,
+    game_agent::Prompter,
     game_logic::ClientActionEvent,
     game_runner::GameClient,
     game_state::{GameState, GameStatePlayerView, PlayerId},

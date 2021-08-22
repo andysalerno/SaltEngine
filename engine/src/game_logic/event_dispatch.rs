@@ -1,6 +1,6 @@
 use super::{event_handlers::*, events::GameEvent, Event};
 use crate::{
-    game_agent::game_agent::{ClientNotifier, Prompter},
+    game_agent::{ClientNotifier, Prompter},
     game_state::{GameState, PlayerId},
 };
 use log::debug;

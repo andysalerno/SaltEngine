@@ -4,7 +4,7 @@ use std::collections::VecDeque;
 
 use salt_engine::{
     cards::{player_view::UnitCardDefinitionPlayerView, UnitCardDefinitionView},
-    game_agent::game_agent::{ClientNotifier, GameAgent, Prompter},
+    game_agent::{ClientNotifier, GameAgent, Prompter},
     game_logic::{
         AttackEvent, ClientActionEvent, ClientEventView, EndTurnEvent, Event,
         SummonCreatureFromHandEvent,

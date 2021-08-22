@@ -26,7 +26,7 @@ pub use sleeping_dog::SleepingDog;
 mod tests {
     use mockall::{mock, predicate::*};
     use salt_engine::{
-        game_agent::game_agent::{ClientNotifier, Prompter},
+        game_agent::{ClientNotifier, Prompter},
         game_logic::EventDispatcher,
         game_state::{board::BoardPos, Deck, GameState, GameStatePlayerView, PlayerId},
     };

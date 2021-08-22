@@ -1,5 +1,5 @@
 use crate::{
-    game_agent::game_agent::{ClientNotifier, Prompter},
+    game_agent::{ClientNotifier, Prompter},
     game_logic::{ClientActionEvent, EventDispatcher, GameEvent, StartGameEvent},
     game_state::{GameState, GameStatePlayerView, GameStateView, MakePlayerView},
 };

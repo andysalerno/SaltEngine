@@ -1,5 +1,9 @@
 use log::info;
-use salt_engine::{game_agent::game_agent::GameAgent, game_state::PlayerId};
+use salt_engine::{
+    game_agent::{ClientNotifier, GameAgent},
+    game_runner::GameClient,
+    game_state::PlayerId,
+};
 use server::{
     connection::Connection,
     messages::{FromClient, FromServer, PromptMessage},
@@ -8,6 +12,7 @@ use smol::net::TcpStream;
 
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error + Send + Sync>>;
 
+/// Starts the client, using the provided GameAgent.
 pub async fn start(make_agent: impl FnOnce(PlayerId) -> Box<dyn GameAgent>) -> Result<()> {
     info!("Salt client starting.");
     let stream = TcpStream::connect("localhost:9000").await?;
@@ -31,6 +36,7 @@ async fn handle_connection(
     info!("Saw a hello - my id is: {:?}", my_id);
 
     let mut agent = make_agent(my_id);
+    let notifier = agent.make_client_notifier();
 
     // Send Ready
     connection.send(FromClient::Ready).await?;
@@ -54,15 +60,24 @@ async fn handle_connection(
         let msg = connection.recv::<FromServer>().await.unwrap();
 
         match msg {
-            FromServer::TurnStart => handle_turn_start(&mut connection, agent.as_mut()).await?,
+            FromServer::TurnStart => {
+                handle_turn(&mut connection, agent.as_mut(), notifier.as_ref()).await?
+            }
             FromServer::State(state) => agent.observe_state_update(state),
+            FromServer::NotifyEvent(event) => notifier.notify(event).await,
             _ => panic!("expected a TurnStart message, but received: {:?}", msg),
         }
     }
 }
 
-async fn handle_turn_start(connection: &mut Connection, agent: &dyn GameAgent) -> Result<()> {
+async fn handle_turn(
+    connection: &mut Connection,
+    // agent: &dyn GameAgent,
+    agent: &dyn GameAgent,
+    agent_notifier: &dyn ClientNotifier,
+) -> Result<()> {
     // Continuously receive actions from the client, until they end their turn.
+    info!("Server says my turn has started.");
     loop {
         // Wait for signal from server that we can send an action
         let msg = connection
@@ -72,10 +87,12 @@ async fn handle_turn_start(connection: &mut Connection, agent: &dyn GameAgent) -
 
         match msg {
             FromServer::WaitingForAction(state) => {
+                info!("Server says: waiting for action.");
                 let player_action = agent.get_action(&state);
 
                 let is_turn_ending = player_action.is_end_turn();
 
+                info!("Sending my action to server.");
                 connection
                     .send(FromClient::ClientAction(player_action))
                     .await?;
@@ -106,6 +123,7 @@ async fn handle_turn_start(connection: &mut Connection, agent: &dyn GameAgent) -
                     .await?;
             }
             FromServer::State(state) => agent.observe_state_update(state),
+            FromServer::NotifyEvent(event) => agent_notifier.notify(event).await,
             _ => panic!("Unexpected message from server: {:?}", msg),
         }
     }
