@@ -3,14 +3,14 @@ mod console_display;
 
 use console_agent::ConsoleAgent;
 use env_logger::Env;
-use salt_engine::game_agent::GameAgent;
+use salt_engine::game_runner::GameClient;
 
 fn main() {
     env_logger::Builder::from_env(Env::default().default_filter_or("info")).init();
 
     smol::block_on(async {
         let make_agent =
-            |player_id| Box::new(ConsoleAgent::new_with_id(player_id)) as Box<dyn GameAgent>;
+            |player_id| Box::new(ConsoleAgent::new_with_id(player_id)) as Box<dyn GameClient>;
 
         websocket_client::start(make_agent)
             .await

@@ -3,11 +3,12 @@ use async_trait::async_trait;
 use log::info;
 use salt_engine::{
     cards::{player_view::UnitCardDefinitionPlayerView, UnitCardDefinitionView},
-    game_agent::{ClientNotifier, GameAgent, Prompter},
+    game_agent::{ClientNotifier, Prompter},
     game_logic::{
         AttackEvent, ClientActionEvent, ClientEventView, EndTurnEvent, Event,
         SummonCreatureFromHandEvent,
     },
+    game_runner::GameClient,
     game_state::{
         board::{BoardPos, BoardView, RowId},
         GameStatePlayerView, GameStateView, HandView, IterAddons, IteratorAny, PlayerId,
@@ -39,15 +40,33 @@ impl ConsoleAgent {
     pub fn new_with_id(id: PlayerId) -> Self {
         Self { id }
     }
+
+    fn id(&self) -> PlayerId {
+        self.id
+    }
 }
 
-impl GameAgent for ConsoleAgent {
-    fn get_action(&self, game_state: &GameStatePlayerView) -> ClientActionEvent {
+#[async_trait]
+impl GameClient for ConsoleAgent {
+    async fn make_prompter(&self) -> Box<dyn Prompter> {
+        Box::new(ConsolePrompter::new(self.id()))
+    }
+
+    async fn make_notifier(&self) -> Box<dyn ClientNotifier> {
+        Box::new(ConsoleNotifier)
+    }
+
+    async fn observe_state_update(&mut self, game_state: GameStatePlayerView) {
         let prompter = ConsolePrompter::new(self.id());
-        prompter.show_hand(game_state);
+        prompter.show_board(&game_state);
+    }
+
+    async fn next_action(&mut self, game_state: GameStatePlayerView) -> ClientActionEvent {
+        let prompter = ConsolePrompter::new(self.id());
+        prompter.show_hand(&game_state);
 
         loop {
-            let result = prompter.prompt(game_state);
+            let result = prompter.prompt(&game_state);
 
             match result {
                 Ok(game_event) => break game_event,
@@ -56,21 +75,8 @@ impl GameAgent for ConsoleAgent {
         }
     }
 
-    fn id(&self) -> PlayerId {
-        self.id
-    }
-
-    fn make_prompter(&self) -> Box<dyn Prompter> {
-        Box::new(ConsolePrompter::new(self.id()))
-    }
-
-    fn observe_state_update(&self, game_state: GameStatePlayerView) {
-        let prompter = ConsolePrompter::new(self.id());
-        prompter.show_board(&game_state);
-    }
-
-    fn make_client_notifier(&self) -> Box<dyn ClientNotifier> {
-        Box::new(ConsoleNotifier)
+    async fn on_turn_start(&mut self, game_state: &salt_engine::game_state::GameState) {
+        todo!()
     }
 }
 
