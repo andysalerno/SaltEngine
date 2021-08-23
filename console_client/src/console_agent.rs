@@ -1,7 +1,6 @@
+use crate::console_display::ConsoleDisplay;
 use async_trait::async_trait;
 use log::info;
-use std::collections::VecDeque;
-
 use salt_engine::{
     cards::{player_view::UnitCardDefinitionPlayerView, UnitCardDefinitionView},
     game_agent::{ClientNotifier, GameAgent, Prompter},
@@ -9,16 +8,14 @@ use salt_engine::{
         AttackEvent, ClientActionEvent, ClientEventView, EndTurnEvent, Event,
         SummonCreatureFromHandEvent,
     },
-    game_runner::GameDisplay,
     game_state::{
         board::{BoardPos, BoardView, RowId},
         GameStatePlayerView, GameStateView, HandView, IterAddons, IteratorAny, PlayerId,
         UnitCardInstancePlayerView,
     },
 };
+use std::collections::VecDeque;
 use thiserror::Error;
-
-use crate::console_display::ConsoleDisplay;
 
 #[derive(Debug, Error)]
 enum ConsoleError {

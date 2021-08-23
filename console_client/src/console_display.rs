@@ -1,15 +1,12 @@
-use salt_engine::{
-    game_runner::GameDisplay,
-    game_state::{
-        board::{player_view::BoardSlotPlayerView, BoardView, RowId},
-        GameStatePlayerView, GameStateView,
-    },
+use salt_engine::game_state::{
+    board::{player_view::BoardSlotPlayerView, BoardView, RowId},
+    GameStatePlayerView, GameStateView,
 };
 
 pub struct ConsoleDisplay;
 
-impl GameDisplay for ConsoleDisplay {
-    fn display(&mut self, game_state: &GameStatePlayerView) {
+impl ConsoleDisplay {
+    pub(crate) fn display(&mut self, game_state: &GameStatePlayerView) {
         let s = to_string(game_state);
 
         println!("{}", s);

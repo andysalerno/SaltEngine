@@ -116,7 +116,3 @@ impl GameRunner {
         }
     }
 }
-
-pub trait GameDisplay {
-    fn display(&mut self, game_state: &GameStatePlayerView);
-}
