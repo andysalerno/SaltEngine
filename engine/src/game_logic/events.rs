@@ -14,7 +14,7 @@ mod start_game_event;
 mod summon_creature_from_hand_event;
 mod turn_start_event;
 
-pub use add_card_to_hand_event::AddCardToHandEvent;
+pub use add_card_to_hand_event::{AddCardToHandClientEvent, AddCardToHandEvent};
 pub use attack::AttackEvent;
 pub use creature_deals_damage_event::CreatureDealsDamageEvent;
 pub use creature_destroyed::CreatureDestroyedEvent;
@@ -32,8 +32,6 @@ pub use summon_creature_from_hand_event::SummonCreatureFromHandEvent;
 pub use turn_start_event::TurnStartEvent;
 
 use crate::game_state::GameStateView;
-
-use self::add_card_to_hand_event::AddCardToHandClientEvent;
 
 pub type Result = std::result::Result<(), Box<dyn std::error::Error>>;
 

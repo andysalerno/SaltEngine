@@ -608,10 +608,10 @@ pub mod player_view {
         }
     }
 
-    impl MakePlayerView for BoardSlot {
+    impl<'a> MakePlayerView<'a> for BoardSlot {
         type TOut = BoardSlotPlayerView;
 
-        fn player_view(&self, player_viewing: PlayerId) -> BoardSlotPlayerView {
+        fn player_view(&'a self, player_viewing: PlayerId) -> BoardSlotPlayerView {
             BoardSlotPlayerView {
                 pos: self.pos,
                 creature: self
@@ -629,10 +629,10 @@ pub mod player_view {
         slots: Vec<BoardSlotPlayerView>,
     }
 
-    impl MakePlayerView for Board {
+    impl<'a> MakePlayerView<'a> for Board {
         type TOut = BoardPlayerView;
 
-        fn player_view(&self, player_viewing: PlayerId) -> BoardPlayerView {
+        fn player_view(&'a self, player_viewing: PlayerId) -> BoardPlayerView {
             BoardPlayerView {
                 player_a_id: self.player_a_id,
                 player_b_id: self.player_b_id,

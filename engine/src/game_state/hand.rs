@@ -87,10 +87,10 @@ pub struct HandPlayerView {
     cards: Vec<UnitCardInstancePlayerView>,
 }
 
-impl MakePlayerView for Hand {
+impl<'a> MakePlayerView<'a> for Hand {
     type TOut = HandPlayerView;
 
-    fn player_view(&self, player_viewing: PlayerId) -> HandPlayerView {
+    fn player_view(&'a self, player_viewing: PlayerId) -> HandPlayerView {
         let cards = self
             .cards()
             .iter()

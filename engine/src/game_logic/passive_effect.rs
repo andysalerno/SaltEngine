@@ -171,11 +171,11 @@ pub mod player_view {
         definition_id: Id,
     }
 
-    impl MakePlayerView for dyn PassiveEffectDefinition {
+    impl<'a> MakePlayerView<'a> for dyn PassiveEffectDefinition {
         type TOut = PassiveEffectDefinitionPlayerView;
 
         fn player_view(
-            &self,
+            &'a self,
             _player_viewing: crate::game_state::PlayerId,
         ) -> PassiveEffectDefinitionPlayerView {
             PassiveEffectDefinitionPlayerView {
@@ -196,11 +196,11 @@ pub mod player_view {
         originator_id: UnitCardInstanceId,
     }
 
-    impl MakePlayerView for PassiveEffectInstance {
+    impl<'a> MakePlayerView<'a> for PassiveEffectInstance {
         type TOut = PassiveEffectInstancePlayerView;
 
         fn player_view(
-            &self,
+            &'a self,
             player_viewing: crate::game_state::PlayerId,
         ) -> PassiveEffectInstancePlayerView {
             let definition = self.definition.player_view(player_viewing);

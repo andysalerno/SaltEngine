@@ -165,10 +165,10 @@ pub mod player_view {
         is_from_passive: bool,
     }
 
-    impl MakePlayerView for dyn Buff {
+    impl<'a> MakePlayerView<'a> for dyn Buff {
         type TOut = BuffPlayerView;
 
-        fn player_view(&self, _player_viewing: crate::game_state::PlayerId) -> BuffPlayerView {
+        fn player_view(&'a self, _player_viewing: crate::game_state::PlayerId) -> BuffPlayerView {
             BuffPlayerView {
                 attack_amount: self.attack_amount(),
                 health_amount: self.health_amount(),

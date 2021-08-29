@@ -158,10 +158,27 @@ pub mod player_view {
         placeable_at: Position,
     }
 
-    impl MakePlayerView for Box<dyn UnitCardDefinition> {
+    // impl MakePlayerView for Box<dyn UnitCardDefinition> {
+    //     type TOut = UnitCardDefinitionPlayerView;
+
+    //     fn player_view(&self, _player_viewing: PlayerId) -> UnitCardDefinitionPlayerView {
+    //         UnitCardDefinitionPlayerView {
+    //             title: self.title().to_string(),
+    //             cost: self.cost(),
+    //             text: self.text().to_string(),
+    //             flavor_text: self.flavor_text().to_string(),
+    //             attack: self.attack(),
+    //             health: self.health(),
+    //             row_width: self.row_width(),
+    //             placeable_at: self.placeable_at(),
+    //         }
+    //     }
+    // }
+
+    impl<'a> MakePlayerView<'a> for dyn UnitCardDefinition {
         type TOut = UnitCardDefinitionPlayerView;
 
-        fn player_view(&self, _player_viewing: PlayerId) -> UnitCardDefinitionPlayerView {
+        fn player_view(&'a self, _player_viewing: PlayerId) -> UnitCardDefinitionPlayerView {
             UnitCardDefinitionPlayerView {
                 title: self.title().to_string(),
                 cost: self.cost(),

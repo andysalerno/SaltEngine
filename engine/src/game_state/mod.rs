@@ -38,9 +38,12 @@ impl PlayerId {
 /// a copy of T that is intended for viewing in a player's
 /// client -- i.e., only containing info visible to the player,
 /// and not info invisible to them (such as the content of the opponent's hand).
-pub trait MakePlayerView {
-    type TOut: Serialize + DeserializeOwned;
-    fn player_view(&self, player_viewing: PlayerId) -> <Self as MakePlayerView>::TOut;
+// pub trait MakePlayerView<'a, 'b>
+pub trait MakePlayerView<'a> // where
+//     'b: 'a,
+{
+    type TOut: Serialize + DeserializeOwned + Sized + 'static;
+    fn player_view(&'a self, player_viewing: PlayerId) -> <Self as MakePlayerView<'a>>::TOut;
 }
 
 #[cfg(test)]

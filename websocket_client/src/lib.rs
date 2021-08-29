@@ -45,15 +45,18 @@ async fn handle_connection(
     info!("My opponent's ID is {:?}", opponent_id);
 
     // Expect the game state
-    let gamestate_view = match connection.recv::<FromServer>().await {
+    let _gamestate_view = match connection.recv::<FromServer>().await {
         Some(FromServer::State(view)) => view,
         _ => panic!("unexpected response from server"),
     };
-    info!("My starting hand is: {:?}", gamestate_view.hand());
 
     loop {
         // Wait for signal from server that we can send an action
-        let msg = connection.recv::<FromServer>().await.unwrap();
+        info!("Waiting for message from server...");
+        let msg = connection
+            .recv::<FromServer>()
+            .await
+            .expect("No message.  This implies the server has closed the connection.");
 
         match msg {
             FromServer::TurnStart => {

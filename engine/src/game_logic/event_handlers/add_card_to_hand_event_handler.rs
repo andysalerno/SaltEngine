@@ -1,8 +1,11 @@
 use log::info;
 
 use crate::{
-    game_logic::{event_handlers::EventHandler, AddCardToHandEvent, EventDispatcher},
-    game_state::GameState,
+    game_logic::{
+        event_handlers::EventHandler, AddCardToHandClientEvent, AddCardToHandEvent,
+        ClientEventView, EventDispatcher,
+    },
+    game_state::{GameState, MakePlayerView},
 };
 
 #[derive(Default)]
@@ -15,9 +18,11 @@ impl EventHandler for AddCardToHandEventHandler {
         &self,
         event: AddCardToHandEvent,
         game_state: &mut GameState,
-        _dispatcher: &mut EventDispatcher,
+        dispatcher: &mut EventDispatcher,
     ) {
         let player_id = event.player_id();
+        let event_view: AddCardToHandClientEvent = event.player_view(player_id);
+        let client_event = ClientEventView::AddCardToHand(event_view);
 
         game_state.hand_mut(player_id).add_card(event.take_card());
 
@@ -26,5 +31,7 @@ impl EventHandler for AddCardToHandEventHandler {
             player_id,
             game_state.hand(player_id).len()
         );
+
+        dispatcher.player_notifier(player_id).notify(client_event);
     }
 }

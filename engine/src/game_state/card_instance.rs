@@ -219,7 +219,7 @@ impl UnitCardInstancePlayerView {
     }
 }
 
-impl MakePlayerView for UnitCardInstance {
+impl<'a> MakePlayerView<'a> for UnitCardInstance {
     type TOut = UnitCardInstancePlayerView;
 
     fn player_view(&self, player_viewing: PlayerId) -> UnitCardInstancePlayerView {

@@ -388,10 +388,10 @@ pub mod player_view {
         Opponent,
     }
 
-    impl MakePlayerView for GameState {
+    impl<'a> MakePlayerView<'a> for GameState {
         type TOut = GameStatePlayerView;
 
-        fn player_view(&self, player_viewing: PlayerId) -> GameStatePlayerView {
+        fn player_view(&'a self, player_viewing: PlayerId) -> GameStatePlayerView {
             let enemy_id = self.other_player(player_viewing);
             GameStatePlayerView {
                 player_id: player_viewing,
