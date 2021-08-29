@@ -39,23 +39,23 @@ pub trait UnitCardDefinition: CardDefinition {
     /// the current game state of the board as it was summoned,
     /// and the event dispatcher, in case the card's summoning effect requries dispatching more events.
     fn upon_summon(&self) -> Box<dyn actions::UponSummonAction> {
-        todo!()
+        Box::new(actions::DoNothingAction)
     }
 
     fn upon_death(&self) -> Box<dyn actions::UponDeathAction> {
-        todo!()
+        Box::new(actions::DoNothingAction)
     }
 
     fn upon_receive_damage(&self) -> Box<dyn actions::UponReceiveDamageAction> {
-        todo!()
+        Box::new(actions::DoNothingAction)
     }
 
     fn upon_turn_start(&self) -> Box<dyn actions::UponTurnStartAction> {
-        todo!()
+        Box::new(actions::DoNothingAction)
     }
 
     fn upon_turn_end(&self) -> Box<dyn actions::UponTurnEndAction> {
-        todo!()
+        Box::new(actions::DoNothingAction)
     }
 
     fn passive_effect(&self) -> Option<Box<dyn PassiveEffectDefinition>> {
@@ -269,5 +269,69 @@ pub mod actions {
             state: &mut GameState,
             dispatcher: &mut EventDispatcher,
         );
+    }
+
+    pub(super) struct DoNothingAction;
+
+    #[async_trait]
+    impl UponSummonAction for DoNothingAction {
+        async fn action(
+            &self,
+            _instance: &mut UnitCardInstance,
+            _pos: BoardPos,
+            _state: &mut GameState,
+            _dispatcher: &mut EventDispatcher,
+        ) {
+            todo!()
+        }
+    }
+
+    #[async_trait]
+    impl UponDeathAction for DoNothingAction {
+        async fn action(
+            &self,
+            _instance: &mut UnitCardInstance,
+            _pos: BoardPos,
+            _state: &mut GameState,
+            _dispatcher: &mut EventDispatcher,
+        ) {
+            todo!()
+        }
+    }
+
+    #[async_trait]
+    impl UponReceiveDamageAction for DoNothingAction {
+        async fn action(
+            &self,
+            _instance_id: UnitCardInstanceId,
+            _state: &mut GameState,
+            _dispatcher: &mut EventDispatcher,
+        ) {
+            todo!()
+        }
+    }
+
+    #[async_trait]
+    impl UponTurnStartAction for DoNothingAction {
+        async fn action(
+            &self,
+            _instance_id: UnitCardInstanceId,
+            _state: &mut GameState,
+            _dispatcher: &mut EventDispatcher,
+        ) {
+            todo!()
+        }
+    }
+
+    #[async_trait]
+    impl UponTurnEndAction for DoNothingAction {
+        async fn action(
+            &self,
+            _instance_id: UnitCardInstanceId,
+            _state: &mut GameState,
+            _dispatcher: &mut EventDispatcher,
+        ) {
+            todo!()
+        }
     }
 }

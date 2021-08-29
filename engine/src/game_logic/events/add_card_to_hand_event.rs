@@ -2,7 +2,7 @@ use std::borrow::Borrow;
 
 use crate::{
     cards::player_view::UnitCardDefinitionPlayerView,
-    game_state::{MakePlayerView, PlayerId, UnitCardInstance},
+    game_state::{MakePlayerView, PlayerId, UnitCardInstance, UnitCardInstancePlayerView},
 };
 use serde::{Deserialize, Serialize};
 
@@ -38,21 +38,19 @@ impl From<AddCardToHandEvent> for GameEvent {
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct AddCardToHandClientEvent {
-    player_id: PlayerId,
-    card: UnitCardDefinitionPlayerView,
+    pub player_id: PlayerId,
+    pub card: UnitCardInstancePlayerView,
 }
 
 impl<'a> MakePlayerView<'a> for AddCardToHandEvent {
     type TOut = AddCardToHandClientEvent;
 
     fn player_view(&'a self, player_viewing: PlayerId) -> <Self as MakePlayerView<'a>>::TOut {
-        // todo!()
         let card = self.card.player_view(player_viewing);
-        let definition_view = card.definition().clone();
 
         AddCardToHandClientEvent {
             player_id: player_viewing,
-            card: definition_view,
+            card,
         }
     }
 }
