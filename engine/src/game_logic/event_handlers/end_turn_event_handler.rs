@@ -37,6 +37,6 @@ impl EventHandler for EndTurnEventHandler {
 
         game_state.set_next_player_turn();
 
-        dispatcher.dispatch(TurnStartEvent, game_state);
+        dispatcher.dispatch(TurnStartEvent, game_state).await;
     }
 }

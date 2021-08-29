@@ -33,7 +33,7 @@ impl EventHandler for DrawCardEventHandler {
 
         if let Some(card) = card {
             let add_to_hand_event = AddCardToHandEvent::new(player_id, card);
-            dispatcher.dispatch(add_to_hand_event, game_state);
+            dispatcher.dispatch(add_to_hand_event, game_state).await;
         } else {
             info!(
                 "Player {:?} had no cards in deck, so drew nothing.",
@@ -42,7 +42,7 @@ impl EventHandler for DrawCardEventHandler {
 
             let hero_id = game_state.board().hero(player_id).id();
             let hero_damaged_event = CreatureTakesDamageEvent::new(hero_id, 1);
-            dispatcher.dispatch(hero_damaged_event, game_state);
+            dispatcher.dispatch(hero_damaged_event, game_state).await;
         }
     }
 }

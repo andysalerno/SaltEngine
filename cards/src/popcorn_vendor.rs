@@ -119,7 +119,7 @@ mod tests {
 
             let pawn_pos = BoardPos::new(player_id, RowId::FrontRow, 0);
             let summon_event = SummonCreatureFromHandEvent::new(player_id, pawn_pos, pawn_id);
-            dispatcher.dispatch(summon_event, &mut state);
+            // dispatcher.dispatch(summon_event, &mut state);
         }
 
         // Summon the popcorn vendor and target the Pawn with the buff
@@ -131,7 +131,7 @@ mod tests {
             hand.add_card(pop_vend);
             let summon_event =
                 SummonCreatureFromHandEvent::new(player_id, pop_vend_pos, pop_vend_id);
-            dispatcher.dispatch(summon_event, &mut state);
+            // dispatcher.dispatch(summon_event, &mut state);
         }
 
         let pawn_instance = state.board().creature_instance(pawn_id);

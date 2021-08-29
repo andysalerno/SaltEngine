@@ -32,11 +32,15 @@ impl EventHandler for StartGameEventHandler {
             player_a_id, player_b_id
         );
 
-        (0..START_GAME_CARD_COUNT).for_each(|_| {
-            dispatcher.dispatch(DrawCardEvent::new(player_a_id), game_state);
-            dispatcher.dispatch(DrawCardEvent::new(player_b_id), game_state);
-        });
+        for _ in 0..START_GAME_CARD_COUNT {
+            dispatcher
+                .dispatch(DrawCardEvent::new(player_a_id), game_state)
+                .await;
+            dispatcher
+                .dispatch(DrawCardEvent::new(player_b_id), game_state)
+                .await;
+        }
 
-        dispatcher.dispatch(TurnStartEvent, game_state);
+        dispatcher.dispatch(TurnStartEvent, game_state).await;
     }
 }

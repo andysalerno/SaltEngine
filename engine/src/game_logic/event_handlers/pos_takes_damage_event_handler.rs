@@ -33,7 +33,7 @@ impl EventHandler for PosTakesDamageHandler {
             let damage_event =
                 CreatureTakesDamageEvent::new(creature_there.id(), event.damage_amount());
 
-            dispatcher.dispatch(damage_event, game_state);
+            dispatcher.dispatch(damage_event, game_state).await;
         }
     }
 }

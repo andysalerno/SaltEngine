@@ -61,7 +61,7 @@ impl GameRunner {
 
         let mut game_state = self.game_state;
 
-        dispatcher.dispatch(StartGameEvent, &mut game_state);
+        dispatcher.dispatch(StartGameEvent, &mut game_state).await;
 
         while !game_state.is_game_over() {
             let (client, other) = if game_state.cur_player_turn() == game_state.player_a_id() {
@@ -103,7 +103,7 @@ impl GameRunner {
 
             let turn_is_over = action.is_end_turn();
 
-            dispatcher.dispatch(action, game_state);
+            dispatcher.dispatch(action, game_state).await;
 
             handler_opponent
                 .observe_state_update(game_state.player_view(opponent))

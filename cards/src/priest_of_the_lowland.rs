@@ -6,7 +6,6 @@ use salt_engine::{
     game_state::{board::BoardView, GameState, UnitCardInstanceId},
     id::Id,
 };
-use std::future::Future;
 
 #[derive(Debug, Clone)]
 pub struct PriestOfTheLowland;
