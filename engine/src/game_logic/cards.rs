@@ -38,44 +38,24 @@ pub trait UnitCardDefinition: CardDefinition {
     /// The boxed function is provided the instance of the card being summoned,
     /// the current game state of the board as it was summoned,
     /// and the event dispatcher, in case the card's summoning effect requries dispatching more events.
-    fn upon_summon(
-        &self,
-    ) -> Box<dyn FnOnce(&mut UnitCardInstance, BoardPos, &mut GameState, &mut EventDispatcher)>
-    {
-        Box::new(|_instance, _summoned_to_pos, _game_state, _dispatcher| {})
-    }
-
-    fn upon_testing(&self) -> Box<dyn actions::UponTestingAction> {
+    fn upon_summon(&self) -> Box<dyn actions::UponSummonAction> {
         todo!()
-    }
-
-    fn upon_deathz(
-        &self,
-    ) -> Box<dyn FnOnce(&mut UnitCardInstance, BoardPos, &mut GameState, &mut EventDispatcher)>
-    {
-        Box::new(|_instance, _destroyed_at_pos, _game_state, _dispatcher| {})
     }
 
     fn upon_death(&self) -> Box<dyn actions::UponDeathAction> {
         todo!()
     }
 
-    fn upon_receive_damage(
-        &self,
-    ) -> Box<dyn FnOnce(UnitCardInstanceId, &mut GameState, &mut EventDispatcher)> {
-        Box::new(|_id, _game_state, _dispatcher| {})
+    fn upon_receive_damage(&self) -> Box<dyn actions::UponReceiveDamageAction> {
+        todo!()
     }
 
-    fn upon_turn_start(
-        &self,
-    ) -> Box<dyn FnOnce(UnitCardInstanceId, &mut GameState, &mut EventDispatcher)> {
-        Box::new(|_id, _game_state, _dispatcher| {})
+    fn upon_turn_start(&self) -> Box<dyn actions::UponTurnStartAction> {
+        todo!()
     }
 
-    fn upon_turn_end(
-        &self,
-    ) -> Box<dyn FnOnce(UnitCardInstanceId, &mut GameState, &mut EventDispatcher)> {
-        Box::new(|_id, _game_state, _dispatcher| {})
+    fn upon_turn_end(&self) -> Box<dyn actions::UponTurnEndAction> {
+        todo!()
     }
 
     fn passive_effect(&self) -> Option<Box<dyn PassiveEffectDefinition>> {
@@ -240,7 +220,7 @@ pub mod actions {
     use super::*;
 
     #[async_trait]
-    pub trait UponTestingAction: Send + Sync {
+    pub trait UponSummonAction: Send + Sync {
         async fn action(
             &self,
             instance: &mut UnitCardInstance,
@@ -256,6 +236,36 @@ pub mod actions {
             &self,
             instance: &mut UnitCardInstance,
             pos: BoardPos,
+            state: &mut GameState,
+            dispatcher: &mut EventDispatcher,
+        );
+    }
+
+    #[async_trait]
+    pub trait UponReceiveDamageAction: Send + Sync {
+        async fn action(
+            &self,
+            instance_id: UnitCardInstanceId,
+            state: &mut GameState,
+            dispatcher: &mut EventDispatcher,
+        );
+    }
+
+    #[async_trait]
+    pub trait UponTurnStartAction: Send + Sync {
+        async fn action(
+            &self,
+            instance_id: UnitCardInstanceId,
+            state: &mut GameState,
+            dispatcher: &mut EventDispatcher,
+        );
+    }
+
+    #[async_trait]
+    pub trait UponTurnEndAction: Send + Sync {
+        async fn action(
+            &self,
+            instance_id: UnitCardInstanceId,
             state: &mut GameState,
             dispatcher: &mut EventDispatcher,
         );

@@ -49,17 +49,9 @@ impl EventHandler for SummonCreatureFromHandEventHandler {
         // Perform the "upon summon"
         {
             let upon_summon = card_from_hand.definition().upon_summon();
-            (upon_summon)(&mut card_from_hand, pos, game_state, dispatcher);
-        }
-
-        // Perform the "upon testing"
-        {
-            let upon_testing = card_from_hand.definition().upon_testing();
-            upon_testing
+            upon_summon
                 .action(&mut card_from_hand, pos, game_state, dispatcher)
                 .await;
-            //.await;
-            // (upon_summon)(&mut card_from_hand, pos, game_state, dispatcher);
         }
 
         // Set the card instance on the board

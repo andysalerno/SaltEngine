@@ -1,6 +1,12 @@
+use std::iter::Sum;
+
+use async_trait::async_trait;
 use log::info;
 use salt_engine::{
-    cards::{CardDefinition, Position, UnitCardDefinition},
+    cards::{
+        actions::{UponSummonAction, UponTurnEndAction, UponTurnStartAction},
+        CardDefinition, Position, UnitCardDefinition,
+    },
     game_logic::{EventDispatcher, PosTakesDamageEvent},
     game_state::{
         board::{BoardPos, BoardView},
@@ -54,33 +60,53 @@ impl UnitCardDefinition for RicketyCannon {
         Position::Back
     }
 
-    fn upon_summon(
-        &self,
-    ) -> Box<dyn FnOnce(&mut UnitCardInstance, BoardPos, &mut GameState, &mut EventDispatcher)>
-    {
-        Box::new(|instance, summoned_to_pos, game_state, dispatcher| {
-            let summoner = summoned_to_pos.player_id;
-
-            let pos = dispatcher
-                .player_prompter(summoned_to_pos.player_id)
-                .prompt_slot(&game_state.player_view(summoner));
-
-            instance.set_state(Some(InstanceState::Pos(pos)));
-        })
+    fn upon_summon(&self) -> Box<dyn UponSummonAction> {
+        Box::new(SummonAction)
     }
 
-    fn upon_turn_start(
-        &self,
-    ) -> Box<dyn FnOnce(UnitCardInstanceId, &mut GameState, &mut EventDispatcher)> {
-        Box::new(|id, game_state, dispatcher| {
-            let instance = game_state.board().creature_instance(id);
-            let cannon_target = instance.state();
+    fn upon_turn_start(&self) -> Box<dyn UponTurnStartAction> {
+        Box::new(TurnStartAction)
+    }
+}
 
-            if let Some(InstanceState::Pos(pos)) = cannon_target {
-                info!("Rickety Cannon fires a shot at {:?}", pos);
-                let damage_event = PosTakesDamageEvent::new(pos, 1);
-                dispatcher.dispatch(damage_event, game_state);
-            }
-        })
+struct TurnStartAction;
+
+#[async_trait]
+impl UponTurnStartAction for TurnStartAction {
+    async fn action(
+        &self,
+        instance_id: UnitCardInstanceId,
+        state: &mut GameState,
+        dispatcher: &mut EventDispatcher,
+    ) {
+        let instance = state.board().creature_instance(instance_id);
+        let cannon_target = instance.state();
+
+        if let Some(InstanceState::Pos(pos)) = cannon_target {
+            info!("Rickety Cannon fires a shot at {:?}", pos);
+            let damage_event = PosTakesDamageEvent::new(pos, 1);
+            dispatcher.dispatch(damage_event, state).await;
+        }
+    }
+}
+
+struct SummonAction;
+
+#[async_trait]
+impl UponSummonAction for SummonAction {
+    async fn action(
+        &self,
+        instance: &mut UnitCardInstance,
+        summoned_to_pos: BoardPos,
+        state: &mut GameState,
+        dispatcher: &mut EventDispatcher,
+    ) {
+        let summoner = summoned_to_pos.player_id;
+
+        let pos = dispatcher
+            .player_prompter(summoned_to_pos.player_id)
+            .prompt_slot(&state.player_view(summoner));
+
+        instance.set_state(Some(InstanceState::Pos(pos)));
     }
 }

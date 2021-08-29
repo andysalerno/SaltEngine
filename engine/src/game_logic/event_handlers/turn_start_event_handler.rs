@@ -25,15 +25,17 @@ impl EventHandler for TurnStartHandler {
         let player_id = game_state.cur_player_id();
         info!("Turn started for player {:?}", player_id);
 
-        dispatcher.dispatch(PlayerGainManaEvent::new(player_id, 1), game_state);
+        dispatcher
+            .dispatch(PlayerGainManaEvent::new(player_id, 1), game_state)
+            .await;
 
         game_state.refresh_player_mana(player_id);
 
-        dispatcher.dispatch(DrawCardEvent::new(player_id), game_state);
+        dispatcher
+            .dispatch(DrawCardEvent::new(player_id), game_state)
+            .await;
 
-        //let x = game_state.board()
-
-        game_state
+        let turn_start_actions = game_state
             .board()
             .player_side(player_id)
             .iter()
@@ -42,7 +44,10 @@ impl EventHandler for TurnStartHandler {
                     .map(|c| (c.id(), c.definition().upon_turn_start()))
             })
             .collect::<Vec<_>>()
-            .into_iter()
-            .for_each(|(id, action)| (action)(id, game_state, dispatcher));
+            .into_iter();
+
+        for (id, action) in turn_start_actions {
+            action.action(id, game_state, dispatcher).await;
+        }
     }
 }

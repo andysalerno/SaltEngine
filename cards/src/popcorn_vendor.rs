@@ -1,5 +1,6 @@
+use async_trait::async_trait;
 use salt_engine::{
-    cards::{CardDefinition, Position, UnitCardDefinition},
+    cards::{actions::UponSummonAction, CardDefinition, Position, UnitCardDefinition},
     game_logic::{
         BuffBuilder, EventDispatcher, PassiveCompanionBuff, PassiveEffectDefinition,
         PassiveEffectInstanceId,
@@ -69,18 +70,28 @@ impl UnitCardDefinition for PopcornVendor {
         Some(Box::new(passive))
     }
 
-    fn upon_summon(
-        &self,
-    ) -> Box<dyn FnOnce(&mut UnitCardInstance, BoardPos, &mut GameState, &mut EventDispatcher)>
-    {
-        Box::new(|instance, pos, _game_state, _dispatcher| {
-            if pos.row() == RowId::FrontRow {
-                // Front: buffs self
-                let buff = BuffBuilder::new(instance.id(), Id::new()).attack(3).build();
+    fn upon_summon(&self) -> Box<dyn UponSummonAction> {
+        Box::new(SummonAction)
+    }
+}
 
-                instance.add_buff(Box::new(buff));
-            }
-        })
+struct SummonAction;
+
+#[async_trait]
+impl UponSummonAction for SummonAction {
+    async fn action(
+        &self,
+        instance: &mut UnitCardInstance,
+        pos: BoardPos,
+        state: &mut GameState,
+        dispatcher: &mut EventDispatcher,
+    ) {
+        if pos.row() == RowId::FrontRow {
+            // Front: buffs self
+            let buff = BuffBuilder::new(instance.id(), Id::new()).attack(3).build();
+
+            instance.add_buff(Box::new(buff));
+        }
     }
 }
 

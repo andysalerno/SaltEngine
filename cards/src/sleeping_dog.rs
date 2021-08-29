@@ -1,9 +1,12 @@
+use async_trait::async_trait;
 use salt_engine::{
-    cards::{CardDefinition, Position, UnitCardDefinition},
+    cards::{actions::UponReceiveDamageAction, CardDefinition, Position, UnitCardDefinition},
     game_logic::{Buff, BuffInstanceId, BuffSourceId, EventDispatcher},
     game_state::{board::BoardView, board::RowId, GameState, UnitCardInstanceId},
     id::Id,
 };
+
+use self::actions::ReceiveDamageAction;
 
 #[derive(Debug, Clone)]
 pub struct SleepingDog;
@@ -54,12 +57,27 @@ impl UnitCardDefinition for SleepingDog {
         Position::Back
     }
 
-    fn upon_receive_damage(
-        &self,
-    ) -> Box<dyn FnOnce(UnitCardInstanceId, &mut GameState, &mut EventDispatcher)> {
-        Box::new(|id, game_state, _dispatcher| {
+    fn upon_receive_damage(&self) -> Box<dyn UponReceiveDamageAction> {
+        Box::new(ReceiveDamageAction)
+    }
+}
+
+mod actions {
+    use super::*;
+    use salt_engine::cards::actions::UponReceiveDamageAction;
+
+    pub(super) struct ReceiveDamageAction;
+
+    #[async_trait]
+    impl UponReceiveDamageAction for ReceiveDamageAction {
+        async fn action(
+            &self,
+            instance_id: UnitCardInstanceId,
+            state: &mut GameState,
+            _dispatcher: &mut EventDispatcher,
+        ) {
             // can move to front row?
-            let slots = game_state.board().slots_with_creature(id);
+            let slots = state.board().slots_with_creature(instance_id);
             let starting_pos = slots[0].pos();
 
             for slot in slots {
@@ -71,62 +89,64 @@ impl UnitCardDefinition for SleepingDog {
                 let mut in_front = slot.pos();
                 in_front.row_id = RowId::FrontRow;
 
-                if game_state.board().creature_at_pos(in_front).is_some() {
+                if state.board().creature_at_pos(in_front).is_some() {
                     // Can't moveto front row if something is already there.
                     return;
                 }
             }
 
             // Take the card off the back row
-            let instance = game_state.board_mut().take_creature_by_id(id);
+            let instance = state.board_mut().take_creature_by_id(instance_id);
 
             // Put it on the front row
             let mut front_slot = starting_pos;
             front_slot.row_id = RowId::FrontRow;
-            game_state
-                .board_mut()
-                .set_creature_at_pos(front_slot, instance);
+            state.board_mut().set_creature_at_pos(front_slot, instance);
 
-            let buff = Box::new(SleepingDogBuff::new(id));
-            let instance_mut = game_state.board_mut().creature_instance_mut(id);
+            let buff = Box::new(buffs::SleepingDogBuff::new(instance_id));
+            let instance_mut = state.board_mut().creature_instance_mut(instance_id);
             instance_mut.add_buff(buff);
-        })
-    }
-}
-
-#[derive(Debug)]
-struct SleepingDogBuff {
-    instance_id: BuffInstanceId,
-    source_id: BuffSourceId,
-}
-
-impl SleepingDogBuff {
-    pub fn new(source_id: UnitCardInstanceId) -> Self {
-        Self {
-            instance_id: BuffInstanceId::new(),
-            source_id: BuffSourceId::CreatureInstance(source_id),
         }
     }
 }
 
-impl Buff for SleepingDogBuff {
-    fn attack_amount(&self) -> i32 {
-        7
+mod buffs {
+    use super::*;
+
+    #[derive(Debug)]
+    pub(super) struct SleepingDogBuff {
+        instance_id: BuffInstanceId,
+        source_id: BuffSourceId,
     }
 
-    fn health_amount(&self) -> i32 {
-        0
+    impl SleepingDogBuff {
+        pub fn new(source_id: UnitCardInstanceId) -> Self {
+            Self {
+                instance_id: BuffInstanceId::new(),
+                source_id: BuffSourceId::CreatureInstance(source_id),
+            }
+        }
     }
 
-    fn instance_id(&self) -> BuffInstanceId {
-        self.instance_id
-    }
+    impl Buff for SleepingDogBuff {
+        fn attack_amount(&self) -> i32 {
+            7
+        }
 
-    fn source_id(&self) -> BuffSourceId {
-        self.source_id
-    }
+        fn health_amount(&self) -> i32 {
+            0
+        }
 
-    fn definition_id(&self) -> Id {
-        todo!()
+        fn instance_id(&self) -> BuffInstanceId {
+            self.instance_id
+        }
+
+        fn source_id(&self) -> BuffSourceId {
+            self.source_id
+        }
+
+        fn definition_id(&self) -> Id {
+            todo!()
+        }
     }
 }

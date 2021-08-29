@@ -1,12 +1,12 @@
-use std::future::Future;
-
+use async_trait::async_trait;
 use log::info;
 use salt_engine::{
-    cards::{CardDefinition, Position, UnitCardDefinition},
+    cards::{actions::UponTurnEndAction, CardDefinition, Position, UnitCardDefinition},
     game_logic::{CreatureHealedEvent, EventDispatcher},
     game_state::{board::BoardView, GameState, UnitCardInstanceId},
     id::Id,
 };
+use std::future::Future;
 
 #[derive(Debug, Clone)]
 pub struct PriestOfTheLowland;
@@ -56,27 +56,37 @@ impl UnitCardDefinition for PriestOfTheLowland {
         Position::Back
     }
 
-    fn upon_turn_end(
+    fn upon_turn_end(&self) -> Box<dyn UponTurnEndAction> {
+        Box::new(TurnEndAction)
+    }
+}
+
+struct TurnEndAction;
+
+#[async_trait]
+impl UponTurnEndAction for TurnEndAction {
+    async fn action(
         &self,
-    ) -> Box<dyn FnOnce(UnitCardInstanceId, &mut GameState, &mut EventDispatcher)> {
-        Box::new(|id, game_state, dispatcher| {
-            let instance_pos = game_state.board().pos_with_creature(id);
+        instance_id: UnitCardInstanceId,
+        state: &mut GameState,
+        dispatcher: &mut EventDispatcher,
+    ) {
+        let instance_pos = state.board().pos_with_creature(instance_id);
 
-            if let Some(companion) = game_state.board().companion_creature(instance_pos) {
-                // Heal the target for 2
-                let heal_amount = 2;
-                let heal_event = CreatureHealedEvent::new(companion.id(), heal_amount);
+        if let Some(companion) = state.board().companion_creature(instance_pos) {
+            // Heal the target for 2
+            let heal_amount = 2;
+            let heal_event = CreatureHealedEvent::new(companion.id(), heal_amount);
 
-                {
-                    let target_creature = game_state.board().creature_instance(companion.id());
-                    info!(
-                        "Priest of the Lowland heals companion {} for 2",
-                        target_creature.definition().title()
-                    );
-                }
-
-                dispatcher.dispatch(heal_event, game_state);
+            {
+                let target_creature = state.board().creature_instance(companion.id());
+                info!(
+                    "Priest of the Lowland heals companion {} for 2",
+                    target_creature.definition().title()
+                );
             }
-        })
+
+            dispatcher.dispatch(heal_event, state).await;
+        }
     }
 }

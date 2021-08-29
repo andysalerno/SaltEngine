@@ -41,7 +41,9 @@ impl EventHandler for CreatureTakesDamageHandler {
             .definition()
             .upon_receive_damage();
 
-        (card_trigger)(event.creature_id(), game_state, dispatcher);
+        card_trigger
+            .action(event.creature_id(), game_state, dispatcher)
+            .await;
 
         if game_state
             .board()
