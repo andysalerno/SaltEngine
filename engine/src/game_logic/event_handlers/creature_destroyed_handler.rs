@@ -5,14 +5,16 @@ use crate::{
     game_state::board::BoardView,
     game_state::GameState,
 };
+use async_trait::async_trait;
 
 #[derive(Default)]
 pub struct CreatureDestroyedEventHandler;
 
+#[async_trait]
 impl EventHandler for CreatureDestroyedEventHandler {
     type Event = CreatureDestroyedEvent;
 
-    fn handle(
+    async fn handle(
         &self,
         event: CreatureDestroyedEvent,
         game_state: &mut GameState,
@@ -30,6 +32,9 @@ impl EventHandler for CreatureDestroyedEventHandler {
         );
 
         let upon_death = creature_instance.definition().upon_death();
-        (upon_death)(&mut creature_instance, pos, game_state, dispatcher);
+
+        upon_death
+            .action(&mut creature_instance, pos, game_state, dispatcher)
+            .await;
     }
 }

@@ -7,14 +7,16 @@ use crate::{
     },
     game_state::GameState,
 };
+use async_trait::async_trait;
 
 #[derive(Default)]
 pub struct TurnStartHandler;
 
+#[async_trait]
 impl EventHandler for TurnStartHandler {
     type Event = TurnStartEvent;
 
-    fn handle(
+    async fn handle(
         &self,
         _event: TurnStartEvent,
         game_state: &mut GameState,

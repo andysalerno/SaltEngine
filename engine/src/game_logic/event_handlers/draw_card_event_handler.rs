@@ -7,14 +7,16 @@ use crate::{
     },
     game_state::GameState,
 };
+use async_trait::async_trait;
 
 #[derive(Default)]
 pub struct DrawCardEventHandler;
 
+#[async_trait]
 impl EventHandler for DrawCardEventHandler {
     type Event = DrawCardEvent;
 
-    fn handle(
+    async fn handle(
         &self,
         event: DrawCardEvent,
         game_state: &mut GameState,

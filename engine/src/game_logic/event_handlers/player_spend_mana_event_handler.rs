@@ -4,14 +4,16 @@ use crate::{
     game_logic::{event_handlers::EventHandler, EventDispatcher, PlayerSpendManaEvent},
     game_state::{GameState, GameStateView},
 };
+use async_trait::async_trait;
 
 #[derive(Default)]
 pub struct PlayerSpendManaEventHandler;
 
+#[async_trait]
 impl EventHandler for PlayerSpendManaEventHandler {
     type Event = PlayerSpendManaEvent;
 
-    fn handle(
+    async fn handle(
         &self,
         event: PlayerSpendManaEvent,
         game_state: &mut GameState,

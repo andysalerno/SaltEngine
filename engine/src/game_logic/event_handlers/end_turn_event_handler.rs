@@ -6,14 +6,16 @@ use crate::{
     },
     game_state::{GameState, GameStateView, IterAddons},
 };
+use async_trait::async_trait;
 
 #[derive(Default)]
 pub struct EndTurnEventHandler;
 
+#[async_trait]
 impl EventHandler for EndTurnEventHandler {
     type Event = EndTurnEvent;
 
-    fn handle(
+    async fn handle(
         &self,
         _event: EndTurnEvent,
         game_state: &mut GameState,

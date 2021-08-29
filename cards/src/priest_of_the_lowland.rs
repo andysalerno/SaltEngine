@@ -1,3 +1,5 @@
+use std::future::Future;
+
 use log::info;
 use salt_engine::{
     cards::{CardDefinition, Position, UnitCardDefinition},

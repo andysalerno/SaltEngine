@@ -5,6 +5,7 @@ use crate::{
     game_state::board::BoardView,
     game_state::GameState,
 };
+use async_trait::async_trait;
 
 #[derive(Default)]
 pub struct AttackEventHandler;
@@ -16,10 +17,11 @@ fn validate(event: &AttackEvent, game_state: &GameState) {
     }
 }
 
+#[async_trait]
 impl EventHandler for AttackEventHandler {
     type Event = AttackEvent;
 
-    fn handle(
+    async fn handle(
         &self,
         event: AttackEvent,
         game_state: &mut GameState,

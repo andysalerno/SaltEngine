@@ -2,6 +2,7 @@ use super::{EventDispatcher, PassiveEffectDefinition};
 use crate::game_state::{
     board::BoardPos, GameState, MakePlayerView, PlayerId, UnitCardInstance, UnitCardInstanceId,
 };
+use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
 
 /// Describes which board positions
@@ -44,11 +45,19 @@ pub trait UnitCardDefinition: CardDefinition {
         Box::new(|_instance, _summoned_to_pos, _game_state, _dispatcher| {})
     }
 
-    fn upon_death(
+    fn upon_testing(&self) -> Box<dyn actions::UponTestingAction> {
+        todo!()
+    }
+
+    fn upon_deathz(
         &self,
     ) -> Box<dyn FnOnce(&mut UnitCardInstance, BoardPos, &mut GameState, &mut EventDispatcher)>
     {
         Box::new(|_instance, _destroyed_at_pos, _game_state, _dispatcher| {})
+    }
+
+    fn upon_death(&self) -> Box<dyn actions::UponDeathAction> {
+        todo!()
     }
 
     fn upon_receive_damage(
@@ -224,5 +233,31 @@ pub mod player_view {
         fn placeable_at(&self) -> Position {
             self.placeable_at
         }
+    }
+}
+
+pub mod actions {
+    use super::*;
+
+    #[async_trait]
+    pub trait UponTestingAction: Send + Sync {
+        async fn action(
+            &self,
+            instance: &mut UnitCardInstance,
+            pos: BoardPos,
+            state: &mut GameState,
+            dispatcher: &mut EventDispatcher,
+        );
+    }
+
+    #[async_trait]
+    pub trait UponDeathAction: Send + Sync {
+        async fn action(
+            &self,
+            instance: &mut UnitCardInstance,
+            pos: BoardPos,
+            state: &mut GameState,
+            dispatcher: &mut EventDispatcher,
+        );
     }
 }

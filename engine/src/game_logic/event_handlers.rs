@@ -30,13 +30,14 @@ pub use start_game_event_handler::StartGameEventHandler;
 pub use summon_creature_from_hand_event_handler::SummonCreatureFromHandEventHandler;
 pub use turn_start_event_handler::TurnStartHandler;
 
-use crate::game_state::GameState;
-
 use super::{Event, EventDispatcher};
+use crate::game_state::GameState;
+use async_trait::async_trait;
 
+#[async_trait]
 pub trait EventHandler {
     type Event: Event;
-    fn handle(
+    async fn handle(
         &self,
         event: Self::Event,
         game_state: &mut GameState,

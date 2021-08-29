@@ -7,14 +7,16 @@ use crate::{
     },
     game_state::GameState,
 };
+use async_trait::async_trait;
 
 #[derive(Default)]
 pub struct SummonCreatureFromHandEventHandler;
 
+#[async_trait]
 impl EventHandler for SummonCreatureFromHandEventHandler {
     type Event = SummonCreatureFromHandEvent;
 
-    fn handle(
+    async fn handle(
         &self,
         event: SummonCreatureFromHandEvent,
         game_state: &mut GameState,
@@ -34,10 +36,12 @@ impl EventHandler for SummonCreatureFromHandEventHandler {
             let mana_amount = card_from_hand.definition().cost();
             info!("Player {:?} summons {}", player_id, creature_name);
 
-            dispatcher.dispatch(
-                PlayerSpendManaEvent::new(player_id, mana_amount as u32),
-                game_state,
-            );
+            dispatcher
+                .dispatch(
+                    PlayerSpendManaEvent::new(player_id, mana_amount as u32),
+                    game_state,
+                )
+                .await;
         }
 
         let pos = event.board_pos();
@@ -48,12 +52,24 @@ impl EventHandler for SummonCreatureFromHandEventHandler {
             (upon_summon)(&mut card_from_hand, pos, game_state, dispatcher);
         }
 
+        // Perform the "upon testing"
+        {
+            let upon_testing = card_from_hand.definition().upon_testing();
+            upon_testing
+                .action(&mut card_from_hand, pos, game_state, dispatcher)
+                .await;
+            //.await;
+            // (upon_summon)(&mut card_from_hand, pos, game_state, dispatcher);
+        }
+
         // Set the card instance on the board
         {
-            dispatcher.dispatch(
-                CreatureSetEvent::new(player_id, card_from_hand, pos),
-                game_state,
-            );
+            dispatcher
+                .dispatch(
+                    CreatureSetEvent::new(player_id, card_from_hand, pos),
+                    game_state,
+                )
+                .await;
         }
     }
 }

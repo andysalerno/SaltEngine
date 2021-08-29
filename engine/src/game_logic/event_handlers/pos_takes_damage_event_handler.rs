@@ -8,14 +8,16 @@ use crate::{
     game_state::board::BoardView,
     game_state::GameState,
 };
+use async_trait::async_trait;
 
 #[derive(Default)]
 pub struct PosTakesDamageHandler;
 
+#[async_trait]
 impl EventHandler for PosTakesDamageHandler {
     type Event = PosTakesDamageEvent;
 
-    fn handle(
+    async fn handle(
         &self,
         event: PosTakesDamageEvent,
         game_state: &mut GameState,

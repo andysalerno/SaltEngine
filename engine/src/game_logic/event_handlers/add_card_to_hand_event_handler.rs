@@ -7,14 +7,16 @@ use crate::{
     },
     game_state::{GameState, MakePlayerView},
 };
+use async_trait::async_trait;
 
 #[derive(Default)]
 pub struct AddCardToHandEventHandler;
 
+#[async_trait]
 impl EventHandler for AddCardToHandEventHandler {
     type Event = AddCardToHandEvent;
 
-    fn handle(
+    async fn handle(
         &self,
         event: AddCardToHandEvent,
         game_state: &mut GameState,
@@ -32,6 +34,9 @@ impl EventHandler for AddCardToHandEventHandler {
             game_state.hand(player_id).len()
         );
 
-        dispatcher.player_notifier(player_id).notify(client_event);
+        dispatcher
+            .player_notifier(player_id)
+            .notify(client_event)
+            .await;
     }
 }

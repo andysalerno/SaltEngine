@@ -36,7 +36,7 @@ impl EventDispatcher {
         }
     }
 
-    pub fn dispatch(&mut self, event: impl Event, game_state: &mut GameState) {
+    pub async fn dispatch(&mut self, event: impl Event, game_state: &mut GameState) {
         event
             .validate(game_state)
             .expect("Validation failed for dispatched event.");
@@ -48,7 +48,7 @@ impl EventDispatcher {
         while let Some(event) = self.stack.pop() {
             game_state.evaluate_passives();
 
-            self.handle(event, game_state);
+            self.handle(event, game_state).await;
 
             game_state.evaluate_passives();
         }
@@ -74,44 +74,86 @@ impl EventDispatcher {
         }
     }
 
-    fn handle(&mut self, event: GameEvent, game_state: &mut GameState) {
+    async fn handle(&mut self, event: GameEvent, game_state: &mut GameState) {
         debug!("Dispatching event: {:?}", event);
 
         let maybe_client_event = event.maybe_client_event();
 
         match event {
-            GameEvent::Attack(e) => AttackEventHandler::default().handle(e, game_state, self),
-            GameEvent::EndTurn(e) => EndTurnEventHandler::default().handle(e, game_state, self),
-            GameEvent::Summon(e) => CreatureSetEventHandler::default().handle(e, game_state, self),
+            GameEvent::Attack(e) => {
+                AttackEventHandler::default()
+                    .handle(e, game_state, self)
+                    .await
+            }
+            GameEvent::EndTurn(e) => {
+                EndTurnEventHandler::default()
+                    .handle(e, game_state, self)
+                    .await
+            }
+            GameEvent::Summon(e) => {
+                CreatureSetEventHandler::default()
+                    .handle(e, game_state, self)
+                    .await
+            }
             GameEvent::CreatureDealsDamage(e) => {
-                CreatureDealsDamageHandler::default().handle(e, game_state, self)
+                CreatureDealsDamageHandler::default()
+                    .handle(e, game_state, self)
+                    .await
             }
             GameEvent::CreatureTakesDamage(e) => {
-                CreatureTakesDamageHandler::default().handle(e, game_state, self)
+                CreatureTakesDamageHandler::default()
+                    .handle(e, game_state, self)
+                    .await
             }
             GameEvent::CreatureDestroyed(e) => {
-                CreatureDestroyedEventHandler::default().handle(e, game_state, self)
+                CreatureDestroyedEventHandler::default()
+                    .handle(e, game_state, self)
+                    .await
             }
-            GameEvent::TurnStart(e) => TurnStartHandler::default().handle(e, game_state, self),
-            GameEvent::DrawCard(e) => DrawCardEventHandler::default().handle(e, game_state, self),
+            GameEvent::TurnStart(e) => {
+                TurnStartHandler::default()
+                    .handle(e, game_state, self)
+                    .await
+            }
+            GameEvent::DrawCard(e) => {
+                DrawCardEventHandler::default()
+                    .handle(e, game_state, self)
+                    .await
+            }
             GameEvent::AddCardToHand(e) => {
-                AddCardToHandEventHandler::default().handle(e, game_state, self)
+                AddCardToHandEventHandler::default()
+                    .handle(e, game_state, self)
+                    .await
             }
-            GameEvent::StartGame(e) => StartGameEventHandler::default().handle(e, game_state, self),
+            GameEvent::StartGame(e) => {
+                StartGameEventHandler::default()
+                    .handle(e, game_state, self)
+                    .await
+            }
             GameEvent::GainMana(e) => {
-                PlayerGainManaEventHandler::default().handle(e, game_state, self)
+                PlayerGainManaEventHandler::default()
+                    .handle(e, game_state, self)
+                    .await
             }
             GameEvent::SpendMana(e) => {
-                PlayerSpendManaEventHandler::default().handle(e, game_state, self)
+                PlayerSpendManaEventHandler::default()
+                    .handle(e, game_state, self)
+                    .await
             }
             GameEvent::SummonCreatureFromHand(e) => {
-                SummonCreatureFromHandEventHandler::default().handle(e, game_state, self)
+                SummonCreatureFromHandEventHandler::default()
+                    .handle(e, game_state, self)
+                    .await
             }
             GameEvent::PosTakesDamage(e) => {
-                PosTakesDamageHandler::default().handle(e, game_state, self)
+                PosTakesDamageHandler::default()
+                    .handle(e, game_state, self)
+                    .await
             }
             GameEvent::CreatureHealed(e) => {
-                CreatureHealedEventHandler::default().handle(e, game_state, self)
+                CreatureHealedEventHandler::default()
+                    .handle(e, game_state, self)
+                    .await
             }
         }
 

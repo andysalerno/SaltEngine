@@ -7,16 +7,18 @@ use crate::{
     },
     game_state::GameState,
 };
+use async_trait::async_trait;
 
 #[derive(Default)]
 pub struct StartGameEventHandler;
 
 const START_GAME_CARD_COUNT: usize = 5;
 
+#[async_trait]
 impl EventHandler for StartGameEventHandler {
     type Event = StartGameEvent;
 
-    fn handle(
+    async fn handle(
         &self,
         _event: StartGameEvent,
         game_state: &mut GameState,

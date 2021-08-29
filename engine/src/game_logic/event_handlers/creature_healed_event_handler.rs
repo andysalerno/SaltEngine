@@ -4,14 +4,16 @@ use crate::{
     game_logic::{event_handlers::EventHandler, CreatureHealedEvent, EventDispatcher},
     game_state::GameState,
 };
+use async_trait::async_trait;
 
 #[derive(Default)]
 pub struct CreatureHealedEventHandler;
 
+#[async_trait]
 impl EventHandler for CreatureHealedEventHandler {
     type Event = CreatureHealedEvent;
 
-    fn handle(
+    async fn handle(
         &self,
         event: CreatureHealedEvent,
         game_state: &mut GameState,

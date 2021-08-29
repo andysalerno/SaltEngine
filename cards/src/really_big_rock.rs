@@ -1,5 +1,6 @@
+use async_trait::async_trait;
 use salt_engine::{
-    cards::{CardDefinition, Position, UnitCardDefinition},
+    cards::{actions::UponDeathAction, CardDefinition, Position, UnitCardDefinition},
     game_logic::{EventDispatcher, PosTakesDamageEvent},
     game_state::{
         board::{BoardPos, RowId},
@@ -58,24 +59,34 @@ impl UnitCardDefinition for ReallyBigRock {
         Position::Either
     }
 
-    fn upon_death(
+    fn upon_death(&self) -> Box<dyn salt_engine::cards::actions::UponDeathAction> {
+        Box::new(DeathAction)
+    }
+}
+
+struct DeathAction;
+
+#[async_trait]
+impl UponDeathAction for DeathAction {
+    async fn action(
         &self,
-    ) -> Box<dyn FnOnce(&mut UnitCardInstance, BoardPos, &mut GameState, &mut EventDispatcher)>
-    {
-        Box::new(|instance, died_at_pos, game_state, dispatcher| {
-            if died_at_pos.row_id != RowId::FrontRow {
-                return;
-            }
+        instance: &mut UnitCardInstance,
+        died_at_pos: BoardPos,
+        state: &mut GameState,
+        dispatcher: &mut EventDispatcher,
+    ) {
+        if died_at_pos.row_id != RowId::FrontRow {
+            return;
+        }
 
-            let width = instance.width();
+        let width = instance.width();
 
-            for i in 0..width {
-                let index = died_at_pos.row_index + i;
-                let behind_pos = BoardPos::new(died_at_pos.player_id, RowId::BackRow, index);
-                let event = PosTakesDamageEvent::new(behind_pos, 1);
+        for i in 0..width {
+            let index = died_at_pos.row_index + i;
+            let behind_pos = BoardPos::new(died_at_pos.player_id, RowId::BackRow, index);
+            let event = PosTakesDamageEvent::new(behind_pos, 1);
 
-                dispatcher.dispatch(event, game_state);
-            }
-        })
+            dispatcher.dispatch(event, state).await;
+        }
     }
 }
