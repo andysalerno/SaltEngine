@@ -8,7 +8,7 @@ use crate::game_logic::{
 use crate::game_logic::{Buff, BuffView, PassiveEffectView};
 use crate::id::Id;
 use serde::{Deserialize, Serialize};
-use std::borrow::Borrow;
+use std::{borrow::Borrow, fmt::Display};
 
 pub trait UnitCardInstanceView<'a> {
     type DefinitionView: ?Sized + UnitCardDefinitionView;
@@ -69,6 +69,13 @@ pub struct UnitCardInstanceId(Id);
 impl UnitCardInstanceId {
     pub fn new() -> Self {
         Self(Id::new())
+    }
+}
+
+impl Display for UnitCardInstanceId {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        use std::fmt::Debug;
+        self.0.fmt(f)
     }
 }
 

@@ -282,7 +282,7 @@ pub mod actions {
             _state: &mut GameState,
             _dispatcher: &mut EventDispatcher,
         ) {
-            todo!()
+            // Do nothing by default
         }
     }
 
@@ -295,7 +295,7 @@ pub mod actions {
             _state: &mut GameState,
             _dispatcher: &mut EventDispatcher,
         ) {
-            todo!()
+            // Do nothing by default
         }
     }
 
@@ -307,7 +307,7 @@ pub mod actions {
             _state: &mut GameState,
             _dispatcher: &mut EventDispatcher,
         ) {
-            todo!()
+            // Do nothing by default
         }
     }
 
@@ -319,7 +319,7 @@ pub mod actions {
             _state: &mut GameState,
             _dispatcher: &mut EventDispatcher,
         ) {
-            todo!()
+            // Do nothing by default
         }
     }
 
@@ -331,7 +331,7 @@ pub mod actions {
             _state: &mut GameState,
             _dispatcher: &mut EventDispatcher,
         ) {
-            todo!()
+            // Do nothing by default
         }
     }
 }
