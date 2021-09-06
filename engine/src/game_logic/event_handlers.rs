@@ -30,7 +30,7 @@ pub use start_game_event_handler::StartGameEventHandler;
 pub use summon_creature_from_hand_event_handler::SummonCreatureFromHandEventHandler;
 pub use turn_start_event_handler::TurnStartHandler;
 
-use super::{Event, EventDispatcher};
+use super::{events::Event, EventDispatcher};
 use crate::game_state::GameState;
 use async_trait::async_trait;
 

@@ -28,7 +28,9 @@ pub use player_spend_mana::PlayerSpendManaEvent;
 pub use pos_takes_damage_event::PosTakesDamageEvent;
 use serde::{Deserialize, Serialize};
 pub use start_game_event::StartGameEvent;
-pub use summon_creature_from_hand_event::SummonCreatureFromHandEvent;
+pub use summon_creature_from_hand_event::{
+    client_view::SummonCreatureFromHandClientEvent, SummonCreatureFromHandEvent,
+};
 pub use turn_start_event::TurnStartEvent;
 
 use crate::game_state::GameStateView;
@@ -49,6 +51,7 @@ pub trait Event: Into<GameEvent> {
 }
 
 /// All possible game events.
+/// TODO: use EnumDispatch crate
 #[derive(Debug)]
 pub enum GameEvent {
     Attack(AttackEvent),
@@ -76,6 +79,7 @@ impl GameEvent {
     pub fn maybe_client_event(&self) -> Option<ClientEventView> {
         match self {
             GameEvent::AddCardToHand(e) => e.maybe_client_event(),
+            GameEvent::SummonCreatureFromHand(e) => e.maybe_client_event(),
             _ => None,
         }
     }
@@ -98,6 +102,7 @@ pub enum ClientActionEvent {
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub enum ClientEventView {
     AddCardToHand(AddCardToHandClientEvent),
+    SummonCreatureFromHand(SummonCreatureFromHandClientEvent),
 }
 
 impl From<ClientActionEvent> for GameEvent {

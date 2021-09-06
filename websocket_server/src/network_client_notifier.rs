@@ -14,7 +14,7 @@ impl NetworkClientNotifier {
 
 #[async_trait]
 impl ClientNotifier for NetworkClientNotifier {
-    async fn notify(&self, event: salt_engine::game_logic::ClientEventView) {
+    async fn notify(&self, event: salt_engine::game_logic::events::ClientEventView) {
         self.connection
             .send(FromServer::NotifyEvent(event))
             .await

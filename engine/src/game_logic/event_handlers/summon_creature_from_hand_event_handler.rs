@@ -2,8 +2,9 @@ use log::{debug, info};
 
 use crate::{
     game_logic::{
-        event_handlers::EventHandler, CreatureSetEvent, EventDispatcher, PlayerSpendManaEvent,
-        SummonCreatureFromHandEvent,
+        event_handlers::EventHandler,
+        events::{CreatureSetEvent, PlayerSpendManaEvent, SummonCreatureFromHandEvent},
+        EventDispatcher,
     },
     game_state::GameState,
 };

@@ -2,8 +2,9 @@ use log::info;
 
 use crate::{
     game_logic::{
-        event_handlers::EventHandler, DrawCardEvent, EventDispatcher, StartGameEvent,
-        TurnStartEvent,
+        event_handlers::EventHandler,
+        events::{DrawCardEvent, StartGameEvent, TurnStartEvent},
+        EventDispatcher,
     },
     game_state::GameState,
 };

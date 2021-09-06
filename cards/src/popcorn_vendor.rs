@@ -102,7 +102,9 @@ mod tests {
         tests::{make_default_dispatcher, make_test_state},
         Pawn,
     };
-    use salt_engine::{game_logic::SummonCreatureFromHandEvent, game_state::board::BoardView};
+    use salt_engine::{
+        game_logic::events::SummonCreatureFromHandEvent, game_state::board::BoardView,
+    };
 
     #[test]
     fn when_summoned_back_gives_buff() {

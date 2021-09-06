@@ -1,5 +1,5 @@
 use salt_engine::{
-    game_logic::{ClientActionEvent, ClientEventView},
+    game_logic::events::{ClientActionEvent, ClientEventView},
     game_state::{board::BoardPos, GameStatePlayerView, PlayerId, UnitCardInstanceId},
     id::Id,
 };

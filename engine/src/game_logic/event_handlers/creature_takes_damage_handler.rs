@@ -2,7 +2,8 @@ use log::info;
 
 use crate::{
     game_logic::{
-        event_handlers::EventHandler, CreatureDestroyedEvent, CreatureTakesDamageEvent,
+        event_handlers::EventHandler,
+        events::{CreatureDestroyedEvent, CreatureTakesDamageEvent},
         EventDispatcher,
     },
     game_state::board::BoardView,

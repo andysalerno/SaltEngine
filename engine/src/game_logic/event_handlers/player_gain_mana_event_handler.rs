@@ -1,7 +1,7 @@
 use log::info;
 
 use crate::{
-    game_logic::{event_handlers::EventHandler, EventDispatcher, PlayerGainManaEvent},
+    game_logic::{event_handlers::EventHandler, events::PlayerGainManaEvent, EventDispatcher},
     game_state::GameState,
 };
 use async_trait::async_trait;

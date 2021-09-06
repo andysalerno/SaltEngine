@@ -68,7 +68,7 @@ impl UnitCardDefinition for EmotionalSupportDog {
 mod tests {
     use salt_engine::{
         cards::UnitCardDefinition,
-        game_logic::CreatureSetEvent,
+        game_logic::events::CreatureSetEvent,
         game_state::board::{BoardPos, BoardView, RowId},
     };
 

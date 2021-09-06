@@ -4,7 +4,7 @@ use log::info;
 use salt_engine::{
     cards::{player_view::UnitCardDefinitionPlayerView, UnitCardDefinitionView},
     game_agent::{ClientNotifier, Prompter},
-    game_logic::{
+    game_logic::events::{
         AttackEvent, ClientActionEvent, ClientEventView, EndTurnEvent, Event,
         SummonCreatureFromHandEvent,
     },

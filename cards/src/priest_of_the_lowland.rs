@@ -2,7 +2,7 @@ use async_trait::async_trait;
 use log::info;
 use salt_engine::{
     cards::{actions::UponTurnEndAction, CardDefinition, Position, UnitCardDefinition},
-    game_logic::{CreatureHealedEvent, EventDispatcher},
+    game_logic::{events::CreatureHealedEvent, EventDispatcher},
     game_state::{board::BoardView, GameState, UnitCardInstanceId},
     id::Id,
 };

@@ -7,7 +7,7 @@ use salt_engine::{
         actions::{UponSummonAction, UponTurnEndAction, UponTurnStartAction},
         CardDefinition, Position, UnitCardDefinition,
     },
-    game_logic::{EventDispatcher, PosTakesDamageEvent},
+    game_logic::{events::PosTakesDamageEvent, EventDispatcher},
     game_state::{
         board::{BoardPos, BoardView},
         GameState, InstanceState, MakePlayerView, UnitCardInstance, UnitCardInstanceId,

@@ -1,9 +1,12 @@
-use super::{event_handlers::*, events::GameEvent, Event};
+use super::{
+    event_handlers::*,
+    events::{Event, GameEvent},
+};
 use crate::{
     game_agent::{ClientNotifier, Prompter},
     game_state::{GameState, PlayerId},
 };
-use log::debug;
+use log::{debug, info};
 
 #[derive(Debug)]
 pub struct EventDispatcher {
@@ -61,6 +64,19 @@ impl EventDispatcher {
             self.player_b_notifier.as_ref()
         } else {
             panic!("Cannot get notifier for unknown player ID: {:?}", player_id)
+        }
+    }
+
+    pub fn opponent_notifier(&self, player_id: PlayerId) -> &dyn ClientNotifier {
+        if player_id == self.player_a_id {
+            self.player_b_notifier.as_ref()
+        } else if player_id == self.player_b_id {
+            self.player_a_notifier.as_ref()
+        } else {
+            panic!(
+                "Cannot get notifier for opponent of unknown player ID: {:?}",
+                player_id
+            )
         }
     }
 
@@ -158,9 +174,10 @@ impl EventDispatcher {
         }
 
         if let Some(event_view) = maybe_client_event {
-            smol::block_on(async {
-                self.player_a_notifier.notify(event_view).await;
-            });
+            info!("Notifying player of event: {:?}", event_view);
+            self.opponent_notifier(game_state.cur_player_id())
+                .notify(event_view)
+                .await;
         }
     }
 }

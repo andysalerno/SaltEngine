@@ -1,7 +1,7 @@
 use log::info;
 
 use crate::{
-    game_logic::{event_handlers::EventHandler, CreatureDealsDamageEvent, EventDispatcher},
+    game_logic::{event_handlers::EventHandler, events::CreatureDealsDamageEvent, EventDispatcher},
     game_state::board::BoardView,
     game_state::GameState,
 };

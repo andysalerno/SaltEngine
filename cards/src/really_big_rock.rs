@@ -1,7 +1,7 @@
 use async_trait::async_trait;
 use salt_engine::{
     cards::{actions::UponDeathAction, CardDefinition, Position, UnitCardDefinition},
-    game_logic::{EventDispatcher, PosTakesDamageEvent},
+    game_logic::{events::PosTakesDamageEvent, EventDispatcher},
     game_state::{
         board::{BoardPos, RowId},
         GameState, UnitCardInstance,

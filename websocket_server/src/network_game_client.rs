@@ -7,7 +7,7 @@ use log::info;
 use salt_engine::game_agent::ClientNotifier;
 use salt_engine::{
     game_agent::Prompter,
-    game_logic::ClientActionEvent,
+    game_logic::events::ClientActionEvent,
     game_runner::GameClient,
     game_state::{GameState, GameStatePlayerView, PlayerId},
 };

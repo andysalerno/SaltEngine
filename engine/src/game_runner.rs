@@ -1,6 +1,9 @@
 use crate::{
     game_agent::{ClientNotifier, Prompter},
-    game_logic::{ClientActionEvent, EventDispatcher, GameEvent, StartGameEvent},
+    game_logic::{
+        events::{ClientActionEvent, GameEvent, StartGameEvent},
+        EventDispatcher,
+    },
     game_state::{GameState, GameStatePlayerView, GameStateView, MakePlayerView},
 };
 use async_trait::async_trait;
