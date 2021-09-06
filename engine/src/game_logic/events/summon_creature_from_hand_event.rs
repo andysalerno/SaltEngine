@@ -1,5 +1,3 @@
-use self::client_view::SummonCreatureFromHandClientEvent;
-
 use super::{Event, GameEvent};
 use crate::{
     cards::UnitCardDefinitionView,
@@ -72,15 +70,11 @@ impl From<SummonCreatureFromHandEvent> for GameEvent {
     }
 }
 
-pub mod client_view {
-    use super::*;
-
-    #[derive(Serialize, Deserialize, Clone, Debug)]
-    pub struct SummonCreatureFromHandClientEvent {
-        pub player_id: PlayerId,
-        pub board_pos: BoardPos,
-        pub hand_card_id: UnitCardInstanceId,
-    }
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct SummonCreatureFromHandClientEvent {
+    pub player_id: PlayerId,
+    pub board_pos: BoardPos,
+    pub hand_card_id: UnitCardInstanceId,
 }
 
 mod validation {

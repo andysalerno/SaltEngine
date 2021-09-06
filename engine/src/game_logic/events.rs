@@ -29,7 +29,7 @@ pub use pos_takes_damage_event::PosTakesDamageEvent;
 use serde::{Deserialize, Serialize};
 pub use start_game_event::StartGameEvent;
 pub use summon_creature_from_hand_event::{
-    client_view::SummonCreatureFromHandClientEvent, SummonCreatureFromHandEvent,
+    SummonCreatureFromHandClientEvent, SummonCreatureFromHandEvent,
 };
 pub use turn_start_event::TurnStartEvent;
 
