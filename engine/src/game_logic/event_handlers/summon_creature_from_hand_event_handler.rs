@@ -31,11 +31,14 @@ impl EventHandler for SummonCreatureFromHandEventHandler {
             .hand_mut(player_id)
             .take_card(event.hand_card_id());
 
-        // Spend the mana
         {
             let creature_name = card_from_hand.definition().title();
+            info!("Player summons {} ({:?})", creature_name, player_id);
+        }
+
+        // Spend the mana
+        {
             let mana_amount = card_from_hand.definition().cost();
-            info!("Player {:?} summons {}", player_id, creature_name);
 
             dispatcher
                 .dispatch(

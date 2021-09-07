@@ -19,7 +19,7 @@ pub use attack::AttackEvent;
 pub use creature_deals_damage_event::CreatureDealsDamageEvent;
 pub use creature_destroyed::CreatureDestroyedEvent;
 pub use creature_healed_event::CreatureHealedEvent;
-pub use creature_set_event::CreatureSetEvent;
+pub use creature_set_event::*;
 pub use creature_takes_damage_event::CreatureTakesDamageEvent;
 pub use draw_card::DrawCardEvent;
 pub use end_turn::EndTurnEvent;
@@ -80,7 +80,19 @@ impl GameEvent {
         match self {
             GameEvent::AddCardToHand(e) => e.maybe_client_event(),
             GameEvent::SummonCreatureFromHand(e) => e.maybe_client_event(),
-            _ => None,
+            GameEvent::Summon(e) => e.maybe_client_event(),
+            GameEvent::Attack(e) => e.maybe_client_event(),
+            GameEvent::EndTurn(e) => e.maybe_client_event(),
+            GameEvent::CreatureDealsDamage(e) => e.maybe_client_event(),
+            GameEvent::CreatureTakesDamage(e) => e.maybe_client_event(),
+            GameEvent::CreatureDestroyed(e) => e.maybe_client_event(),
+            GameEvent::TurnStart(e) => e.maybe_client_event(),
+            GameEvent::DrawCard(e) => e.maybe_client_event(),
+            GameEvent::StartGame(e) => e.maybe_client_event(),
+            GameEvent::GainMana(e) => e.maybe_client_event(),
+            GameEvent::SpendMana(e) => e.maybe_client_event(),
+            GameEvent::PosTakesDamage(e) => e.maybe_client_event(),
+            GameEvent::CreatureHealed(e) => e.maybe_client_event(),
         }
     }
 }
@@ -102,6 +114,7 @@ pub enum ClientActionEvent {
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub enum ClientEventView {
     AddCardToHand(AddCardToHandClientEvent),
+    UnitSet(CreatureSetClientEvent),
     SummonCreatureFromHand(SummonCreatureFromHandClientEvent),
 }
 
