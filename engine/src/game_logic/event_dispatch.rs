@@ -6,6 +6,7 @@ use crate::{
     game_agent::{ClientNotifier, Prompter},
     game_state::{GameState, PlayerId},
 };
+use futures::join;
 use log::{debug, info};
 
 #[derive(Debug)]
@@ -174,10 +175,16 @@ impl EventDispatcher {
         }
 
         if let Some(event_view) = maybe_client_event {
-            info!("Notifying player of event: {:?}", event_view);
-            self.opponent_notifier(game_state.cur_player_id())
-                .notify(event_view)
-                .await;
+            info!("Notifying players of event: {:?}", event_view);
+            let notify_opponent = self
+                .opponent_notifier(game_state.cur_player_id())
+                .notify(event_view.clone());
+
+            let notify_player = self
+                .player_notifier(game_state.cur_player_id())
+                .notify(event_view);
+
+            join!(notify_opponent, notify_player);
         }
     }
 }

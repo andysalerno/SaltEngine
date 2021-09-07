@@ -913,6 +913,7 @@ name = "salt_engine"
 version = "0.1.0"
 dependencies = [
  "async-trait",
+ "futures",
  "log",
  "mockall",
  "rand",
