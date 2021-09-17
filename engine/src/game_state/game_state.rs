@@ -371,18 +371,6 @@ pub mod player_view {
         board: BoardPlayerView,
     }
 
-    impl GameStatePlayerView {
-        /// Get the game state player view's player id.
-        pub fn player_id(&self) -> PlayerId {
-            self.player_id
-        }
-
-        /// Get the game state player view's opponent id.
-        pub fn opponent_id(&self) -> PlayerId {
-            self.opponent_id
-        }
-    }
-
     enum PlayerOpponent {
         Player,
         Opponent,
@@ -411,6 +399,19 @@ pub mod player_view {
     }
 
     impl GameStatePlayerView {
+        pub fn cur_player_turn(&self) -> PlayerId {
+            self.cur_player_turn
+        }
+
+        /// Get the game state player view's player id.
+        pub fn player_id(&self) -> PlayerId {
+            self.player_id
+        }
+
+        /// Get the game state player view's opponent id.
+        pub fn opponent_id(&self) -> PlayerId {
+            self.opponent_id
+        }
         pub fn board(&self) -> &BoardPlayerView {
             &self.board
         }
