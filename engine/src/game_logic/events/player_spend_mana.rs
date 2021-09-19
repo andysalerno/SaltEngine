@@ -50,4 +50,11 @@ impl Event for PlayerSpendManaEvent {
             .into())
         }
     }
+
+    fn maybe_client_event(&self) -> Option<super::ClientEventView> {
+        Some(super::ClientEventView::PlayerSpendMana {
+            player_id: self.player_id,
+            spent_mana_count: self.mana_count as usize,
+        })
+    }
 }

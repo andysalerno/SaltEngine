@@ -119,6 +119,10 @@ pub enum ClientEventView {
     TurnEnded(PlayerId),
     TurnStarted(PlayerId),
     PlayerGainMana(PlayerId, usize),
+    PlayerSpendMana {
+        player_id: PlayerId,
+        spent_mana_count: usize,
+    },
 }
 
 impl From<ClientActionEvent> for GameEvent {
