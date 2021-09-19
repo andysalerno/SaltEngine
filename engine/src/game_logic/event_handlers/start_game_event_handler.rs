@@ -42,6 +42,10 @@ impl EventHandler for StartGameEventHandler {
                 .await;
         }
 
-        dispatcher.dispatch(TurnStartEvent, game_state).await;
+        let first_turn_player = game_state.cur_player_id();
+
+        dispatcher
+            .dispatch(TurnStartEvent(first_turn_player), game_state)
+            .await;
     }
 }

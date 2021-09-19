@@ -22,9 +22,9 @@ impl EventHandler for PlayerGainManaEventHandler {
         info!(
             "Player {:?} gains {} mana.",
             event.player_id(),
-            event.mana_count()
+            event.gain_count()
         );
 
-        game_state.raise_mana_limit(event.player_id(), event.mana_count());
+        game_state.raise_mana_limit(event.player_id(), event.gain_count());
     }
 }

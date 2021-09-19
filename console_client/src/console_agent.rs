@@ -253,7 +253,7 @@ impl ConsolePrompter {
                     None
                 }
                 "attack" => Some(self.attack(game_state, &mut input_queue)),
-                "end" => Some(Ok(ClientActionEvent::EndTurn(EndTurnEvent))),
+                "end" => Some(Ok(ClientActionEvent::EndTurn(EndTurnEvent(self.id())))),
                 "quit" => panic!(),
                 _ => None,
             };

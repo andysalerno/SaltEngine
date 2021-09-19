@@ -228,22 +228,22 @@ impl GameState {
         }
     }
 
-    pub fn reduce_mana(&mut self, player_id: PlayerId, mana_count: u32) {
+    pub fn reduce_mana(&mut self, player_id: PlayerId, reduce_by: u32) {
         let player_mana = match self.player_ab(player_id) {
             PlayerAB::PlayerA => &mut self.player_a_mana,
             PlayerAB::PlayerB => &mut self.player_b_mana,
         };
 
-        *player_mana = *player_mana - mana_count;
+        *player_mana -= reduce_by;
     }
 
-    pub fn raise_mana_limit(&mut self, player_id: PlayerId, mana_count: u32) {
+    pub fn raise_mana_limit(&mut self, player_id: PlayerId, raise_by: u32) {
         let player_mana_limit = match self.player_ab(player_id) {
             PlayerAB::PlayerA => &mut self.player_a_mana_limit,
             PlayerAB::PlayerB => &mut self.player_b_mana_limit,
         };
 
-        *player_mana_limit = *player_mana_limit + mana_count;
+        *player_mana_limit += raise_by;
     }
 
     pub fn draw_card(&mut self, player_id: PlayerId) -> Option<UnitCardInstance> {

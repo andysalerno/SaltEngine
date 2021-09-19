@@ -33,7 +33,7 @@ pub use summon_creature_from_hand_event::{
 };
 pub use turn_start_event::TurnStartEvent;
 
-use crate::game_state::GameStateView;
+use crate::game_state::{GameStateView, PlayerId};
 
 pub type Result = std::result::Result<(), Box<dyn std::error::Error>>;
 
@@ -116,6 +116,9 @@ pub enum ClientEventView {
     AddCardToHand(AddCardToHandClientEvent),
     UnitSet(CreatureSetClientEvent),
     SummonCreatureFromHand(SummonCreatureFromHandClientEvent),
+    TurnEnded(PlayerId),
+    TurnStarted(PlayerId),
+    PlayerGainMana(PlayerId, usize),
 }
 
 impl From<ClientActionEvent> for GameEvent {

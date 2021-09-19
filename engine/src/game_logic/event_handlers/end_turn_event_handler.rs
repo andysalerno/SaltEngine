@@ -37,8 +37,10 @@ impl EventHandler for EndTurnEventHandler {
             action.action(id, game_state, dispatcher).await;
         }
 
-        game_state.set_next_player_turn();
+        let next_player = game_state.set_next_player_turn();
 
-        dispatcher.dispatch(TurnStartEvent, game_state).await;
+        dispatcher
+            .dispatch(TurnStartEvent(next_player), game_state)
+            .await;
     }
 }

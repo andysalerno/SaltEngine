@@ -5,14 +5,14 @@ use super::{Event, GameEvent};
 #[derive(Debug, Clone)]
 pub struct PlayerGainManaEvent {
     player_id: PlayerId,
-    mana_count: u32,
+    gain_count: u32,
 }
 
 impl PlayerGainManaEvent {
-    pub fn new(player_id: PlayerId, mana_count: u32) -> Self {
+    pub fn new(player_id: PlayerId, gain_count: u32) -> Self {
         Self {
             player_id,
-            mana_count,
+            gain_count,
         }
     }
 
@@ -20,8 +20,8 @@ impl PlayerGainManaEvent {
         self.player_id
     }
 
-    pub fn mana_count(&self) -> u32 {
-        self.mana_count
+    pub fn gain_count(&self) -> u32 {
+        self.gain_count
     }
 }
 
@@ -31,4 +31,11 @@ impl From<PlayerGainManaEvent> for GameEvent {
     }
 }
 
-impl Event for PlayerGainManaEvent {}
+impl Event for PlayerGainManaEvent {
+    fn maybe_client_event(&self) -> Option<super::ClientEventView> {
+        Some(super::ClientEventView::PlayerGainMana(
+            self.player_id,
+            self.gain_count as usize,
+        ))
+    }
+}
