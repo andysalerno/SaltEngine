@@ -6,19 +6,6 @@ use async_trait::async_trait;
 #[cfg(test)]
 use mockall::{automock, predicate::str};
 
-/// A trait representing an player agent that can decide what
-/// action to take for a given game state.
-// pub trait GameAgent {
-//     fn get_action(&self, game_state: &GameStatePlayerView) -> ClientActionEvent;
-//     fn id(&self) -> PlayerId;
-//     fn make_prompter(&self) -> Box<dyn Prompter>;
-//     fn make_client_notifier(&self) -> Box<dyn ClientNotifier>;
-
-//     fn observe_state_update(&self, _game_state: GameStatePlayerView) {
-//         // no implementation by default
-//     }
-// }
-
 #[cfg_attr(test, automock)]
 pub trait Prompter: Send + Sync {
     /// Prompt the player for for any position (slot) on the board.

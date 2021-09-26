@@ -35,6 +35,7 @@ pub use sleeping_dog::SleepingDog;
 
 #[cfg(test)]
 mod tests {
+    use async_trait::async_trait;
     use mockall::mock;
     use salt_engine::{
         game_agent::{ClientNotifier, Prompter},
@@ -51,6 +52,15 @@ mod tests {
             fn prompt_creature_pos(&self, game_state: &GameStatePlayerView) -> BoardPos;
             fn prompt_player_creature_pos(&self, game_state: &GameStatePlayerView) -> BoardPos;
             fn prompt_opponent_creature_pos(&self, game_state: &GameStatePlayerView) -> BoardPos;
+        }
+    }
+
+    struct TestClientNotifier;
+
+    #[async_trait]
+    impl ClientNotifier for TestClientNotifier {
+        async fn notify(&self, _event: salt_engine::game_logic::events::ClientEventView) {
+            // Doing nothing for now
         }
     }
 
@@ -73,26 +83,20 @@ mod tests {
         state
     }
 
-    pub fn make_default_dispatcher() -> EventDispatcher {
-        todo!()
-        // let prompt_a = MockTestPrompter::new();
-        // let prompt_b = MockTestPrompter::new();
+    pub fn make_dispatcher(player_a_id: PlayerId, player_b_id: PlayerId) -> EventDispatcher {
+        let notifier_a = Box::new(TestClientNotifier);
+        let notifier_b = Box::new(TestClientNotifier);
 
-        // make_dispatcher(prompt_a, PlayerId::new(), prompt_b, PlayerId::new())
-    }
+        let prompter_a = Box::new(MockTestPrompter::new());
+        let prompter_b = Box::new(MockTestPrompter::new());
 
-    pub fn make_dispatcher(
-        _prompter_a: impl ClientNotifier + 'static,
-        _player_a_id: PlayerId,
-        _prompter_b: impl ClientNotifier + 'static,
-        _player_b_id: PlayerId,
-    ) -> EventDispatcher {
-        todo!()
-        // EventDispatcher::new(
-        //     Box::new(prompter_a),
-        //     player_a_id,
-        //     Box::new(prompter_b),
-        //     player_b_id,
-        // )
+        EventDispatcher::new(
+            notifier_a,
+            prompter_a,
+            player_a_id,
+            notifier_b,
+            prompter_b,
+            player_b_id,
+        )
     }
 }

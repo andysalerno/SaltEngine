@@ -7,6 +7,7 @@ use crate::{
     game_state::{GameState, GameStatePlayerView, GameStateView, MakePlayerView},
 };
 use async_trait::async_trait;
+use futures::join;
 use log::info;
 
 /// A trait that defines the interaction between the GameRunner
@@ -109,9 +110,10 @@ impl GameRunner {
 
             dispatcher.dispatch(action, game_state).await;
 
-            handler_opponent
-                .observe_state_update(game_state.player_view(opponent))
-                .await;
+            join!(
+                handler_opponent.observe_state_update(game_state.player_view(opponent)),
+                handler_player.observe_state_update(game_state.player_view(cur_player_id))
+            );
 
             if turn_is_over {
                 info!("Turn ends for player: {:?}", cur_player_id);

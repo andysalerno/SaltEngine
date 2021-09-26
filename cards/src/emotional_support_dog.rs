@@ -73,7 +73,7 @@ mod tests {
     };
 
     use crate::{
-        tests::{make_default_dispatcher, make_test_state},
+        tests::{make_dispatcher, make_test_state},
         ReallyBigRock,
     };
 
@@ -81,8 +81,8 @@ mod tests {
 
     #[test]
     fn when_summoned_expects_provides_buff() {
-        let state = make_test_state();
-        let _dispatcher = make_default_dispatcher();
+        let mut state = make_test_state();
+        let mut dispatcher = make_dispatcher(state.player_a_id(), state.player_b_id());
 
         // Summon the thing that will get buffed.
         let rock = ReallyBigRock.make_instance();
@@ -91,15 +91,20 @@ mod tests {
         let buffed_id = rock.id();
         {
             let summon_at = BoardPos::new(state.player_a_id(), RowId::FrontRow, 3);
-            let _summon_doggy_event = CreatureSetEvent::new(state.player_a_id(), rock, summon_at);
-            // dispatcher.dispatch(summon_doggy_event, &mut state); TODO: fix me
+            let summon_doggy_event = CreatureSetEvent::new(state.player_a_id(), rock, summon_at);
+            smol::block_on(async {
+                dispatcher.dispatch(summon_doggy_event, &mut state).await;
+            });
         }
 
         {
             let doggy = EmotionalSupportDog.make_instance();
             let summon_at = BoardPos::new(state.player_a_id(), RowId::BackRow, 3);
-            let _summon_doggy_event = CreatureSetEvent::new(state.player_a_id(), doggy, summon_at);
-            // dispatcher.dispatch(summon_doggy_event, &mut state); TODO: fix me
+            let summon_doggy_event = CreatureSetEvent::new(state.player_a_id(), doggy, summon_at);
+
+            smol::block_on(async {
+                dispatcher.dispatch(summon_doggy_event, &mut state).await;
+            });
         }
 
         let rock_updated_attack = state.board().creature_instance(buffed_id).attack();

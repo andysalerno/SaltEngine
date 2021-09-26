@@ -61,9 +61,9 @@ pub fn run() -> Result<()> {
             smol::spawn(async move {
                 let result = queue_player_and_play(connection, context).await;
 
-                match result {
-                    Err(e) => eprintln!("{}", e),
-                    _ => {}
+                if let Err(e) = result {
+                    eprintln!("{}", e);
+                    panic!("exploding");
                 }
             })
             .detach();

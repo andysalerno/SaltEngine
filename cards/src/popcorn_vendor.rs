@@ -99,7 +99,7 @@ impl UponSummonAction for SummonAction {
 mod tests {
     use super::*;
     use crate::{
-        tests::{make_default_dispatcher, make_test_state},
+        tests::{make_dispatcher, make_test_state},
         Pawn,
     };
     use salt_engine::{
@@ -109,7 +109,7 @@ mod tests {
     #[test]
     fn when_summoned_back_gives_buff() {
         let mut state = make_test_state();
-        let _dispatcher = make_default_dispatcher();
+        let mut dispatcher = make_dispatcher(state.player_a_id(), state.player_b_id());
         let player_id = state.player_a_id();
 
         // Summon a pawn to receive the buff
@@ -120,8 +120,11 @@ mod tests {
             hand.add_card(pawn);
 
             let pawn_pos = BoardPos::new(player_id, RowId::FrontRow, 0);
-            let _summon_event = SummonCreatureFromHandEvent::new(player_id, pawn_pos, pawn_id);
-            // dispatcher.dispatch(summon_event, &mut state);
+            let summon_event = SummonCreatureFromHandEvent::new(player_id, pawn_pos, pawn_id);
+
+            smol::block_on(async {
+                dispatcher.dispatch(summon_event, &mut state).await;
+            });
         }
 
         // Summon the popcorn vendor and target the Pawn with the buff
@@ -131,9 +134,12 @@ mod tests {
             let hand = state.hand_mut(player_id);
             let pop_vend_pos = BoardPos::new(player_id, RowId::BackRow, 0);
             hand.add_card(pop_vend);
-            let _summon_event =
+            let summon_event =
                 SummonCreatureFromHandEvent::new(player_id, pop_vend_pos, pop_vend_id);
-            // dispatcher.dispatch(summon_event, &mut state);
+
+            smol::block_on(async {
+                dispatcher.dispatch(summon_event, &mut state).await;
+            });
         }
 
         let pawn_instance = state.board().creature_instance(pawn_id);
@@ -147,7 +153,7 @@ mod tests {
     #[test]
     fn when_summoned_front_gets_buff() {
         let mut state = make_test_state();
-        let mut dispatcher = make_default_dispatcher();
+        let mut dispatcher = make_dispatcher(state.player_a_id(), state.player_b_id());
 
         let player_a = state.player_a_id();
         let hand = state.hand_mut(player_a);
@@ -158,7 +164,9 @@ mod tests {
 
         let pos = BoardPos::new(player_a, RowId::FrontRow, 0);
         let summon_event = SummonCreatureFromHandEvent::new(player_a, pos, popcorn_vendor_id);
-        dispatcher.dispatch(summon_event, &mut state);
+        smol::block_on(async {
+            dispatcher.dispatch(summon_event, &mut state).await;
+        });
 
         let summoned_vendor = state.board().creature_instance(popcorn_vendor_id);
 
