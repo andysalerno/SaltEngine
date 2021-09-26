@@ -67,8 +67,15 @@ impl<'a> UnitCardInstanceView<'a> for UnitCardInstance {
 pub struct UnitCardInstanceId(Id);
 
 impl UnitCardInstanceId {
+    #[must_use]
     pub fn new() -> Self {
         Self(Id::new())
+    }
+}
+
+impl Default for UnitCardInstanceId {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -250,7 +257,7 @@ impl<'a> MakePlayerView<'a> for UnitCardInstance {
             attack: self.attack(),
             health: self.health(),
             width: self.width(),
-            state: self.state.clone(),
+            state: self.state,
         }
     }
 }

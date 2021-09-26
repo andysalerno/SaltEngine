@@ -84,25 +84,19 @@ pub enum RowId {
 }
 
 impl RowId {
+    #[must_use]
     pub fn is_back(&self) -> bool {
-        match self {
-            RowId::BackRow => true,
-            _ => false,
-        }
+        matches!(self, RowId::BackRow)
     }
 
+    #[must_use]
     pub fn is_front(&self) -> bool {
-        match self {
-            RowId::FrontRow => true,
-            _ => false,
-        }
+        matches!(self, RowId::FrontRow)
     }
 
+    #[must_use]
     pub fn is_hero(&self) -> bool {
-        match self {
-            RowId::Hero => true,
-            _ => false,
-        }
+        matches!(self, RowId::Hero)
     }
 }
 
@@ -169,9 +163,8 @@ pub trait BoardView<'a> {
 
     fn slot_with_creature(&self, id: UnitCardInstanceId) -> &<Self as BoardView<'a>>::SlotView {
         self.slots_iter()
-            .filter(|s| s.maybe_creature().map(|c| c.id()) == Some(id))
-            .next()
-            .expect(&format!("Creature instance with id {:?} not found.", id))
+            .find(|s| s.maybe_creature().map(|c| c.id()) == Some(id))
+            .unwrap_or_else(|| panic!("Creature instance with id {:?} not found.", id))
     }
 
     /// A slice starting at the slot where the creature instance exists,
@@ -180,9 +173,8 @@ pub trait BoardView<'a> {
         let (start_index, slot) = self
             .slots_iter()
             .enumerate()
-            .filter(|(_, slot)| slot.maybe_creature().map(|c| c.id()) == Some(id))
-            .next()
-            .expect(&format!("Creature instance with id {:?} not found.", id));
+            .find(|(_, slot)| slot.maybe_creature().map(|c| c.id()) == Some(id))
+            .unwrap_or_else(|| panic!("Creature instance with id {:?} not found.", id));
 
         let creature_width = slot.maybe_creature().unwrap().width();
 
@@ -191,8 +183,7 @@ pub trait BoardView<'a> {
 
     fn slot_at_pos(&self, pos: BoardPos) -> &<Self as BoardView<'a>>::SlotView {
         self.slots_iter()
-            .filter(|s| s.pos() == pos)
-            .next()
+            .find(|s| s.pos() == pos)
             .expect("The position was not a valid board slot.")
     }
 
@@ -288,7 +279,7 @@ pub trait BoardView<'a> {
             }
         }
 
-        return None;
+        None
     }
 }
 
@@ -465,7 +456,7 @@ impl Board {
     }
 
     pub fn companion_slot(&self, pos: BoardPos) -> &BoardSlot {
-        let mut companion_pos = pos.clone();
+        let mut companion_pos = pos;
 
         let companion_row = match pos.row() {
             RowId::BackRow => RowId::FrontRow,
@@ -532,15 +523,13 @@ impl Board {
         self.slots_iter_mut()
             .collect::<Vec<_>>()
             .into_iter()
-            .filter(|s| s.maybe_creature().map(|c| c.id()) == Some(id))
-            .next()
-            .expect(&format!("Creature instance with id {:?} not found.", id))
+            .find(|s| s.maybe_creature().map(|c| c.id()) == Some(id))
+            .unwrap_or_else(|| panic!("Creature instance with id {:?} not found.", id))
     }
 
     pub fn slot_at_pos_mut(&mut self, pos: BoardPos) -> &mut BoardSlot {
         self.slots_iter_mut()
-            .filter(|s| s.pos() == pos)
-            .next()
+            .find(|s| s.pos() == pos)
             .expect("The position was not a valid board slot.")
     }
 

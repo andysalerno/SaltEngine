@@ -27,8 +27,15 @@ impl std::fmt::Debug for dyn PassiveEffectDefinition {
 pub struct PassiveEffectInstanceId(Id);
 
 impl PassiveEffectInstanceId {
+    #[must_use]
     pub fn new() -> Self {
         Self(Id::new())
+    }
+}
+
+impl Default for PassiveEffectInstanceId {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -140,7 +147,7 @@ where
         &self,
     ) -> Box<dyn FnOnce(PassiveEffectInstanceId, UnitCardInstanceId, &mut GameState)> {
         let buff = self.buff.clone();
-        let for_row = self.for_row.clone();
+        let for_row = self.for_row;
 
         Box::new(move |_, originator_id, game_state| {
             let originator_pos = game_state.board().pos_with_creature(originator_id);

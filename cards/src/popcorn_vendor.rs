@@ -83,8 +83,8 @@ impl UponSummonAction for SummonAction {
         &self,
         instance: &mut UnitCardInstance,
         pos: BoardPos,
-        state: &mut GameState,
-        dispatcher: &mut EventDispatcher,
+        _state: &mut GameState,
+        _dispatcher: &mut EventDispatcher,
     ) {
         if pos.row() == RowId::FrontRow {
             // Front: buffs self
@@ -109,7 +109,7 @@ mod tests {
     #[test]
     fn when_summoned_back_gives_buff() {
         let mut state = make_test_state();
-        let mut dispatcher = make_default_dispatcher();
+        let _dispatcher = make_default_dispatcher();
         let player_id = state.player_a_id();
 
         // Summon a pawn to receive the buff
@@ -120,7 +120,7 @@ mod tests {
             hand.add_card(pawn);
 
             let pawn_pos = BoardPos::new(player_id, RowId::FrontRow, 0);
-            let summon_event = SummonCreatureFromHandEvent::new(player_id, pawn_pos, pawn_id);
+            let _summon_event = SummonCreatureFromHandEvent::new(player_id, pawn_pos, pawn_id);
             // dispatcher.dispatch(summon_event, &mut state);
         }
 
@@ -131,7 +131,7 @@ mod tests {
             let hand = state.hand_mut(player_id);
             let pop_vend_pos = BoardPos::new(player_id, RowId::BackRow, 0);
             hand.add_card(pop_vend);
-            let summon_event =
+            let _summon_event =
                 SummonCreatureFromHandEvent::new(player_id, pop_vend_pos, pop_vend_id);
             // dispatcher.dispatch(summon_event, &mut state);
         }

@@ -81,8 +81,8 @@ mod tests {
 
     #[test]
     fn when_summoned_expects_provides_buff() {
-        let mut state = make_test_state();
-        let mut dispatcher = make_default_dispatcher();
+        let state = make_test_state();
+        let _dispatcher = make_default_dispatcher();
 
         // Summon the thing that will get buffed.
         let rock = ReallyBigRock.make_instance();
@@ -91,14 +91,14 @@ mod tests {
         let buffed_id = rock.id();
         {
             let summon_at = BoardPos::new(state.player_a_id(), RowId::FrontRow, 3);
-            let summon_doggy_event = CreatureSetEvent::new(state.player_a_id(), rock, summon_at);
+            let _summon_doggy_event = CreatureSetEvent::new(state.player_a_id(), rock, summon_at);
             // dispatcher.dispatch(summon_doggy_event, &mut state); TODO: fix me
         }
 
         {
             let doggy = EmotionalSupportDog.make_instance();
             let summon_at = BoardPos::new(state.player_a_id(), RowId::BackRow, 3);
-            let summon_doggy_event = CreatureSetEvent::new(state.player_a_id(), doggy, summon_at);
+            let _summon_doggy_event = CreatureSetEvent::new(state.player_a_id(), doggy, summon_at);
             // dispatcher.dispatch(summon_doggy_event, &mut state); TODO: fix me
         }
 

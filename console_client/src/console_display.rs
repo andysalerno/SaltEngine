@@ -78,7 +78,7 @@ fn row_to_string(row: &[BoardSlotPlayerView], start_index: usize, index_after: b
             let c = get_alpha_char(i + start_index);
             result.push_str(&format!("  {}  ", c));
         }
-        result.push_str("\n");
+        result.push('\n');
     }
 
     let mut row_iter = row.iter();
@@ -95,7 +95,7 @@ fn row_to_string(row: &[BoardSlotPlayerView], start_index: usize, index_after: b
                 result.push_str("-----");
             }
 
-            result.push_str("]");
+            result.push(']');
 
         // If the slot is empty...
         } else {
@@ -104,7 +104,7 @@ fn row_to_string(row: &[BoardSlotPlayerView], start_index: usize, index_after: b
     }
 
     if index_after {
-        result.push_str("\n");
+        result.push('\n');
 
         for i in 0..row.len() {
             let c = get_alpha_char(i + start_index);

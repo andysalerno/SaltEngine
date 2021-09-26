@@ -1,6 +1,6 @@
 use crate::console_display::ConsoleDisplay;
 use async_trait::async_trait;
-use log::info;
+
 use salt_engine::{
     cards::{player_view::UnitCardDefinitionPlayerView, UnitCardDefinitionView},
     game_agent::{ClientNotifier, Prompter},
@@ -75,7 +75,7 @@ impl GameClient for ConsoleAgent {
         }
     }
 
-    async fn on_turn_start(&mut self, game_state: &salt_engine::game_state::GameState) {
+    async fn on_turn_start(&mut self, _game_state: &salt_engine::game_state::GameState) {
         todo!()
     }
 }
@@ -384,7 +384,7 @@ impl ConsolePrompter {
                 result.push_str("   ");
             }
 
-            result.push_str("\n");
+            result.push('\n');
         }
 
         println!("{}", result);
@@ -411,7 +411,7 @@ impl ConsolePrompter {
         input_queue: &mut VecDeque<String>,
     ) -> Result<BoardPos, ConsoleError> {
         let c = self.ask("Letter position: ", input_queue);
-        let input_c = c.chars().nth(0).ok_or_else(|| {
+        let input_c = c.chars().next().ok_or_else(|| {
             ConsoleError::UserInputError("Input was not a valid character.".to_owned())
         })?;
 
@@ -442,7 +442,7 @@ impl ConsolePrompter {
             BoardPos::new(game_state.player_id(), RowId::BackRow, index)
         } else {
             return Err(ConsoleError::UserInputError(
-                format!("The input char {} did not match any position", input_c).into(),
+                format!("The input char {} did not match any position", input_c),
             ));
         };
 

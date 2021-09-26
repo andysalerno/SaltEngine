@@ -16,7 +16,7 @@ pub struct Connection {
 }
 
 impl Connection {
-    pub fn new(stream: WebSocketStream<TcpStream>) -> Self {
+    #[must_use] pub fn new(stream: WebSocketStream<TcpStream>) -> Self {
         Self {
             stream: Arc::new(Mutex::new(stream)),
         }

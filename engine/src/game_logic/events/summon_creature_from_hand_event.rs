@@ -119,7 +119,7 @@ mod validation {
             }
         }
 
-        return Ok(());
+        Ok(())
     }
 
     pub fn validate_is_players_side<'a>(

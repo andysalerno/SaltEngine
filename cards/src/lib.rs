@@ -71,10 +71,10 @@ mod tests {
     }
 
     pub fn make_dispatcher(
-        prompter_a: impl ClientNotifier + 'static,
-        player_a_id: PlayerId,
-        prompter_b: impl ClientNotifier + 'static,
-        player_b_id: PlayerId,
+        _prompter_a: impl ClientNotifier + 'static,
+        _player_a_id: PlayerId,
+        _prompter_b: impl ClientNotifier + 'static,
+        _player_b_id: PlayerId,
     ) -> EventDispatcher {
         todo!()
         // EventDispatcher::new(

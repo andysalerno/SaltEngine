@@ -22,8 +22,15 @@ use crate::id::Id;
 pub struct PlayerId(Id);
 
 impl PlayerId {
+    #[must_use]
     pub fn new() -> Self {
         Self(Id::new())
+    }
+}
+
+impl Default for PlayerId {
+    fn default() -> Self {
+        Self::new()
     }
 }
 

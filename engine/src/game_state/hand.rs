@@ -12,12 +12,13 @@ pub trait HandView<'a> {
     fn card(&self, id: UnitCardInstanceId) -> &Self::TCard {
         self.cards()
             .iter()
-            .filter(|c| c.id() == id)
-            .next()
-            .expect(&format!(
-                "Attempted to find card with id {:?} in hand, but no such card was found.",
-                id
-            ))
+            .find(|c| c.id() == id)
+            .unwrap_or_else(|| {
+                panic!(
+                    "Attempted to find card with id {:?} in hand, but no such card was found.",
+                    id
+                )
+            })
     }
 
     fn nth(&self, n: usize) -> Option<&Self::TCard> {
@@ -27,6 +28,10 @@ pub trait HandView<'a> {
     fn len(&self) -> usize {
         self.cards().len()
     }
+
+    fn is_empty(&self) -> bool {
+        self.len() == 0
+    }
 }
 
 #[derive(Debug, Default)]
@@ -35,10 +40,17 @@ pub struct Hand {
 }
 
 impl Hand {
+    #[must_use]
     pub fn len(&self) -> usize {
         self.cards.len()
     }
 
+    #[must_use]
+    pub fn is_empty(&self) -> bool {
+        self.len() == 0
+    }
+
+    #[must_use]
     pub fn cards(&self) -> &[UnitCardInstance] {
         self.cards.as_slice()
     }
@@ -60,12 +72,13 @@ impl Hand {
             .cards
             .iter()
             .enumerate()
-            .filter(|(_i, c)| c.id() == id)
-            .next()
-            .expect(&format!(
-                "Attempted to take card with id {:?} from hand, but no such card was found.",
-                id
-            ));
+            .find(|(_i, c)| c.id() == id)
+            .unwrap_or_else(|| {
+                panic!(
+                    "Attempted to take card with id {:?} from hand, but no such card was found.",
+                    id
+                )
+            });
 
         let card = self.cards.remove(index);
         assert!(card.id() == id);

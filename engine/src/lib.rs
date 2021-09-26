@@ -2,8 +2,10 @@
 #![warn(clippy::pedantic)]
 #![allow(
     clippy::needless_pass_by_value,
+    clippy::module_name_repetitions,
     clippy::unused_self,
-    clippy::cast_lossless
+    clippy::cast_lossless,
+    clippy::module_inception
 )]
 
 pub mod game_agent;

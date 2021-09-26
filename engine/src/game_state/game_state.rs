@@ -258,8 +258,7 @@ impl GameState {
         let creature = self
             .board_mut()
             .creatures_iter_mut()
-            .filter(|i| i.id() == id)
-            .next()
+            .find(|i| i.id() == id)
             .expect("Cannot update_by_id; creature with id not found");
 
         (update)(creature);
@@ -296,6 +295,7 @@ impl GameState {
             .creature_ids()
     }
 
+    #[allow(clippy::needless_collect)]
     pub fn evaluate_passives(&mut self) {
         // clear out all passive buffs
         self.iter()
