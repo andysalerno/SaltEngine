@@ -1,6 +1,6 @@
 use crate::game_logic::events::ClientEventView;
 use crate::game_state::board::BoardPos;
-use crate::game_state::{GameStatePlayerView, PlayerId};
+use crate::game_state::{GameStatePlayerView};
 use async_trait::async_trait;
 
 #[cfg(test)]

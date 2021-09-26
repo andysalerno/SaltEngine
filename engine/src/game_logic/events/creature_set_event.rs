@@ -1,5 +1,5 @@
 use crate::game_state::{
-    board::BoardPos, MakePlayerView, PlayerId, UnitCardInstance, UnitCardInstanceId,
+    board::BoardPos, MakePlayerView, PlayerId, UnitCardInstance,
     UnitCardInstancePlayerView,
 };
 use serde::{Deserialize, Serialize};

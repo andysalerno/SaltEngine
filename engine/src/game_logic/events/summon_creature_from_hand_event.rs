@@ -4,8 +4,7 @@ use crate::{
     game_logic::cards::Position,
     game_state::{
         board::{BoardPos, BoardView, RowId},
-        GameStateView, HandView, MakePlayerView, PlayerId, UnitCardInstanceId,
-        UnitCardInstancePlayerView, UnitCardInstanceView,
+        GameStateView, HandView, PlayerId, UnitCardInstanceId, UnitCardInstanceView,
     },
 };
 use log::debug;
