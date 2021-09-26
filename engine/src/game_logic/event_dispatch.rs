@@ -1,5 +1,11 @@
 use super::{
-    event_handlers::*,
+    event_handlers::{
+        AddCardToHandEventHandler, AttackEventHandler, CreatureDealsDamageHandler,
+        CreatureDestroyedEventHandler, CreatureHealedEventHandler, CreatureSetEventHandler,
+        CreatureTakesDamageHandler, DrawCardEventHandler, EndTurnEventHandler, EventHandler,
+        PlayerGainManaEventHandler, PlayerSpendManaEventHandler, PosTakesDamageHandler,
+        StartGameEventHandler, SummonCreatureFromHandEventHandler, TurnStartHandler,
+    },
     events::{Event, GameEvent},
 };
 use crate::{
@@ -21,6 +27,7 @@ pub struct EventDispatcher {
 }
 
 impl EventDispatcher {
+    #[must_use]
     pub fn new(
         player_a_notifier: Box<dyn ClientNotifier>,
         player_a_prompter: Box<dyn Prompter>,
@@ -58,6 +65,7 @@ impl EventDispatcher {
         }
     }
 
+    #[must_use]
     pub fn player_notifier(&self, player_id: PlayerId) -> &dyn ClientNotifier {
         if player_id == self.player_a_id {
             self.player_a_notifier.as_ref()
@@ -68,6 +76,7 @@ impl EventDispatcher {
         }
     }
 
+    #[must_use]
     pub fn opponent_notifier(&self, player_id: PlayerId) -> &dyn ClientNotifier {
         if player_id == self.player_a_id {
             self.player_b_notifier.as_ref()
@@ -81,6 +90,7 @@ impl EventDispatcher {
         }
     }
 
+    #[must_use]
     pub fn player_prompter(&self, player_id: PlayerId) -> &dyn Prompter {
         if player_id == self.player_a_id {
             self.player_a_prompter.as_ref()
@@ -113,77 +123,77 @@ impl EventDispatcher {
             GameEvent::Attack(e) => {
                 AttackEventHandler::default()
                     .handle(e, game_state, self)
-                    .await
+                    .await;
             }
             GameEvent::EndTurn(e) => {
                 EndTurnEventHandler::default()
                     .handle(e, game_state, self)
-                    .await
+                    .await;
             }
             GameEvent::Summon(e) => {
                 CreatureSetEventHandler::default()
                     .handle(e, game_state, self)
-                    .await
+                    .await;
             }
             GameEvent::CreatureDealsDamage(e) => {
                 CreatureDealsDamageHandler::default()
                     .handle(e, game_state, self)
-                    .await
+                    .await;
             }
             GameEvent::CreatureTakesDamage(e) => {
                 CreatureTakesDamageHandler::default()
                     .handle(e, game_state, self)
-                    .await
+                    .await;
             }
             GameEvent::CreatureDestroyed(e) => {
                 CreatureDestroyedEventHandler::default()
                     .handle(e, game_state, self)
-                    .await
+                    .await;
             }
             GameEvent::TurnStart(e) => {
                 TurnStartHandler::default()
                     .handle(e, game_state, self)
-                    .await
+                    .await;
             }
             GameEvent::DrawCard(e) => {
                 DrawCardEventHandler::default()
                     .handle(e, game_state, self)
-                    .await
+                    .await;
             }
             GameEvent::AddCardToHand(e) => {
                 AddCardToHandEventHandler::default()
                     .handle(e, game_state, self)
-                    .await
+                    .await;
             }
             GameEvent::StartGame(e) => {
                 StartGameEventHandler::default()
                     .handle(e, game_state, self)
-                    .await
+                    .await;
             }
             GameEvent::GainMana(e) => {
                 PlayerGainManaEventHandler::default()
                     .handle(e, game_state, self)
-                    .await
+                    .await;
             }
             GameEvent::SpendMana(e) => {
                 PlayerSpendManaEventHandler::default()
                     .handle(e, game_state, self)
-                    .await
+                    .await;
             }
             GameEvent::SummonCreatureFromHand(e) => {
                 SummonCreatureFromHandEventHandler::default()
                     .handle(e, game_state, self)
-                    .await
+                    .await;
             }
             GameEvent::PosTakesDamage(e) => {
                 PosTakesDamageHandler::default()
                     .handle(e, game_state, self)
-                    .await
+                    .await;
             }
             GameEvent::CreatureHealed(e) => {
                 CreatureHealedEventHandler::default()
                     .handle(e, game_state, self)
-                    .await
+                    .await;
             }
         }
     }

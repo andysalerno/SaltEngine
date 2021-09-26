@@ -105,6 +105,7 @@ pub struct UnitCardInstance {
 }
 
 impl UnitCardInstance {
+    #[must_use]
     pub fn new(definition: Box<dyn UnitCardDefinition>) -> Self {
         let id = UnitCardInstanceId::new();
 
@@ -124,25 +125,30 @@ impl UnitCardInstance {
         }
     }
 
+    #[must_use]
     pub fn attack(&self) -> i32 {
-        let attack_buf: i32 = self.buffs().iter().map(|b| b.attack_amount()).sum();
+        let attack_buf: i32 = self.buffs().iter().map(BuffView::attack_amount).sum();
 
         self.attack + attack_buf
     }
 
+    #[must_use]
     pub fn health(&self) -> i32 {
-        let health_buf: i32 = self.buffs().iter().map(|b| b.health_amount()).sum();
+        let health_buf: i32 = self.buffs().iter().map(BuffView::health_amount).sum();
         self.health + health_buf
     }
 
+    #[must_use]
     pub fn width(&self) -> usize {
         self.width
     }
 
+    #[must_use]
     pub fn buffs(&self) -> &[Box<dyn Buff>] {
         self.buffs.as_slice()
     }
 
+    #[must_use]
     pub fn definition(&self) -> &dyn UnitCardDefinition {
         self.definition.borrow()
     }
@@ -151,7 +157,7 @@ impl UnitCardInstance {
         self.health -= damage_amount as i32;
     }
 
-    /// Increases health by heal_amount, but not beyond the starting health from the
+    /// Increases health by `heal_amount`, but not beyond the starting health from the
     /// creature's definition.
     pub fn receive_heal(&mut self, heal_amount: usize) {
         let starting_health = self.health();
@@ -170,14 +176,17 @@ impl UnitCardInstance {
         self.buffs.retain(|i| i.instance_id() != buff_id);
     }
 
+    #[must_use]
     pub fn passive_effect_instance(&self) -> Option<&PassiveEffectInstance> {
         self.passive_effect.borrow().as_ref()
     }
 
+    #[must_use]
     pub fn id(&self) -> UnitCardInstanceId {
         self.id
     }
 
+    #[must_use]
     pub fn state(&self) -> Option<InstanceState> {
         self.state
     }
@@ -200,34 +209,42 @@ pub struct UnitCardInstancePlayerView {
 }
 
 impl UnitCardInstancePlayerView {
+    #[must_use]
     pub fn id(&self) -> UnitCardInstanceId {
         self.id
     }
 
+    #[must_use]
     pub fn definition(&self) -> &UnitCardDefinitionPlayerView {
         &self.definition
     }
 
+    #[must_use]
     pub fn buffs(&self) -> &Vec<BuffPlayerView> {
         &self.buffs
     }
 
+    #[must_use]
     pub fn passive_effect(&self) -> Option<&PassiveEffectInstancePlayerView> {
         self.passive_effect.as_ref()
     }
 
+    #[must_use]
     pub fn attack(&self) -> i32 {
         self.attack
     }
 
+    #[must_use]
     pub fn health(&self) -> i32 {
         self.health
     }
 
+    #[must_use]
     pub fn width(&self) -> usize {
         self.width
     }
 
+    #[must_use]
     pub fn state(&self) -> Option<InstanceState> {
         self.state
     }

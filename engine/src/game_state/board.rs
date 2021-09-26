@@ -16,7 +16,7 @@ enum PlayerAB {
 pub trait BoardSlotView<'a> {
     type CardInstanceView: UnitCardInstanceView<'a>;
 
-    /// The BoardPos this view represents.
+    /// The `BoardPos` this view represents.
     fn pos(&self) -> BoardPos;
 
     /// The view of the creature on this pos, if there is one.
@@ -51,6 +51,7 @@ impl BoardSlot {
         }
     }
 
+    #[must_use]
     pub fn has_creature(&self) -> bool {
         self.maybe_creature().is_some()
     }
@@ -59,6 +60,7 @@ impl BoardSlot {
         self.creature.take().unwrap()
     }
 
+    #[must_use]
     pub fn maybe_creature(&self) -> Option<&UnitCardInstance> {
         self.creature.as_ref()
     }
@@ -71,6 +73,7 @@ impl BoardSlot {
         self.creature = Some(creature);
     }
 
+    #[must_use]
     pub fn pos(&self) -> BoardPos {
         self.pos
     }
@@ -108,6 +111,7 @@ pub struct BoardPos {
 }
 
 impl BoardPos {
+    #[must_use]
     pub fn new(player_id: PlayerId, row_id: RowId, row_index: usize) -> Self {
         Self {
             player_id,
@@ -116,6 +120,7 @@ impl BoardPos {
         }
     }
 
+    #[must_use]
     pub fn hero_pos(player_id: PlayerId) -> Self {
         Self {
             player_id,
@@ -124,6 +129,7 @@ impl BoardPos {
         }
     }
 
+    #[must_use]
     pub fn row(&self) -> RowId {
         self.row_id
     }
@@ -149,7 +155,7 @@ pub trait BoardView<'a> {
     fn player_b_id(&self) -> PlayerId;
     fn slots(&self) -> &[Self::SlotView];
 
-    /// True if there are 'n_slots' starting at 'pos' within one row.
+    /// True if there are `n_slots` starting at 'pos' within one row.
     /// Does not consider whether the slots are occupied or not.
     fn is_range_in_row(&self, pos: BoardPos, n_slots: usize) -> bool {
         let row = self.player_row(pos.player_id, pos.row());
@@ -209,10 +215,6 @@ pub trait BoardView<'a> {
             PlayerAB::PlayerB => front_half(0..SLOTS_COUNT),
             PlayerAB::PlayerA => end_half(0..SLOTS_COUNT),
         }
-        // match self.player_ab(player_id) {
-        //     PlayerAB::PlayerB => front_half(0..SLOTS_COUNT),
-        //     PlayerAB::PlayerA => end_half(0..SLOTS_COUNT),
-        // }
     }
 
     /// The range for the given player's row.
@@ -307,6 +309,7 @@ pub struct Board {
 }
 
 impl Board {
+    #[must_use]
     pub fn new(_size: usize, player_a_id: PlayerId, player_b_id: PlayerId) -> Self {
         let mut slots = Vec::with_capacity(SLOTS_COUNT + 4);
 
@@ -359,80 +362,18 @@ impl Board {
         }
     }
 
-    // fn player_ab(&self, player_id: PlayerId) -> PlayerAB {
-    //     if player_id == self.player_a_id {
-    //         PlayerAB::PlayerA
-    //     } else if player_id == self.player_b_id {
-    //         PlayerAB::PlayerB
-    //     } else {
-    //         panic!("Unknown player id: {:?}", player_id)
-    //     }
-    // }
-
-    // /// The range for the entire board.
-    // fn board_range(&self, _player_id: PlayerId) -> std::ops::Range<usize> {
-    //     0..SLOTS_COUNT
-    // }
-
-    // /// The range for the given player.
-    // fn player_range(&self, player_id: PlayerId) -> std::ops::Range<usize> {
-    //     match self.player_ab(player_id) {
-    //         PlayerAB::PlayerB => front_half(0..SLOTS_COUNT),
-    //         PlayerAB::PlayerA => end_half(0..SLOTS_COUNT),
-    //     }
-    // }
-
-    /// The range for the given player's row.
-    // fn row_range(&self, player_id: PlayerId, row_id: RowId) -> std::ops::Range<usize> {
-    //     // Hero row is a special case
-    //     if row_id == RowId::Hero {
-    //         let player_offset = match self.player_ab(player_id) {
-    //             PlayerAB::PlayerA => 0,
-    //             PlayerAB::PlayerB => 2,
-    //         };
-
-    //         let start = SLOTS_COUNT + player_offset;
-    //         let end = start + 2;
-
-    //         return start..end;
-    //     }
-
-    //     let player_range = self.player_range(player_id);
-
-    //     match self.player_ab(player_id) {
-    //         PlayerAB::PlayerB => match row_id {
-    //             RowId::BackRow => front_half(player_range),
-    //             RowId::FrontRow => end_half(player_range),
-    //             RowId::Hero => panic!("hero is not part of row range"),
-    //         },
-    //         PlayerAB::PlayerA => match row_id {
-    //             RowId::FrontRow => front_half(player_range),
-    //             RowId::BackRow => end_half(player_range),
-    //             RowId::Hero => panic!("hero is not part of row range"),
-    //         },
-    //     }
-    // }
-
-    /// An iterator over all slots on the entire board (even empty ones).
-    // pub fn slots_iter(&self) -> impl Iterator<Item = &BoardSlot> {
-    //     self.slots.iter()
-    // }
-
     /// An iterator over all slots on the entire board (even empty ones).
     pub fn slots_iter_mut(&mut self) -> impl Iterator<Item = &mut BoardSlot> {
         self.slots.iter_mut()
     }
 
     /// An iterator over all the creatures on the board.
-    // pub fn creatures_iter(&self) -> impl Iterator<Item = &UnitCardInstance> {
-    //     self.slots_iter().creatures()
-    // }
-
-    /// An iterator over all the creatures on the board.
     pub fn creatures_iter_mut(&mut self) -> impl Iterator<Item = &mut UnitCardInstance> {
-        self.slots_iter_mut().filter_map(|s| s.maybe_creature_mut())
+        self.slots_iter_mut()
+            .filter_map(BoardSlot::maybe_creature_mut)
     }
 
+    #[must_use]
     pub fn player_side(&self, player_id: PlayerId) -> &[BoardSlot] {
         &self.slots[self.player_range(player_id)]
     }
@@ -442,6 +383,7 @@ impl Board {
         &mut self.slots[range]
     }
 
+    #[must_use]
     pub fn player_row(&self, player_id: PlayerId, row: RowId) -> &[BoardSlot] {
         &self.slots[self.row_range(player_id, row)]
     }
@@ -455,6 +397,7 @@ impl Board {
         self.slot_with_creature_mut(id).take_creature()
     }
 
+    #[must_use]
     pub fn companion_slot(&self, pos: BoardPos) -> &BoardSlot {
         let mut companion_pos = pos;
 
@@ -469,10 +412,12 @@ impl Board {
         self.slot_at_pos(companion_pos)
     }
 
+    #[must_use]
     pub fn companion_creature(&self, pos: BoardPos) -> Option<&UnitCardInstance> {
         self.companion_slot(pos).maybe_creature()
     }
 
+    #[must_use]
     pub fn hero(&self, player_id: PlayerId) -> &UnitCardInstance {
         BoardView::hero(self, player_id)
     }
@@ -495,35 +440,11 @@ impl Board {
         }
     }
 
-    /// The single slot where the creature instance exists.
-    // pub fn slot_with_creature(&self, id: UnitCardInstanceId) -> &BoardSlot {
-    //     self.slots_iter()
-    //         .filter(|s| s.maybe_creature().map(|c| c.id()) == Some(id))
-    //         .next()
-    //         .expect(&format!("Creature instance with id {:?} not found.", id))
-    // }
-
-    /// A slice starting at the slot where the creature instance exists,
-    /// and including all subsequent slots it occupies (if the creature has a Width of more than 1 slot).
-    // pub fn slots_with_creature(&self, id: UnitCardInstanceId) -> &[BoardSlot] {
-    //     let (start_index, slot) = self
-    //         .slots
-    //         .iter()
-    //         .enumerate()
-    //         .filter(|(_, slot)| slot.maybe_creature().map(|c| c.id()) == Some(id))
-    //         .next()
-    //         .expect(&format!("Creature instance with id {:?} not found.", id));
-
-    //     let creature_width = slot.maybe_creature().unwrap().width();
-
-    //     &self.slots[start_index..start_index + creature_width]
-    // }
-
     pub fn slot_with_creature_mut(&mut self, id: UnitCardInstanceId) -> &mut BoardSlot {
         self.slots_iter_mut()
             .collect::<Vec<_>>()
             .into_iter()
-            .find(|s| s.maybe_creature().map(|c| c.id()) == Some(id))
+            .find(|s| s.maybe_creature().map(UnitCardInstance::id) == Some(id))
             .unwrap_or_else(|| panic!("Creature instance with id {:?} not found.", id))
     }
 
@@ -532,21 +453,6 @@ impl Board {
             .find(|s| s.pos() == pos)
             .expect("The position was not a valid board slot.")
     }
-
-    // pub fn slot_at_pos(&self, pos: BoardPos) -> &BoardSlot {
-    //     self.slots_iter()
-    //         .filter(|s| s.pos() == pos)
-    //         .next()
-    //         .expect("The position was not a valid board slot.")
-    // }
-
-    // pub fn pos_with_creature(&self, id: UnitCardInstanceId) -> BoardPos {
-    //     self.slot_with_creature(id).pos()
-    // }
-
-    // pub fn creature_instance(&self, id: UnitCardInstanceId) -> &UnitCardInstance {
-    //     self.slot_with_creature(id).maybe_creature().unwrap()
-    // }
 
     pub fn creature_instance_mut(&mut self, id: UnitCardInstanceId) -> &mut UnitCardInstance {
         self.slot_with_creature_mut(id)
@@ -578,7 +484,9 @@ fn end_half(ops: std::ops::Range<usize>) -> std::ops::Range<usize> {
 }
 
 pub mod player_view {
-    use super::*;
+    use super::{
+        Board, BoardPos, BoardSlot, BoardSlotView, BoardView, Deserialize, PlayerId, Serialize,
+    };
     use crate::game_state::{card_instance::UnitCardInstancePlayerView, MakePlayerView};
 
     #[derive(Debug, Serialize, Clone, Deserialize)]
@@ -588,10 +496,12 @@ pub mod player_view {
     }
 
     impl BoardSlotPlayerView {
+        #[must_use]
         pub fn pos(&self) -> BoardPos {
             self.pos
         }
 
+        #[must_use]
         pub fn maybe_creature(&self) -> Option<&UnitCardInstancePlayerView> {
             self.creature.as_ref()
         }

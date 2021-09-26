@@ -5,7 +5,7 @@ use super::{
 };
 
 pub mod iter_helpers {
-    use super::*;
+    use super::{BoardSlotView, PlayerId, RowId, UnitCardInstanceId, UnitCardInstanceView};
 
     /// A trait containing helpful methods when iterating over board slots.
     pub trait IterAddons<'a, I, S: 'a>

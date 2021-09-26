@@ -1,3 +1,14 @@
+#![deny(clippy::all, nonstandard_style, future_incompatible)]
+#![warn(clippy::pedantic)]
+#![allow(
+    clippy::needless_pass_by_value,
+    clippy::module_name_repetitions,
+    clippy::unused_self,
+    clippy::cast_lossless,
+    clippy::module_inception,
+    dead_code
+)]
+
 mod attack_dog;
 mod emotional_support_dog;
 mod fraidy_cat;
@@ -24,7 +35,7 @@ pub use sleeping_dog::SleepingDog;
 
 #[cfg(test)]
 mod tests {
-    use mockall::{mock, predicate::*};
+    use mockall::mock;
     use salt_engine::{
         game_agent::{ClientNotifier, Prompter},
         game_logic::EventDispatcher,

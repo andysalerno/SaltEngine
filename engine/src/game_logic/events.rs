@@ -51,7 +51,7 @@ pub trait Event: Into<GameEvent> {
 }
 
 /// All possible game events.
-/// TODO: use EnumDispatch crate
+/// TODO: use `EnumDispatch` crate
 #[derive(Debug)]
 pub enum GameEvent {
     Attack(AttackEvent),
@@ -72,10 +72,12 @@ pub enum GameEvent {
 }
 
 impl GameEvent {
+    #[must_use]
     pub fn is_end_turn(&self) -> bool {
         matches!(self, GameEvent::EndTurn(_))
     }
 
+    #[must_use]
     pub fn maybe_client_event(&self) -> Option<ClientEventView> {
         match self {
             GameEvent::AddCardToHand(e) => e.maybe_client_event(),
@@ -99,9 +101,9 @@ impl GameEvent {
 
 /// The subset of game events that clients can
 /// provide the server over the course of the game.
-/// For example, a client can legally provide a TurnEnd event
+/// For example, a client can legally provide a `TurnEnd` event
 /// (they are allowed to end their own turn), but a client cannot
-/// directly provide a CreatureDestroyed event.
+/// directly provide a `CreatureDestroyed` event.
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub enum ClientActionEvent {
     EndTurn(EndTurnEvent),
@@ -137,6 +139,7 @@ impl From<ClientActionEvent> for GameEvent {
 }
 
 impl ClientActionEvent {
+    #[must_use]
     pub fn is_end_turn(&self) -> bool {
         matches!(self, ClientActionEvent::EndTurn(_))
     }

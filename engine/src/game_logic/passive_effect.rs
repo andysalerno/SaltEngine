@@ -75,6 +75,7 @@ pub struct PassiveEffectInstance {
 }
 
 impl PassiveEffectInstance {
+    #[must_use]
     pub fn new(
         definition: Box<dyn PassiveEffectDefinition>,
         originator_id: UnitCardInstanceId,
@@ -87,16 +88,19 @@ impl PassiveEffectInstance {
     }
 
     /// The unique ID of this instance of the passive effect.
+    #[must_use]
     pub fn instance_id(&self) -> PassiveEffectInstanceId {
         self.instance_id
     }
 
     /// The ID of the card instance that originated this passive effect.
+    #[must_use]
     pub fn originator_id(&self) -> UnitCardInstanceId {
         self.originator_id
     }
 
     /// The definition of the passive effect.
+    #[must_use]
     pub fn definition(&self) -> &dyn PassiveEffectDefinition {
         self.definition.borrow()
     }
@@ -118,6 +122,7 @@ impl<T> PassiveCompanionBuff<T>
 where
     T: Buff + Clone,
 {
+    #[must_use]
     pub fn new(definition_id: Id, buff: Box<T>) -> Self {
         Self {
             definition_id,
@@ -126,6 +131,7 @@ where
         }
     }
 
+    #[must_use]
     pub fn new_for_row(definition_id: Id, buff: Box<T>, row: RowId) -> Self {
         Self {
             definition_id,
@@ -170,7 +176,10 @@ where
 }
 
 pub mod player_view {
-    use super::*;
+    use super::{
+        Deserialize, Id, PassiveEffectDefinition, PassiveEffectInstance, PassiveEffectInstanceId,
+        PassiveEffectView, Serialize, UnitCardInstanceId,
+    };
     use crate::game_state::MakePlayerView;
 
     #[derive(Debug, Serialize, Deserialize, Clone)]

@@ -85,6 +85,7 @@ enum PlayerAB {
 const BOARD_LEN: usize = 6;
 
 impl GameState {
+    #[must_use]
     pub fn is_game_over(&self) -> bool {
         self.board().hero(self.player_a_id).health() <= 0
             || self.board().hero(self.player_b_id).health() <= 0
@@ -114,6 +115,7 @@ impl GameState {
         }
     }
 
+    #[must_use]
     pub fn initial_state(
         player_a_id: PlayerId,
         player_a_deck: Deck,
@@ -146,10 +148,12 @@ impl GameState {
         }
     }
 
+    #[must_use]
     pub fn cur_player_id(&self) -> PlayerId {
         self.cur_player_turn
     }
 
+    #[must_use]
     pub fn opponent_id(&self, player_id: PlayerId) -> PlayerId {
         match self.player_ab(player_id) {
             PlayerAB::PlayerA => self.player_b_id(),
@@ -167,6 +171,7 @@ impl GameState {
         next_player
     }
 
+    #[must_use]
     pub fn board(&self) -> &Board {
         &self.board
     }
@@ -175,15 +180,18 @@ impl GameState {
         &mut self.board
     }
 
+    #[must_use]
     pub fn player_a_id(&self) -> PlayerId {
         self.player_a_id
     }
 
+    #[must_use]
     pub fn player_b_id(&self) -> PlayerId {
         self.player_b_id
     }
 
     /// Given the ID of a player, returns the ID of the other player.
+    #[must_use]
     pub fn other_player(&self, player_id: PlayerId) -> PlayerId {
         match self.player_ab(player_id) {
             PlayerAB::PlayerA => self.player_b_id(),
@@ -191,6 +199,7 @@ impl GameState {
         }
     }
 
+    #[must_use]
     pub fn hand(&self, player_id: PlayerId) -> &Hand {
         match self.player_ab(player_id) {
             PlayerAB::PlayerA => &self.player_a_hand,
@@ -206,6 +215,7 @@ impl GameState {
         }
     }
 
+    #[must_use]
     pub fn deck(&self, player_id: PlayerId) -> &Deck {
         match self.player_ab(player_id) {
             PlayerAB::PlayerA => &self.player_a_deck,
@@ -264,6 +274,7 @@ impl GameState {
         (update)(creature);
     }
 
+    #[must_use]
     pub fn is_pos_defended(&self, pos: BoardPos) -> bool {
         if pos.row_id == RowId::FrontRow {
             return false;
@@ -277,6 +288,7 @@ impl GameState {
         }
     }
 
+    #[must_use]
     pub fn player_has_any_creature(&self, player_id: PlayerId) -> bool {
         self.board()
             .slots_iter()
@@ -326,30 +338,29 @@ impl GameState {
             })
             .collect::<Vec<_>>();
 
-        effects
-            .into_iter()
-            .for_each(|(instance_id, originator_id, updater)| {
-                (updater)(instance_id, originator_id, self);
-            });
+        for (instance_id, originator_id, updater) in effects {
+            (updater)(instance_id, originator_id, self);
+        }
     }
 
     /// Get a reference to the game state's player a mana.
+    #[must_use]
     pub fn player_a_mana(&self) -> u32 {
         self.player_a_mana
     }
 
     /// Get a reference to the game state's player b mana.
+    #[must_use]
     pub fn player_b_mana(&self) -> u32 {
         self.player_b_mana
     }
 }
 
 pub mod player_view {
+    use super::{debug, Deserialize, GameState, GameStateView, PlayerId, Serialize};
     use crate::game_state::{
         board::player_view::BoardPlayerView, hand::HandPlayerView, MakePlayerView,
     };
-
-    use super::*;
 
     #[derive(Debug, Serialize, Clone, Deserialize)]
     pub struct GameStatePlayerView {
@@ -399,23 +410,28 @@ pub mod player_view {
     }
 
     impl GameStatePlayerView {
+        #[must_use]
         pub fn cur_player_turn(&self) -> PlayerId {
             self.cur_player_turn
         }
 
         /// Get the game state player view's player id.
+        #[must_use]
         pub fn player_id(&self) -> PlayerId {
             self.player_id
         }
 
         /// Get the game state player view's opponent id.
+        #[must_use]
         pub fn opponent_id(&self) -> PlayerId {
             self.opponent_id
         }
+        #[must_use]
         pub fn board(&self) -> &BoardPlayerView {
             &self.board
         }
 
+        #[must_use]
         pub fn hand(&self) -> &HandPlayerView {
             &self.player_hand
         }

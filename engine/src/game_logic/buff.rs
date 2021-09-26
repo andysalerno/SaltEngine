@@ -6,6 +6,7 @@ use serde::{Deserialize, Serialize};
 pub struct BuffInstanceId(Id);
 
 impl BuffInstanceId {
+    #[must_use]
     pub fn new() -> Self {
         Self(Id::new())
     }
@@ -102,16 +103,19 @@ impl BuffBuilder {
         }
     }
 
+    #[must_use]
     pub fn attack(mut self, attack_buff_amount: i32) -> Self {
         self.attack_amount = attack_buff_amount;
         self
     }
 
+    #[must_use]
     pub fn health(mut self, health_buff_amount: i32) -> Self {
         self.health_amount = health_buff_amount;
         self
     }
 
+    #[must_use]
     pub fn build(self) -> BuiltBuff {
         BuiltBuff {
             attack_amount: self.attack_amount,
@@ -155,7 +159,7 @@ impl Buff for BuiltBuff {
 }
 
 pub mod player_view {
-    use super::*;
+    use super::{Buff, BuffInstanceId, BuffSourceId, BuffView, Deserialize, Id, Serialize};
     use crate::game_state::MakePlayerView;
 
     #[derive(Debug, Serialize, Clone, Deserialize)]

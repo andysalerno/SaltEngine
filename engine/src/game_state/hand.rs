@@ -63,6 +63,7 @@ impl Hand {
         self.cards.push(card);
     }
 
+    #[must_use]
     pub fn card(&self, id: UnitCardInstanceId) -> &UnitCardInstance {
         HandView::card(self, id)
     }

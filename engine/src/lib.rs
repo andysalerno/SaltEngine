@@ -5,7 +5,10 @@
     clippy::module_name_repetitions,
     clippy::unused_self,
     clippy::cast_lossless,
-    clippy::module_inception
+    clippy::module_inception,
+    clippy::missing_panics_doc,
+    clippy::similar_names,
+    dead_code
 )]
 
 pub mod game_agent;
