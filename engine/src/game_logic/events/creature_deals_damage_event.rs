@@ -10,7 +10,7 @@ pub struct CreatureDealsDamageEvent {
 }
 
 impl CreatureDealsDamageEvent {
-    pub fn new(
+    #[must_use] pub fn new(
         creature_id: UnitCardInstanceId,
         target_id: UnitCardInstanceId,
         damage_amount: usize,
@@ -22,15 +22,15 @@ impl CreatureDealsDamageEvent {
         }
     }
 
-    pub fn creature_id(&self) -> UnitCardInstanceId {
+    #[must_use] pub fn creature_id(&self) -> UnitCardInstanceId {
         self.creature_id
     }
 
-    pub fn target_id(&self) -> UnitCardInstanceId {
+    #[must_use] pub fn target_id(&self) -> UnitCardInstanceId {
         self.target_id
     }
 
-    pub fn damage_amount(&self) -> usize {
+    #[must_use] pub fn damage_amount(&self) -> usize {
         self.damage_amount
     }
 }

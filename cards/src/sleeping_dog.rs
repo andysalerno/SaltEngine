@@ -63,7 +63,7 @@ impl UnitCardDefinition for SleepingDog {
 }
 
 mod actions {
-    use super::*;
+    use super::{BoardView, EventDispatcher, GameState, RowId, UnitCardInstanceId, async_trait, buffs};
     use salt_engine::cards::actions::UponReceiveDamageAction;
 
     pub(super) struct ReceiveDamageAction;
@@ -111,7 +111,7 @@ mod actions {
 }
 
 mod buffs {
-    use super::*;
+    use super::{Buff, BuffInstanceId, BuffSourceId, Id, UnitCardInstanceId};
 
     #[derive(Debug)]
     pub(super) struct SleepingDogBuff {

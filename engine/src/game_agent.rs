@@ -4,7 +4,7 @@ use crate::game_state::{GameStatePlayerView};
 use async_trait::async_trait;
 
 #[cfg(test)]
-use mockall::{automock, predicate::*};
+use mockall::{automock, predicate::str};
 
 /// A trait representing an player agent that can decide what
 /// action to take for a given game state.

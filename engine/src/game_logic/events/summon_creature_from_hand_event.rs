@@ -18,7 +18,7 @@ pub struct SummonCreatureFromHandEvent {
 }
 
 impl SummonCreatureFromHandEvent {
-    pub fn new(player_id: PlayerId, board_pos: BoardPos, hand_card_id: UnitCardInstanceId) -> Self {
+    #[must_use] pub fn new(player_id: PlayerId, board_pos: BoardPos, hand_card_id: UnitCardInstanceId) -> Self {
         Self {
             player_id,
             board_pos,
@@ -26,15 +26,15 @@ impl SummonCreatureFromHandEvent {
         }
     }
 
-    pub fn player_id(&self) -> PlayerId {
+    #[must_use] pub fn player_id(&self) -> PlayerId {
         self.player_id
     }
 
-    pub fn board_pos(&self) -> BoardPos {
+    #[must_use] pub fn board_pos(&self) -> BoardPos {
         self.board_pos
     }
 
-    pub fn hand_card_id(&self) -> UnitCardInstanceId {
+    #[must_use] pub fn hand_card_id(&self) -> UnitCardInstanceId {
         self.hand_card_id
     }
 }
@@ -77,7 +77,7 @@ pub struct SummonCreatureFromHandClientEvent {
 }
 
 mod validation {
-    use super::*;
+    use super::{BoardView, GameStateView, HandView, Position, RowId, SummonCreatureFromHandEvent, UnitCardDefinitionView, UnitCardInstanceView, debug};
 
     pub fn validate_slots_available<'a>(
         event: &SummonCreatureFromHandEvent,

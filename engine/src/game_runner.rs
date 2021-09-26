@@ -34,7 +34,7 @@ pub struct GameRunner {
 }
 
 impl GameRunner {
-    pub fn new(
+    #[must_use] pub fn new(
         player_a_handler: Box<dyn GameClient>,
         player_b_handler: Box<dyn GameClient>,
         game_state: GameState,

@@ -9,18 +9,18 @@ pub struct PlayerGainManaEvent {
 }
 
 impl PlayerGainManaEvent {
-    pub fn new(player_id: PlayerId, gain_count: u32) -> Self {
+    #[must_use] pub fn new(player_id: PlayerId, gain_count: u32) -> Self {
         Self {
             player_id,
             gain_count,
         }
     }
 
-    pub fn player_id(&self) -> PlayerId {
+    #[must_use] pub fn player_id(&self) -> PlayerId {
         self.player_id
     }
 
-    pub fn gain_count(&self) -> u32 {
+    #[must_use] pub fn gain_count(&self) -> u32 {
         self.gain_count
     }
 }

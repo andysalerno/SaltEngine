@@ -14,15 +14,15 @@ pub struct AddCardToHandEvent {
 }
 
 impl AddCardToHandEvent {
-    pub fn new(player_id: PlayerId, card: UnitCardInstance) -> Self {
+    #[must_use] pub fn new(player_id: PlayerId, card: UnitCardInstance) -> Self {
         Self { player_id, card }
     }
 
-    pub fn player_id(&self) -> PlayerId {
+    #[must_use] pub fn player_id(&self) -> PlayerId {
         self.player_id
     }
 
-    pub fn take_card(self) -> UnitCardInstance {
+    #[must_use] pub fn take_card(self) -> UnitCardInstance {
         self.card
     }
 }
