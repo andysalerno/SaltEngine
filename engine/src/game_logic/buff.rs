@@ -11,6 +11,12 @@ impl BuffInstanceId {
     }
 }
 
+impl Default for BuffInstanceId {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[derive(Debug, Copy, Clone, PartialEq, Serialize, Deserialize)]
 pub enum BuffSourceId {
     Passive(PassiveEffectInstanceId),
@@ -73,10 +79,7 @@ pub trait Buff: Sync + Send + std::fmt::Debug {
     fn definition_id(&self) -> Id;
 
     fn is_from_passive(&self) -> bool {
-        match self.source_id() {
-            BuffSourceId::Passive(_) => true,
-            _ => false,
-        }
+        matches!(self.source_id(), BuffSourceId::Passive(_))
     }
 }
 

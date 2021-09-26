@@ -34,7 +34,7 @@ pub mod iter_helpers {
         fn for_player(self, player_id: PlayerId) -> PlayerFilter<'a, I, S> {
             PlayerFilter {
                 iter: self,
-                player_id: player_id,
+                player_id,
             }
         }
 

@@ -1,3 +1,11 @@
+#![deny(clippy::all, nonstandard_style, future_incompatible)]
+#![warn(clippy::pedantic)]
+#![allow(
+    clippy::needless_pass_by_value,
+    clippy::unused_self,
+    clippy::cast_lossless
+)]
+
 pub mod connection;
 pub mod messages;
 mod network_prompter;

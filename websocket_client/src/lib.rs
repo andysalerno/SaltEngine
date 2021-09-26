@@ -1,3 +1,10 @@
+#![deny(clippy::all, nonstandard_style, future_incompatible)]
+#![warn(clippy::pedantic)]
+#![allow(
+    clippy::needless_pass_by_value,
+    clippy::unused_self,
+    clippy::cast_lossless
+)]
 use log::info;
 use salt_engine::{game_agent::ClientNotifier, game_runner::GameClient, game_state::PlayerId};
 use smol::net::TcpStream;
