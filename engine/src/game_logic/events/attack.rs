@@ -10,15 +10,18 @@ pub struct AttackEvent {
 }
 
 impl AttackEvent {
-    #[must_use] pub fn new(attacker: UnitCardInstanceId, target: UnitCardInstanceId) -> Self {
+    #[must_use]
+    pub fn new(attacker: UnitCardInstanceId, target: UnitCardInstanceId) -> Self {
         Self { attacker, target }
     }
 
-    #[must_use] pub fn attacker(&self) -> UnitCardInstanceId {
+    #[must_use]
+    pub fn attacker(&self) -> UnitCardInstanceId {
         self.attacker
     }
 
-    #[must_use] pub fn target(&self) -> UnitCardInstanceId {
+    #[must_use]
+    pub fn target(&self) -> UnitCardInstanceId {
         self.target
     }
 }

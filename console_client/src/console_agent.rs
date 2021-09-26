@@ -441,9 +441,10 @@ impl ConsolePrompter {
         } else if let Some((index, _)) = my_back_chars.enumerate().find(|&(_, c)| c == input_c) {
             BoardPos::new(game_state.player_id(), RowId::BackRow, index)
         } else {
-            return Err(ConsoleError::UserInputError(
-                format!("The input char {} did not match any position", input_c),
-            ));
+            return Err(ConsoleError::UserInputError(format!(
+                "The input char {} did not match any position",
+                input_c
+            )));
         };
 
         Ok(board_pos)

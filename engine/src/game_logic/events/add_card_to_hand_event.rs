@@ -1,8 +1,4 @@
-
-
-use crate::{
-    game_state::{MakePlayerView, PlayerId, UnitCardInstance, UnitCardInstancePlayerView},
-};
+use crate::game_state::{MakePlayerView, PlayerId, UnitCardInstance, UnitCardInstancePlayerView};
 use serde::{Deserialize, Serialize};
 
 use super::{Event, GameEvent};
@@ -14,15 +10,18 @@ pub struct AddCardToHandEvent {
 }
 
 impl AddCardToHandEvent {
-    #[must_use] pub fn new(player_id: PlayerId, card: UnitCardInstance) -> Self {
+    #[must_use]
+    pub fn new(player_id: PlayerId, card: UnitCardInstance) -> Self {
         Self { player_id, card }
     }
 
-    #[must_use] pub fn player_id(&self) -> PlayerId {
+    #[must_use]
+    pub fn player_id(&self) -> PlayerId {
         self.player_id
     }
 
-    #[must_use] pub fn take_card(self) -> UnitCardInstance {
+    #[must_use]
+    pub fn take_card(self) -> UnitCardInstance {
         self.card
     }
 }

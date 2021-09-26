@@ -1,5 +1,3 @@
-
-
 use async_trait::async_trait;
 use log::info;
 use salt_engine::{

@@ -8,11 +8,13 @@ pub struct CreatureDestroyedEvent {
 }
 
 impl CreatureDestroyedEvent {
-    #[must_use] pub fn new(creature_id: UnitCardInstanceId) -> Self {
+    #[must_use]
+    pub fn new(creature_id: UnitCardInstanceId) -> Self {
         Self { creature_id }
     }
 
-    #[must_use] pub fn creature_id(&self) -> UnitCardInstanceId {
+    #[must_use]
+    pub fn creature_id(&self) -> UnitCardInstanceId {
         self.creature_id
     }
 }

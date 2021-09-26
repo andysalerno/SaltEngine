@@ -1,6 +1,5 @@
 use crate::game_state::{
-    board::BoardPos, MakePlayerView, PlayerId, UnitCardInstance,
-    UnitCardInstancePlayerView,
+    board::BoardPos, MakePlayerView, PlayerId, UnitCardInstance, UnitCardInstancePlayerView,
 };
 use serde::{Deserialize, Serialize};
 
@@ -14,7 +13,8 @@ pub struct CreatureSetEvent {
 }
 
 impl CreatureSetEvent {
-    #[must_use] pub fn new(player_id: PlayerId, card: UnitCardInstance, target_position: BoardPos) -> Self {
+    #[must_use]
+    pub fn new(player_id: PlayerId, card: UnitCardInstance, target_position: BoardPos) -> Self {
         Self {
             player_id,
             card,
@@ -22,19 +22,23 @@ impl CreatureSetEvent {
         }
     }
 
-    #[must_use] pub fn player_id(&self) -> PlayerId {
+    #[must_use]
+    pub fn player_id(&self) -> PlayerId {
         self.player_id
     }
 
-    #[must_use] pub fn card(&self) -> &UnitCardInstance {
+    #[must_use]
+    pub fn card(&self) -> &UnitCardInstance {
         &self.card
     }
 
-    #[must_use] pub fn take_card(self) -> UnitCardInstance {
+    #[must_use]
+    pub fn take_card(self) -> UnitCardInstance {
         self.card
     }
 
-    #[must_use] pub fn target_position(&self) -> BoardPos {
+    #[must_use]
+    pub fn target_position(&self) -> BoardPos {
         self.target_position
     }
 }
