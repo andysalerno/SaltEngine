@@ -19,7 +19,7 @@ impl EventHandler for AddCardToHandEventHandler {
 
     async fn handle(
         &self,
-        event: AddCardToHandEvent,
+        event: &AddCardToHandEvent,
         game_state: &mut GameState,
         dispatcher: &mut EventDispatcher,
     ) {
@@ -27,7 +27,8 @@ impl EventHandler for AddCardToHandEventHandler {
         let event_view: AddCardToHandClientEvent = event.player_view(player_id);
         let client_event = ClientEventView::AddCardToHand(event_view);
 
-        game_state.hand_mut(player_id).add_card(event.take_card());
+        todo!();
+        // game_state.hand_mut(player_id).add_card(event.take_card());
 
         info!(
             "Player {:?} adds a card to hand. Next hand size: {}",

@@ -70,7 +70,7 @@ struct DeathAction;
 impl UponDeathAction for DeathAction {
     async fn action(
         &self,
-        instance: &mut UnitCardInstance,
+        instance: &UnitCardInstance,
         died_at_pos: BoardPos,
         state: &mut GameState,
         dispatcher: &mut EventDispatcher,

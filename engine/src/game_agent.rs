@@ -45,3 +45,32 @@ impl std::fmt::Debug for dyn ClientNotifier {
         write!(f, "{{ClientNotifier}}")
     }
 }
+
+#[cfg(test)]
+pub mod tests {
+    use super::{ClientNotifier, Prompter};
+    use crate::game_state::{board::BoardPos, GameStatePlayerView};
+    use async_trait::async_trait;
+    use mockall::mock;
+
+    mock! {
+        pub(crate) TestPrompter {}
+        impl Prompter for TestPrompter {
+            fn prompt_slot(&self, game_state: &GameStatePlayerView) -> BoardPos;
+            fn prompt_player_slot(&self, game_state: &GameStatePlayerView) -> BoardPos;
+            fn prompt_opponent_slot(&self, game_state: &GameStatePlayerView) -> BoardPos;
+            fn prompt_creature_pos(&self, game_state: &GameStatePlayerView) -> BoardPos;
+            fn prompt_player_creature_pos(&self, game_state: &GameStatePlayerView) -> BoardPos;
+            fn prompt_opponent_creature_pos(&self, game_state: &GameStatePlayerView) -> BoardPos;
+        }
+    }
+
+    pub(crate) struct StubNotifier;
+
+    #[async_trait]
+    impl ClientNotifier for StubNotifier {
+        async fn notify(&self, _event: crate::game_logic::events::ClientEventView) {
+            // Do nothing for the stub
+        }
+    }
+}

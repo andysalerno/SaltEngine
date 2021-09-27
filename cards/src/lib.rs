@@ -12,6 +12,7 @@
 mod attack_dog;
 mod emotional_support_dog;
 mod fraidy_cat;
+mod grandma_the_soother;
 mod indoor_cat;
 mod outdoor_cat;
 mod pawn;
@@ -24,6 +25,7 @@ mod sleeping_dog;
 pub use attack_dog::AttackDog;
 pub use emotional_support_dog::EmotionalSupportDog;
 pub use fraidy_cat::FraidyCat;
+pub use grandma_the_soother::GrandmaTheSoother;
 pub use indoor_cat::IndoorCat;
 pub use outdoor_cat::OutdoorCat;
 pub use pawn::Pawn;
@@ -44,7 +46,7 @@ mod tests {
     };
 
     mock! {
-        pub TestPrompter {}
+        pub(crate) TestPrompter {}
         impl Prompter for TestPrompter {
             fn prompt_slot(&self, game_state: &GameStatePlayerView) -> BoardPos;
             fn prompt_player_slot(&self, game_state: &GameStatePlayerView) -> BoardPos;
@@ -60,7 +62,7 @@ mod tests {
     #[async_trait]
     impl ClientNotifier for TestClientNotifier {
         async fn notify(&self, _event: salt_engine::game_logic::events::ClientEventView) {
-            // Doing nothing for now
+            // Doing nothing for tests
         }
     }
 

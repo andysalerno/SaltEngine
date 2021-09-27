@@ -15,7 +15,7 @@ impl EventHandler for CreatureHealedEventHandler {
 
     async fn handle(
         &self,
-        event: CreatureHealedEvent,
+        event: &CreatureHealedEvent,
         game_state: &mut GameState,
         _dispatcher: &mut EventDispatcher,
     ) {

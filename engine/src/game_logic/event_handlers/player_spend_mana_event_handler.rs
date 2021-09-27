@@ -15,7 +15,7 @@ impl EventHandler for PlayerSpendManaEventHandler {
 
     async fn handle(
         &self,
-        event: PlayerSpendManaEvent,
+        event: &PlayerSpendManaEvent,
         game_state: &mut GameState,
         _dispatcher: &mut EventDispatcher,
     ) {

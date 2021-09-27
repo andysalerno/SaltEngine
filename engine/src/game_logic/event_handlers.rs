@@ -1,3 +1,4 @@
+mod add_buff_to_card_instance_handler;
 mod add_card_to_hand_event_handler;
 mod attack_event_handler;
 mod creature_deals_damage_handler;
@@ -14,6 +15,7 @@ mod start_game_event_handler;
 mod summon_creature_from_hand_event_handler;
 mod turn_start_event_handler;
 
+pub use add_buff_to_card_instance_handler::AddBuffToCardInstanceHandler;
 pub use add_card_to_hand_event_handler::AddCardToHandEventHandler;
 pub use attack_event_handler::AttackEventHandler;
 pub use creature_deals_damage_handler::CreatureDealsDamageHandler;
@@ -39,7 +41,7 @@ pub trait EventHandler {
     type Event: Event;
     async fn handle(
         &self,
-        event: Self::Event,
+        event: &Self::Event,
         game_state: &mut GameState,
         dispatcher: &mut EventDispatcher,
     );

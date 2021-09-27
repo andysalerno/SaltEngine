@@ -94,7 +94,7 @@ struct SummonAction;
 impl UponSummonAction for SummonAction {
     async fn action(
         &self,
-        instance: &mut UnitCardInstance,
+        _card_id: UnitCardInstanceId,
         summoned_to_pos: BoardPos,
         state: &mut GameState,
         dispatcher: &mut EventDispatcher,
@@ -105,6 +105,7 @@ impl UponSummonAction for SummonAction {
             .player_prompter(summoned_to_pos.player_id)
             .prompt_slot(&state.player_view(summoner));
 
-        instance.set_state(Some(InstanceState::Pos(pos)));
+        todo!();
+        // instance.set_state(Some(InstanceState::Pos(pos)));
     }
 }

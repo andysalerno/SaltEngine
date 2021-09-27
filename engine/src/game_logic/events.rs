@@ -1,3 +1,4 @@
+mod add_buff_to_card_instance_event;
 mod add_card_to_hand_event;
 mod attack;
 mod creature_deals_damage_event;
@@ -14,6 +15,7 @@ mod start_game_event;
 mod summon_creature_from_hand_event;
 mod turn_start_event;
 
+pub use add_buff_to_card_instance_event::AddBuffToCardInstanceEvent;
 pub use add_card_to_hand_event::{AddCardToHandClientEvent, AddCardToHandEvent};
 pub use attack::AttackEvent;
 pub use creature_deals_damage_event::CreatureDealsDamageEvent;
@@ -57,6 +59,7 @@ pub enum GameEvent {
     Attack(AttackEvent),
     EndTurn(EndTurnEvent),
     Summon(CreatureSetEvent),
+    AddBuffToCardInstance(AddBuffToCardInstanceEvent),
     CreatureDealsDamage(CreatureDealsDamageEvent),
     CreatureTakesDamage(CreatureTakesDamageEvent),
     CreatureDestroyed(CreatureDestroyedEvent),
@@ -95,6 +98,7 @@ impl GameEvent {
             GameEvent::SpendMana(e) => e.maybe_client_event(),
             GameEvent::PosTakesDamage(e) => e.maybe_client_event(),
             GameEvent::CreatureHealed(e) => e.maybe_client_event(),
+            GameEvent::AddBuffToCardInstance(e) => e.maybe_client_event(),
         }
     }
 }
@@ -166,6 +170,7 @@ impl Event for GameEvent {
             GameEvent::SummonCreatureFromHand(e) => e.validate(game_state),
             GameEvent::PosTakesDamage(e) => e.validate(game_state),
             GameEvent::CreatureHealed(e) => e.validate(game_state),
+            GameEvent::AddBuffToCardInstance(e) => e.validate(game_state),
         }
     }
 }

@@ -19,7 +19,7 @@ impl EventHandler for TurnStartHandler {
 
     async fn handle(
         &self,
-        _event: TurnStartEvent,
+        _event: &TurnStartEvent,
         game_state: &mut GameState,
         dispatcher: &mut EventDispatcher,
     ) {

@@ -10,6 +10,7 @@ use super::{
 };
 use crate::{
     game_agent::{ClientNotifier, Prompter},
+    game_logic::event_handlers::AddBuffToCardInstanceHandler,
     game_state::{GameState, PlayerId},
 };
 use futures::join;
@@ -59,7 +60,9 @@ impl EventDispatcher {
         while let Some(event) = self.stack.pop() {
             game_state.evaluate_passives();
 
-            self.handle(event, game_state).await;
+            // self.pre_handle(event, game_state).await;
+            self.handle(&event, game_state).await;
+            // self.post_handle(event, game_state).await;
 
             game_state.evaluate_passives();
         }
@@ -101,7 +104,11 @@ impl EventDispatcher {
         }
     }
 
-    async fn handle(&mut self, event: GameEvent, game_state: &mut GameState) {
+    async fn pre_handle(&mut self, event: GameEvent, game_state: &mut GameState) {}
+
+    async fn post_handle(&mut self, event: GameEvent, game_state: &mut GameState) {}
+
+    async fn handle(&mut self, event: &GameEvent, game_state: &mut GameState) {
         debug!("Dispatching event: {:?}", event);
 
         let maybe_client_event = event.maybe_client_event();
@@ -195,6 +202,11 @@ impl EventDispatcher {
                     .handle(e, game_state, self)
                     .await;
             }
+            GameEvent::AddBuffToCardInstance(e) => {
+                AddBuffToCardInstanceHandler::default()
+                    .handle(e, game_state, self)
+                    .await;
+            }
         }
     }
 
@@ -204,9 +216,50 @@ impl EventDispatcher {
         dispatcher: &mut EventDispatcher,
     ) {
         let handler = H::default();
-        handler.handle(event, game_state, dispatcher).await;
+        handler.handle(&event, game_state, dispatcher).await;
     }
 }
 
 #[cfg(test)]
-mod test {}
+mod tests {
+    use super::EventDispatcher;
+    use crate::game_agent::tests::{MockTestPrompter, StubNotifier};
+    use crate::game_state::{Deck, GameState, PlayerId};
+
+    pub(crate) fn make_test_state() -> GameState {
+        let player_a_deck = Deck::new(Vec::new());
+        let player_b_deck = Deck::new(Vec::new());
+
+        let mut state = GameState::initial_state(
+            PlayerId::new(),
+            player_a_deck,
+            PlayerId::new(),
+            player_b_deck,
+        );
+
+        state.raise_mana_limit(state.player_a_id(), 10);
+        state.raise_mana_limit(state.player_b_id(), 10);
+        state.refresh_player_mana(state.player_a_id());
+        state.refresh_player_mana(state.player_b_id());
+
+        state
+    }
+
+    #[test]
+    fn dispatcher_uses_stack_ordering() {
+        let prompter_a = Box::new(MockTestPrompter::new());
+        let prompter_b = Box::new(MockTestPrompter::new());
+
+        let notifier_a = Box::new(StubNotifier);
+        let notifier_b = Box::new(StubNotifier);
+
+        let dispatcher = EventDispatcher::new(
+            notifier_a,
+            prompter_a,
+            PlayerId::new(),
+            notifier_b,
+            prompter_b,
+            PlayerId::new(),
+        );
+    }
+}

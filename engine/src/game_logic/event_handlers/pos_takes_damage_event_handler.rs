@@ -20,7 +20,7 @@ impl EventHandler for PosTakesDamageHandler {
 
     async fn handle(
         &self,
-        event: PosTakesDamageEvent,
+        event: &PosTakesDamageEvent,
         game_state: &mut GameState,
         dispatcher: &mut EventDispatcher,
     ) {

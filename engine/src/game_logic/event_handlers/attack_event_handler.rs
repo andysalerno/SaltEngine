@@ -27,11 +27,11 @@ impl EventHandler for AttackEventHandler {
 
     async fn handle(
         &self,
-        event: AttackEvent,
+        event: &AttackEvent,
         game_state: &mut GameState,
         dispatcher: &mut EventDispatcher,
     ) {
-        validate(&event, game_state);
+        validate(event, game_state);
 
         {
             let attacker_instance = game_state.board().creature_instance(event.attacker());

@@ -19,7 +19,7 @@ impl EventHandler for SummonCreatureFromHandEventHandler {
 
     async fn handle(
         &self,
-        event: SummonCreatureFromHandEvent,
+        event: &SummonCreatureFromHandEvent,
         game_state: &mut GameState,
         dispatcher: &mut EventDispatcher,
     ) {
@@ -27,7 +27,7 @@ impl EventHandler for SummonCreatureFromHandEventHandler {
 
         // Take the card out of the player's hand
         debug!("Taking card from player's hand.");
-        let mut card_from_hand = game_state
+        let card_from_hand = game_state
             .hand_mut(player_id)
             .take_card(event.hand_card_id());
 
@@ -36,10 +36,14 @@ impl EventHandler for SummonCreatureFromHandEventHandler {
             info!("Player summons {} ({:?})", creature_name, player_id);
         }
 
+        let mana_amount = card_from_hand.definition().cost();
+        let upon_summon = card_from_hand.definition().upon_summon();
+        let card_instance_id = card_from_hand.id();
+
+        game_state.set_purgatory(card_from_hand);
+
         // Spend the mana
         {
-            let mana_amount = card_from_hand.definition().cost();
-
             dispatcher
                 .dispatch(
                     PlayerSpendManaEvent::new(player_id, mana_amount as u32),
@@ -52,9 +56,8 @@ impl EventHandler for SummonCreatureFromHandEventHandler {
 
         // Perform the "upon summon"
         {
-            let upon_summon = card_from_hand.definition().upon_summon();
             upon_summon
-                .action(&mut card_from_hand, pos, game_state, dispatcher)
+                .action(card_instance_id, pos, game_state, dispatcher)
                 .await;
         }
 
@@ -62,7 +65,7 @@ impl EventHandler for SummonCreatureFromHandEventHandler {
         {
             dispatcher
                 .dispatch(
-                    CreatureSetEvent::new(player_id, card_from_hand, pos),
+                    CreatureSetEvent::new(player_id, card_instance_id, pos),
                     game_state,
                 )
                 .await;

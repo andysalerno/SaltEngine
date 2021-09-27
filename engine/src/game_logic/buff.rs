@@ -127,7 +127,7 @@ impl BuffBuilder {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct BuiltBuff {
     attack_amount: i32,
     health_amount: i32,

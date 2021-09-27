@@ -19,7 +19,7 @@ impl EventHandler for EndTurnEventHandler {
 
     async fn handle(
         &self,
-        _event: EndTurnEvent,
+        _event: &EndTurnEvent,
         game_state: &mut GameState,
         dispatcher: &mut EventDispatcher,
     ) {

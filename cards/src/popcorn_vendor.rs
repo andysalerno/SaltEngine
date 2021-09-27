@@ -2,12 +2,12 @@ use async_trait::async_trait;
 use salt_engine::{
     cards::{actions::UponSummonAction, CardDefinition, Position, UnitCardDefinition},
     game_logic::{
-        BuffBuilder, EventDispatcher, PassiveCompanionBuff, PassiveEffectDefinition,
-        PassiveEffectInstanceId,
+        events::AddBuffToCardInstanceEvent, BuffBuilder, EventDispatcher, PassiveCompanionBuff,
+        PassiveEffectDefinition, PassiveEffectInstanceId,
     },
     game_state::{
         board::{BoardPos, RowId},
-        GameState, UnitCardInstance,
+        GameState, UnitCardInstance, UnitCardInstanceId,
     },
     id::Id,
 };
@@ -81,16 +81,16 @@ struct SummonAction;
 impl UponSummonAction for SummonAction {
     async fn action(
         &self,
-        instance: &mut UnitCardInstance,
+        card_id: UnitCardInstanceId,
         pos: BoardPos,
-        _state: &mut GameState,
-        _dispatcher: &mut EventDispatcher,
+        game_state: &mut GameState,
+        dispatcher: &mut EventDispatcher,
     ) {
         if pos.row() == RowId::FrontRow {
             // Front: buffs self
-            let buff = BuffBuilder::new(instance.id(), Id::new()).attack(3).build();
-
-            instance.add_buff(Box::new(buff));
+            let buff = BuffBuilder::new(card_id, Id::new()).attack(3).build();
+            let event = AddBuffToCardInstanceEvent::new(buff, card_id);
+            dispatcher.dispatch(event, game_state).await;
         }
     }
 }

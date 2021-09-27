@@ -14,23 +14,30 @@ impl EventHandler for CreatureSetEventHandler {
 
     async fn handle(
         &self,
-        event: CreatureSetEvent,
+        event: &CreatureSetEvent,
         game_state: &mut GameState,
         _dispatcher: &mut EventDispatcher,
     ) {
         let player_id = event.player_id();
         let target_position = event.target_position();
-        let instance = event.take_card();
+
+        let card_instance = game_state.take_from_purgatory();
+
+        if card_instance.id() != event.card_id() {
+            panic!(
+                "Took a card from purgatory, but it wasn't the one in the summon event request."
+            );
+        }
 
         info!(
             "{} is set on pos {:?} by player {:?}",
-            instance.definition().title(),
+            card_instance.definition().title(),
             target_position,
             player_id
         );
 
         game_state
             .board_mut()
-            .set_creature_at_pos(target_position, instance);
+            .set_creature_at_pos(target_position, card_instance);
     }
 }

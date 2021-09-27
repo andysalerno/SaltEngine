@@ -1,5 +1,6 @@
 use crate::game_state::{
-    board::BoardPos, MakePlayerView, PlayerId, UnitCardInstance, UnitCardInstancePlayerView,
+    board::BoardPos, MakePlayerView, PlayerId, UnitCardInstance, UnitCardInstanceId,
+    UnitCardInstancePlayerView,
 };
 use serde::{Deserialize, Serialize};
 
@@ -8,16 +9,20 @@ use super::{ClientEventView, Event, GameEvent};
 #[derive(Debug)]
 pub struct CreatureSetEvent {
     player_id: PlayerId,
-    card: UnitCardInstance,
+    card_id: UnitCardInstanceId,
     target_position: BoardPos,
 }
 
 impl CreatureSetEvent {
     #[must_use]
-    pub fn new(player_id: PlayerId, card: UnitCardInstance, target_position: BoardPos) -> Self {
+    pub fn new(
+        player_id: PlayerId,
+        card_id: UnitCardInstanceId,
+        target_position: BoardPos,
+    ) -> Self {
         Self {
             player_id,
-            card,
+            card_id,
             target_position,
         }
     }
@@ -28,13 +33,8 @@ impl CreatureSetEvent {
     }
 
     #[must_use]
-    pub fn card(&self) -> &UnitCardInstance {
-        &self.card
-    }
-
-    #[must_use]
-    pub fn take_card(self) -> UnitCardInstance {
-        self.card
+    pub fn card_id(&self) -> UnitCardInstanceId {
+        self.card_id
     }
 
     #[must_use]
@@ -46,7 +46,7 @@ impl CreatureSetEvent {
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct CreatureSetClientEvent {
     pub player_id: PlayerId,
-    pub card: UnitCardInstancePlayerView,
+    pub card_id: UnitCardInstanceId,
     pub pos: BoardPos,
 }
 
@@ -54,7 +54,7 @@ impl Event for CreatureSetEvent {
     fn maybe_client_event(&self) -> Option<ClientEventView> {
         Some(ClientEventView::UnitSet(CreatureSetClientEvent {
             player_id: self.player_id,
-            card: self.card.player_view(self.player_id),
+            card_id: self.card_id,
             pos: self.target_position,
         }))
     }

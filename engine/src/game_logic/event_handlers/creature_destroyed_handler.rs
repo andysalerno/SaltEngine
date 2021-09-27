@@ -16,12 +16,12 @@ impl EventHandler for CreatureDestroyedEventHandler {
 
     async fn handle(
         &self,
-        event: CreatureDestroyedEvent,
+        event: &CreatureDestroyedEvent,
         game_state: &mut GameState,
         dispatcher: &mut EventDispatcher,
     ) {
         let pos = game_state.board().pos_with_creature(event.creature_id());
-        let mut creature_instance = game_state
+        let creature_instance = game_state
             .board_mut()
             .take_creature_by_id(event.creature_id());
 
@@ -34,7 +34,7 @@ impl EventHandler for CreatureDestroyedEventHandler {
         let upon_death = creature_instance.definition().upon_death();
 
         upon_death
-            .action(&mut creature_instance, pos, game_state, dispatcher)
+            .action(&creature_instance, pos, game_state, dispatcher)
             .await;
     }
 }

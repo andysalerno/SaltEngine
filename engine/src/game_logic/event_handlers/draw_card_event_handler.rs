@@ -19,7 +19,7 @@ impl EventHandler for DrawCardEventHandler {
 
     async fn handle(
         &self,
-        event: DrawCardEvent,
+        event: &DrawCardEvent,
         game_state: &mut GameState,
         dispatcher: &mut EventDispatcher,
     ) {

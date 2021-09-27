@@ -1,4 +1,4 @@
-use super::{EventDispatcher, PassiveEffectDefinition};
+use super::{events::GameEvent, EventDispatcher, PassiveEffectDefinition};
 use crate::game_state::{
     board::BoardPos, GameState, MakePlayerView, PlayerId, UnitCardInstance, UnitCardInstanceId,
 };
@@ -15,7 +15,7 @@ pub enum Position {
     /// The back side of the board.
     Back,
 
-    /// Either the front or the back sides of the board..
+    /// Either the front or the back sides of the board.
     Either,
 }
 
@@ -58,7 +58,31 @@ pub trait UnitCardDefinition: CardDefinition {
         Box::new(actions::DoNothingAction)
     }
 
+    fn upon_companion_damaged(&self) -> Box<dyn actions::UponTurnEndAction> {
+        Box::new(actions::DoNothingAction)
+    }
+
     fn passive_effect(&self) -> Option<Box<dyn PassiveEffectDefinition>> {
+        None
+    }
+
+    /// Invoked on each instance before every event is executed.
+    fn pre_event_action(
+        &self,
+        _event: GameEvent,
+        _game_state: &GameState,
+        _dispatcher: &mut EventDispatcher,
+    ) -> Option<Box<dyn actions::UponEventAction>> {
+        None
+    }
+
+    /// Invoked on each instance after every event is executed.
+    fn post_event_action(
+        &self,
+        _event: GameEvent,
+        _game_state: &GameState,
+        _dispatcher: &mut EventDispatcher,
+    ) -> Option<Box<dyn actions::UponEventAction>> {
         None
     }
 
@@ -220,6 +244,8 @@ pub mod player_view {
 }
 
 pub mod actions {
+    use crate::game_logic::events::GameEvent;
+
     use super::{
         async_trait, BoardPos, EventDispatcher, GameState, UnitCardInstance, UnitCardInstanceId,
     };
@@ -228,7 +254,7 @@ pub mod actions {
     pub trait UponSummonAction: Send + Sync {
         async fn action(
             &self,
-            instance: &mut UnitCardInstance,
+            instance_id: UnitCardInstanceId,
             pos: BoardPos,
             state: &mut GameState,
             dispatcher: &mut EventDispatcher,
@@ -239,7 +265,7 @@ pub mod actions {
     pub trait UponDeathAction: Send + Sync {
         async fn action(
             &self,
-            instance: &mut UnitCardInstance,
+            instance: &UnitCardInstance,
             pos: BoardPos,
             state: &mut GameState,
             dispatcher: &mut EventDispatcher,
@@ -276,13 +302,33 @@ pub mod actions {
         );
     }
 
+    #[async_trait]
+    pub trait UponCompanionDamagedAction: Send + Sync {
+        async fn action(
+            &self,
+            instance_id: UnitCardInstanceId,
+            state: &mut GameState,
+            dispatcher: &mut EventDispatcher,
+        );
+    }
+
+    #[async_trait]
+    pub trait UponEventAction: Send + Sync {
+        async fn action(
+            &self,
+            event: GameEvent,
+            state: &mut GameState,
+            dispatcher: &mut EventDispatcher,
+        );
+    }
+
     pub(super) struct DoNothingAction;
 
     #[async_trait]
     impl UponSummonAction for DoNothingAction {
         async fn action(
             &self,
-            _instance: &mut UnitCardInstance,
+            _instance_id: UnitCardInstanceId,
             _pos: BoardPos,
             _state: &mut GameState,
             _dispatcher: &mut EventDispatcher,
@@ -295,7 +341,7 @@ pub mod actions {
     impl UponDeathAction for DoNothingAction {
         async fn action(
             &self,
-            _instance: &mut UnitCardInstance,
+            _instance: &UnitCardInstance,
             _pos: BoardPos,
             _state: &mut GameState,
             _dispatcher: &mut EventDispatcher,

@@ -21,7 +21,7 @@ impl EventHandler for StartGameEventHandler {
 
     async fn handle(
         &self,
-        _event: StartGameEvent,
+        _event: &StartGameEvent,
         game_state: &mut GameState,
         dispatcher: &mut EventDispatcher,
     ) {

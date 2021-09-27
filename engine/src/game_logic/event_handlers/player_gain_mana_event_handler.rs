@@ -15,7 +15,7 @@ impl EventHandler for PlayerGainManaEventHandler {
 
     async fn handle(
         &self,
-        event: PlayerGainManaEvent,
+        event: &PlayerGainManaEvent,
         game_state: &mut GameState,
         _dispatcher: &mut EventDispatcher,
     ) {
