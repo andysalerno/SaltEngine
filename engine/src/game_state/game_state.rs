@@ -74,8 +74,6 @@ pub struct GameState {
     player_b_mana: u32,
     player_b_mana_limit: u32,
 
-    pre_summon_purgatory: Option<UnitCardInstance>,
-
     board: Box<Board>,
 }
 
@@ -91,10 +89,6 @@ impl GameState {
     pub fn is_game_over(&self) -> bool {
         self.board().hero(self.player_a_id).health() <= 0
             || self.board().hero(self.player_b_id).health() <= 0
-    }
-
-    pub fn set_purgatory(&mut self, card_instance: UnitCardInstance) {
-        self.pre_summon_purgatory.replace(card_instance);
     }
 
     fn player_ab(&self, player_id: PlayerId) -> PlayerAB {
@@ -151,8 +145,6 @@ impl GameState {
             player_b_mana: 0,
             player_b_mana_limit: 0,
             board,
-
-            pre_summon_purgatory: None,
         }
     }
 
@@ -361,12 +353,6 @@ impl GameState {
     #[must_use]
     pub fn player_b_mana(&self) -> u32 {
         self.player_b_mana
-    }
-
-    pub fn take_from_purgatory(&mut self) -> UnitCardInstance {
-        self.pre_summon_purgatory
-            .take()
-            .expect("Expected a card to exist in purgatory")
     }
 }
 

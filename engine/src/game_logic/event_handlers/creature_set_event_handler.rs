@@ -21,7 +21,7 @@ impl EventHandler for CreatureSetEventHandler {
         let player_id = event.player_id();
         let target_position = event.target_position();
 
-        let card_instance = game_state.take_from_purgatory();
+        let card_instance = game_state.board_mut().take_pre_summon();
 
         if card_instance.id() != event.card_id() {
             panic!(

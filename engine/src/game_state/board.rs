@@ -306,6 +306,7 @@ pub struct Board {
     player_a_id: PlayerId,
     player_b_id: PlayerId,
     slots: Vec<BoardSlot>,
+    pre_summon_card: Option<UnitCardInstance>,
 }
 
 impl Board {
@@ -349,7 +350,22 @@ impl Board {
             player_a_id,
             player_b_id,
             slots,
+            pre_summon_card: None,
         }
+    }
+
+    pub fn set_pre_summon(&mut self, card: UnitCardInstance) {
+        self.pre_summon_card.replace(card);
+    }
+
+    pub fn take_pre_summon(&mut self) -> UnitCardInstance {
+        self.pre_summon_card
+            .take()
+            .expect("Expected a pre-summoning card for the taking.")
+    }
+
+    pub fn pre_summon(&self) -> Option<&UnitCardInstance> {
+        self.pre_summon_card.as_ref()
     }
 
     fn player_ab(&self, player_id: PlayerId) -> PlayerAB {
@@ -454,10 +470,16 @@ impl Board {
             .expect("The position was not a valid board slot.")
     }
 
+    /// Returns a mutable reference to the `UnitCardInstance` on the board with the given ID.
+    /// This includes searching the pre-summon section, unlike the other methods of this pattern.
     pub fn creature_instance_mut(&mut self, id: UnitCardInstanceId) -> &mut UnitCardInstance {
-        self.slot_with_creature_mut(id)
-            .maybe_creature_mut()
-            .unwrap()
+        if self.pre_summon_card.is_some() {
+            self.pre_summon_card.as_mut().unwrap()
+        } else {
+            self.slot_with_creature_mut(id)
+                .maybe_creature_mut()
+                .unwrap()
+        }
     }
 }
 

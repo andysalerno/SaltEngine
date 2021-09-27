@@ -90,7 +90,7 @@ mod tests {
         let health_start = rock.health();
         let buffed_id = rock.id();
         {
-            state.set_purgatory(rock);
+            state.board_mut().set_pre_summon(rock);
             let summon_at = BoardPos::new(state.player_a_id(), RowId::FrontRow, 3);
             let summon_doggy_event =
                 CreatureSetEvent::new(state.player_a_id(), buffed_id, summon_at);
@@ -102,7 +102,7 @@ mod tests {
         {
             let doggy = EmotionalSupportDog.make_instance();
             let doggy_id = doggy.id();
-            state.set_purgatory(doggy);
+            state.board_mut().set_pre_summon(doggy);
             let summon_at = BoardPos::new(state.player_a_id(), RowId::BackRow, 3);
             let summon_doggy_event =
                 CreatureSetEvent::new(state.player_a_id(), doggy_id, summon_at);

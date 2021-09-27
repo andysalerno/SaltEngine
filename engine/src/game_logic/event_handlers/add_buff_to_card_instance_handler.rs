@@ -1,13 +1,8 @@
 use crate::{
     game_logic::{
-        event_handlers::EventHandler,
-        events::{
-            AddBuffToCardInstanceEvent, AddCardToHandClientEvent, AddCardToHandEvent,
-            ClientEventView,
-        },
-        EventDispatcher,
+        event_handlers::EventHandler, events::AddBuffToCardInstanceEvent, EventDispatcher,
     },
-    game_state::{GameState, MakePlayerView},
+    game_state::GameState,
 };
 use async_trait::async_trait;
 use log::info;
@@ -23,7 +18,14 @@ impl EventHandler for AddBuffToCardInstanceHandler {
         &self,
         event: &AddBuffToCardInstanceEvent,
         game_state: &mut GameState,
-        dispatcher: &mut EventDispatcher,
+        _dispatcher: &mut EventDispatcher,
     ) {
+        let card_instance = game_state
+            .board_mut()
+            .creature_instance_mut(event.recipient());
+
+        card_instance.add_buff(Box::new(event.buff().clone()));
+
+        info!("Added buff to {}", card_instance.definition().title());
     }
 }
