@@ -21,7 +21,10 @@ impl EventHandler for CreatureSetEventHandler {
         let player_id = event.player_id();
         let target_position = event.target_position();
 
-        let card_instance = game_state.board_mut().take_pre_summon();
+        let card_instance = game_state
+            .board_mut()
+            .take_tracked_pending_card(event.card_id())
+            .expect("The pending card was expected but not found");
 
         if card_instance.id() != event.card_id() {
             panic!(

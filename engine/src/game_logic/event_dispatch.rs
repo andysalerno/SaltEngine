@@ -60,9 +60,9 @@ impl EventDispatcher {
         while let Some(event) = self.stack.pop() {
             game_state.evaluate_passives();
 
-            // self.pre_handle(event, game_state).await;
+            self.pre_handle(&event, game_state).await;
             self.handle(&event, game_state).await;
-            // self.post_handle(event, game_state).await;
+            self.post_handle(&event, game_state).await;
 
             game_state.evaluate_passives();
         }
@@ -104,9 +104,35 @@ impl EventDispatcher {
         }
     }
 
-    async fn pre_handle(&mut self, event: GameEvent, game_state: &mut GameState) {}
+    async fn pre_handle(&mut self, event: &GameEvent, game_state: &mut GameState) {
+        let pre_existing_actions = game_state
+            .board()
+            .creatures_iter()
+            .filter_map(|c| {
+                c.definition()
+                    .pre_event_action(c.id(), event, game_state, self)
+            })
+            .collect::<Vec<_>>();
 
-    async fn post_handle(&mut self, event: GameEvent, game_state: &mut GameState) {}
+        for action in pre_existing_actions {
+            action.action(event, game_state, self).await;
+        }
+    }
+
+    async fn post_handle(&mut self, event: &GameEvent, game_state: &mut GameState) {
+        let pre_existing_actions = game_state
+            .board()
+            .creatures_iter()
+            .filter_map(|c| {
+                c.definition()
+                    .post_event_action(c.id(), event, game_state, self)
+            })
+            .collect::<Vec<_>>();
+
+        for action in pre_existing_actions {
+            action.action(event, game_state, self).await;
+        }
+    }
 
     async fn handle(&mut self, event: &GameEvent, game_state: &mut GameState) {
         debug!("Dispatching event: {:?}", event);

@@ -40,7 +40,7 @@ impl EventHandler for SummonCreatureFromHandEventHandler {
         let upon_summon = card_from_hand.definition().upon_summon();
         let card_instance_id = card_from_hand.id();
 
-        game_state.board_mut().set_pre_summon(card_from_hand);
+        game_state.board_mut().track_pending_card(card_from_hand);
 
         // Spend the mana
         {

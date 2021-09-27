@@ -40,10 +40,13 @@ mod tests {
     use async_trait::async_trait;
     use mockall::mock;
     use salt_engine::{
+        cards::UnitCardDefinition,
         game_agent::{ClientNotifier, Prompter},
         game_logic::EventDispatcher,
         game_state::{board::BoardPos, Deck, GameState, GameStatePlayerView, PlayerId},
     };
+
+    use crate::Pawn;
 
     mock! {
         pub(crate) TestPrompter {}
@@ -67,8 +70,8 @@ mod tests {
     }
 
     pub fn make_test_state() -> GameState {
-        let player_a_deck = Deck::new(Vec::new());
-        let player_b_deck = Deck::new(Vec::new());
+        let player_a_deck = Deck::new(vec![Pawn.make_instance()]);
+        let player_b_deck = Deck::new(vec![Pawn.make_instance()]);
 
         let mut state = GameState::initial_state(
             PlayerId::new(),

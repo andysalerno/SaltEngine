@@ -3,8 +3,8 @@ use salt_engine::{
     cards::{actions::UponDeathAction, CardDefinition, Position, UnitCardDefinition},
     game_logic::{events::PosTakesDamageEvent, EventDispatcher},
     game_state::{
-        board::{BoardPos, RowId},
-        GameState, UnitCardInstance,
+        board::{BoardPos, BoardView, RowId},
+        GameState, UnitCardInstance, UnitCardInstanceId,
     },
     id::Id,
 };
@@ -70,7 +70,7 @@ struct DeathAction;
 impl UponDeathAction for DeathAction {
     async fn action(
         &self,
-        instance: &UnitCardInstance,
+        instance_id: UnitCardInstanceId,
         died_at_pos: BoardPos,
         state: &mut GameState,
         dispatcher: &mut EventDispatcher,
@@ -78,6 +78,8 @@ impl UponDeathAction for DeathAction {
         if died_at_pos.row_id != RowId::FrontRow {
             return;
         }
+
+        let instance = state.board().creature_instance(instance_id);
 
         let width = instance.width();
 

@@ -69,7 +69,8 @@ pub trait UnitCardDefinition: CardDefinition {
     /// Invoked on each instance before every event is executed.
     fn pre_event_action(
         &self,
-        _event: GameEvent,
+        _card_instance_id: UnitCardInstanceId,
+        _event: &GameEvent,
         _game_state: &GameState,
         _dispatcher: &mut EventDispatcher,
     ) -> Option<Box<dyn actions::UponEventAction>> {
@@ -79,7 +80,8 @@ pub trait UnitCardDefinition: CardDefinition {
     /// Invoked on each instance after every event is executed.
     fn post_event_action(
         &self,
-        _event: GameEvent,
+        _card_instance_id: UnitCardInstanceId,
+        _event: &GameEvent,
         _game_state: &GameState,
         _dispatcher: &mut EventDispatcher,
     ) -> Option<Box<dyn actions::UponEventAction>> {
@@ -174,23 +176,6 @@ pub mod player_view {
         placeable_at: Position,
     }
 
-    // impl MakePlayerView for Box<dyn UnitCardDefinition> {
-    //     type TOut = UnitCardDefinitionPlayerView;
-
-    //     fn player_view(&self, _player_viewing: PlayerId) -> UnitCardDefinitionPlayerView {
-    //         UnitCardDefinitionPlayerView {
-    //             title: self.title().to_string(),
-    //             cost: self.cost(),
-    //             text: self.text().to_string(),
-    //             flavor_text: self.flavor_text().to_string(),
-    //             attack: self.attack(),
-    //             health: self.health(),
-    //             row_width: self.row_width(),
-    //             placeable_at: self.placeable_at(),
-    //         }
-    //     }
-    // }
-
     impl<'a> MakePlayerView<'a> for dyn UnitCardDefinition {
         type TOut = UnitCardDefinitionPlayerView;
 
@@ -246,9 +231,7 @@ pub mod player_view {
 pub mod actions {
     use crate::game_logic::events::GameEvent;
 
-    use super::{
-        async_trait, BoardPos, EventDispatcher, GameState, UnitCardInstance, UnitCardInstanceId,
-    };
+    use super::{async_trait, BoardPos, EventDispatcher, GameState, UnitCardInstanceId};
 
     #[async_trait]
     pub trait UponSummonAction: Send + Sync {
@@ -265,7 +248,7 @@ pub mod actions {
     pub trait UponDeathAction: Send + Sync {
         async fn action(
             &self,
-            instance: &UnitCardInstance,
+            instance_id: UnitCardInstanceId,
             pos: BoardPos,
             state: &mut GameState,
             dispatcher: &mut EventDispatcher,
@@ -316,7 +299,7 @@ pub mod actions {
     pub trait UponEventAction: Send + Sync {
         async fn action(
             &self,
-            event: GameEvent,
+            event: &GameEvent,
             state: &mut GameState,
             dispatcher: &mut EventDispatcher,
         );
@@ -341,7 +324,7 @@ pub mod actions {
     impl UponDeathAction for DoNothingAction {
         async fn action(
             &self,
-            _instance: &UnitCardInstance,
+            _instance_id: UnitCardInstanceId,
             _pos: BoardPos,
             _state: &mut GameState,
             _dispatcher: &mut EventDispatcher,

@@ -25,16 +25,21 @@ impl EventHandler for CreatureDestroyedEventHandler {
             .board_mut()
             .take_creature_by_id(event.creature_id());
 
-        info!(
-            "{} was destroyed (instance id: {:?})",
-            creature_instance.definition().title(),
-            creature_instance.id()
-        );
-
+        let title = creature_instance.definition().title().to_string();
+        let creature_id = creature_instance.id();
         let upon_death = creature_instance.definition().upon_death();
 
+        info!("{} was destroyed (instance id: {:?})", title, creature_id);
+
+        game_state.board_mut().add_to_graveyard(creature_instance);
+
+        info!(
+            "{} was added to the graveyard (instance id: {:?})",
+            title, creature_id
+        );
+
         upon_death
-            .action(&creature_instance, pos, game_state, dispatcher)
+            .action(creature_id, pos, game_state, dispatcher)
             .await;
     }
 }

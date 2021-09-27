@@ -306,7 +306,13 @@ pub struct Board {
     player_a_id: PlayerId,
     player_b_id: PlayerId,
     slots: Vec<BoardSlot>,
-    pre_summon_card: Option<UnitCardInstance>,
+
+    /// Cards that are not on a `BoardSlot`, but are known to the board and accessible from `Board` functions.
+    /// Example: a card is summoned from a player's hand: it is removed from the hand, but while the "on summoned"
+    /// event resolves, it is not yet in a board slot.
+    /// So ownership of the card is tracked here.
+    tracked_pending_cards: Vec<UnitCardInstance>,
+    graveyard: Vec<UnitCardInstance>,
 }
 
 impl Board {
@@ -350,22 +356,32 @@ impl Board {
             player_a_id,
             player_b_id,
             slots,
-            pre_summon_card: None,
+            tracked_pending_cards: Vec::new(),
+            graveyard: Vec::new(),
         }
     }
 
-    pub fn set_pre_summon(&mut self, card: UnitCardInstance) {
-        self.pre_summon_card.replace(card);
+    pub fn track_pending_card(&mut self, card: UnitCardInstance) {
+        self.tracked_pending_cards.push(card);
     }
 
-    pub fn take_pre_summon(&mut self) -> UnitCardInstance {
-        self.pre_summon_card
-            .take()
-            .expect("Expected a pre-summoning card for the taking.")
+    pub fn tracked_pending_cards(&self) -> impl Iterator<Item = &UnitCardInstance> {
+        self.tracked_pending_cards.iter()
     }
 
-    pub fn pre_summon(&self) -> Option<&UnitCardInstance> {
-        self.pre_summon_card.as_ref()
+    pub fn take_tracked_pending_card(
+        &mut self,
+        id: UnitCardInstanceId,
+    ) -> Option<UnitCardInstance> {
+        self.tracked_pending_cards
+            .iter()
+            .position(|c| c.id() == id)
+            .and_then(|a| Some(self.tracked_pending_cards.remove(a)))
+    }
+
+    /// Adds the given dead card instance to the graveyard.
+    pub fn add_to_graveyard(&mut self, dead_card: UnitCardInstance) {
+        self.graveyard.push(dead_card);
     }
 
     fn player_ab(&self, player_id: PlayerId) -> PlayerAB {
@@ -387,6 +403,11 @@ impl Board {
     pub fn creatures_iter_mut(&mut self) -> impl Iterator<Item = &mut UnitCardInstance> {
         self.slots_iter_mut()
             .filter_map(BoardSlot::maybe_creature_mut)
+    }
+
+    /// An iterator over all the creatures on the board.
+    pub fn creatures_iter(&self) -> impl Iterator<Item = &UnitCardInstance> {
+        self.slots_iter().filter_map(BoardSlot::maybe_creature)
     }
 
     #[must_use]
@@ -473,13 +494,17 @@ impl Board {
     /// Returns a mutable reference to the `UnitCardInstance` on the board with the given ID.
     /// This includes searching the pre-summon section, unlike the other methods of this pattern.
     pub fn creature_instance_mut(&mut self, id: UnitCardInstanceId) -> &mut UnitCardInstance {
-        if self.pre_summon_card.is_some() {
-            self.pre_summon_card.as_mut().unwrap()
-        } else {
-            self.slot_with_creature_mut(id)
-                .maybe_creature_mut()
-                .unwrap()
+        {
+            let tracked_card = self.tracked_pending_cards.iter_mut().find(|c| c.id() == id);
+            if tracked_card.is_some() {
+                return tracked_card.unwrap();
+            }
         }
+
+        return self
+            .slot_with_creature_mut(id)
+            .maybe_creature_mut()
+            .unwrap();
     }
 }
 
