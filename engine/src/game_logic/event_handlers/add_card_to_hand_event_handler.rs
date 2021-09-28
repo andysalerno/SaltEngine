@@ -27,8 +27,12 @@ impl EventHandler for AddCardToHandEventHandler {
         let event_view: AddCardToHandClientEvent = event.player_view(player_id);
         let client_event = ClientEventView::AddCardToHand(event_view);
 
-        todo!();
-        // game_state.hand_mut(player_id).add_card(event.take_card());
+        let card = game_state
+            .board_mut()
+            .take_tracked_pending_card(event.card_id())
+            .expect("Expected to find the tracked pending card");
+
+        game_state.hand_mut(event.player_id()).add_card(card);
 
         info!(
             "Player {:?} adds a card to hand. Next hand size: {}",

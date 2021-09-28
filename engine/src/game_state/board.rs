@@ -376,7 +376,7 @@ impl Board {
         self.tracked_pending_cards
             .iter()
             .position(|c| c.id() == id)
-            .and_then(|a| Some(self.tracked_pending_cards.remove(a)))
+            .map(|a| self.tracked_pending_cards.remove(a))
     }
 
     /// Adds the given dead card instance to the graveyard.
@@ -494,11 +494,9 @@ impl Board {
     /// Returns a mutable reference to the `UnitCardInstance` on the board with the given ID.
     /// This includes searching the pre-summon section, unlike the other methods of this pattern.
     pub fn creature_instance_mut(&mut self, id: UnitCardInstanceId) -> &mut UnitCardInstance {
-        {
-            let tracked_card = self.tracked_pending_cards.iter_mut().find(|c| c.id() == id);
-            if tracked_card.is_some() {
-                return tracked_card.unwrap();
-            }
+        let index = self.tracked_pending_cards.iter().position(|c| c.id() == id);
+        if let Some(index) = index {
+            return self.tracked_pending_cards.get_mut(index).unwrap();
         }
 
         return self

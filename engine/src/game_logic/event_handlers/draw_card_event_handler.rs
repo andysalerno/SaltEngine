@@ -32,7 +32,9 @@ impl EventHandler for DrawCardEventHandler {
         let card = game_state.draw_card(player_id);
 
         if let Some(card) = card {
-            let add_to_hand_event = AddCardToHandEvent::new(player_id, card.id());
+            let card_id = card.id();
+            game_state.board_mut().track_pending_card(card);
+            let add_to_hand_event = AddCardToHandEvent::new(player_id, card_id);
             dispatcher.dispatch(add_to_hand_event, game_state).await;
         } else {
             info!(
