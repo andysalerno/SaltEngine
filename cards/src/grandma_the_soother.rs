@@ -6,7 +6,7 @@ use salt_engine::{
         events::{DrawCardEvent, GameEvent},
         EventDispatcher,
     },
-    game_state::{board::BoardView, GameState, PlayerId, UnitCardInstance, UnitCardInstanceId},
+    game_state::{board::BoardView, GameState, PlayerId, UnitCardInstanceId},
     id::Id,
 };
 
@@ -126,7 +126,7 @@ mod tests {
     };
 
     #[test]
-    fn when_companion_takes_damage_expects_draws_card() {
+    fn when_companion_takes_damage_and_survives_expects_draws_card() {
         let _ = env_logger::builder().is_test(true).try_init();
         let mut state = make_test_state();
         let mut dispatcher = make_dispatcher(state.player_a_id(), state.player_b_id());
@@ -176,6 +176,112 @@ mod tests {
             hand_size_after,
             original_hand_size + 1,
             "Expected the hand size to be higher since Grandma should have been triggered."
+        );
+    }
+
+    #[test]
+    fn when_companion_takes_damage_and_dies_expects_not_draws_card() {
+        let _ = env_logger::builder().is_test(true).try_init();
+        let mut state = make_test_state();
+        let mut dispatcher = make_dispatcher(state.player_a_id(), state.player_b_id());
+        let player_id = state.player_a_id();
+
+        // Summon a pawn to receive the buff
+        let pawn = Pawn.make_instance();
+        let pawn_id = pawn.id();
+        {
+            let hand = state.hand_mut(player_id);
+            hand.add_card(pawn);
+
+            let pawn_pos = BoardPos::new(player_id, RowId::FrontRow, 0);
+            let summon_event = SummonCreatureFromHandEvent::new(player_id, pawn_pos, pawn_id);
+
+            smol::block_on(async {
+                dispatcher.dispatch(summon_event, &mut state).await;
+            });
+        }
+
+        // Summon grandma
+        info!("Summoning grandma");
+        {
+            let grandma = GrandmaTheSoother.make_instance();
+            let grandma_id = grandma.id();
+            let hand = state.hand_mut(player_id);
+            let grandma_pos = BoardPos::new(player_id, RowId::BackRow, 0);
+            hand.add_card(grandma);
+            let summon_event = SummonCreatureFromHandEvent::new(player_id, grandma_pos, grandma_id);
+
+            smol::block_on(async {
+                dispatcher.dispatch(summon_event, &mut state).await;
+            });
+        }
+
+        let original_hand_size = state.hand(player_id).len();
+
+        // Damage the pawn (to trigger Grandma)
+        let damage_event = CreatureTakesDamageEvent::new(pawn_id, 1);
+        smol::block_on(async {
+            dispatcher.dispatch(damage_event, &mut state).await;
+        });
+
+        let hand_size_after = state.hand(player_id).len();
+
+        assert_eq!(
+            hand_size_after, original_hand_size,
+            "Expected the hand size to be the same since grandma should not have triggered"
+        );
+    }
+
+    #[test]
+    fn when_non_companion_takes_damage_expects_draws_card() {
+        let _ = env_logger::builder().is_test(true).try_init();
+        let mut state = make_test_state();
+        let mut dispatcher = make_dispatcher(state.player_a_id(), state.player_b_id());
+        let player_id = state.player_a_id();
+
+        // Summon a card to receive the buff
+        let cat = IndoorCat.make_instance();
+        let cat_id = cat.id();
+        {
+            let hand = state.hand_mut(player_id);
+            hand.add_card(cat);
+
+            let cat_pos = BoardPos::new(player_id, RowId::FrontRow, 0);
+            let summon_event = SummonCreatureFromHandEvent::new(player_id, cat_pos, cat_id);
+
+            smol::block_on(async {
+                dispatcher.dispatch(summon_event, &mut state).await;
+            });
+        }
+
+        // Summon grandma
+        info!("Summoning grandma");
+        {
+            let grandma = GrandmaTheSoother.make_instance();
+            let grandma_id = grandma.id();
+            let hand = state.hand_mut(player_id);
+            let grandma_pos = BoardPos::new(player_id, RowId::BackRow, 1);
+            hand.add_card(grandma);
+            let summon_event = SummonCreatureFromHandEvent::new(player_id, grandma_pos, grandma_id);
+
+            smol::block_on(async {
+                dispatcher.dispatch(summon_event, &mut state).await;
+            });
+        }
+
+        let original_hand_size = state.hand(player_id).len();
+
+        // Damage the pawn (to trigger Grandma)
+        let damage_event = CreatureTakesDamageEvent::new(cat_id, 1);
+        smol::block_on(async {
+            dispatcher.dispatch(damage_event, &mut state).await;
+        });
+
+        let hand_size_after = state.hand(player_id).len();
+
+        assert_eq!(
+            hand_size_after, original_hand_size,
+            "Expected the hand size to be the same since grandma should not have triggered"
         );
     }
 }
