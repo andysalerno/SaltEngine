@@ -65,7 +65,7 @@ impl UnitCardDefinition for GrandmaTheSoother {
         game_state: &GameState,
         _dispatcher: &mut EventDispatcher,
     ) -> Option<Box<dyn UponEventAction>> {
-        let damage_event = if let GameEvent::CreatureTakesDamage(e) = event {
+        let damage_event = if let GameEvent::CreatureTakesDamageEvent(e) = event {
             e
         } else {
             return None;

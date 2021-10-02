@@ -21,8 +21,8 @@ impl CreatureDestroyedEvent {
 
 impl Event for CreatureDestroyedEvent {}
 
-impl From<CreatureDestroyedEvent> for GameEvent {
-    fn from(val: CreatureDestroyedEvent) -> Self {
-        GameEvent::CreatureDestroyed(val)
-    }
-}
+// impl From<CreatureDestroyedEvent> for GameEvent {
+//     fn from(val: CreatureDestroyedEvent) -> Self {
+//         GameEvent::CreatureDestroyed(val)
+//     }
+// }

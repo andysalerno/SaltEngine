@@ -21,8 +21,8 @@ impl Event for TurnStartEvent {
     }
 }
 
-impl From<TurnStartEvent> for GameEvent {
-    fn from(val: TurnStartEvent) -> Self {
-        GameEvent::TurnStart(val)
-    }
-}
+// impl From<TurnStartEvent> for GameEvent {
+//     fn from(val: TurnStartEvent) -> Self {
+//         GameEvent::TurnStart(val)
+//     }
+// }

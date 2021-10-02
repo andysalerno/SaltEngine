@@ -28,8 +28,8 @@ impl AttackEvent {
 
 impl Event for AttackEvent {}
 
-impl From<AttackEvent> for GameEvent {
-    fn from(val: AttackEvent) -> Self {
-        GameEvent::Attack(val)
-    }
-}
+// impl From<AttackEvent> for GameEvent {
+//     fn from(val: AttackEvent) -> Self {
+//         GameEvent::Attack(val)
+//     }
+// }

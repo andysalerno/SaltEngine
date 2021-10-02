@@ -28,11 +28,11 @@ impl PlayerSpendManaEvent {
     }
 }
 
-impl From<PlayerSpendManaEvent> for GameEvent {
-    fn from(val: PlayerSpendManaEvent) -> Self {
-        GameEvent::SpendMana(val)
-    }
-}
+// impl From<PlayerSpendManaEvent> for GameEvent {
+//     fn from(val: PlayerSpendManaEvent) -> Self {
+//         GameEvent::SpendMana(val)
+//     }
+// }
 
 impl Event for PlayerSpendManaEvent {
     fn validate<'a, G>(&self, game_state: &G) -> super::Result

@@ -27,8 +27,8 @@ impl PosTakesDamageEvent {
 
 impl Event for PosTakesDamageEvent {}
 
-impl From<PosTakesDamageEvent> for GameEvent {
-    fn from(val: PosTakesDamageEvent) -> Self {
-        GameEvent::PosTakesDamage(val)
-    }
-}
+// impl From<PosTakesDamageEvent> for GameEvent {
+//     fn from(val: PosTakesDamageEvent) -> Self {
+//         GameEvent::PosTakesDamage(val)
+//     }
+// }

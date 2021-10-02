@@ -67,11 +67,11 @@ impl Event for SummonCreatureFromHandEvent {
     }
 }
 
-impl From<SummonCreatureFromHandEvent> for GameEvent {
-    fn from(val: SummonCreatureFromHandEvent) -> Self {
-        GameEvent::SummonCreatureFromHand(val)
-    }
-}
+// impl From<SummonCreatureFromHandEvent> for GameEvent {
+//     fn from(val: SummonCreatureFromHandEvent) -> Self {
+//         GameEvent::SummonCreatureFromHand(val)
+//     }
+// }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct SummonCreatureFromHandClientEvent {

@@ -28,11 +28,11 @@ impl AddCardToHandEvent {
 
 impl Event for AddCardToHandEvent {}
 
-impl From<AddCardToHandEvent> for GameEvent {
-    fn from(val: AddCardToHandEvent) -> Self {
-        GameEvent::AddCardToHand(val)
-    }
-}
+// impl From<AddCardToHandEvent> for GameEvent {
+//     fn from(val: AddCardToHandEvent) -> Self {
+//         GameEvent::AddCardToHand(val)
+//     }
+// }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct AddCardToHandClientEvent {

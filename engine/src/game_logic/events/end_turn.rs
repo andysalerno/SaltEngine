@@ -23,8 +23,8 @@ impl Event for EndTurnEvent {
     }
 }
 
-impl From<EndTurnEvent> for GameEvent {
-    fn from(val: EndTurnEvent) -> Self {
-        GameEvent::EndTurn(val)
-    }
-}
+// impl From<EndTurnEvent> for GameEvent {
+//     fn from(val: EndTurnEvent) -> Self {
+//         GameEvent::EndTurn(val)
+//     }
+// }

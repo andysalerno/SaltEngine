@@ -30,8 +30,8 @@ impl CreatureHealedEvent {
 
 impl Event for CreatureHealedEvent {}
 
-impl From<CreatureHealedEvent> for GameEvent {
-    fn from(val: CreatureHealedEvent) -> Self {
-        GameEvent::CreatureHealed(val)
-    }
-}
+// impl From<CreatureHealedEvent> for GameEvent {
+//     fn from(val: CreatureHealedEvent) -> Self {
+//         GameEvent::CreatureHealed(val)
+//     }
+// }

@@ -28,11 +28,11 @@ impl PlayerGainManaEvent {
     }
 }
 
-impl From<PlayerGainManaEvent> for GameEvent {
-    fn from(val: PlayerGainManaEvent) -> Self {
-        GameEvent::GainMana(val)
-    }
-}
+// impl From<PlayerGainManaEvent> for GameEvent {
+//     fn from(val: PlayerGainManaEvent) -> Self {
+//         GameEvent::GainMana(val)
+//     }
+// }
 
 impl Event for PlayerGainManaEvent {
     fn maybe_client_event(&self) -> Option<super::ClientEventView> {

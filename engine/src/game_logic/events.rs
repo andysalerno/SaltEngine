@@ -15,6 +15,8 @@ mod start_game_event;
 mod summon_creature_from_hand_event;
 mod turn_start_event;
 
+use std::fmt::Debug;
+
 pub use add_buff_to_card_instance_event::AddBuffToCardInstanceEvent;
 pub use add_card_to_hand_event::{AddCardToHandClientEvent, AddCardToHandEvent};
 pub use attack::AttackEvent;
@@ -36,10 +38,25 @@ pub use summon_creature_from_hand_event::{
 pub use turn_start_event::TurnStartEvent;
 
 use crate::game_state::{GameStateView, PlayerId};
+use enum_dispatch::enum_dispatch;
 
 pub type Result = std::result::Result<(), Box<dyn std::error::Error>>;
 
-pub trait Event: Into<GameEvent> {
+// pub trait Event: Into<GameEvent> {
+//     fn validate<'a, G>(&self, _game_state: &'a G) -> Result
+//     where
+//         G: GameStateView<'a>,
+//     {
+//         Ok(())
+//     }
+
+//     fn maybe_client_event(&self) -> Option<ClientEventView> {
+//         None
+//     }
+// }
+
+#[enum_dispatch(GameEvent)]
+pub trait Event: Debug {
     fn validate<'a, G>(&self, _game_state: &'a G) -> Result
     where
         G: GameStateView<'a>,
@@ -54,53 +71,60 @@ pub trait Event: Into<GameEvent> {
 
 /// All possible game events.
 /// TODO: use `EnumDispatch` crate
-#[derive(Debug)]
+// #[derive(Debug)]
+#[enum_dispatch]
 pub enum GameEvent {
-    Attack(AttackEvent),
-    EndTurn(EndTurnEvent),
-    Summon(CreatureSetEvent),
-    AddBuffToCardInstance(AddBuffToCardInstanceEvent),
-    CreatureDealsDamage(CreatureDealsDamageEvent),
-    CreatureTakesDamage(CreatureTakesDamageEvent),
-    CreatureDestroyed(CreatureDestroyedEvent),
-    TurnStart(TurnStartEvent),
-    DrawCard(DrawCardEvent),
-    AddCardToHand(AddCardToHandEvent),
-    StartGame(StartGameEvent),
-    GainMana(PlayerGainManaEvent),
-    SpendMana(PlayerSpendManaEvent),
-    SummonCreatureFromHand(SummonCreatureFromHandEvent),
-    PosTakesDamage(PosTakesDamageEvent),
-    CreatureHealed(CreatureHealedEvent),
+    AttackEvent,
+    EndTurnEvent,
+    CreatureSetEvent,
+    AddBuffToCardInstanceEvent,
+    CreatureDealsDamageEvent,
+    CreatureTakesDamageEvent,
+    CreatureDestroyedEvent,
+    TurnStartEvent,
+    DrawCardEvent,
+    AddCardToHandEvent,
+    StartGameEvent,
+    PlayerGainManaEvent,
+    PlayerSpendManaEvent,
+    SummonCreatureFromHandEvent,
+    PosTakesDamageEvent,
+    CreatureHealedEvent,
+}
+
+impl Debug for GameEvent {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        self.fmt(f)
+    }
 }
 
 impl GameEvent {
     #[must_use]
     pub fn is_end_turn(&self) -> bool {
-        matches!(self, GameEvent::EndTurn(_))
+        matches!(self, GameEvent::EndTurnEvent(_))
     }
 
-    #[must_use]
-    pub fn maybe_client_event(&self) -> Option<ClientEventView> {
-        match self {
-            GameEvent::AddCardToHand(e) => e.maybe_client_event(),
-            GameEvent::SummonCreatureFromHand(e) => e.maybe_client_event(),
-            GameEvent::Summon(e) => e.maybe_client_event(),
-            GameEvent::Attack(e) => e.maybe_client_event(),
-            GameEvent::EndTurn(e) => e.maybe_client_event(),
-            GameEvent::CreatureDealsDamage(e) => e.maybe_client_event(),
-            GameEvent::CreatureTakesDamage(e) => e.maybe_client_event(),
-            GameEvent::CreatureDestroyed(e) => e.maybe_client_event(),
-            GameEvent::TurnStart(e) => e.maybe_client_event(),
-            GameEvent::DrawCard(e) => e.maybe_client_event(),
-            GameEvent::StartGame(e) => e.maybe_client_event(),
-            GameEvent::GainMana(e) => e.maybe_client_event(),
-            GameEvent::SpendMana(e) => e.maybe_client_event(),
-            GameEvent::PosTakesDamage(e) => e.maybe_client_event(),
-            GameEvent::CreatureHealed(e) => e.maybe_client_event(),
-            GameEvent::AddBuffToCardInstance(e) => e.maybe_client_event(),
-        }
-    }
+    // #[must_use]
+    // pub fn maybe_client_event(&self) -> Option<ClientEventView> {
+    //     match self {
+    //         GameEvent::AddCardToHandEvent(e) => e.maybe_client_event(),
+    //         GameEvent::SummonCreatureFromHandEvent(e) => e.maybe_client_event(),
+    //         GameEvent::Summon(e) => e.maybe_client_event(),
+    //         GameEvent::Attack(e) => e.maybe_client_event(),
+    //         GameEvent::EndTurn(e) => e.maybe_client_event(),
+    //         GameEvent::CreatureDealsDamage(e) => e.maybe_client_event(),
+    //         GameEvent::CreatureTakesDamage(e) => e.maybe_client_event(),
+    //         GameEvent::CreatureDestroyed(e) => e.maybe_client_event(),
+    //         GameEvent::TurnStart(e) => e.maybe_client_event(),
+    //         GameEvent::DrawCard(e) => e.maybe_client_event(),
+    //         GameEvent::StartGame(e) => e.maybe_client_event(),
+    //         GameEvent::GainMana(e) => e.maybe_client_event(),
+    //         GameEvent::SpendMana(e) => e.maybe_client_event(),
+    //         GameEvent::PosTakesDamage(e) => e.maybe_client_event(),
+    //         GameEvent::CreatureHealed(e) => e.maybe_client_event(),
+    //         GameEvent::AddBuffToCardInstance(e) => e.maybe_client_event(),
+    //     }
+    // }
 }
 
 /// The subset of game events that clients can
@@ -149,28 +173,28 @@ impl ClientActionEvent {
     }
 }
 
-impl Event for GameEvent {
-    fn validate<'a, G>(&self, game_state: &'a G) -> Result
-    where
-        G: GameStateView<'a>,
-    {
-        match self {
-            GameEvent::Attack(e) => e.validate(game_state),
-            GameEvent::EndTurn(e) => e.validate(game_state),
-            GameEvent::Summon(e) => e.validate(game_state),
-            GameEvent::CreatureDealsDamage(e) => e.validate(game_state),
-            GameEvent::CreatureTakesDamage(e) => e.validate(game_state),
-            GameEvent::CreatureDestroyed(e) => e.validate(game_state),
-            GameEvent::TurnStart(e) => e.validate(game_state),
-            GameEvent::DrawCard(e) => e.validate(game_state),
-            GameEvent::AddCardToHand(e) => e.validate(game_state),
-            GameEvent::StartGame(e) => e.validate(game_state),
-            GameEvent::GainMana(e) => e.validate(game_state),
-            GameEvent::SpendMana(e) => e.validate(game_state),
-            GameEvent::SummonCreatureFromHand(e) => e.validate(game_state),
-            GameEvent::PosTakesDamage(e) => e.validate(game_state),
-            GameEvent::CreatureHealed(e) => e.validate(game_state),
-            GameEvent::AddBuffToCardInstance(e) => e.validate(game_state),
-        }
-    }
-}
+// impl Event for GameEvent {
+//     fn validate<'a, G>(&self, game_state: &'a G) -> Result
+//     where
+//         G: GameStateView<'a>,
+//     {
+//         match self {
+//             GameEvent::Attack(e) => e.validate(game_state),
+//             GameEvent::EndTurn(e) => e.validate(game_state),
+//             GameEvent::Summon(e) => e.validate(game_state),
+//             GameEvent::CreatureDealsDamage(e) => e.validate(game_state),
+//             GameEvent::CreatureTakesDamage(e) => e.validate(game_state),
+//             GameEvent::CreatureDestroyed(e) => e.validate(game_state),
+//             GameEvent::TurnStart(e) => e.validate(game_state),
+//             GameEvent::DrawCard(e) => e.validate(game_state),
+//             GameEvent::AddCardToHand(e) => e.validate(game_state),
+//             GameEvent::StartGame(e) => e.validate(game_state),
+//             GameEvent::GainMana(e) => e.validate(game_state),
+//             GameEvent::SpendMana(e) => e.validate(game_state),
+//             GameEvent::SummonCreatureFromHand(e) => e.validate(game_state),
+//             GameEvent::PosTakesDamage(e) => e.validate(game_state),
+//             GameEvent::CreatureHealed(e) => e.validate(game_state),
+//             GameEvent::AddBuffToCardInstance(e) => e.validate(game_state),
+//         }
+//     }
+// }

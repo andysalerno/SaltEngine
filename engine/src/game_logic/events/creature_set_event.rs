@@ -60,8 +60,8 @@ impl Event for CreatureSetEvent {
     }
 }
 
-impl From<CreatureSetEvent> for GameEvent {
-    fn from(val: CreatureSetEvent) -> Self {
-        GameEvent::Summon(val)
-    }
-}
+// impl From<CreatureSetEvent> for GameEvent {
+//     fn from(val: CreatureSetEvent) -> Self {
+//         GameEvent::Summon(val)
+//     }
+// }
