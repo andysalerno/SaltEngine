@@ -22,9 +22,3 @@ impl Event for EndTurnEvent {
         Some(super::ClientEventView::TurnEnded(self.0))
     }
 }
-
-// impl From<EndTurnEvent> for GameEvent {
-//     fn from(val: EndTurnEvent) -> Self {
-//         GameEvent::EndTurn(val)
-//     }
-// }

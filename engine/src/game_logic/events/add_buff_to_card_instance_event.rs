@@ -27,9 +27,3 @@ impl AddBuffToCardInstanceEvent {
 }
 
 impl Event for AddBuffToCardInstanceEvent {}
-
-// impl From<AddBuffToCardInstanceEvent> for GameEvent {
-//     fn from(val: AddBuffToCardInstanceEvent) -> Self {
-//         GameEvent::AddBuffToCardInstance(val)
-//     }
-// }

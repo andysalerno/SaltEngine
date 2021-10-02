@@ -20,10 +20,4 @@ impl DrawCardEvent {
     }
 }
 
-// impl From<DrawCardEvent> for GameEvent {
-//     fn from(val: DrawCardEvent) -> Self {
-//         GameEvent::DrawCard(val)
-//     }
-// }
-
 impl Event for DrawCardEvent {}
