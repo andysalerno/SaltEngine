@@ -42,19 +42,6 @@ use enum_dispatch::enum_dispatch;
 
 pub type Result = std::result::Result<(), Box<dyn std::error::Error>>;
 
-// pub trait Event: Into<GameEvent> {
-//     fn validate<'a, G>(&self, _game_state: &'a G) -> Result
-//     where
-//         G: GameStateView<'a>,
-//     {
-//         Ok(())
-//     }
-
-//     fn maybe_client_event(&self) -> Option<ClientEventView> {
-//         None
-//     }
-// }
-
 #[enum_dispatch(GameEvent)]
 pub trait Event: Debug {
     fn validate<'a, G>(&self, _game_state: &'a G) -> Result
@@ -70,8 +57,6 @@ pub trait Event: Debug {
 }
 
 /// All possible game events.
-/// TODO: use `EnumDispatch` crate
-// #[derive(Debug)]
 #[enum_dispatch]
 pub enum GameEvent {
     AttackEvent,
