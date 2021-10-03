@@ -1,5 +1,7 @@
 use crate::game_state::{
-    board::BoardPos, MakePlayerView, PlayerId, UnitCardInstance, UnitCardInstanceId,
+    self,
+    board::{BoardPos, BoardView},
+    GameState, MakePlayerView, PlayerId, UnitCardInstance, UnitCardInstanceId,
     UnitCardInstancePlayerView,
 };
 use serde::{Deserialize, Serialize};
@@ -41,6 +43,20 @@ impl CreatureSetEvent {
     pub fn target_position(&self) -> BoardPos {
         self.target_position
     }
+
+    pub fn make_client_event(&self, game_state: &GameState) -> CreatureSetClientEvent {
+        let view = game_state
+            .board()
+            .creature_instance(self.card_id())
+            .player_view(self.player_id); // todo: this is wrong, since both players get the owning player's view
+
+        CreatureSetClientEvent {
+            player_id: self.player_id,
+            card_id: self.card_id,
+            pos: self.target_position,
+            card: view,
+        }
+    }
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -48,14 +64,12 @@ pub struct CreatureSetClientEvent {
     pub player_id: PlayerId,
     pub card_id: UnitCardInstanceId,
     pub pos: BoardPos,
+    pub card: UnitCardInstancePlayerView,
 }
 
 impl Event for CreatureSetEvent {
-    fn maybe_client_event(&self) -> Option<ClientEventView> {
-        Some(ClientEventView::UnitSet(CreatureSetClientEvent {
-            player_id: self.player_id,
-            card_id: self.card_id,
-            pos: self.target_position,
-        }))
+    fn maybe_client_event(&self, game_state: &GameState) -> Option<ClientEventView> {
+        let event = self.make_client_event(game_state);
+        Some(ClientEventView::UnitSet(event))
     }
 }

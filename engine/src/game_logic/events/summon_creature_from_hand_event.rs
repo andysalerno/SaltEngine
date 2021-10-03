@@ -1,10 +1,10 @@
-use super::{Event, GameEvent};
+use super::{ClientEventView, Event, GameEvent};
 use crate::{
     cards::UnitCardDefinitionView,
     game_logic::cards::Position,
     game_state::{
         board::{BoardPos, BoardView, RowId},
-        GameStateView, HandView, PlayerId, UnitCardInstanceId, UnitCardInstanceView,
+        GameState, GameStateView, HandView, PlayerId, UnitCardInstanceId, UnitCardInstanceView,
     },
 };
 use log::debug;
@@ -56,7 +56,7 @@ impl Event for SummonCreatureFromHandEvent {
         Ok(())
     }
 
-    fn maybe_client_event(&self) -> Option<super::ClientEventView> {
+    fn maybe_client_event(&self, game_state: &GameState) -> Option<ClientEventView> {
         let client_event = SummonCreatureFromHandClientEvent {
             player_id: self.player_id,
             board_pos: self.board_pos,
@@ -130,14 +130,14 @@ mod validation {
         let player_id = event.player_id();
         let requested_pos = event.board_pos();
 
-        if requested_pos.player_id != player_id {
+        if requested_pos.player_id == player_id {
+            Ok(())
+        } else {
             Err(format!(
                 "Player {:?} cannot summon a creature on player {:?}'s side",
                 player_id, requested_pos.player_id
             )
             .into())
-        } else {
-            Ok(())
         }
     }
 

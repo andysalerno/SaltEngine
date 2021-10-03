@@ -46,9 +46,7 @@ impl Default for PlayerId {
 /// client -- i.e., only containing info visible to the player,
 /// and not info invisible to them (such as the content of the opponent's hand).
 // pub trait MakePlayerView<'a, 'b>
-pub trait MakePlayerView<'a> // where
-//     'b: 'a,
-{
+pub trait MakePlayerView<'a> {
     type TOut: Serialize + DeserializeOwned + Sized + 'static;
     fn player_view(&'a self, player_viewing: PlayerId) -> <Self as MakePlayerView<'a>>::TOut;
 }

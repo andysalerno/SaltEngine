@@ -1,6 +1,6 @@
-use crate::game_state::PlayerId;
+use crate::game_state::{GameState, PlayerId};
 
-use super::{Event, GameEvent};
+use super::{ClientEventView, Event, GameEvent};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -11,14 +11,14 @@ impl Event for EndTurnEvent {
     where
         G: crate::game_state::GameStateView<'a>,
     {
-        if game_state.cur_player_turn() != self.0 {
-            super::Result::Err("Cannot end a different player's turn.".into())
-        } else {
+        if game_state.cur_player_turn() == self.0 {
             Ok(())
+        } else {
+            super::Result::Err("Cannot end a different player's turn.".into())
         }
     }
 
-    fn maybe_client_event(&self) -> Option<super::ClientEventView> {
-        Some(super::ClientEventView::TurnEnded(self.0))
+    fn maybe_client_event(&self, game_state: &GameState) -> Option<ClientEventView> {
+        Some(ClientEventView::TurnEnded(self.0))
     }
 }

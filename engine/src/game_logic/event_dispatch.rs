@@ -136,7 +136,7 @@ impl EventDispatcher {
     async fn handle(&mut self, event: &GameEvent, game_state: &mut GameState) {
         debug!("Dispatching event: {:?}", event);
 
-        let maybe_client_event = event.maybe_client_event();
+        let maybe_client_event = event.maybe_client_event(game_state);
 
         if let Some(event_view) = maybe_client_event {
             info!("Notifying players of event: {:?}", event_view);

@@ -1,6 +1,6 @@
-use crate::game_state::PlayerId;
+use crate::game_state::{GameState, PlayerId};
 
-use super::{Event, GameEvent};
+use super::{ClientEventView, Event, GameEvent};
 
 #[derive(Debug, Clone)]
 pub struct PlayerGainManaEvent {
@@ -29,8 +29,8 @@ impl PlayerGainManaEvent {
 }
 
 impl Event for PlayerGainManaEvent {
-    fn maybe_client_event(&self) -> Option<super::ClientEventView> {
-        Some(super::ClientEventView::PlayerGainMana(
+    fn maybe_client_event(&self, game_state: &GameState) -> Option<ClientEventView> {
+        Some(ClientEventView::PlayerGainMana(
             self.player_id,
             self.gain_count as usize,
         ))

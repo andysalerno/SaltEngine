@@ -1,14 +1,13 @@
-use log::info;
-
 use crate::{
     game_logic::{
         event_handlers::EventHandler,
         events::{AddCardToHandClientEvent, AddCardToHandEvent, ClientEventView},
         EventDispatcher,
     },
-    game_state::{GameState, MakePlayerView},
+    game_state::GameState,
 };
 use async_trait::async_trait;
+use log::info;
 
 #[derive(Default)]
 pub struct AddCardToHandEventHandler;
@@ -24,7 +23,8 @@ impl EventHandler for AddCardToHandEventHandler {
         dispatcher: &mut EventDispatcher,
     ) {
         let player_id = event.player_id();
-        let event_view: AddCardToHandClientEvent = event.player_view(player_id);
+        let event_view: AddCardToHandClientEvent = event.make_client_event(game_state);
+
         let client_event = ClientEventView::AddCardToHand(event_view);
 
         let card = game_state

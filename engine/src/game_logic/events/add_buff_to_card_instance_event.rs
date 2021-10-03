@@ -1,7 +1,6 @@
+use super::{Event, GameEvent};
 use crate::{game_logic::buff::BuiltBuff, game_state::UnitCardInstanceId};
 use serde::{Deserialize, Serialize};
-
-use super::{Event, GameEvent};
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct AddBuffToCardInstanceEvent {

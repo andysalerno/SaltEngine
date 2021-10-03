@@ -37,7 +37,7 @@ pub use summon_creature_from_hand_event::{
 };
 pub use turn_start_event::TurnStartEvent;
 
-use crate::game_state::{GameStateView, PlayerId};
+use crate::game_state::{self, GameState, GameStateView, PlayerId};
 use enum_dispatch::enum_dispatch;
 
 pub type Result = std::result::Result<(), Box<dyn std::error::Error>>;
@@ -51,7 +51,7 @@ pub trait Event: Debug {
         Ok(())
     }
 
-    fn maybe_client_event(&self) -> Option<ClientEventView> {
+    fn maybe_client_event(&self, game_state: &GameState) -> Option<ClientEventView> {
         None
     }
 }
