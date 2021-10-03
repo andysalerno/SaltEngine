@@ -1,12 +1,11 @@
 use crate::game_state::{
-    self,
     board::{BoardPos, BoardView},
-    GameState, MakePlayerView, PlayerId, UnitCardInstance, UnitCardInstanceId,
+    GameState, MakePlayerView, PlayerId, UnitCardInstanceId,
     UnitCardInstancePlayerView,
 };
 use serde::{Deserialize, Serialize};
 
-use super::{ClientEventView, Event, GameEvent};
+use super::{ClientEventView, Event};
 
 #[derive(Debug)]
 pub struct CreatureSetEvent {

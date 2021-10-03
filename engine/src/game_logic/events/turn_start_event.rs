@@ -1,11 +1,11 @@
-use super::{ClientEventView, Event, GameEvent};
+use super::{ClientEventView, Event};
 use crate::game_state::{GameState, PlayerId};
 
 #[derive(Debug, Clone)]
 pub struct TurnStartEvent(pub PlayerId);
 
 impl Event for TurnStartEvent {
-    fn maybe_client_event(&self, game_state: &GameState) -> Option<ClientEventView> {
+    fn maybe_client_event(&self, _game_state: &GameState) -> Option<ClientEventView> {
         Some(ClientEventView::TurnStarted(self.0))
     }
 

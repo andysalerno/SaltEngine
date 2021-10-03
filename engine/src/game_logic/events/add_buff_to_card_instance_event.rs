@@ -1,4 +1,4 @@
-use super::{Event, GameEvent};
+use super::{Event};
 use crate::{game_logic::buff::BuiltBuff, game_state::UnitCardInstanceId};
 use serde::{Deserialize, Serialize};
 

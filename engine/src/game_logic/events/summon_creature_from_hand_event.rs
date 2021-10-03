@@ -1,4 +1,4 @@
-use super::{ClientEventView, Event, GameEvent};
+use super::{ClientEventView, Event};
 use crate::{
     cards::UnitCardDefinitionView,
     game_logic::cards::Position,
@@ -56,7 +56,7 @@ impl Event for SummonCreatureFromHandEvent {
         Ok(())
     }
 
-    fn maybe_client_event(&self, game_state: &GameState) -> Option<ClientEventView> {
+    fn maybe_client_event(&self, _game_state: &GameState) -> Option<ClientEventView> {
         let client_event = SummonCreatureFromHandClientEvent {
             player_id: self.player_id,
             board_pos: self.board_pos,

@@ -7,7 +7,7 @@ use salt_engine::{
     },
     game_state::{
         board::{BoardPos, RowId},
-        GameState, UnitCardInstance, UnitCardInstanceId,
+        GameState, UnitCardInstanceId,
     },
     id::Id,
 };

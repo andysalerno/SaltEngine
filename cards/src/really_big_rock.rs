@@ -4,7 +4,7 @@ use salt_engine::{
     game_logic::{events::PosTakesDamageEvent, EventDispatcher},
     game_state::{
         board::{BoardPos, BoardView, RowId},
-        GameState, UnitCardInstance, UnitCardInstanceId,
+        GameState, UnitCardInstanceId,
     },
     id::Id,
 };

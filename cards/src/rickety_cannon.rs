@@ -8,7 +8,7 @@ use salt_engine::{
     game_logic::{events::PosTakesDamageEvent, EventDispatcher},
     game_state::{
         board::{BoardPos, BoardView},
-        GameState, InstanceState, MakePlayerView, UnitCardInstance, UnitCardInstanceId,
+        GameState, InstanceState, MakePlayerView, UnitCardInstanceId,
     },
     id::Id,
 };
@@ -101,7 +101,7 @@ impl UponSummonAction for SummonAction {
     ) {
         let summoner = summoned_to_pos.player_id;
 
-        let pos = dispatcher
+        let _pos = dispatcher
             .player_prompter(summoned_to_pos.player_id)
             .prompt_slot(&state.player_view(summoner));
 

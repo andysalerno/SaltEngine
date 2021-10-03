@@ -278,7 +278,7 @@ mod tests {
         let notifier_a = Box::new(StubNotifier);
         let notifier_b = Box::new(StubNotifier);
 
-        let dispatcher = EventDispatcher::new(
+        let _dispatcher = EventDispatcher::new(
             notifier_a,
             prompter_a,
             PlayerId::new(),
