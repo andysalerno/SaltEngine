@@ -1,4 +1,4 @@
-use super::{Event};
+use super::Event;
 
 #[derive(Debug, Clone)]
 pub struct StartGameEvent;

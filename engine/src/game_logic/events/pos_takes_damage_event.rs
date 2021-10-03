@@ -1,6 +1,6 @@
 use crate::game_state::board::BoardPos;
 
-use super::{Event};
+use super::Event;
 
 #[derive(Debug, Clone)]
 pub struct PosTakesDamageEvent {
