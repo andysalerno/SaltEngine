@@ -66,18 +66,16 @@ impl UnitCardDefinition for EmotionalSupportDog {
 
 #[cfg(test)]
 mod tests {
+    use super::EmotionalSupportDog;
+    use crate::{
+        tests::{make_dispatcher, make_test_state},
+        ReallyBigRock,
+    };
     use salt_engine::{
         cards::UnitCardDefinition,
         game_logic::events::CreatureSetEvent,
         game_state::board::{BoardPos, BoardView, RowId},
     };
-
-    use crate::{
-        tests::{make_dispatcher, make_test_state},
-        ReallyBigRock,
-    };
-
-    use super::EmotionalSupportDog;
 
     #[test]
     fn when_summoned_expects_provides_buff() {

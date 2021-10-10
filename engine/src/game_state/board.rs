@@ -504,6 +504,18 @@ impl Board {
             .maybe_creature_mut()
             .unwrap();
     }
+
+    /// Returns a mutable reference to the `UnitCardInstance` on the board with the given ID.
+    /// This includes searching the pre-summon section, unlike the other methods of this pattern.
+    #[must_use]
+    pub fn creature_instance_all(&self, id: UnitCardInstanceId) -> &UnitCardInstance {
+        let index = self.tracked_pending_cards.iter().position(|c| c.id() == id);
+        if let Some(index) = index {
+            return self.tracked_pending_cards.get(index).unwrap();
+        }
+
+        return self.slot_with_creature(id).maybe_creature().unwrap();
+    }
 }
 
 fn front_half(ops: std::ops::Range<usize>) -> std::ops::Range<usize> {

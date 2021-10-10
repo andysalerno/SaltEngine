@@ -42,10 +42,11 @@ impl CreatureSetEvent {
         self.target_position
     }
 
+    #[must_use]
     pub fn make_client_event(&self, game_state: &GameState) -> CreatureSetClientEvent {
         let view = game_state
             .board()
-            .creature_instance(self.card_id())
+            .creature_instance_all(self.card_id())
             .player_view(self.player_id); // todo: this is wrong, since both players get the owning player's view
 
         CreatureSetClientEvent {

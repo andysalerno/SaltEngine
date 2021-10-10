@@ -31,7 +31,7 @@ impl AddCardToHandEvent {
     pub fn make_client_event(&self, game_state: &GameState) -> AddCardToHandClientEvent {
         let card = game_state
             .board()
-            .creature_instance(self.card_id())
+            .creature_instance_all(self.card_id())
             .player_view(self.player_id);
         AddCardToHandClientEvent {
             player_id: self.player_id,
