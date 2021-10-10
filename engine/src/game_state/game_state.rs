@@ -7,11 +7,13 @@ use log::debug;
 use serde::{Deserialize, Serialize};
 use std::slice::Iter;
 
+/// A trait defining a view of a `GameState`.
 pub trait GameStateView<'a> {
     type HandView: HandView<'a>;
     type BoardView: BoardView<'a>;
 
     fn cur_player_turn(&self) -> PlayerId;
+    fn opponent_id(&self, player_id: PlayerId) -> PlayerId;
 
     fn player_mana(&self, player_id: PlayerId) -> u32;
     fn player_mana_limit(&self, player_id: PlayerId) -> u32;
@@ -22,8 +24,6 @@ pub trait GameStateView<'a> {
     fn iter(&'a self) -> Iter<'_, <Self::BoardView as BoardView<'a>>::SlotView> {
         self.board().slots_iter()
     }
-
-    fn opponent_id(&self, player_id: PlayerId) -> PlayerId;
 }
 
 impl<'a> GameStateView<'a> for GameState {
@@ -58,6 +58,7 @@ impl<'a> GameStateView<'a> for GameState {
     }
 }
 
+/// A struct representing the full state of the game.
 pub struct GameState {
     player_b_id: PlayerId,
     player_a_id: PlayerId,
