@@ -63,7 +63,7 @@ impl<'a> UnitCardInstanceView<'a> for UnitCardInstance {
     }
 }
 
-#[derive(Debug, Copy, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Copy, Clone, PartialEq, Serialize, Deserialize, Eq, Hash)]
 pub struct UnitCardInstanceId(Id);
 
 impl UnitCardInstanceId {

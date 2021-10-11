@@ -1,3 +1,8 @@
+use std::{
+    collections::{HashMap, HashSet},
+    fmt::Debug,
+};
+
 use super::{
     card_instance::{UnitCardInstance, UnitCardInstanceView},
     PlayerId, UnitCardInstanceId,
@@ -148,6 +153,7 @@ where
     }
 }
 
+/// A trait representing a view on a `Board`.
 pub trait BoardView<'a> {
     type SlotView: BoardSlotView<'a>;
 
@@ -303,6 +309,7 @@ impl<'a> BoardView<'a> for Board {
 
 #[derive(Debug)]
 pub struct Board {
+    arena: HashMap<UnitCardInstanceId, UnitCardInstance>,
     player_a_id: PlayerId,
     player_b_id: PlayerId,
     slots: Vec<BoardSlot>,
@@ -358,10 +365,12 @@ impl Board {
             slots,
             tracked_pending_cards: Vec::new(),
             graveyard: Vec::new(),
+            arena: HashMap::new(),
         }
     }
 
     pub fn track_pending_card(&mut self, card: UnitCardInstance) {
+        // self.arena.insert(card.id(), card);
         self.tracked_pending_cards.push(card);
     }
 
@@ -406,8 +415,14 @@ impl Board {
     }
 
     /// An iterator over all the creatures on the board.
+    // pub fn creatures_iter<'a>(&'a self) -> impl Iterator<Item = &'a UnitCardInstance> {
     pub fn creatures_iter(&self) -> impl Iterator<Item = &UnitCardInstance> {
         self.slots_iter().filter_map(BoardSlot::maybe_creature)
+
+        // self.slots.iter().map(move |s| {
+        //     let id = s.maybe_creature().unwrap().id();
+        //     self.arena.get(&id).unwrap()
+        // })
     }
 
     #[must_use]
