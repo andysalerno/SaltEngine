@@ -71,12 +71,8 @@ impl UnitCardDefinition for GrandmaTheSoother {
             return None;
         };
 
-        info!("Grandma has her action read");
-
         let grandma_pos = game_state.board().pos_with_creature(card_instance_id);
         let companion = game_state.board().companion_creature(grandma_pos)?;
-
-        info!("Grandma has a companion");
 
         if companion.id() == damage_event.creature_id() {
             info!("Grandma's companion was damaged");
@@ -148,7 +144,6 @@ mod tests {
         }
 
         // Summon grandma
-        info!("Summoning grandma");
         {
             let grandma = GrandmaTheSoother.make_instance();
             let grandma_id = grandma.id();
@@ -233,7 +228,7 @@ mod tests {
     }
 
     #[test]
-    fn when_non_companion_takes_damage_expects_draws_card() {
+    fn when_non_companion_takes_damage_expects_not_draws_card() {
         let _ = env_logger::builder().is_test(true).try_init();
         let mut state = make_test_state();
         let mut dispatcher = make_dispatcher(state.player_a_id(), state.player_b_id());

@@ -88,6 +88,17 @@ const BOARD_LEN: usize = 6;
 impl GameState {
     #[must_use]
     pub fn is_game_over(&self) -> bool {
+        // bit of a hack - if the hero is missing, it was killed, so the game is over
+        let player_a_hero_pos = BoardPos::hero_pos(self.player_a_id());
+        if self.board().creature_at_pos(player_a_hero_pos).is_none() {
+            return true;
+        }
+
+        let player_b_hero_pos = BoardPos::hero_pos(self.player_b_id());
+        if self.board().creature_at_pos(player_b_hero_pos).is_none() {
+            return true;
+        }
+
         self.board().hero(self.player_a_id).health() <= 0
             || self.board().hero(self.player_b_id).health() <= 0
     }
@@ -498,7 +509,7 @@ pub(crate) mod tests {
 
     use super::*;
 
-    fn make_test_state() -> GameState {
+    pub(crate) fn make_test_state() -> GameState {
         let player_a_deck = Deck::new(Vec::new());
         let player_b_deck = Deck::new(Vec::new());
 

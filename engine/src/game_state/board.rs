@@ -1,13 +1,11 @@
-use std::{
-    collections::{HashMap, HashSet},
-    fmt::Debug,
-};
-
 use super::{
     card_instance::{UnitCardInstance, UnitCardInstanceView},
+    hero::HeroDefinition,
     PlayerId, UnitCardInstanceId,
 };
+use crate::cards::UnitCardDefinition;
 use serde::{Deserialize, Serialize};
+use std::{collections::HashMap, fmt::Debug};
 
 const BOARD_WIDTH: usize = 6;
 const SLOTS_COUNT: usize = BOARD_WIDTH * 4;
@@ -311,6 +309,8 @@ impl<'a> BoardView<'a> for Board {
 pub struct Board {
     arena: HashMap<UnitCardInstanceId, UnitCardInstance>,
     player_a_id: PlayerId,
+    player_a_hero_slot: BoardSlot,
+    player_b_hero_slot: BoardSlot,
     player_b_id: PlayerId,
     slots: Vec<BoardSlot>,
 
@@ -359,8 +359,16 @@ impl Board {
             slots.push(BoardSlot::new(pos));
         }
 
+        let mut player_a_hero_slot = BoardSlot::new(BoardPos::hero_pos(player_a_id));
+        player_a_hero_slot.set_creature(HeroDefinition.make_instance());
+
+        let mut player_b_hero_slot = BoardSlot::new(BoardPos::hero_pos(player_b_id));
+        player_b_hero_slot.set_creature(HeroDefinition.make_instance());
+
         Self {
             player_a_id,
+            player_a_hero_slot,
+            player_b_hero_slot,
             player_b_id,
             slots,
             tracked_pending_cards: Vec::new(),
@@ -484,7 +492,13 @@ impl Board {
         }
 
         if pos.row() == RowId::Hero {
-            let slot = self.slot_at_pos_mut(pos);
+            // let slot = self.slot_at_pos_mut(pos);
+            // slot.set_creature(card_instance);
+            let slot = match self.player_ab(pos.player_id) {
+                PlayerAB::PlayerA => &mut self.player_a_hero_slot,
+                PlayerAB::PlayerB => &mut self.player_b_hero_slot,
+            };
+
             slot.set_creature(card_instance);
         } else {
             let row = self.player_row_mut(pos.player_id, pos.row_id);

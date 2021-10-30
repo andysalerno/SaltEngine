@@ -13,7 +13,7 @@ use log::info;
 /// A trait that defines the interaction between the GameRunner
 /// and the client.
 /// The GameRunner is the rules engine, and it will use the
-/// GameRunnerHandler for each player client to alert that client
+/// GameClient for each player client to alert that client
 /// to events, and to receive input from the player client.
 #[async_trait]
 pub trait GameClient: Send + Sync {
@@ -120,5 +120,95 @@ impl GameRunner {
                 return;
             }
         }
+    }
+}
+
+#[cfg(test)]
+pub mod tests {
+    use super::*;
+    use crate::{
+        game_agent::tests::{MockTestPrompter, StubNotifier},
+        game_logic::events::EndTurnEvent,
+        game_state::make_test_state,
+    };
+
+    struct TestClient {
+        action_queue: Vec<ClientActionEvent>,
+        on_turn_start_queue: Vec<Box<dyn FnMut(&GameState) + Send + Sync>>,
+    }
+
+    impl TestClient {
+        fn new() -> Self {
+            Self {
+                action_queue: Vec::new(),
+                on_turn_start_queue: Vec::new(),
+            }
+        }
+
+        fn add_action(&mut self, action: ClientActionEvent) {
+            self.action_queue.push(action);
+        }
+
+        fn add_turn_start_check(&mut self, check: Box<dyn FnMut(&GameState) + Send + Sync>) {
+            self.on_turn_start_queue.push(check);
+        }
+    }
+
+    #[async_trait]
+    impl GameClient for TestClient {
+        async fn on_turn_start(&mut self, game_state: &GameState) {
+            if let Some(mut check) = self.on_turn_start_queue.pop() {
+                check(game_state);
+            }
+        }
+
+        async fn next_action(&mut self, game_state_view: GameStatePlayerView) -> ClientActionEvent {
+            self.action_queue
+                .pop()
+                .expect("No actions left in the queue")
+        }
+
+        async fn make_prompter(&self) -> Box<dyn Prompter> {
+            Box::new(MockTestPrompter::new())
+        }
+
+        async fn make_notifier(&self) -> Box<dyn ClientNotifier> {
+            Box::new(StubNotifier)
+        }
+
+        async fn observe_state_update(&mut self, game_state_view: GameStatePlayerView) {
+            // todo!()
+        }
+    }
+
+    #[test]
+    pub fn thing() {
+        let mut client_a = Box::new(TestClient::new());
+        let mut client_b = Box::new(TestClient::new());
+        let game_state = make_test_state();
+
+        client_a.add_turn_start_check(Box::new(|game_state| {
+            let anything_on_board = game_state.board().creatures_iter().next();
+            assert!(
+                anything_on_board.is_none(),
+                "Expected no creatures on board since none were ever played."
+            );
+        }));
+
+        for _ in 0..100 {
+            client_a.add_action(ClientActionEvent::EndTurn(EndTurnEvent(
+                game_state.player_a_id(),
+            )));
+
+            client_b.add_action(ClientActionEvent::EndTurn(EndTurnEvent(
+                game_state.player_b_id(),
+            )));
+        }
+
+        let runner = GameRunner::new(client_a, client_b, game_state);
+
+        smol::block_on(async {
+            runner.run_game().await;
+        });
     }
 }

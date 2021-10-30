@@ -538,7 +538,7 @@ struct ConsoleNotifier;
 
 #[async_trait]
 impl ClientNotifier for ConsoleNotifier {
-    async fn notify(&self, _event: ClientEventView) {
-        // No-op for the console client
+    async fn notify(&self, event: ClientEventView) {
+        say(format!("Saw client event: {:?}", event));
     }
 }

@@ -1,8 +1,25 @@
 use super::{
-    board::{BoardSlotView, RowId},
+    board::{Board, BoardSlot, BoardSlotView, BoardView, RowId},
     card_instance::UnitCardInstanceView,
-    PlayerId, UnitCardInstanceId,
+    PlayerId, UnitCardInstance, UnitCardInstanceId,
 };
+
+// struct Selector<'a> {
+//     board: &'a Board,
+// }
+
+// impl<'a> Selector<'a> {
+//     pub fn creature_with_id(&self, id: UnitCardInstanceId) -> Option<&UnitCardInstance> {
+//         self.slot_with_id(id).and_then(BoardSlot::maybe_creature)
+//     }
+
+//     pub fn slot_with_id(&self, id: UnitCardInstanceId) -> Option<&BoardSlot> {
+//         self.board
+//             .slots()
+//             .iter()
+//             .find(|s| s.maybe_creature().map_or(false, |c| c.id() == id))
+//     }
+// }
 
 pub mod iter_helpers {
     use super::{BoardSlotView, PlayerId, RowId, UnitCardInstanceId, UnitCardInstanceView};
