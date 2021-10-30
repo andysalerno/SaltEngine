@@ -245,15 +245,7 @@ pub trait BoardView<'a> {
     fn row_range(&self, player_id: PlayerId, row_id: RowId) -> std::ops::Range<usize> {
         // Hero row is a special case
         if row_id == RowId::Hero {
-            let player_offset = match player_ab(self, player_id) {
-                PlayerAB::PlayerA => 0,
-                PlayerAB::PlayerB => 2,
-            };
-
-            let start = SLOTS_COUNT + player_offset;
-            let end = start + 2;
-
-            return start..end;
+            panic!("RowId 'Hero' not valid for row_range() operation.");
         }
 
         let player_range = self.player_range(player_id);
@@ -296,6 +288,13 @@ pub trait BoardView<'a> {
         &'a self,
         pos: BoardPos,
     ) -> Option<&<<Self as BoardView<'a>>::SlotView as BoardSlotView<'a>>::CardInstanceView> {
+        if pos.row() == RowId::Hero {
+            return match player_ab(self, pos.player_id) {
+                PlayerAB::PlayerA => self.player_a_hero().maybe_creature(),
+                PlayerAB::PlayerB => self.player_b_hero().maybe_creature(),
+            };
+        }
+
         let row = self.player_row(pos.player_id, pos.row_id);
 
         // start at pos.row_index, and work back, in case there's
@@ -361,7 +360,7 @@ pub struct Board {
 impl Board {
     #[must_use]
     pub fn new(_size: usize, player_a_id: PlayerId, player_b_id: PlayerId) -> Self {
-        let mut slots = Vec::with_capacity(SLOTS_COUNT + 4);
+        let mut slots = Vec::with_capacity(SLOTS_COUNT);
 
         // player b
         for i in 0..BOARD_WIDTH {
@@ -380,18 +379,6 @@ impl Board {
         }
         for i in 0..BOARD_WIDTH {
             let pos = BoardPos::new(player_a_id, RowId::BackRow, i);
-            slots.push(BoardSlot::new(pos));
-        }
-
-        // player a hero
-        for i in 0..2 {
-            let pos = BoardPos::new(player_a_id, RowId::Hero, i);
-            slots.push(BoardSlot::new(pos));
-        }
-
-        // player b hero
-        for i in 0..2 {
-            let pos = BoardPos::new(player_b_id, RowId::Hero, i);
             slots.push(BoardSlot::new(pos));
         }
 

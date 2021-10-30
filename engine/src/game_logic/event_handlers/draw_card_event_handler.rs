@@ -44,18 +44,15 @@ impl EventHandler for DrawCardEventHandler {
                 player_id
             );
 
-            {
-                let mut hero_iter = game_state
-                    .board()
-                    .all_characters_slots()
-                    .for_player(player_id)
-                    .heroes_only();
+            let hero_id = game_state
+                .board()
+                .all_characters_slots()
+                .for_player(player_id)
+                .heroes_only()
+                .creatures()
+                .expect_single()
+                .id();
 
-                info!("First hero is: {:?}", hero_iter.next().unwrap());
-                info!("Next hero is: {:?}", hero_iter.next().unwrap());
-            }
-
-            let hero_id = game_state.board().hero(player_id).id();
             let hero_damaged_event = CreatureTakesDamageEvent::new(hero_id, 1);
             dispatcher.dispatch(hero_damaged_event, game_state).await;
         }

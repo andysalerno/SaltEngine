@@ -134,12 +134,7 @@ impl GameState {
         player_b_id: PlayerId,
         player_b_deck: Deck,
     ) -> Self {
-        let hero_a = super::hero::make_hero_instance();
-        let hero_b = super::hero::make_hero_instance();
-        let mut board = Box::new(Board::new(BOARD_LEN, player_a_id, player_b_id));
-
-        board.set_creature_at_pos(BoardPos::hero_pos(player_a_id), hero_a);
-        board.set_creature_at_pos(BoardPos::hero_pos(player_b_id), hero_b);
+        let board = Box::new(Board::new(BOARD_LEN, player_a_id, player_b_id));
 
         Self {
             player_a_id,
