@@ -157,7 +157,21 @@ pub trait BoardView<'a> {
 
     fn player_a_id(&self) -> PlayerId;
     fn player_b_id(&self) -> PlayerId;
+
+    fn player_a_hero(&'a self) -> &'a Self::SlotView;
+    fn player_b_hero(&'a self) -> &'a Self::SlotView;
+
     fn slots(&self) -> &[Self::SlotView];
+
+    fn all_characters_slots(
+        &'a self,
+    ) -> std::iter::Chain<
+        std::slice::Iter<'_, <Self as BoardView<'a>>::SlotView>,
+        std::array::IntoIter<&<Self as BoardView<'a>>::SlotView, 2_usize>,
+    > {
+        let heroes = [self.player_a_hero(), self.player_b_hero()];
+        self.slots().iter().chain(heroes)
+    }
 
     /// True if there are `n_slots` starting at 'pos' within one row.
     /// Does not consider whether the slots are occupied or not.
@@ -171,10 +185,16 @@ pub trait BoardView<'a> {
         self.slots().iter()
     }
 
-    fn slot_with_creature(&self, id: UnitCardInstanceId) -> &<Self as BoardView<'a>>::SlotView {
-        self.slots_iter()
-            .find(|s| s.maybe_creature().map(|c| c.id()) == Some(id))
-            .unwrap_or_else(|| panic!("Creature instance with id {:?} not found.", id))
+    fn slot_with_creature(&'a self, id: UnitCardInstanceId) -> &<Self as BoardView<'a>>::SlotView {
+        if self.player_a_hero().maybe_creature().unwrap().id() == id {
+            self.player_a_hero()
+        } else if self.player_b_hero().maybe_creature().unwrap().id() == id {
+            self.player_b_hero()
+        } else {
+            self.slots_iter()
+                .find(|s| s.maybe_creature().map(|c| c.id()) == Some(id))
+                .unwrap_or_else(|| panic!("Creature instance with id {:?} not found.", id))
+        }
     }
 
     /// A slice starting at the slot where the creature instance exists,
@@ -197,7 +217,7 @@ pub trait BoardView<'a> {
             .expect("The position was not a valid board slot.")
     }
 
-    fn pos_with_creature(&self, id: UnitCardInstanceId) -> BoardPos {
+    fn pos_with_creature(&'a self, id: UnitCardInstanceId) -> BoardPos {
         self.slot_with_creature(id).pos()
     }
 
@@ -260,8 +280,16 @@ pub trait BoardView<'a> {
         &'a self,
         player_id: PlayerId,
     ) -> &<<Self as BoardView<'a>>::SlotView as BoardSlotView<'a>>::CardInstanceView {
-        let pos = BoardPos::hero_pos(player_id);
-        self.creature_at_pos(pos).expect("must have a hero")
+        match player_ab(self, player_id) {
+            PlayerAB::PlayerA => self
+                .player_a_hero()
+                .maybe_creature()
+                .expect("Expected a hero in the hero slot."),
+            PlayerAB::PlayerB => self
+                .player_b_hero()
+                .maybe_creature()
+                .expect("Expected a hero in the hero slot"),
+        }
     }
 
     fn creature_at_pos(
@@ -302,6 +330,14 @@ impl<'a> BoardView<'a> for Board {
 
     fn slots(&self) -> &[BoardSlot] {
         self.slots.as_slice()
+    }
+
+    fn player_a_hero(&self) -> &Self::SlotView {
+        &self.player_a_hero_slot
+    }
+
+    fn player_b_hero(&self) -> &Self::SlotView {
+        &self.player_b_hero_slot
     }
 }
 
@@ -413,7 +449,8 @@ impl Board {
 
     /// An iterator over all slots on the entire board (even empty ones).
     pub fn slots_iter_mut(&mut self) -> impl Iterator<Item = &mut BoardSlot> {
-        self.slots.iter_mut()
+        let heros = [&mut self.player_a_hero_slot, &mut self.player_b_hero_slot];
+        self.slots.iter_mut().chain(heros)
     }
 
     /// An iterator over all the creatures on the board.
@@ -611,6 +648,8 @@ pub mod player_view {
     pub struct BoardPlayerView {
         player_a_id: PlayerId,
         player_b_id: PlayerId,
+        player_a_hero: BoardSlotPlayerView,
+        player_b_hero: BoardSlotPlayerView,
         slots: Vec<BoardSlotPlayerView>,
     }
 
@@ -621,6 +660,8 @@ pub mod player_view {
             BoardPlayerView {
                 player_a_id: self.player_a_id,
                 player_b_id: self.player_b_id,
+                player_a_hero: self.player_a_hero().player_view(player_viewing),
+                player_b_hero: self.player_b_hero().player_view(player_viewing),
                 slots: self
                     .slots
                     .iter()
@@ -655,6 +696,14 @@ pub mod player_view {
 
         fn slots(&self) -> &[Self::SlotView] {
             self.slots.as_slice()
+        }
+
+        fn player_a_hero(&self) -> &Self::SlotView {
+            &self.player_a_hero
+        }
+
+        fn player_b_hero(&self) -> &Self::SlotView {
+            &self.player_b_hero
         }
     }
 }

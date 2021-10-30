@@ -1,10 +1,12 @@
+use crate::game_state::selector::iter_helpers::IteratorExpectSingle;
+use crate::game_state::IterAddons;
 use crate::{
     game_logic::{
         event_handlers::EventHandler,
         events::{AddCardToHandEvent, CreatureTakesDamageEvent, DrawCardEvent},
         EventDispatcher,
     },
-    game_state::GameState,
+    game_state::{board::BoardView, GameState},
 };
 use async_trait::async_trait;
 use log::info;
@@ -38,9 +40,20 @@ impl EventHandler for DrawCardEventHandler {
             dispatcher.dispatch(add_to_hand_event, game_state).await;
         } else {
             info!(
-                "Player {:?} had no cards in deck, so drew nothing.",
+                "Player {:?} had no cards in deck, so drew nothing. Hero receives 1 damage.",
                 player_id
             );
+
+            {
+                let mut hero_iter = game_state
+                    .board()
+                    .all_characters_slots()
+                    .for_player(player_id)
+                    .heroes_only();
+
+                info!("First hero is: {:?}", hero_iter.next().unwrap());
+                info!("Next hero is: {:?}", hero_iter.next().unwrap());
+            }
 
             let hero_id = game_state.board().hero(player_id).id();
             let hero_damaged_event = CreatureTakesDamageEvent::new(hero_id, 1);

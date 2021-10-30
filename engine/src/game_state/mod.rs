@@ -4,7 +4,7 @@ mod deck;
 mod game_state;
 mod hand;
 mod hero;
-mod selector;
+pub mod selector;
 
 pub use card_instance::{
     InstanceState, UnitCardInstance, UnitCardInstanceId, UnitCardInstancePlayerView,

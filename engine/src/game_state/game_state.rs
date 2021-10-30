@@ -505,11 +505,54 @@ pub mod player_view {
 
 #[cfg(test)]
 pub(crate) mod tests {
-    use crate::game_state::MakePlayerView;
+    use crate::{
+        cards::{CardDefinition, Position, UnitCardDefinition},
+        game_state::MakePlayerView,
+    };
 
     use super::*;
 
+    #[derive(Debug)]
+    struct Slime;
+
+    impl CardDefinition for Slime {
+        fn title(&self) -> &str {
+            "Attack Dog"
+        }
+
+        fn cost(&self) -> i32 {
+            3
+        }
+
+        fn flavor_text(&self) -> &str {
+            "todo"
+        }
+
+        fn text(&self) -> &str {
+            ""
+        }
+    }
+
+    impl UnitCardDefinition for Slime {
+        fn attack(&self) -> i32 {
+            5
+        }
+
+        fn health(&self) -> i32 {
+            3
+        }
+
+        fn row_width(&self) -> usize {
+            1
+        }
+
+        fn placeable_at(&self) -> Position {
+            Position::Front
+        }
+    }
+
     pub(crate) fn make_test_state() -> GameState {
+        // let player_a_deck = Deck::new(vec![Slime.make_instance()]);
         let player_a_deck = Deck::new(Vec::new());
         let player_b_deck = Deck::new(Vec::new());
 

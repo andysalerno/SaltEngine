@@ -183,6 +183,7 @@ pub mod tests {
 
     #[test]
     pub fn thing() {
+        let _ = env_logger::builder().is_test(true).try_init();
         let mut client_a = Box::new(TestClient::new());
         let mut client_b = Box::new(TestClient::new());
         let game_state = make_test_state();

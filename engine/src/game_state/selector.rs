@@ -41,6 +41,8 @@ pub mod iter_helpers {
 
         /// A filter that excludes hero slots from the iteration.
         fn exclude_heroes(self) -> ExcludeHeroesFilter<'a, I, S>;
+
+        fn heroes_only(self) -> HeroesOnlyFilter<'a, I, S>;
     }
 
     impl<'a, I, S: 'a> IterAddons<'a, I, S> for I
@@ -69,6 +71,10 @@ pub mod iter_helpers {
 
         fn exclude_heroes(self) -> ExcludeHeroesFilter<'a, I, S> {
             ExcludeHeroesFilter { iter: self }
+        }
+
+        fn heroes_only(self) -> HeroesOnlyFilter<'a, I, S> {
+            HeroesOnlyFilter { iter: self }
         }
     }
 
@@ -174,6 +180,26 @@ pub mod iter_helpers {
         }
     }
 
+    pub struct HeroesOnlyFilter<'a, I, S: 'a>
+    where
+        I: Iterator<Item = &'a S>,
+        S: BoardSlotView<'a>,
+    {
+        iter: I,
+    }
+
+    impl<'a, I, S: 'a> Iterator for HeroesOnlyFilter<'a, I, S>
+    where
+        I: Iterator<Item = &'a S>,
+        S: BoardSlotView<'a>,
+    {
+        type Item = I::Item;
+
+        fn next(&mut self) -> Option<Self::Item> {
+            self.iter.find(|s| s.pos().row() == RowId::Hero)
+        }
+    }
+
     pub trait IteratorAny {
         fn has_any(self) -> bool;
     }
@@ -181,6 +207,29 @@ pub mod iter_helpers {
     impl<T: IntoIterator> IteratorAny for T {
         fn has_any(self) -> bool {
             self.into_iter().next().is_some()
+        }
+    }
+
+    pub trait IteratorExpectSingle<TItem> {
+        fn expect_single(self) -> TItem;
+    }
+
+    impl<T, TItem> IteratorExpectSingle<TItem> for T
+    where
+        T: IntoIterator<Item = TItem>,
+    {
+        fn expect_single(self) -> TItem {
+            let mut iter = self.into_iter();
+
+            let item = iter
+                .next()
+                .expect("Expected a single item, but there were none.");
+
+            if iter.next().is_some() {
+                panic!("Expected a single item, but there were multiple.");
+            }
+
+            item
         }
     }
 }

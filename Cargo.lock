@@ -941,6 +941,7 @@ version = "0.1.0"
 dependencies = [
  "async-trait",
  "enum_dispatch",
+ "env_logger 0.9.0",
  "futures",
  "log",
  "mockall",
