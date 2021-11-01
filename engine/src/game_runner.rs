@@ -129,7 +129,7 @@ pub mod tests {
     use crate::{
         game_agent::tests::{MockTestPrompter, StubNotifier},
         game_logic::events::EndTurnEvent,
-        game_state::make_test_state,
+        game_state::{board::BoardView, make_test_state, IterAddons},
     };
 
     struct TestClient {
@@ -189,7 +189,12 @@ pub mod tests {
         let game_state = make_test_state();
 
         client_a.add_turn_start_check(Box::new(|game_state| {
-            let anything_on_board = game_state.board().creatures_iter().next();
+            let anything_on_board = game_state
+                .board()
+                .all_characters_slots()
+                .exclude_heroes()
+                .creatures()
+                .next();
             assert!(
                 anything_on_board.is_none(),
                 "Expected no creatures on board since none were ever played."

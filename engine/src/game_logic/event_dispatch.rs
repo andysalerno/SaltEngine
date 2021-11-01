@@ -11,7 +11,7 @@ use super::{
 use crate::{
     game_agent::{ClientNotifier, Prompter},
     game_logic::event_handlers::AddBuffToCardInstanceHandler,
-    game_state::{GameState, PlayerId},
+    game_state::{board::BoardView, GameState, IterAddons, PlayerId},
 };
 use futures::join;
 use log::{debug, info};
@@ -106,7 +106,8 @@ impl EventDispatcher {
     async fn pre_handle(&mut self, event: &GameEvent, game_state: &mut GameState) {
         let pre_existing_actions = game_state
             .board()
-            .creatures_iter()
+            .all_characters_slots()
+            .creatures()
             .filter_map(|c| {
                 c.definition()
                     .pre_event_action(c.id(), event, game_state, self)
@@ -121,7 +122,8 @@ impl EventDispatcher {
     async fn post_handle(&mut self, event: &GameEvent, game_state: &mut GameState) {
         let pre_existing_actions = game_state
             .board()
-            .creatures_iter()
+            .all_characters_slots()
+            .creatures()
             .filter_map(|c| {
                 c.definition()
                     .post_event_action(c.id(), event, game_state, self)
