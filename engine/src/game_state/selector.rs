@@ -1,6 +1,4 @@
-use std::iter::Filter;
-
-use futures::future::Select;
+use std::{borrow::Borrow, ops::Deref};
 
 use super::{
     board::{Board, BoardSlot, BoardSlotView, BoardView, RowId},
@@ -28,7 +26,7 @@ where
 
 impl<'a, TBoard> Selectorz<'a, TBoard>
 where
-    TBoard: AsRef<&'a Board>,
+    TBoard: Borrow<Board> + 'a,
 {
     pub fn new(board: TBoard) -> Self {
         Self {
@@ -39,18 +37,17 @@ where
             player_id: None,
         }
     }
-}
 
-impl<'a, TBoard> Selectorz<'a, TBoard>
-where
-    TBoard: AsRef<&'a Board> + 'a,
-{
-    pub fn iter(self) -> impl Iterator<Item = &'a BoardSlot> + 'a {
+    pub fn iter(&'a self) -> impl Iterator<Item = &'a BoardSlot> + 'a {
+        let heroes = self.heroes;
+        let creatures = self.creatures;
+        let player_id = self.player_id;
+
         self.board
-            .as_ref()
+            .borrow()
             .slots()
             .iter()
-            .filter(move |s| match_slot(s, self.heroes, self.creatures, self.player_id))
+            .filter(move |s| match_slot(s, heroes, creatures, player_id))
     }
 }
 
@@ -380,4 +377,46 @@ pub mod iter_helpers {
             item
         }
     }
+}
+
+#[cfg(test)]
+mod test {
+    use crate::game_state::{board::Board, PlayerId};
+
+    use super::Selectorz;
+
+    fn selector_consumes_board() {
+        let board = Board::new(8, PlayerId::new(), PlayerId::new());
+        let selector = Selectorz::new(board);
+        let vec = selector.iter().collect::<Vec<_>>();
+        drop(vec);
+    }
+
+    fn selector_consumes_board_ref() {
+        let board = Board::new(8, PlayerId::new(), PlayerId::new());
+        let selector = Selectorz::new(&board);
+        let vec = selector.iter().collect::<Vec<_>>();
+        drop(vec);
+    }
+
+    fn selector_consumes_board_mut_ref() {
+        let mut board = Board::new(8, PlayerId::new(), PlayerId::new());
+        let selector = Selectorz::new(&mut board);
+        let vec = selector.iter().collect::<Vec<_>>();
+        drop(vec);
+    }
+
+    fn selector_consumes_board_mut_ref_iter_mut() {
+        let mut board = Board::new(8, PlayerId::new(), PlayerId::new());
+        let selector = Selectorz::new(&mut board);
+        let vec = selector.iter_mut().collect::<Vec<_>>();
+        drop(vec);
+    }
+
+    // fn selector_consumes_board_iter_mut() {
+    //     let mut board = Board::new(8, PlayerId::new(), PlayerId::new());
+    //     let selector = Selectorz::new(board);
+    //     let vec = selector.iter_mut().collect::<Vec<_>>();
+    //     drop(vec);
+    // }
 }
