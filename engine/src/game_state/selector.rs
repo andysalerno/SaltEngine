@@ -1,12 +1,14 @@
 use std::iter::Filter;
 
+use futures::future::Select;
+
 use super::{
     board::{Board, BoardSlot, BoardSlotView, BoardView, RowId},
     card_instance::UnitCardInstanceView,
     PlayerId, UnitCardInstance, UnitCardInstanceId,
 };
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Copy, Clone)]
 enum Selection {
     MustInclude,
     MustExclude,
@@ -22,37 +24,6 @@ where
     heroes: Selection,
     creatures: Selection,
     player_id: Option<PlayerId>,
-}
-
-impl<'a, TBoard> Selectorz<'a, TBoard>
-where
-    TBoard: 'a,
-{
-    fn match_slot(&'a self, slot: &'a BoardSlot) -> bool {
-        if self.heroes == Selection::MustExclude && slot.pos().row().is_hero() {
-            return false;
-        }
-
-        if self.heroes == Selection::MustInclude && !slot.pos().row().is_hero() {
-            return false;
-        }
-
-        if self.creatures == Selection::MustExclude && slot.has_creature() {
-            return false;
-        }
-
-        if self.creatures == Selection::MustInclude && !slot.has_creature() {
-            return false;
-        }
-
-        if let Some(player_id) = self.player_id {
-            if slot.pos().player_id != player_id {
-                return false;
-            }
-        }
-
-        true
-    }
 }
 
 impl<'a, TBoard> Selectorz<'a, TBoard>
@@ -79,20 +50,53 @@ where
             .as_ref()
             .slots()
             .iter()
-            .filter(move |s| self.match_slot(s))
+            .filter(move |s| match_slot(s, self.heroes, self.creatures, self.player_id))
     }
 }
 
-impl<'a, TBoard> Selectorz<'a, TBoard>
-where
-    //Self: 'a,
-    TBoard: AsMut<Board> + 'a,
-{
-    // pub fn iter_mut(&'a mut self) -> impl Iterator<Item = &'a mut BoardSlot> + 'a {
+impl<'a> Selectorz<'a, &'a mut Board> {
     pub fn iter_mut(self) -> impl Iterator<Item = &'a mut BoardSlot> + 'a {
-        let mut board = self.board;
-        board.as_mut().im().filter(move |s| self.match_slot(s))
+        let board = self.board;
+        let heroes = self.heroes;
+        let creatures = self.creatures;
+        let player_id = self.player_id;
+
+        board
+            .slots
+            .iter_mut()
+            .filter(move |s| match_slot(s, heroes, creatures, player_id))
     }
+}
+
+fn match_slot(
+    slot: &BoardSlot,
+    heroes: Selection,
+    creatures: Selection,
+    player_id: Option<PlayerId>,
+) -> bool {
+    if heroes == Selection::MustExclude && slot.pos().row().is_hero() {
+        return false;
+    }
+
+    if heroes == Selection::MustInclude && !slot.pos().row().is_hero() {
+        return false;
+    }
+
+    if creatures == Selection::MustExclude && slot.has_creature() {
+        return false;
+    }
+
+    if creatures == Selection::MustInclude && !slot.has_creature() {
+        return false;
+    }
+
+    if let Some(player_id) = player_id {
+        if slot.pos().player_id != player_id {
+            return false;
+        }
+    }
+
+    true
 }
 
 struct Selector<'a> {

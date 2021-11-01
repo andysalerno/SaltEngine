@@ -350,7 +350,7 @@ pub struct Board {
     player_a_hero_slot: BoardSlot,
     player_b_hero_slot: BoardSlot,
     player_b_id: PlayerId,
-    slots: Vec<BoardSlot>,
+    pub(crate) slots: Vec<BoardSlot>,
 
     /// Cards that are not on a `BoardSlot`, but are known to the board and accessible from `Board` functions.
     /// Example: a card is summoned from a player's hand: it is removed from the hand, but while the "on summoned"
