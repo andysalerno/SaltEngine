@@ -1,3 +1,5 @@
+use self::player_view::BoardSlotPlayerView;
+
 use super::{
     card_instance::{UnitCardInstance, UnitCardInstanceView},
     hero::HeroDefinition,
@@ -186,18 +188,6 @@ pub trait BoardView<'a> {
         space_in_row >= n_slots
     }
 
-    fn slot_with_creature(&'a self, id: UnitCardInstanceId) -> &<Self as BoardView<'a>>::SlotView {
-        if self.player_a_hero().maybe_creature().unwrap().id() == id {
-            self.player_a_hero()
-        } else if self.player_b_hero().maybe_creature().unwrap().id() == id {
-            self.player_b_hero()
-        } else {
-            self.slots_iter()
-                .find(|s| s.maybe_creature().map(|c| c.id()) == Some(id))
-                .unwrap_or_else(|| panic!("Creature instance with id {:?} not found.", id))
-        }
-    }
-
     fn player_row(&self, player_id: PlayerId, row: RowId) -> &[<Self as BoardView<'a>>::SlotView] {
         &self.slots()[row_range(self, player_id, row)]
     }
@@ -230,6 +220,18 @@ pub trait BoardView<'a> {
         let creature_width = slot.maybe_creature().unwrap().width();
 
         &self.slots()[start_index..start_index + creature_width]
+    }
+
+    fn slot_with_creature(&'a self, id: UnitCardInstanceId) -> &<Self as BoardView<'a>>::SlotView {
+        if self.player_a_hero().maybe_creature().unwrap().id() == id {
+            self.player_a_hero()
+        } else if self.player_b_hero().maybe_creature().unwrap().id() == id {
+            self.player_b_hero()
+        } else {
+            self.slots_iter()
+                .find(|s| s.maybe_creature().map(|c| c.id()) == Some(id))
+                .unwrap_or_else(|| panic!("Creature instance with id {:?} not found.", id))
+        }
     }
 
     fn slot_at_pos(&self, pos: BoardPos) -> &<Self as BoardView<'a>>::SlotView {
@@ -440,17 +442,15 @@ impl Board {
         self.slots.iter_mut().chain(heros)
     }
 
+    pub fn im(&mut self) -> impl Iterator<Item = &mut BoardSlot> {
+        self.slots.iter_mut()
+    }
+
     /// An iterator over all the creatures on the board.
     pub fn creatures_iter_mut(&mut self) -> impl Iterator<Item = &mut UnitCardInstance> {
         self.slots_iter_mut()
             .filter_map(BoardSlot::maybe_creature_mut)
     }
-
-    /// An iterator over all the creatures on the board.
-    // pub fn creatures_iter<'a>(&'a self) -> impl Iterator<Item = &'a UnitCardInstance> {
-    // pub fn creatures_iter(&self) -> impl Iterator<Item = &UnitCardInstance> {
-    //     self.slots_iter().filter_map(BoardSlot::maybe_creature)
-    // }
 
     #[must_use]
     pub fn player_side(&self, player_id: PlayerId) -> &[BoardSlot] {
