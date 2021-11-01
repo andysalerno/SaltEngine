@@ -3,7 +3,10 @@ use self::player_view::BoardSlotPlayerView;
 use super::{
     card_instance::{UnitCardInstance, UnitCardInstanceView},
     hero::HeroDefinition,
-    selector::iter_helpers::{SlotCreatureFilter, SlotCreatureMap},
+    selector::{
+        iter_helpers::{SlotCreatureFilter, SlotCreatureMap},
+        Selector,
+    },
     IterAddons, PlayerId, UnitCardInstanceId,
 };
 use crate::cards::UnitCardDefinition;
@@ -417,6 +420,16 @@ impl Board {
         self.tracked_pending_cards.push(card);
     }
 
+    #[must_use]
+    pub fn selector(&self) -> Selector<&Board> {
+        Selector::new(self)
+    }
+
+    #[must_use]
+    pub fn selector_mut(&mut self) -> Selector<&mut Board> {
+        Selector::new(self)
+    }
+
     pub fn tracked_pending_cards(&self) -> impl Iterator<Item = &UnitCardInstance> {
         self.tracked_pending_cards.iter()
     }
@@ -677,5 +690,25 @@ pub mod player_view {
         fn player_b_hero(&self) -> &Self::SlotView {
             &self.player_b_hero
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::Board;
+    use crate::game_state::PlayerId;
+
+    #[test]
+    fn board_selector_iter() {
+        let board = Board::new(8, PlayerId::new(), PlayerId::new());
+
+        for _slot in board.selector().iter() {}
+    }
+
+    #[test]
+    fn board_selector_iter_mut() {
+        let mut board = Board::new(8, PlayerId::new(), PlayerId::new());
+
+        for _slot in board.selector_mut().iter_mut() {}
     }
 }

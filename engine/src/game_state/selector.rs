@@ -12,7 +12,7 @@ enum Selection {
     IncludeOrExclude,
 }
 
-struct Selector<'a, TBoard>
+pub struct Selector<'a, TBoard>
 where
     TBoard: 'a,
 {
