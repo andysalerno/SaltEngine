@@ -50,6 +50,35 @@ where
     }
 }
 
+impl<'a, TBoardView> Selector<'a, &'a TBoardView>
+where
+    TBoardView: BoardView<'a>,
+{
+    pub fn from_boardview(board: &'a TBoardView) -> Self {
+        Self {
+            _phantom: std::marker::PhantomData::default(),
+            board,
+            heroes: Selection::IncludeOrExclude,
+            creatures: Selection::IncludeOrExclude,
+            player_id: None,
+        }
+    }
+
+    pub fn iter_boardview(
+        &'a self,
+    ) -> impl Iterator<Item = &<TBoardView as BoardView<'a>>::SlotView> + 'a {
+        let heroes = self.heroes;
+        let creatures = self.creatures;
+        let player_id = self.player_id;
+
+        self.board
+            .borrow()
+            .slots()
+            .iter()
+            .filter(move |&s| match_slot_view(s, heroes, creatures, player_id))
+    }
+}
+
 impl<'a> Selector<'a, &'a mut Board> {
     pub fn iter_mut(self) -> impl Iterator<Item = &'a mut BoardSlot> + 'a {
         let board = self.board;
@@ -66,6 +95,37 @@ impl<'a> Selector<'a, &'a mut Board> {
 
 fn match_slot(
     slot: &BoardSlot,
+    heroes: Selection,
+    creatures: Selection,
+    player_id: Option<PlayerId>,
+) -> bool {
+    if heroes == Selection::MustExclude && slot.pos().row().is_hero() {
+        return false;
+    }
+
+    if heroes == Selection::MustInclude && !slot.pos().row().is_hero() {
+        return false;
+    }
+
+    if creatures == Selection::MustExclude && slot.has_creature() {
+        return false;
+    }
+
+    if creatures == Selection::MustInclude && !slot.has_creature() {
+        return false;
+    }
+
+    if let Some(player_id) = player_id {
+        if slot.pos().player_id != player_id {
+            return false;
+        }
+    }
+
+    true
+}
+
+fn match_slot_view<'a, TSlotView: BoardSlotView<'a>>(
+    slot: &'a TSlotView,
     heroes: Selection,
     creatures: Selection,
     player_id: Option<PlayerId>,

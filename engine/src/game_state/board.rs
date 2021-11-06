@@ -25,6 +25,11 @@ pub trait BoardSlotView<'a> {
 
     /// The view of the creature on this pos, if there is one.
     fn maybe_creature(&self) -> Option<&Self::CardInstanceView>;
+
+    #[must_use]
+    fn has_creature(&self) -> bool {
+        self.maybe_creature().is_some()
+    }
 }
 
 /// A slot on the board, which has a position
@@ -283,6 +288,14 @@ pub trait BoardView<'a> {
         }
 
         None
+    }
+
+    #[must_use]
+    fn selector(&'a self) -> Selector<&Self>
+    where
+        Self: Sized,
+    {
+        Selector::from_boardview(self)
     }
 }
 
