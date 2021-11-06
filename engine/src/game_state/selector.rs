@@ -23,31 +23,31 @@ where
     player_id: Option<PlayerId>,
 }
 
-impl<'a, TBoard> Selector<'a, TBoard>
+impl<'a, TBoard> Selector<'a, &'a TBoard>
 where
-    TBoard: Borrow<Board> + 'a,
+    TBoard: 'a,
 {
-    pub fn new(board: TBoard) -> Self {
+    pub fn new<T: Borrow<TBoard> + 'a>(board: T) -> Self {
         Self {
             _phantom: std::marker::PhantomData::default(),
-            board,
+            board: board.borrow(),
             heroes: Selection::IncludeOrExclude,
             creatures: Selection::IncludeOrExclude,
             player_id: None,
         }
     }
 
-    pub fn iter(&'a self) -> impl Iterator<Item = &'a BoardSlot> + 'a {
-        let heroes = self.heroes;
-        let creatures = self.creatures;
-        let player_id = self.player_id;
+    // pub fn iter(&'a self) -> impl Iterator<Item = &'a BoardSlot> + 'a {
+    //     let heroes = self.heroes;
+    //     let creatures = self.creatures;
+    //     let player_id = self.player_id;
 
-        self.board
-            .borrow()
-            .slots()
-            .iter()
-            .filter(move |s| match_slot(s, heroes, creatures, player_id))
-    }
+    //     self.board
+    //         .borrow()
+    //         .slots()
+    //         .iter()
+    //         .filter(move |s| match_slot_view(s as &BoardSlot, heroes, creatures, player_id))
+    // }
 }
 
 impl<'a, TBoardView> Selector<'a, &'a TBoardView>
@@ -64,9 +64,7 @@ where
         }
     }
 
-    pub fn iter_boardview(
-        &'a self,
-    ) -> impl Iterator<Item = &<TBoardView as BoardView<'a>>::SlotView> + 'a {
+    pub fn iter(&'a self) -> impl Iterator<Item = &<TBoardView as BoardView<'a>>::SlotView> + 'a {
         let heroes = self.heroes;
         let creatures = self.creatures;
         let player_id = self.player_id;
@@ -89,11 +87,11 @@ impl<'a> Selector<'a, &'a mut Board> {
         board
             .slots
             .iter_mut()
-            .filter(move |s| match_slot(s, heroes, creatures, player_id))
+            .filter(move |s| match_slot_view(s as &BoardSlot, heroes, creatures, player_id))
     }
 }
 
-fn match_slot(
+fn match_slotz(
     slot: &BoardSlot,
     heroes: Selection,
     creatures: Selection,
@@ -373,13 +371,13 @@ mod test {
     use super::Selector;
     use crate::game_state::{board::Board, PlayerId};
 
-    #[test]
-    fn selector_consumes_board() {
-        let board = Board::new(8, PlayerId::new(), PlayerId::new());
-        let selector = Selector::new(board);
-        let vec = selector.iter().collect::<Vec<_>>();
-        drop(vec);
-    }
+    // #[test]
+    // fn selector_consumes_board() {
+    //     let board = Board::new(8, PlayerId::new(), PlayerId::new());
+    //     let selector = Selector::new(board);
+    //     let vec = selector.iter().collect::<Vec<_>>();
+    //     drop(vec);
+    // }
 
     #[test]
     fn selector_consumes_board_ref() {

@@ -434,11 +434,6 @@ impl Board {
     }
 
     #[must_use]
-    pub fn selector(&self) -> Selector<&Board> {
-        Selector::new(self)
-    }
-
-    #[must_use]
     pub fn selector_mut(&mut self) -> Selector<&mut Board> {
         Selector::new(self)
     }
@@ -708,7 +703,7 @@ pub mod player_view {
 
 #[cfg(test)]
 mod tests {
-    use super::Board;
+    use super::{Board, BoardView};
     use crate::game_state::PlayerId;
 
     #[test]
