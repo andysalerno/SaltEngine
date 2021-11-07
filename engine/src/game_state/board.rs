@@ -1,10 +1,7 @@
 use super::{
     card_instance::{UnitCardInstance, UnitCardInstanceView},
     hero::HeroDefinition,
-    selector::{
-        iter_helpers::{SlotCreatureFilter, SlotCreatureMap},
-        Selector,
-    },
+    selector::iter_helpers::{SlotCreatureFilter, SlotCreatureMap},
     IterAddons, MakePlayerView, PlayerId, UnitCardInstanceId, UnitCardInstancePlayerView,
 };
 use crate::cards::UnitCardDefinition;
@@ -474,15 +471,15 @@ impl Board {
         self.tracked_pending_cards.push(card);
     }
 
-    #[must_use]
-    pub fn selector_mut(&mut self) -> Selector<&mut Board> {
-        Selector::new_mut(self)
-    }
+    // #[must_use]
+    // pub fn selector_mut(&mut self) -> Selector<&mut Board> {
+    //     Selector::new_mut(self)
+    // }
 
-    #[must_use]
-    pub fn selector(&self) -> Selector<&Board> {
-        Selector::new(self)
-    }
+    // #[must_use]
+    // pub fn selector(&self) -> Selector<&Board> {
+    //     Selector::new(self)
+    // }
 
     pub fn tracked_pending_cards(&self) -> impl Iterator<Item = &UnitCardInstance> {
         self.tracked_pending_cards.iter()
@@ -686,15 +683,15 @@ pub struct BoardPlayerView {
     slots: Vec<BoardSlotPlayerView>,
 }
 
-impl BoardPlayerView {
-    #[must_use]
-    pub fn selector<'a>(&'a self) -> Selector<&'a Self>
-    where
-        Self: BoardView<'a>,
-    {
-        Selector::new(self)
-    }
-}
+// impl BoardPlayerView {
+//     #[must_use]
+//     pub fn selector<'a>(&'a self) -> Selector<&'a Self>
+//     where
+//         Self: BoardView<'a>,
+//     {
+//         Selector::new(self)
+//     }
+// }
 
 impl<'a> MakePlayerView<'a> for Board {
     type TOut = BoardPlayerView;
@@ -750,32 +747,32 @@ impl<'a> BoardView<'a> for BoardPlayerView {
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use super::Board;
-    use crate::game_state::{MakePlayerView, PlayerId};
+// #[cfg(test)]
+// mod tests {
+//     use super::Board;
+//     use crate::game_state::{MakePlayerView, PlayerId};
 
-    #[test]
-    fn board_selector_iter() {
-        let board = Board::new(8, PlayerId::new(), PlayerId::new());
+//     #[test]
+//     fn board_selector_iter() {
+//         let board = Board::new(8, PlayerId::new(), PlayerId::new());
 
-        for _slot in board.selector().iter() {}
-    }
+//         for _slot in board.selector().iter() {}
+//     }
 
-    #[test]
-    fn board_selector_iter_mut() {
-        let mut board = Board::new(8, PlayerId::new(), PlayerId::new());
+//     #[test]
+//     fn board_selector_iter_mut() {
+//         let mut board = Board::new(8, PlayerId::new(), PlayerId::new());
 
-        for _slot in board.selector_mut().iter_mut() {}
-    }
+//         for _slot in board.selector_mut().iter_mut() {}
+//     }
 
-    #[test]
-    fn board_view_selector_iter() {
-        let player_a = PlayerId::new();
-        let player_b = PlayerId::new();
-        let board = Board::new(8, player_a, player_b);
-        let view = board.player_view(player_a);
+//     #[test]
+//     fn board_view_selector_iter() {
+//         let player_a = PlayerId::new();
+//         let player_b = PlayerId::new();
+//         let board = Board::new(8, player_a, player_b);
+//         let view = board.player_view(player_a);
 
-        for _slot in view.selector().iter() {}
-    }
-}
+//         for _slot in view.selector().iter() {}
+//     }
+// }

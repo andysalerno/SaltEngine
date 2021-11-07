@@ -5,118 +5,103 @@ use super::{
 };
 use std::borrow::{Borrow, BorrowMut};
 
-#[derive(Debug, PartialEq, Copy, Clone)]
-enum Selection {
-    MustInclude,
-    MustExclude,
-    IncludeOrExclude,
-}
+// #[derive(Debug, PartialEq, Copy, Clone)]
+// enum Selection {
+//     MustInclude,
+//     MustExclude,
+//     IncludeOrExclude,
+// }
 
-pub struct Selector<'a, TBoard>
-where
-    TBoard: 'a,
-{
-    _phantom: std::marker::PhantomData<&'a TBoard>,
-    board: TBoard,
-    heroes: Selection,
-    creatures: Selection,
-    player_id: Option<PlayerId>,
-}
+// pub struct Selector<'a, TBoard>
+// where
+//     TBoard: 'a,
+// {
+//     _phantom: std::marker::PhantomData<&'a TBoard>,
+//     board: TBoard,
+//     heroes: Selection,
+//     creatures: Selection,
+//     player_id: Option<PlayerId>,
+// }
 
-impl<'a, TBoard> Selector<'a, &'a TBoard>
-where
-    TBoard: BoardView<'a> + 'a,
-{
-    pub fn new(board: &'a TBoard) -> Self {
-        Self {
-            _phantom: std::marker::PhantomData::default(),
-            board,
-            heroes: Selection::IncludeOrExclude,
-            creatures: Selection::IncludeOrExclude,
-            player_id: None,
-        }
-    }
+// impl<'a, TBoard> Selector<'a, &'a TBoard>
+// where
+//     TBoard: BoardView<'a> + 'a,
+// {
+//     pub fn new(board: &'a TBoard) -> Self {
+//         Self {
+//             _phantom: std::marker::PhantomData::default(),
+//             board,
+//             heroes: Selection::IncludeOrExclude,
+//             creatures: Selection::IncludeOrExclude,
+//             player_id: None,
+//         }
+//     }
 
-    pub fn iter(&'a self) -> impl Iterator<Item = &<TBoard as BoardView<'a>>::SlotView> + 'a {
-        let heroes = self.heroes;
-        let creatures = self.creatures;
-        let player_id = self.player_id;
+//     pub fn iter(&'a self) -> impl Iterator<Item = &<TBoard as BoardView<'a>>::SlotView> + 'a {
+//         let heroes = self.heroes;
+//         let creatures = self.creatures;
+//         let player_id = self.player_id;
 
-        self.board
-            .slots()
-            .iter()
-            .filter(move |&s| match_slot_view(s, heroes, creatures, player_id))
-    }
-}
+//         self.board
+//             .slots()
+//             .iter()
+//             .filter(move |&s| match_slot_view(s, heroes, creatures, player_id))
+//     }
+// }
 
-impl<'a> Selector<'a, &'a mut Board> {
-    pub fn new_mut(board: &'a mut Board) -> Self {
-        Self {
-            _phantom: std::marker::PhantomData::default(),
-            board,
-            heroes: Selection::IncludeOrExclude,
-            creatures: Selection::IncludeOrExclude,
-            player_id: None,
-        }
-    }
+// impl<'a> Selector<'a, &'a mut Board> {
+//     pub fn new_mut(board: &'a mut Board) -> Self {
+//         Self {
+//             _phantom: std::marker::PhantomData::default(),
+//             board,
+//             heroes: Selection::IncludeOrExclude,
+//             creatures: Selection::IncludeOrExclude,
+//             player_id: None,
+//         }
+//     }
 
-    pub fn iter_mut(&'a mut self) -> impl Iterator<Item = &'a mut BoardSlot> + 'a {
-        let heroes = self.heroes;
-        let creatures = self.creatures;
-        let player_id = self.player_id;
+//     pub fn iter_mut(&'a mut self) -> impl Iterator<Item = &'a mut BoardSlot> + 'a {
+//         let heroes = self.heroes;
+//         let creatures = self.creatures;
+//         let player_id = self.player_id;
 
-        self.board
-            .slots
-            .iter_mut()
-            .filter(move |s| match_slot_view(s as &BoardSlot, heroes, creatures, player_id))
-    }
-}
+//         self.board
+//             .slots
+//             .iter_mut()
+//             .filter(move |s| match_slot_view(s as &BoardSlot, heroes, creatures, player_id))
+//     }
+// }
 
-impl<'a, TBoard> Selector<'a, TBoard>
-where
-    TBoard: BoardView<'a>,
-{
-    pub fn from_boardview(board: TBoard) -> Self {
-        Self {
-            _phantom: std::marker::PhantomData::default(),
-            board,
-            heroes: Selection::IncludeOrExclude,
-            creatures: Selection::IncludeOrExclude,
-            player_id: None,
-        }
-    }
-}
+// fn match_slot_view<'a, TSlotView: BoardSlotView<'a>>(
+//     slot: &'a TSlotView,
+//     heroes: Selection,
+//     creatures: Selection,
+//     player_id: Option<PlayerId>,
+// ) -> bool {
+//     if heroes == Selection::MustExclude && slot.pos().row().is_hero() {
+//         return false;
+//     }
 
-fn match_slot_view<'a, TSlotView: BoardSlotView<'a>>(
-    slot: &'a TSlotView,
-    heroes: Selection,
-    creatures: Selection,
-    player_id: Option<PlayerId>,
-) -> bool {
-    if heroes == Selection::MustExclude && slot.pos().row().is_hero() {
-        return false;
-    }
+//     if heroes == Selection::MustInclude && !slot.pos().row().is_hero() {
+//         return false;
+//     }
 
-    if heroes == Selection::MustInclude && !slot.pos().row().is_hero() {
-        return false;
-    }
+//     if creatures == Selection::MustExclude && slot.has_creature() {
+//         return false;
+//     }
 
-    if creatures == Selection::MustExclude && slot.has_creature() {
-        return false;
-    }
+//     if creatures == Selection::MustInclude && !slot.has_creature() {
+//         return false;
+//     }
 
-    if creatures == Selection::MustInclude && !slot.has_creature() {
-        return false;
-    }
+//     if let Some(player_id) = player_id {
+//         if slot.pos().player_id != player_id {
+//             return false;
+//         }
+//     }
 
-    if let Some(player_id) = player_id {
-        if slot.pos().player_id != player_id {
-            return false;
-        }
-    }
-
-    true
-}
+//     true
+// }
 
 pub mod iter_helpers {
     use super::{BoardSlotView, PlayerId, RowId, UnitCardInstanceId, UnitCardInstanceView};
@@ -331,43 +316,43 @@ pub mod iter_helpers {
     }
 }
 
-#[cfg(test)]
-mod test {
-    use super::Selector;
-    use crate::game_state::{board::Board, PlayerId};
+// #[cfg(test)]
+// mod test {
+//     use super::Selector;
+//     use crate::game_state::{board::Board, PlayerId};
 
-    // #[test]
-    // fn selector_consumes_board() {
-    //     let board = Board::new(8, PlayerId::new(), PlayerId::new());
-    //     let selector = Selector::new(board);
-    //     let _vec = selector.iter().collect::<Vec<_>>();
-    // }
+//     // #[test]
+//     // fn selector_consumes_board() {
+//     //     let board = Board::new(8, PlayerId::new(), PlayerId::new());
+//     //     let selector = Selector::new(board);
+//     //     let _vec = selector.iter().collect::<Vec<_>>();
+//     // }
 
-    #[test]
-    fn selector_consumes_board_ref() {
-        let board = Board::new(8, PlayerId::new(), PlayerId::new());
-        let selector = Selector::new(&board);
-        let _vec = selector.iter().collect::<Vec<_>>();
-    }
+//     #[test]
+//     fn selector_consumes_board_ref() {
+//         let board = Board::new(8, PlayerId::new(), PlayerId::new());
+//         let selector = Selector::new(&board);
+//         let _vec = selector.iter().collect::<Vec<_>>();
+//     }
 
-    // #[test]
-    // fn selector_consumes_board_mut_ref() {
-    //     let mut board = Board::new(8, PlayerId::new(), PlayerId::new());
-    //     let selector = Selector::new_mut(&mut board);
-    //     let _vec = selector.iter().collect::<Vec<_>>();
-    // }
+//     // #[test]
+//     // fn selector_consumes_board_mut_ref() {
+//     //     let mut board = Board::new(8, PlayerId::new(), PlayerId::new());
+//     //     let selector = Selector::new_mut(&mut board);
+//     //     let _vec = selector.iter().collect::<Vec<_>>();
+//     // }
 
-    #[test]
-    fn selector_consumes_board_mut_ref_iter_mut() {
-        let mut board = Board::new(8, PlayerId::new(), PlayerId::new());
-        let mut selector = Selector::new_mut(&mut board);
-        let _vec = selector.iter_mut().collect::<Vec<_>>();
-    }
+//     #[test]
+//     fn selector_consumes_board_mut_ref_iter_mut() {
+//         let mut board = Board::new(8, PlayerId::new(), PlayerId::new());
+//         let mut selector = Selector::new_mut(&mut board);
+//         let _vec = selector.iter_mut().collect::<Vec<_>>();
+//     }
 
-    // #[test]
-    // fn selector_consumes_board_iter_mut() {
-    //     let board = Board::new(8, PlayerId::new(), PlayerId::new());
-    //     let mut selector = Selector::new(board);
-    //     let _vec = selector.iter_mut().collect::<Vec<_>>();
-    // }
-}
+//     // #[test]
+//     // fn selector_consumes_board_iter_mut() {
+//     //     let board = Board::new(8, PlayerId::new(), PlayerId::new());
+//     //     let mut selector = Selector::new(board);
+//     //     let _vec = selector.iter_mut().collect::<Vec<_>>();
+//     // }
+// }
