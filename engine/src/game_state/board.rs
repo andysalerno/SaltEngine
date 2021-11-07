@@ -7,7 +7,7 @@ use super::{
         iter_helpers::{SlotCreatureFilter, SlotCreatureMap},
         Selector,
     },
-    IterAddons, PlayerId, UnitCardInstanceId,
+    IterAddons, MakePlayerView, PlayerId, UnitCardInstanceId, UnitCardInstancePlayerView,
 };
 use crate::cards::UnitCardDefinition;
 use serde::{Deserialize, Serialize};
@@ -289,15 +289,6 @@ pub trait BoardView<'a> {
 
         None
     }
-
-    #[must_use]
-    fn selector(&'a self) -> Selector<&Self>
-    where
-        Self: Sized,
-    {
-        let () = Selector::new(self.borrow());
-        todo!()
-    }
 }
 
 fn row_range<'a>(
@@ -486,7 +477,12 @@ impl Board {
     }
 
     #[must_use]
-    pub fn selector_mut<TRef>(&mut self) -> Selector<&mut Board> {
+    pub fn selector_mut(&mut self) -> Selector<&mut Board> {
+        Selector::new(self)
+    }
+
+    #[must_use]
+    pub fn selector(&self) -> Selector<&Board> {
         Selector::new(self)
     }
 
@@ -651,112 +647,111 @@ fn end_half(ops: std::ops::Range<usize>) -> std::ops::Range<usize> {
     ops.start + len / 2..ops.end
 }
 
-pub mod player_view {
-    use super::{
-        Board, BoardPos, BoardSlot, BoardSlotView, BoardView, Deserialize, PlayerId, Serialize,
-    };
-    use crate::game_state::{card_instance::UnitCardInstancePlayerView, MakePlayerView};
+#[derive(Debug, Serialize, Clone, Deserialize)]
+pub struct BoardSlotPlayerView {
+    pos: BoardPos,
+    creature: Option<UnitCardInstancePlayerView>,
+}
 
-    #[derive(Debug, Serialize, Clone, Deserialize)]
-    pub struct BoardSlotPlayerView {
-        pos: BoardPos,
-        creature: Option<UnitCardInstancePlayerView>,
+impl BoardSlotPlayerView {
+    #[must_use]
+    pub fn pos(&self) -> BoardPos {
+        self.pos
     }
 
-    impl BoardSlotPlayerView {
-        #[must_use]
-        pub fn pos(&self) -> BoardPos {
-            self.pos
-        }
+    #[must_use]
+    pub fn maybe_creature(&self) -> Option<&UnitCardInstancePlayerView> {
+        self.creature.as_ref()
+    }
+}
 
-        #[must_use]
-        pub fn maybe_creature(&self) -> Option<&UnitCardInstancePlayerView> {
-            self.creature.as_ref()
+impl<'a> MakePlayerView<'a> for BoardSlot {
+    type TOut = BoardSlotPlayerView;
+
+    fn player_view(&'a self, player_viewing: PlayerId) -> BoardSlotPlayerView {
+        BoardSlotPlayerView {
+            pos: self.pos,
+            creature: self
+                .creature
+                .as_ref()
+                .map(|c| c.player_view(player_viewing)),
         }
     }
+}
 
-    impl<'a> MakePlayerView<'a> for BoardSlot {
-        type TOut = BoardSlotPlayerView;
+#[derive(Debug, Serialize, Clone, Deserialize)]
+pub struct BoardPlayerView {
+    player_a_id: PlayerId,
+    player_b_id: PlayerId,
+    player_a_hero: BoardSlotPlayerView,
+    player_b_hero: BoardSlotPlayerView,
+    slots: Vec<BoardSlotPlayerView>,
+}
 
-        fn player_view(&'a self, player_viewing: PlayerId) -> BoardSlotPlayerView {
-            BoardSlotPlayerView {
-                pos: self.pos,
-                creature: self
-                    .creature
-                    .as_ref()
-                    .map(|c| c.player_view(player_viewing)),
-            }
+impl BoardPlayerView {
+    pub fn selector<'a>(&'a self) -> Selector<&'a Self> {
+        Selector::new(self)
+    }
+}
+
+impl<'a> MakePlayerView<'a> for Board {
+    type TOut = BoardPlayerView;
+
+    fn player_view(&'a self, player_viewing: PlayerId) -> BoardPlayerView {
+        BoardPlayerView {
+            player_a_id: self.player_a_id,
+            player_b_id: self.player_b_id,
+            player_a_hero: self.player_a_hero().player_view(player_viewing),
+            player_b_hero: self.player_b_hero().player_view(player_viewing),
+            slots: self
+                .slots
+                .iter()
+                .map(|s| s.player_view(player_viewing))
+                .collect(),
         }
     }
+}
 
-    #[derive(Debug, Serialize, Clone, Deserialize)]
-    pub struct BoardPlayerView {
-        player_a_id: PlayerId,
-        player_b_id: PlayerId,
-        player_a_hero: BoardSlotPlayerView,
-        player_b_hero: BoardSlotPlayerView,
-        slots: Vec<BoardSlotPlayerView>,
+impl<'a> BoardSlotView<'a> for BoardSlotPlayerView {
+    type CardInstanceView = UnitCardInstancePlayerView;
+
+    fn pos(&self) -> BoardPos {
+        BoardSlotPlayerView::pos(self)
     }
 
-    impl<'a> MakePlayerView<'a> for Board {
-        type TOut = BoardPlayerView;
+    fn maybe_creature(&self) -> Option<&Self::CardInstanceView> {
+        BoardSlotPlayerView::maybe_creature(self)
+    }
+}
 
-        fn player_view(&'a self, player_viewing: PlayerId) -> BoardPlayerView {
-            BoardPlayerView {
-                player_a_id: self.player_a_id,
-                player_b_id: self.player_b_id,
-                player_a_hero: self.player_a_hero().player_view(player_viewing),
-                player_b_hero: self.player_b_hero().player_view(player_viewing),
-                slots: self
-                    .slots
-                    .iter()
-                    .map(|s| s.player_view(player_viewing))
-                    .collect(),
-            }
-        }
+impl<'a> BoardView<'a> for BoardPlayerView {
+    type SlotView = BoardSlotPlayerView;
+
+    fn player_a_id(&self) -> PlayerId {
+        self.player_a_id
     }
 
-    impl<'a> BoardSlotView<'a> for BoardSlotPlayerView {
-        type CardInstanceView = UnitCardInstancePlayerView;
-
-        fn pos(&self) -> BoardPos {
-            BoardSlotPlayerView::pos(self)
-        }
-
-        fn maybe_creature(&self) -> Option<&Self::CardInstanceView> {
-            BoardSlotPlayerView::maybe_creature(self)
-        }
+    fn player_b_id(&self) -> PlayerId {
+        self.player_b_id
     }
 
-    impl<'a> BoardView<'a> for BoardPlayerView {
-        type SlotView = BoardSlotPlayerView;
+    fn slots(&self) -> &[Self::SlotView] {
+        self.slots.as_slice()
+    }
 
-        fn player_a_id(&self) -> PlayerId {
-            self.player_a_id
-        }
+    fn player_a_hero(&self) -> &Self::SlotView {
+        &self.player_a_hero
+    }
 
-        fn player_b_id(&self) -> PlayerId {
-            self.player_b_id
-        }
-
-        fn slots(&self) -> &[Self::SlotView] {
-            self.slots.as_slice()
-        }
-
-        fn player_a_hero(&self) -> &Self::SlotView {
-            &self.player_a_hero
-        }
-
-        fn player_b_hero(&self) -> &Self::SlotView {
-            &self.player_b_hero
-        }
+    fn player_b_hero(&self) -> &Self::SlotView {
+        &self.player_b_hero
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::{Board, BoardView};
-    use crate::game_state::PlayerId;
+    use crate::game_state::{MakePlayerView, PlayerId};
 
     #[test]
     fn board_selector_iter() {
@@ -770,5 +765,15 @@ mod tests {
         let mut board = Board::new(8, PlayerId::new(), PlayerId::new());
 
         for _slot in board.selector_mut().iter_mut() {}
+    }
+
+    #[test]
+    fn board_view_selector_iter() {
+        let player_a = PlayerId::new();
+        let player_b = PlayerId::new();
+        let board = Board::new(8, player_a, player_b);
+        let view = board.player_view(player_a);
+
+        //for _slot in view.selector().iter() {}
     }
 }
