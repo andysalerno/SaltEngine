@@ -11,7 +11,7 @@ use super::{
 };
 use crate::cards::UnitCardDefinition;
 use serde::{Deserialize, Serialize};
-use std::{collections::HashMap, fmt::Debug};
+use std::{borrow::Borrow, collections::HashMap, fmt::Debug};
 
 const BOARD_WIDTH: usize = 6;
 const SLOTS_COUNT: usize = BOARD_WIDTH * 4;
@@ -295,7 +295,8 @@ pub trait BoardView<'a> {
     where
         Self: Sized,
     {
-        Selector::from_boardview(self)
+        let () = Selector::new(self.borrow());
+        todo!()
     }
 }
 
@@ -335,27 +336,78 @@ fn player_range<'a>(
     }
 }
 
-impl<'a> BoardView<'a> for Board {
+// impl<'a> BoardView<'a> for Board {
+//     type SlotView = BoardSlot;
+
+//     fn player_a_id(&self) -> PlayerId {
+//         self.player_a_id
+//     }
+
+//     fn player_b_id(&self) -> PlayerId {
+//         self.player_b_id
+//     }
+
+//     fn slots(&self) -> &[BoardSlot] {
+//         self.slots.as_slice()
+//     }
+
+//     fn player_a_hero(&self) -> &Self::SlotView {
+//         &self.player_a_hero_slot
+//     }
+
+//     fn player_b_hero(&self) -> &Self::SlotView {
+//         &self.player_b_hero_slot
+//     }
+// }
+
+// impl<'a> BoardView<'a> for &'a mut Board {
+//     type SlotView = BoardSlot;
+
+//     fn player_a_id(&self) -> PlayerId {
+//         todo!()
+//     }
+
+//     fn player_b_id(&self) -> PlayerId {
+//         todo!()
+//     }
+
+//     fn player_a_hero(&'a self) -> &'a Self::SlotView {
+//         todo!()
+//     }
+
+//     fn player_b_hero(&'a self) -> &'a Self::SlotView {
+//         todo!()
+//     }
+
+//     fn slots(&self) -> &[Self::SlotView] {
+//         todo!()
+//     }
+// }
+
+impl<'a, T> BoardView<'a> for T
+where
+    T: Borrow<Board>,
+{
     type SlotView = BoardSlot;
 
     fn player_a_id(&self) -> PlayerId {
-        self.player_a_id
+        self.borrow().player_a_id
     }
 
     fn player_b_id(&self) -> PlayerId {
-        self.player_b_id
+        self.borrow().player_b_id
     }
 
     fn slots(&self) -> &[BoardSlot] {
-        self.slots.as_slice()
+        self.borrow().slots.as_slice()
     }
 
     fn player_a_hero(&self) -> &Self::SlotView {
-        &self.player_a_hero_slot
+        &self.borrow().player_a_hero_slot
     }
 
     fn player_b_hero(&self) -> &Self::SlotView {
-        &self.player_b_hero_slot
+        &self.borrow().player_b_hero_slot
     }
 }
 
@@ -434,7 +486,7 @@ impl Board {
     }
 
     #[must_use]
-    pub fn selector_mut(&mut self) -> Selector<&mut Board> {
+    pub fn selector_mut<TRef>(&mut self) -> Selector<&mut Board> {
         Selector::new(self)
     }
 
