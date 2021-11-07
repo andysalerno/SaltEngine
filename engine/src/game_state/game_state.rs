@@ -365,9 +365,7 @@ impl GameState {
 
 pub mod player_view {
     use super::{debug, Deserialize, GameState, GameStateView, PlayerId, Serialize};
-    use crate::game_state::{
-        board::player_view::BoardPlayerView, hand::HandPlayerView, MakePlayerView,
-    };
+    use crate::game_state::{board::BoardPlayerView, hand::HandPlayerView, MakePlayerView};
 
     #[derive(Debug, Serialize, Clone, Deserialize)]
     pub struct GameStatePlayerView {

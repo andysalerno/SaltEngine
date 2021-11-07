@@ -1,5 +1,5 @@
 use salt_engine::game_state::{
-    board::{player_view::BoardSlotPlayerView, BoardView, RowId},
+    board::{BoardSlotPlayerView, BoardView, RowId},
     GameStatePlayerView, GameStateView,
 };
 

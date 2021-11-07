@@ -1,5 +1,3 @@
-use self::player_view::BoardSlotPlayerView;
-
 use super::{
     card_instance::{UnitCardInstance, UnitCardInstanceView},
     hero::HeroDefinition,
@@ -327,29 +325,29 @@ fn player_range<'a>(
     }
 }
 
-// impl<'a> BoardView<'a> for Board {
-//     type SlotView = BoardSlot;
+impl<'a> BoardView<'a> for Board {
+    type SlotView = BoardSlot;
 
-//     fn player_a_id(&self) -> PlayerId {
-//         self.player_a_id
-//     }
+    fn player_a_id(&self) -> PlayerId {
+        self.player_a_id
+    }
 
-//     fn player_b_id(&self) -> PlayerId {
-//         self.player_b_id
-//     }
+    fn player_b_id(&self) -> PlayerId {
+        self.player_b_id
+    }
 
-//     fn slots(&self) -> &[BoardSlot] {
-//         self.slots.as_slice()
-//     }
+    fn slots(&self) -> &[BoardSlot] {
+        self.slots.as_slice()
+    }
 
-//     fn player_a_hero(&self) -> &Self::SlotView {
-//         &self.player_a_hero_slot
-//     }
+    fn player_a_hero(&self) -> &Self::SlotView {
+        &self.player_a_hero_slot
+    }
 
-//     fn player_b_hero(&self) -> &Self::SlotView {
-//         &self.player_b_hero_slot
-//     }
-// }
+    fn player_b_hero(&self) -> &Self::SlotView {
+        &self.player_b_hero_slot
+    }
+}
 
 // impl<'a> BoardView<'a> for &'a mut Board {
 //     type SlotView = BoardSlot;
@@ -375,32 +373,32 @@ fn player_range<'a>(
 //     }
 // }
 
-impl<'a, T> BoardView<'a> for T
-where
-    T: Borrow<Board>,
-{
-    type SlotView = BoardSlot;
+// impl<'a, T> BoardView<'a> for T
+// where
+//     T: Borrow<Board>,
+// {
+//     type SlotView = BoardSlot;
 
-    fn player_a_id(&self) -> PlayerId {
-        self.borrow().player_a_id
-    }
+//     fn player_a_id(&self) -> PlayerId {
+//         self.borrow().player_a_id
+//     }
 
-    fn player_b_id(&self) -> PlayerId {
-        self.borrow().player_b_id
-    }
+//     fn player_b_id(&self) -> PlayerId {
+//         self.borrow().player_b_id
+//     }
 
-    fn slots(&self) -> &[BoardSlot] {
-        self.borrow().slots.as_slice()
-    }
+//     fn slots(&self) -> &[BoardSlot] {
+//         self.borrow().slots.as_slice()
+//     }
 
-    fn player_a_hero(&self) -> &Self::SlotView {
-        &self.borrow().player_a_hero_slot
-    }
+//     fn player_a_hero(&self) -> &Self::SlotView {
+//         &self.borrow().player_a_hero_slot
+//     }
 
-    fn player_b_hero(&self) -> &Self::SlotView {
-        &self.borrow().player_b_hero_slot
-    }
-}
+//     fn player_b_hero(&self) -> &Self::SlotView {
+//         &self.borrow().player_b_hero_slot
+//     }
+// }
 
 #[derive(Debug)]
 pub struct Board {
@@ -478,7 +476,7 @@ impl Board {
 
     #[must_use]
     pub fn selector_mut(&mut self) -> Selector<&mut Board> {
-        Selector::new(self)
+        Selector::new_mut(self)
     }
 
     #[must_use]
@@ -689,7 +687,11 @@ pub struct BoardPlayerView {
 }
 
 impl BoardPlayerView {
-    pub fn selector<'a>(&'a self) -> Selector<&'a Self> {
+    #[must_use]
+    pub fn selector<'a>(&'a self) -> Selector<&'a Self>
+    where
+        Self: BoardView<'a>,
+    {
         Selector::new(self)
     }
 }
@@ -750,7 +752,7 @@ impl<'a> BoardView<'a> for BoardPlayerView {
 
 #[cfg(test)]
 mod tests {
-    use super::{Board, BoardView};
+    use super::Board;
     use crate::game_state::{MakePlayerView, PlayerId};
 
     #[test]
@@ -774,6 +776,6 @@ mod tests {
         let board = Board::new(8, player_a, player_b);
         let view = board.player_view(player_a);
 
-        //for _slot in view.selector().iter() {}
+        for _slot in view.selector().iter() {}
     }
 }
