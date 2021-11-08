@@ -747,32 +747,34 @@ impl<'a> BoardView<'a> for BoardPlayerView {
     }
 }
 
-// #[cfg(test)]
-// mod tests {
-//     use super::Board;
-//     use crate::game_state::{MakePlayerView, PlayerId};
+#[cfg(test)]
+mod tests {
+    use super::{Board, BoardView};
+    use crate::game_state::{IterAddons, PlayerId};
 
-//     #[test]
-//     fn board_selector_iter() {
-//         let board = Board::new(8, PlayerId::new(), PlayerId::new());
+    #[test]
+    fn board_iter() {
+        let player_a = PlayerId::new();
+        let board = Board::new(8, player_a, PlayerId::new());
 
-//         for _slot in board.selector().iter() {}
-//     }
+        let _ids = board
+            .slots_iter()
+            .for_player(player_a)
+            .with_creature()
+            .exclude_heroes()
+            .creature_ids()
+            .collect::<Vec<_>>();
+    }
 
-//     #[test]
-//     fn board_selector_iter_mut() {
-//         let mut board = Board::new(8, PlayerId::new(), PlayerId::new());
+    // #[test]
+    // fn board_iter_mut() {
+    //     let player_a = PlayerId::new();
+    //     let mut board = Board::new(8, player_a, PlayerId::new());
 
-//         for _slot in board.selector_mut().iter_mut() {}
-//     }
-
-//     #[test]
-//     fn board_view_selector_iter() {
-//         let player_a = PlayerId::new();
-//         let player_b = PlayerId::new();
-//         let board = Board::new(8, player_a, player_b);
-//         let view = board.player_view(player_a);
-
-//         for _slot in view.selector().iter() {}
-//     }
-// }
+    //     let _ids = board.slots_iter_mut().for_player(player_a);
+    //     // .with_creature()
+    //     // .exclude_heroes()
+    //     // .creature_ids()
+    //     // .collect::<Vec<_>>();
+    // }
+}
