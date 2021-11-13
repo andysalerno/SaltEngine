@@ -23,9 +23,9 @@ impl EventHandler for AddCardToHandEventHandler {
         dispatcher: &mut EventDispatcher,
     ) {
         let player_id = event.player_id();
-        let event_view: AddCardToHandClientEvent = event.make_client_event(game_state);
+        // let event_view: AddCardToHandClientEvent = event.make_client_event(game_state);
 
-        let client_event = ClientEventView::AddCardToHand(event_view);
+        // let client_event = ClientEventView::AddCardToHand(event_view);
 
         let card = game_state
             .board_mut()
@@ -40,9 +40,9 @@ impl EventHandler for AddCardToHandEventHandler {
             game_state.hand(player_id).len()
         );
 
-        dispatcher
-            .player_notifier(player_id)
-            .notify(client_event)
-            .await;
+        // dispatcher
+        //     .player_notifier(player_id)
+        //     .notify(client_event)
+        //     .await;
     }
 }
