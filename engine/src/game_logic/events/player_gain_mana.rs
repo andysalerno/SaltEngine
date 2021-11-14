@@ -29,7 +29,11 @@ impl PlayerGainManaEvent {
 }
 
 impl Event for PlayerGainManaEvent {
-    fn maybe_client_event(&self, _game_state: &GameState) -> Option<ClientEventView> {
+    fn maybe_client_event(
+        &self,
+        player_id: PlayerId,
+        _game_state: &GameState,
+    ) -> Option<ClientEventView> {
         Some(ClientEventView::PlayerGainMana(
             self.player_id,
             self.gain_count as usize,

@@ -56,7 +56,11 @@ impl Event for SummonCreatureFromHandEvent {
         Ok(())
     }
 
-    fn maybe_client_event(&self, _game_state: &GameState) -> Option<ClientEventView> {
+    fn maybe_client_event(
+        &self,
+        player_id: PlayerId,
+        _game_state: &GameState,
+    ) -> Option<ClientEventView> {
         let client_event = SummonCreatureFromHandClientEvent {
             player_id: self.player_id,
             board_pos: self.board_pos,

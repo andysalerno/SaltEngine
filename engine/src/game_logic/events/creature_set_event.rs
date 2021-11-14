@@ -41,21 +41,6 @@ impl CreatureSetEvent {
     pub fn target_position(&self) -> BoardPos {
         self.target_position
     }
-
-    #[must_use]
-    pub fn make_client_event(&self, game_state: &GameState) -> CreatureSetClientEvent {
-        let view = game_state
-            .board()
-            .creature_instance_all(self.card_id())
-            .player_view(self.player_id); // todo: this is wrong, since both players get the owning player's view
-
-        CreatureSetClientEvent {
-            player_id: self.player_id,
-            card_id: self.card_id,
-            pos: self.target_position,
-            card: view,
-        }
-    }
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -67,8 +52,23 @@ pub struct CreatureSetClientEvent {
 }
 
 impl Event for CreatureSetEvent {
-    fn maybe_client_event(&self, game_state: &GameState) -> Option<ClientEventView> {
-        let event = self.make_client_event(game_state);
+    fn maybe_client_event(
+        &self,
+        player_id: PlayerId,
+        game_state: &GameState,
+    ) -> Option<ClientEventView> {
+        let view = game_state
+            .board()
+            .creature_instance_all(self.card_id())
+            .player_view(self.player_id); // todo: this is wrong, since both players get the owning player's view
+
+        let event = CreatureSetClientEvent {
+            player_id: self.player_id,
+            card_id: self.card_id,
+            pos: self.target_position,
+            card: view,
+        };
+
         Some(ClientEventView::UnitSet(event))
     }
 }

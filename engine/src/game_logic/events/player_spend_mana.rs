@@ -48,7 +48,11 @@ impl Event for PlayerSpendManaEvent {
         }
     }
 
-    fn maybe_client_event(&self, _game_state: &GameState) -> Option<ClientEventView> {
+    fn maybe_client_event(
+        &self,
+        player_id: PlayerId,
+        _game_state: &GameState,
+    ) -> Option<ClientEventView> {
         Some(ClientEventView::PlayerSpendMana {
             player_id: self.player_id,
             spent_mana_count: self.mana_count as usize,

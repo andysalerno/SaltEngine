@@ -5,7 +5,11 @@ use crate::game_state::{GameState, PlayerId};
 pub struct TurnStartEvent(pub PlayerId);
 
 impl Event for TurnStartEvent {
-    fn maybe_client_event(&self, _game_state: &GameState) -> Option<ClientEventView> {
+    fn maybe_client_event(
+        &self,
+        player_id: PlayerId,
+        _game_state: &GameState,
+    ) -> Option<ClientEventView> {
         Some(ClientEventView::TurnStarted(self.0))
     }
 

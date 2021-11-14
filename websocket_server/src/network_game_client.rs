@@ -50,12 +50,15 @@ impl GameClient for NetworkGameClient {
             .recv::<FromClient>()
             .await
             .expect("no response from the client.");
-        info!("Action received from player.");
 
-        match from_client {
+        let action = match from_client {
             FromClient::ClientAction(e) => e,
             _ => panic!("Unexpected response from client; expected ClientGameEvent"),
-        }
+        };
+
+        info!("Action received from player: {:?}", action);
+
+        action
     }
 
     async fn make_prompter(&self) -> Box<dyn Prompter> {

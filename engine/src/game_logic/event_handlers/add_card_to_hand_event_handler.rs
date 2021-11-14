@@ -20,13 +20,9 @@ impl EventHandler for AddCardToHandEventHandler {
         &self,
         event: &AddCardToHandEvent,
         game_state: &mut GameState,
-        dispatcher: &mut EventDispatcher,
+        _dispatcher: &mut EventDispatcher,
     ) {
         let player_id = event.player_id();
-        // let event_view: AddCardToHandClientEvent = event.make_client_event(game_state);
-
-        // let client_event = ClientEventView::AddCardToHand(event_view);
-
         let card = game_state
             .board_mut()
             .take_tracked_pending_card(event.card_id())
@@ -39,10 +35,5 @@ impl EventHandler for AddCardToHandEventHandler {
             player_id,
             game_state.hand(player_id).len()
         );
-
-        // dispatcher
-        //     .player_notifier(player_id)
-        //     .notify(client_event)
-        //     .await;
     }
 }

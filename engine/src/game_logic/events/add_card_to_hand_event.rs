@@ -26,24 +26,30 @@ impl AddCardToHandEvent {
     pub fn card_id(&self) -> UnitCardInstanceId {
         self.card_id
     }
-
-    #[must_use]
-    pub fn make_client_event(&self, game_state: &GameState) -> AddCardToHandClientEvent {
-        let card = game_state
-            .board()
-            .creature_instance_all(self.card_id())
-            .player_view(self.player_id);
-        AddCardToHandClientEvent {
-            player_id: self.player_id,
-            card_id: self.card_id,
-            card,
-        }
-    }
 }
 
 impl Event for AddCardToHandEvent {
-    fn maybe_client_event(&self, game_state: &GameState) -> Option<ClientEventView> {
-        let event = self.make_client_event(game_state);
+    fn maybe_client_event(
+        &self,
+        player_id: PlayerId,
+        game_state: &GameState,
+    ) -> Option<ClientEventView> {
+        let card = if self.player_id == player_id {
+            let card = game_state
+                .board()
+                .creature_instance_all(self.card_id())
+                .player_view(self.player_id);
+
+            Some(card)
+        } else {
+            None
+        };
+
+        let event = AddCardToHandClientEvent {
+            player_id: self.player_id,
+            card_id: self.card_id,
+            card,
+        };
         Some(ClientEventView::AddCardToHand(event))
     }
 }
@@ -52,5 +58,5 @@ impl Event for AddCardToHandEvent {
 pub struct AddCardToHandClientEvent {
     pub player_id: PlayerId,
     pub card_id: UnitCardInstanceId,
-    pub card: UnitCardInstancePlayerView,
+    pub card: Option<UnitCardInstancePlayerView>,
 }

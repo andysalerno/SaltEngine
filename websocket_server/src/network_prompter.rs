@@ -2,6 +2,7 @@ use crate::messages::FromClient;
 use crate::messages::FromServer;
 use crate::{connection::Connection, messages::PromptMessage};
 use log::info;
+use salt_engine::game_state::board::RowId;
 use salt_engine::{
     game_agent::Prompter,
     game_state::{board::BoardPos, GameStatePlayerView},
@@ -17,25 +18,29 @@ impl NewtorkPrompter {
     }
 
     fn send_prompt(&self, message: PromptMessage, game_state: &GameStatePlayerView) -> BoardPos {
-        info!("Prompting for slot.");
+        let player_a = game_state.player_id();
 
-        smol::block_on(async {
-            self.connection
-                .send(FromServer::Prompt(message, game_state.clone()))
-                .await
-                .expect("failed to send prompt request");
+        BoardPos::new(player_a, RowId::BackRow, 0)
 
-            let response = self
-                .connection
-                .recv::<FromClient>()
-                .await
-                .expect("no response from server");
+        // info!("Prompting for slot.");
 
-            match response {
-                FromClient::PromptResponse(pos) => pos,
-                _ => panic!("Expected PromptResponse from client"),
-            }
-        })
+        // smol::block_on(async {
+        //     self.connection
+        //         .send(FromServer::Prompt(message, game_state.clone()))
+        //         .await
+        //         .expect("failed to send prompt request");
+
+        //     let response = self
+        //         .connection
+        //         .recv::<FromClient>()
+        //         .await
+        //         .expect("no response from server");
+
+        //     match response {
+        //         FromClient::PromptResponse(pos) => pos,
+        //         _ => panic!("Expected PromptResponse from client"),
+        //     }
+        // })
     }
 }
 

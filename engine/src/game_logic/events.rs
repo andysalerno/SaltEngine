@@ -51,7 +51,11 @@ pub trait Event: Debug {
         Ok(())
     }
 
-    fn maybe_client_event(&self, _game_state: &GameState) -> Option<ClientEventView> {
+    fn maybe_client_event(
+        &self,
+        _player_id: PlayerId,
+        _game_state: &GameState,
+    ) -> Option<ClientEventView> {
         None
     }
 }

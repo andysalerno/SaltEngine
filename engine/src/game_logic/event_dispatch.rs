@@ -138,19 +138,18 @@ impl EventDispatcher {
     async fn handle(&mut self, event: &GameEvent, game_state: &mut GameState) {
         debug!("Dispatching event: {:?}", event);
 
-        let maybe_client_event = event.maybe_client_event(game_state);
+        if let Some(client_event) = event.maybe_client_event(game_state.player_a_id(), game_state) {
+            info!("Notifying player_a of event: {:?}", client_event);
+            self.player_notifier(game_state.player_a_id())
+                .notify(client_event)
+                .await;
+        }
 
-        if let Some(event_view) = maybe_client_event {
-            info!("Notifying players of event: {:?}", event_view);
-            let notify_opponent = self
-                .opponent_notifier(game_state.cur_player_id())
-                .notify(event_view.clone());
-
-            let notify_player = self
-                .player_notifier(game_state.cur_player_id())
-                .notify(event_view);
-
-            join!(notify_opponent, notify_player);
+        if let Some(client_event) = event.maybe_client_event(game_state.player_b_id(), game_state) {
+            info!("Notifying player_b of event: {:?}", client_event);
+            self.player_notifier(game_state.player_b_id())
+                .notify(client_event)
+                .await;
         }
 
         match event {

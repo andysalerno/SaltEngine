@@ -99,13 +99,13 @@ impl UponSummonAction for SummonAction {
         state: &mut GameState,
         dispatcher: &mut EventDispatcher,
     ) {
-        let summoner = summoned_to_pos.player_id;
+        // let summoner = summoned_to_pos.player_id;
 
-        let _pos = dispatcher
-            .player_prompter(summoned_to_pos.player_id)
-            .prompt_slot(&state.player_view(summoner));
+        // let _pos = dispatcher
+        //     .player_prompter(summoned_to_pos.player_id)
+        //     .prompt_slot(&state.player_view(summoner));
 
-        todo!();
+        // todo!();
         // instance.set_state(Some(InstanceState::Pos(pos)));
     }
 }
