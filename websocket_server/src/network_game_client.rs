@@ -65,13 +65,6 @@ impl GameClient for NetworkGameClient {
         Box::new(NewtorkPrompter::new(self.connection.clone()))
     }
 
-    async fn observe_state_update(&mut self, game_state_view: GameStatePlayerView) {
-        self.connection
-            .send(FromServer::State(game_state_view))
-            .await
-            .expect("Failed to send state update");
-    }
-
     async fn make_notifier(&self) -> Box<dyn ClientNotifier> {
         Box::new(NetworkClientNotifier::new(self.connection.clone()))
     }

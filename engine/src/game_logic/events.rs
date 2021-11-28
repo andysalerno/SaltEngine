@@ -42,8 +42,10 @@ use enum_dispatch::enum_dispatch;
 
 pub type Result = std::result::Result<(), Box<dyn std::error::Error>>;
 
+/// A marker trait defining an event in the game.
 #[enum_dispatch(GameEvent)]
 pub trait Event: Debug {
+    /// Returns a result indicating if the game event is valid given the current game state.
     fn validate<'a, G>(&self, _game_state: &'a G) -> Result
     where
         G: GameStateView<'a>,
@@ -51,6 +53,7 @@ pub trait Event: Debug {
         Ok(())
     }
 
+    /// Returns a `ClientEventView` representation of this event, or `None` if there isn't one.
     fn maybe_client_event(
         &self,
         _player_id: PlayerId,
@@ -61,6 +64,7 @@ pub trait Event: Debug {
 }
 
 /// All possible game events.
+/// This is an enum-dispatched implentation of the trait `Event`.
 #[enum_dispatch]
 pub enum GameEvent {
     AttackEvent,
@@ -139,6 +143,8 @@ pub enum ClientEventView {
     },
 }
 
+/// Since `ClientActionEvent` is a subset of all `GameEvent`s,
+/// each one can be converted back into a `GameEvent` representation.
 impl From<ClientActionEvent> for GameEvent {
     fn from(e: ClientActionEvent) -> Self {
         match e {

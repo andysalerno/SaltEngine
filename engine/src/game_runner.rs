@@ -21,7 +21,6 @@ pub trait GameClient: Send + Sync {
     async fn next_action(&mut self, game_state_view: GameStatePlayerView) -> ClientActionEvent;
     async fn make_prompter(&self) -> Box<dyn Prompter>;
     async fn make_notifier(&self) -> Box<dyn ClientNotifier>;
-    async fn observe_state_update(&mut self, game_state_view: GameStatePlayerView);
 }
 
 /// A runner for a game.
@@ -110,11 +109,6 @@ impl GameRunner {
 
             dispatcher.dispatch(action, game_state).await;
 
-            join!(
-                handler_opponent.observe_state_update(game_state.player_view(opponent)),
-                handler_player.observe_state_update(game_state.player_view(cur_player_id))
-            );
-
             if turn_is_over {
                 info!("Turn ends for player: {:?}", cur_player_id);
                 return;
@@ -162,7 +156,10 @@ pub mod tests {
             }
         }
 
-        async fn next_action(&mut self, game_state_view: GameStatePlayerView) -> ClientActionEvent {
+        async fn next_action(
+            &mut self,
+            _game_state_view: GameStatePlayerView,
+        ) -> ClientActionEvent {
             self.action_queue
                 .pop()
                 .expect("No actions left in the queue")
@@ -174,10 +171,6 @@ pub mod tests {
 
         async fn make_notifier(&self) -> Box<dyn ClientNotifier> {
             Box::new(StubNotifier)
-        }
-
-        async fn observe_state_update(&mut self, game_state_view: GameStatePlayerView) {
-            // todo!()
         }
     }
 

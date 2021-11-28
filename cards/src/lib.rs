@@ -5,6 +5,7 @@
     clippy::module_name_repetitions,
     clippy::unused_self,
     clippy::cast_lossless,
+    clippy::similar_names,
     clippy::module_inception,
     dead_code
 )]

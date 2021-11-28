@@ -56,11 +56,6 @@ impl GameClient for ConsoleAgent {
         Box::new(ConsoleNotifier)
     }
 
-    async fn observe_state_update(&mut self, game_state: GameStatePlayerView) {
-        let prompter = ConsolePrompter::new(self.id());
-        prompter.show_board(&game_state);
-    }
-
     async fn next_action(&mut self, game_state: GameStatePlayerView) -> ClientActionEvent {
         let prompter = ConsolePrompter::new(self.id());
         prompter.show_hand(&game_state);
@@ -286,7 +281,7 @@ impl ConsolePrompter {
             let selected_card = game_state
                 .hand()
                 .nth(card_index)
-                .ok_or(user_input_err("Not a valid card index."))?;
+                .ok_or_else(|| user_input_err("Not a valid card index."))?;
 
             selected_card.id()
         };

@@ -69,7 +69,6 @@ async fn handle_connection(
             FromServer::TurnStart => {
                 handle_turn(&mut connection, agent.as_mut(), notifier.as_ref()).await?
             }
-            FromServer::State(state) => agent.observe_state_update(state).await,
             FromServer::NotifyEvent(event) => notifier.notify(event).await,
             _ => panic!("expected a TurnStart message, but received: {:?}", msg),
         }
@@ -128,7 +127,6 @@ async fn handle_turn(
                     .send(FromClient::PromptResponse(player_input))
                     .await?;
             }
-            FromServer::State(state) => agent.observe_state_update(state).await,
             FromServer::NotifyEvent(event) => agent_notifier.notify(event).await,
             _ => panic!("Unexpected message from server: {:?}", msg),
         }
