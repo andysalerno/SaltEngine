@@ -235,15 +235,6 @@ impl EventDispatcher {
             }
         }
     }
-
-    async fn _invoke<E: Event, H: EventHandler<Event = E> + Default>(
-        event: E,
-        game_state: &mut GameState,
-        dispatcher: &mut EventDispatcher,
-    ) {
-        let handler = H::default();
-        handler.handle(&event, game_state, dispatcher).await;
-    }
 }
 
 #[cfg(test)]

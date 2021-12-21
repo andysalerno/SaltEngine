@@ -7,7 +7,6 @@ use crate::{
     game_state::{GameState, GameStatePlayerView, GameStateView, MakePlayerView},
 };
 use async_trait::async_trait;
-use futures::join;
 use log::info;
 
 /// A trait that defines the interaction between the GameRunner
@@ -47,6 +46,7 @@ impl GameRunner {
         }
     }
 
+    /// Run a game until completion.
     pub async fn run_game(mut self) {
         let player_a_notifier = self.player_a_handler.make_notifier().await;
         let player_b_notifier = self.player_b_handler.make_notifier().await;
@@ -68,31 +68,22 @@ impl GameRunner {
         dispatcher.dispatch(StartGameEvent, &mut game_state).await;
 
         while !game_state.is_game_over() {
-            let (client, other) = if game_state.cur_player_turn() == game_state.player_a_id() {
-                (
-                    self.player_a_handler.as_mut(),
-                    self.player_b_handler.as_mut(),
-                )
+            let client = if game_state.cur_player_turn() == game_state.player_a_id() {
+                self.player_a_handler.as_mut()
             } else {
-                (
-                    self.player_b_handler.as_mut(),
-                    self.player_a_handler.as_mut(),
-                )
+                self.player_b_handler.as_mut()
             };
 
-            GameRunner::player_take_turn_stage(client, other, &mut game_state, &mut dispatcher)
-                .await;
+            GameRunner::player_take_turn_stage(client, &mut game_state, &mut dispatcher).await;
         }
     }
 
     async fn player_take_turn_stage(
         handler_player: &mut dyn GameClient,
-        handler_opponent: &mut dyn GameClient,
         game_state: &mut GameState,
         dispatcher: &mut EventDispatcher,
     ) {
         let cur_player_id = game_state.cur_player_id();
-        let opponent = game_state.other_player(cur_player_id);
         info!("Turn starts for player: {:?}", cur_player_id);
 
         handler_player.on_turn_start(game_state).await;
@@ -175,7 +166,7 @@ pub mod tests {
     }
 
     #[test]
-    pub fn thing() {
+    pub fn gamerunner_when_game_run_expects_game_ends() {
         let _ = env_logger::builder().is_test(true).try_init();
         let mut client_a = Box::new(TestClient::new());
         let mut client_b = Box::new(TestClient::new());
