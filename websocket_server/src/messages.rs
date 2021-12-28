@@ -1,11 +1,11 @@
-use salt_engine::{
-    game_logic::events::{ClientActionEvent, ClientEventView},
-    game_state::{board::BoardPos, GameStatePlayerView, PlayerId, UnitCardInstanceId},
-    id::Id,
+use protocol::{
+    entities::{BoardPos, Id, PlayerId, UnitCardInstanceId},
+    ClientAction, ClientEventView,
 };
+use salt_engine::game_state::GameStatePlayerView;
 use serde::{de::DeserializeOwned, Deserialize, Serialize};
 
-/// A marker trait to indicate a type is a GameMessage.
+/// A marker trait to indicate a type is a `GameMessage`.
 pub trait GameMessage: Serialize + DeserializeOwned {}
 
 /// Messages that can be sent from the game client to the game server.
@@ -14,7 +14,7 @@ pub enum FromClient {
     JoinGame,
     Ready,
     GameId(Id),
-    ClientAction(ClientActionEvent),
+    ClientAction(ClientAction),
     PromptResponse(BoardPos),
 }
 impl GameMessage for FromClient {}

@@ -1,7 +1,8 @@
 use super::{
     card_instance::{UnitCardInstancePlayerView, UnitCardInstanceView},
-    MakePlayerView, PlayerId, UnitCardInstance, UnitCardInstanceId,
+    MakePlayerView, PlayerId, UnitCardInstance,
 };
+use protocol::entities::UnitCardInstanceId;
 use serde::{Deserialize, Serialize};
 
 pub trait HandView<'a> {

@@ -1,7 +1,5 @@
-use crate::game_state::{
-    board::{BoardPos, BoardView},
-    GameState, MakePlayerView, PlayerId, UnitCardInstanceId, UnitCardInstancePlayerView,
-};
+use crate::game_state::{GameState, MakePlayerView, UnitCardInstancePlayerView};
+use protocol::entities::{BoardPos, PlayerId, UnitCardInstanceId};
 use serde::{Deserialize, Serialize};
 
 use super::{ClientEventView, Event};
@@ -57,18 +55,19 @@ impl Event for CreatureSetEvent {
         player_id: PlayerId,
         game_state: &GameState,
     ) -> Option<ClientEventView> {
-        let view = game_state
-            .board()
-            .creature_instance_all(self.card_id())
-            .player_view(self.player_id); // todo: this is wrong, since both players get the owning player's view
+        // let view = game_state
+        //     .board()
+        //     .creature_instance_all(self.card_id())
+        //     .player_view(self.player_id); // todo: this is wrong, since both players get the owning player's view
 
-        let event = CreatureSetClientEvent {
-            player_id: self.player_id,
-            card_id: self.card_id,
-            pos: self.target_position,
-            card: view,
-        };
+        // let event = CreatureSetClientEvent {
+        //     player_id: self.player_id,
+        //     card_id: self.card_id,
+        //     pos: self.target_position,
+        //     card: view,
+        // };
 
-        Some(ClientEventView::UnitSet(event))
+        // Some(ClientEventView::UnitSet(event))
+        None
     }
 }

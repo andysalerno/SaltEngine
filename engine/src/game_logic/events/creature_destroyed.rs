@@ -1,6 +1,5 @@
-use crate::game_state::UnitCardInstanceId;
-
 use super::Event;
+use protocol::entities::UnitCardInstanceId;
 
 #[derive(Debug, Clone)]
 pub struct CreatureDestroyedEvent {

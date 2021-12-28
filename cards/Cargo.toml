@@ -7,6 +7,7 @@ edition = "2021"
 
 [dependencies]
 salt_engine = { path = "../engine" }
+protocol = { path = "../protocol" }
 log = "0.4"
 async-trait = "0.1"
 

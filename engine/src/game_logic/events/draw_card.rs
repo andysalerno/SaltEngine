@@ -1,7 +1,6 @@
-use crate::game_state::PlayerId;
-use serde::{Deserialize, Serialize};
-
 use super::Event;
+use protocol::entities::PlayerId;
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct DrawCardEvent {

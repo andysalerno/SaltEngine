@@ -50,3 +50,22 @@ players agree which cards they consider "legal" in the game by having a set of t
 the original set of cards will have hashes that are signed by myself that all clients trust (though allow blacklisting).
 
 iteractive automated tutorial to introduce players to the game, duh
+
+# The protocol
+
+## "Thin"
+
+The server sends actions to clients, and the clients apply the actions to update their own state, and then represent that state graphically.
+
+## "Thick"
+
+The server sends a tuple (action,resulting_state) to clients, and the clients replace their state with the resulting state, and use the action to render some event graphically.  (crazy failure case - the client ends up with a different resulting state than the server's resulting_state)
+
+## "Naive Client"
+
+The server sends property updates to the client, which mutate data, and notifications describing what UI action to render.
+
+Example:
+
+type:visual,event:attack,attacker:fa34,target:4df8
+type:update,id:4df8,key:HEALTH,val:7

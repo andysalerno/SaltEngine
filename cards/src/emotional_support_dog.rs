@@ -1,9 +1,7 @@
+use protocol::entities::{Id, PassiveEffectInstanceId, Position};
 use salt_engine::{
-    cards::{CardDefinition, Position, UnitCardDefinition},
-    game_logic::{
-        BuffBuilder, PassiveCompanionBuff, PassiveEffectDefinition, PassiveEffectInstanceId,
-    },
-    id::Id,
+    cards::{CardDefinition, UnitCardDefinition},
+    game_logic::{BuffBuilder, PassiveCompanionBuff, PassiveEffectDefinition},
 };
 
 #[derive(Debug, Clone)]
@@ -71,10 +69,10 @@ mod tests {
         tests::{make_dispatcher, make_test_state},
         ReallyBigRock,
     };
+    use protocol::entities::{BoardPos, RowId};
     use salt_engine::{
-        cards::UnitCardDefinition,
-        game_logic::events::CreatureSetEvent,
-        game_state::board::{BoardPos, BoardView, RowId},
+        cards::UnitCardDefinition, game_logic::events::CreatureSetEvent,
+        game_state::board::BoardView,
     };
 
     #[test]

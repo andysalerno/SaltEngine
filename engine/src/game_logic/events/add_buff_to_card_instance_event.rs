@@ -1,5 +1,6 @@
 use super::Event;
-use crate::{game_logic::buff::BuiltBuff, game_state::UnitCardInstanceId};
+use crate::game_logic::buff::BuiltBuff;
+use protocol::entities::UnitCardInstanceId;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize, Clone)]

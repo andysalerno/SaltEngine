@@ -1,23 +1,8 @@
 use super::{events::GameEvent, EventDispatcher, PassiveEffectDefinition};
-use crate::game_state::{
-    board::BoardPos, GameState, MakePlayerView, PlayerId, UnitCardInstance, UnitCardInstanceId,
-};
+use crate::game_state::{GameState, MakePlayerView, UnitCardInstance};
 use async_trait::async_trait;
+use protocol::entities::{Position, UnitCardInstanceId};
 use serde::{Deserialize, Serialize};
-
-/// Describes which board positions
-/// this creature card may occupy.
-#[derive(Debug, Copy, Clone, PartialEq, Serialize, Deserialize)]
-pub enum Position {
-    /// The front side of the board.
-    Front,
-
-    /// The back side of the board.
-    Back,
-
-    /// Either the front or the back sides of the board.
-    Either,
-}
 
 /// The most general definition that cards of all types must implement.
 pub trait CardDefinition: std::fmt::Debug + Send + Sync {
@@ -159,8 +144,10 @@ impl UnitCardDefinitionView for dyn UnitCardDefinition {
 }
 
 pub mod player_view {
+    use protocol::entities::PlayerId;
+
     use super::{
-        Deserialize, MakePlayerView, PlayerId, Position, Serialize, UnitCardDefinition,
+        Deserialize, MakePlayerView, Position, Serialize, UnitCardDefinition,
         UnitCardDefinitionView,
     };
 
@@ -229,9 +216,10 @@ pub mod player_view {
 }
 
 pub mod actions {
-    use crate::game_logic::events::GameEvent;
+    use protocol::entities::BoardPos;
 
-    use super::{async_trait, BoardPos, EventDispatcher, GameState, UnitCardInstanceId};
+    use super::{async_trait, EventDispatcher, GameState, UnitCardInstanceId};
+    use crate::game_logic::events::GameEvent;
 
     #[async_trait]
     pub trait UponSummonAction: Send + Sync {
@@ -366,6 +354,216 @@ pub mod actions {
             _dispatcher: &mut EventDispatcher,
         ) {
             // Do nothing by default
+        }
+    }
+}
+
+mod builder {
+    use protocol::entities::UnitCardInstanceId;
+
+    use super::{
+        actions::{
+            DoNothingAction, UponDeathAction, UponEventAction, UponReceiveDamageAction,
+            UponSummonAction, UponTurnEndAction, UponTurnStartAction,
+        },
+        CardDefinition, Position, UnitCardDefinition,
+    };
+    use crate::{
+        game_logic::{events::GameEvent, EventDispatcher, PassiveEffectDefinition},
+        game_state::{GameState, UnitCardInstance},
+    };
+
+    /// A builder for unit card definitions.
+    pub struct Builder {
+        inner: BuiltUnitCardDefinition,
+    }
+
+    impl Builder {
+        pub fn new() -> Self {
+            Self {
+                inner: BuiltUnitCardDefinition::new(),
+            }
+        }
+
+        pub fn build(self) -> Box<dyn UnitCardDefinition> {
+            Box::new(self.inner)
+        }
+
+        pub fn title(&mut self, title: impl AsRef<str>) -> &mut Self {
+            self.inner.title = title.as_ref().to_string();
+            self
+        }
+    }
+
+    struct BuiltUnitCardDefinition {
+        title: String,
+        cost: i32,
+        text: String,
+        flavor_text: String,
+        attack: i32,
+        health: i32,
+        row_width: i32,
+        placeable_at: Position,
+        is_defender: bool,
+        is_hidden: bool,
+        pre_action_event: Option<Box<dyn UponEventAction>>,
+        post_action_event: Option<Box<dyn UponEventAction>>,
+        passive_effect: Option<Box<dyn PassiveEffectDefinition>>,
+        upon_summon: Box<dyn UponSummonAction>,
+        upon_death: Box<dyn UponSummonAction>,
+        upon_receive_damage: Box<dyn UponSummonAction>,
+        upon_turn_start: Box<dyn UponSummonAction>,
+        upon_turn_end: Box<dyn UponSummonAction>,
+        upon_companion_damaged: Box<dyn UponSummonAction>,
+    }
+
+    impl BuiltUnitCardDefinition {
+        pub(crate) fn new() -> Self {
+            Self {
+                title: todo!(),
+                cost: todo!(),
+                text: todo!(),
+                flavor_text: todo!(),
+                attack: todo!(),
+                health: todo!(),
+                row_width: todo!(),
+                placeable_at: todo!(),
+                is_defender: todo!(),
+                is_hidden: todo!(),
+                pre_action_event: todo!(),
+                post_action_event: todo!(),
+                passive_effect: todo!(),
+                upon_summon: todo!(),
+                upon_death: todo!(),
+                upon_receive_damage: todo!(),
+                upon_turn_start: todo!(),
+                upon_turn_end: todo!(),
+                upon_companion_damaged: todo!(),
+            }
+        }
+    }
+
+    impl std::fmt::Debug for BuiltUnitCardDefinition {
+        fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+            f.debug_struct("BuiltUnitCardDefinition")
+                .field("title", &self.title)
+                .field("cost", &self.cost)
+                .field("text", &self.text)
+                .field("flavor_text", &self.flavor_text)
+                .field("attack", &self.attack)
+                .field("health", &self.health)
+                .field("row_width", &self.row_width)
+                .field("placeable_at", &self.placeable_at)
+                .field("is_defender", &self.is_defender)
+                .field("is_hidden", &self.is_hidden)
+                .finish()
+        }
+    }
+
+    impl CardDefinition for BuiltUnitCardDefinition {
+        fn title(&self) -> &str {
+            todo!()
+        }
+
+        fn cost(&self) -> i32 {
+            todo!()
+        }
+
+        fn text(&self) -> &str {
+            todo!()
+        }
+
+        fn flavor_text(&self) -> &str {
+            todo!()
+        }
+    }
+
+    impl UnitCardDefinition for BuiltUnitCardDefinition {
+        fn attack(&self) -> i32 {
+            todo!()
+        }
+
+        fn health(&self) -> i32 {
+            todo!()
+        }
+
+        fn row_width(&self) -> usize {
+            todo!()
+        }
+
+        fn placeable_at(&self) -> Position {
+            todo!()
+        }
+
+        fn upon_summon(&self) -> Box<dyn UponSummonAction> {
+            Box::new(DoNothingAction)
+        }
+
+        fn upon_death(&self) -> Box<dyn UponDeathAction> {
+            Box::new(DoNothingAction)
+        }
+
+        fn upon_receive_damage(&self) -> Box<dyn UponReceiveDamageAction> {
+            Box::new(DoNothingAction)
+        }
+
+        fn upon_turn_start(&self) -> Box<dyn UponTurnStartAction> {
+            Box::new(DoNothingAction)
+        }
+
+        fn upon_turn_end(&self) -> Box<dyn UponTurnEndAction> {
+            Box::new(DoNothingAction)
+        }
+
+        fn upon_companion_damaged(&self) -> Box<dyn UponTurnEndAction> {
+            Box::new(DoNothingAction)
+        }
+
+        fn passive_effect(&self) -> Option<Box<dyn PassiveEffectDefinition>> {
+            None
+        }
+
+        fn pre_event_action(
+            &self,
+            _card_instance_id: UnitCardInstanceId,
+            _event: &GameEvent,
+            _game_state: &GameState,
+            _dispatcher: &mut EventDispatcher,
+        ) -> Option<Box<dyn UponEventAction>> {
+            None
+        }
+
+        fn post_event_action(
+            &self,
+            _card_instance_id: UnitCardInstanceId,
+            _event: &GameEvent,
+            _game_state: &GameState,
+            _dispatcher: &mut EventDispatcher,
+        ) -> Option<Box<dyn UponEventAction>> {
+            None
+        }
+
+        fn is_defender(&self) -> bool {
+            false
+        }
+
+        fn is_hidden(&self) -> bool {
+            false
+        }
+
+        fn boxed(self) -> Box<Self>
+        where
+            Self: Sized,
+        {
+            Box::new(self)
+        }
+
+        fn make_instance(self) -> UnitCardInstance
+        where
+            Self: Sized + 'static,
+        {
+            let boxed: Box<dyn UnitCardDefinition> = self.boxed();
+            UnitCardInstance::new(boxed)
         }
     }
 }

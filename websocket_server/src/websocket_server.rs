@@ -2,7 +2,7 @@ use crate::Result;
 use crate::{connection::Connection, matchmaker::MatchMaker};
 use crate::{messages::FromServer, play_game::play_game};
 use log::info;
-use salt_engine::game_state::PlayerId;
+use protocol::entities::PlayerId;
 use smol::net::TcpListener;
 use std::sync::Arc;
 

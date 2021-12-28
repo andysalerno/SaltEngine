@@ -30,14 +30,14 @@ pub use end_turn::EndTurnEvent;
 pub use player_gain_mana::PlayerGainManaEvent;
 pub use player_spend_mana::PlayerSpendManaEvent;
 pub use pos_takes_damage_event::PosTakesDamageEvent;
-use serde::{Deserialize, Serialize};
+use protocol::{entities::PlayerId, ClientAction, ClientEventView};
 pub use start_game_event::StartGameEvent;
 pub use summon_creature_from_hand_event::{
     SummonCreatureFromHandClientEvent, SummonCreatureFromHandEvent,
 };
 pub use turn_start_event::TurnStartEvent;
 
-use crate::game_state::{GameState, GameStateView, PlayerId};
+use crate::game_state::{GameState, GameStateView};
 use enum_dispatch::enum_dispatch;
 
 pub type Result = std::result::Result<(), Box<dyn std::error::Error>>;
@@ -115,50 +115,52 @@ impl GameEvent {
     }
 }
 
-/// The subset of game events that clients can
-/// provide the server over the course of the game.
-/// For example, a client can legally provide a `TurnEnd` event
-/// (they are allowed to end their own turn), but a client cannot
-/// directly provide a `CreatureDestroyed` event.
-#[derive(Debug, Serialize, Deserialize, Clone)]
-pub enum ClientActionEvent {
-    EndTurn(EndTurnEvent),
-    SummonCreatureFromHand(SummonCreatureFromHandEvent),
-    Attack(AttackEvent),
-    DrawCard(DrawCardEvent),
-}
+// The subset of game events that clients can
+// provide the server over the course of the game.
+// For example, a client can legally provide a `TurnEnd` event
+// (they are allowed to end their own turn), but a client cannot
+// directly provide a `CreatureDestroyed` event.
+// #[derive(Debug, Serialize, Deserialize, Clone)]
+// pub enum ClientActionEvent {
+//     EndTurn(EndTurnEvent),
+//     SummonCreatureFromHand(SummonCreatureFromHandEvent),
+//     Attack(AttackEvent),
+//     DrawCard(DrawCardEvent),
+// }
 
-/// Views of events that can be sent to clients.
-#[derive(Debug, Serialize, Deserialize, Clone)]
-pub enum ClientEventView {
-    AddCardToHand(AddCardToHandClientEvent),
-    UnitSet(CreatureSetClientEvent),
-    SummonCreatureFromHand(SummonCreatureFromHandClientEvent),
-    TurnEnded(PlayerId),
-    TurnStarted(PlayerId),
-    PlayerGainMana(PlayerId, usize),
-    PlayerSpendMana {
-        player_id: PlayerId,
-        spent_mana_count: usize,
-    },
-}
+// Views of events that can be sent to clients.
+// #[derive(Debug, Serialize, Deserialize, Clone)]
+// pub enum ClientEventView {
+//     AddCardToHand(AddCardToHandClientEvent),
+//     UnitSet(CreatureSetClientEvent),
+//     SummonCreatureFromHand(SummonCreatureFromHandClientEvent),
+//     TurnEnded(PlayerId),
+//     TurnStarted(PlayerId),
+//     PlayerGainMana(PlayerId, usize),
+//     PlayerSpendMana {
+//         player_id: PlayerId,
+//         spent_mana_count: usize,
+//     },
+// }
 
 /// Since `ClientActionEvent` is a subset of all `GameEvent`s,
 /// each one can be converted back into a `GameEvent` representation.
-impl From<ClientActionEvent> for GameEvent {
-    fn from(e: ClientActionEvent) -> Self {
+impl From<ClientAction> for GameEvent {
+    fn from(e: ClientAction) -> Self {
         match e {
-            ClientActionEvent::EndTurn(e) => e.into(),
-            ClientActionEvent::SummonCreatureFromHand(e) => e.into(),
-            ClientActionEvent::Attack(e) => e.into(),
-            ClientActionEvent::DrawCard(e) => e.into(),
+            ClientAction::EndTurn(e) => EndTurnEvent(e.player_id).into(),
+            ClientAction::SummonCreatureFromHand(e) => {
+                SummonCreatureFromHandEvent::new(e.player_id, e.board_pos, e.card_id).into()
+            }
+            ClientAction::Attack(e) => AttackEvent::new(e.attacker, e.target).into(),
+            // ClientAction::DrawCard(e) => e.into(),
         }
     }
 }
 
-impl ClientActionEvent {
-    #[must_use]
-    pub fn is_end_turn(&self) -> bool {
-        matches!(self, ClientActionEvent::EndTurn(_))
-    }
-}
+// impl ClientActionEvent {
+//     #[must_use]
+//     pub fn is_end_turn(&self) -> bool {
+//         matches!(self, ClientActionEvent::EndTurn(_))
+//     }
+// }

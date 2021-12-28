@@ -1,15 +1,14 @@
 use async_trait::async_trait;
+use protocol::entities::{
+    BoardPos, Id, PassiveEffectInstanceId, Position, RowId, UnitCardInstanceId,
+};
 use salt_engine::{
-    cards::{actions::UponSummonAction, CardDefinition, Position, UnitCardDefinition},
+    cards::{actions::UponSummonAction, CardDefinition, UnitCardDefinition},
     game_logic::{
         events::AddBuffToCardInstanceEvent, BuffBuilder, EventDispatcher, PassiveCompanionBuff,
-        PassiveEffectDefinition, PassiveEffectInstanceId,
+        PassiveEffectDefinition,
     },
-    game_state::{
-        board::{BoardPos, RowId},
-        GameState, UnitCardInstanceId,
-    },
-    id::Id,
+    game_state::GameState,
 };
 
 #[derive(Debug, Clone)]

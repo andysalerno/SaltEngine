@@ -1,13 +1,14 @@
 use crate::{
     game_agent::{ClientNotifier, Prompter},
     game_logic::{
-        events::{ClientActionEvent, GameEvent, StartGameEvent},
+        events::{GameEvent, StartGameEvent},
         EventDispatcher,
     },
     game_state::{GameState, GameStatePlayerView, GameStateView, MakePlayerView},
 };
 use async_trait::async_trait;
 use log::info;
+use protocol::ClientAction;
 
 /// A trait that defines the interaction between the GameRunner
 /// and the client.
@@ -17,7 +18,7 @@ use log::info;
 #[async_trait]
 pub trait GameClient: Send + Sync {
     async fn on_turn_start(&mut self, game_state: &GameState);
-    async fn next_action(&mut self, game_state_view: GameStatePlayerView) -> ClientActionEvent;
+    async fn next_action(&mut self, game_state_view: GameStatePlayerView) -> ClientAction;
     async fn make_prompter(&self) -> Box<dyn Prompter>;
     async fn make_notifier(&self) -> Box<dyn ClientNotifier>;
 }
@@ -110,6 +111,8 @@ impl GameRunner {
 
 #[cfg(test)]
 pub mod tests {
+    use protocol::{client_actions::EndTurn, ClientAction};
+
     use super::*;
     use crate::{
         game_agent::tests::{MockTestPrompter, StubNotifier},
@@ -118,7 +121,7 @@ pub mod tests {
     };
 
     struct TestClient {
-        action_queue: Vec<ClientActionEvent>,
+        action_queue: Vec<ClientAction>,
         on_turn_start_queue: Vec<Box<dyn FnMut(&GameState) + Send + Sync>>,
     }
 
@@ -130,7 +133,7 @@ pub mod tests {
             }
         }
 
-        fn add_action(&mut self, action: ClientActionEvent) {
+        fn add_action(&mut self, action: ClientAction) {
             self.action_queue.push(action);
         }
 
@@ -147,10 +150,7 @@ pub mod tests {
             }
         }
 
-        async fn next_action(
-            &mut self,
-            _game_state_view: GameStatePlayerView,
-        ) -> ClientActionEvent {
+        async fn next_action(&mut self, _game_state_view: GameStatePlayerView) -> ClientAction {
             self.action_queue
                 .pop()
                 .expect("No actions left in the queue")
@@ -186,13 +186,13 @@ pub mod tests {
         }));
 
         for _ in 0..100 {
-            client_a.add_action(ClientActionEvent::EndTurn(EndTurnEvent(
-                game_state.player_a_id(),
-            )));
+            client_a.add_action(ClientAction::EndTurn(EndTurn {
+                player_id: game_state.player_a_id(),
+            }));
 
-            client_b.add_action(ClientActionEvent::EndTurn(EndTurnEvent(
-                game_state.player_b_id(),
-            )));
+            client_b.add_action(ClientAction::EndTurn(EndTurn {
+                player_id: game_state.player_b_id(),
+            }));
         }
 
         let runner = GameRunner::new(client_a, client_b, game_state);

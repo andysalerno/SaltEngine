@@ -40,11 +40,15 @@ pub use sleeping_dog::SleepingDog;
 mod tests {
     use async_trait::async_trait;
     use mockall::mock;
+    use protocol::{
+        entities::{BoardPos, PlayerId},
+        ClientEventView,
+    };
     use salt_engine::{
         cards::UnitCardDefinition,
         game_agent::{ClientNotifier, Prompter},
         game_logic::EventDispatcher,
-        game_state::{board::BoardPos, Deck, GameState, GameStatePlayerView, PlayerId},
+        game_state::{Deck, GameState, GameStatePlayerView},
     };
 
     use crate::Pawn;
@@ -65,7 +69,7 @@ mod tests {
 
     #[async_trait]
     impl ClientNotifier for TestClientNotifier {
-        async fn notify(&self, _event: salt_engine::game_logic::events::ClientEventView) {
+        async fn notify(&self, _event: ClientEventView) {
             // Doing nothing for tests
         }
     }

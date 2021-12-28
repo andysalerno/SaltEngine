@@ -6,7 +6,8 @@
     clippy::cast_lossless
 )]
 use log::info;
-use salt_engine::{game_agent::ClientNotifier, game_runner::GameClient, game_state::PlayerId};
+use protocol::entities::PlayerId;
+use salt_engine::{game_agent::ClientNotifier, game_runner::GameClient};
 use smol::net::TcpStream;
 use websocket_server::{
     connection::Connection,
@@ -15,7 +16,7 @@ use websocket_server::{
 
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error + Send + Sync>>;
 
-/// Starts the client, using the provided GameAgent.
+/// Starts the client, using the provided `GameClient`.
 pub async fn start(make_agent: impl FnOnce(PlayerId) -> Box<dyn GameClient>) -> Result<()> {
     info!("Salt client starting.");
     let stream = TcpStream::connect("localhost:9000").await?;

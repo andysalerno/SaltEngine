@@ -1,8 +1,6 @@
 use super::{ClientEventView, Event};
-use crate::game_state::{
-    board::BoardView, GameState, MakePlayerView, PlayerId, UnitCardInstanceId,
-    UnitCardInstancePlayerView,
-};
+use crate::game_state::{board::BoardView, GameState, MakePlayerView, UnitCardInstancePlayerView};
+use protocol::entities::{PlayerId, UnitCardInstanceId};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug)]
@@ -50,7 +48,8 @@ impl Event for AddCardToHandEvent {
             card_id: self.card_id,
             card,
         };
-        Some(ClientEventView::AddCardToHand(event))
+        // Some(ClientEventView::AddCardToHand(event))
+        None
     }
 }
 

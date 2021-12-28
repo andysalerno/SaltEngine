@@ -1,4 +1,4 @@
-use crate::game_state::board::BoardPos;
+use protocol::entities::BoardPos;
 
 use super::Event;
 

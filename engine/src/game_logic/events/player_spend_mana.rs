@@ -1,6 +1,6 @@
-use crate::game_state::{GameState, GameStateView, PlayerId};
-
 use super::{ClientEventView, Event};
+use crate::game_state::{GameState, GameStateView};
+use protocol::entities::PlayerId;
 
 #[derive(Debug, Clone)]
 pub struct PlayerSpendManaEvent {
@@ -53,9 +53,10 @@ impl Event for PlayerSpendManaEvent {
         player_id: PlayerId,
         _game_state: &GameState,
     ) -> Option<ClientEventView> {
-        Some(ClientEventView::PlayerSpendMana {
-            player_id: self.player_id,
-            spent_mana_count: self.mana_count as usize,
-        })
+        None
+        // Some(ClientEventView::PlayerSpendMana {
+        //     player_id: self.player_id,
+        //     spent_mana_count: self.mana_count as usize,
+        // })
     }
 }

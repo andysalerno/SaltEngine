@@ -5,10 +5,11 @@ use crate::{connection::Connection, Result};
 use cards::*;
 use futures::{join, try_join};
 use log::info;
+use protocol::entities::PlayerId;
 use salt_engine::{
     cards::UnitCardDefinition,
     game_runner::GameRunner,
-    game_state::{Deck, GameState, MakePlayerView, PlayerId, UnitCardInstance},
+    game_state::{Deck, GameState, MakePlayerView, UnitCardInstance},
 };
 
 /// Plays a game to completion.

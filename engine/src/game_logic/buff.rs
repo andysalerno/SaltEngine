@@ -1,41 +1,5 @@
-use super::passive_effect::PassiveEffectInstanceId;
-use crate::{game_state::UnitCardInstanceId, id::Id};
+use protocol::entities::{BuffInstanceId, BuffSourceId, Id};
 use serde::{Deserialize, Serialize};
-
-#[derive(Debug, Copy, Clone, PartialEq, Serialize, Deserialize)]
-pub struct BuffInstanceId(Id);
-
-impl BuffInstanceId {
-    #[must_use]
-    pub fn new() -> Self {
-        Self(Id::new())
-    }
-}
-
-impl Default for BuffInstanceId {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-#[derive(Debug, Copy, Clone, PartialEq, Serialize, Deserialize)]
-pub enum BuffSourceId {
-    Passive(PassiveEffectInstanceId),
-    CreatureInstance(UnitCardInstanceId),
-    Other(Id),
-}
-
-impl From<PassiveEffectInstanceId> for BuffSourceId {
-    fn from(id: PassiveEffectInstanceId) -> Self {
-        BuffSourceId::Passive(id)
-    }
-}
-
-impl From<UnitCardInstanceId> for BuffSourceId {
-    fn from(id: UnitCardInstanceId) -> Self {
-        BuffSourceId::CreatureInstance(id)
-    }
-}
 
 pub trait BuffView {
     fn attack_amount(&self) -> i32;
@@ -159,23 +123,15 @@ impl Buff for BuiltBuff {
 }
 
 pub mod player_view {
-    use super::{Buff, BuffInstanceId, BuffSourceId, BuffView, Deserialize, Id, Serialize};
-    use crate::game_state::MakePlayerView;
+    use protocol::entities::{BuffInstanceId, BuffPlayerView, BuffSourceId, PlayerId};
 
-    #[derive(Debug, Serialize, Clone, Deserialize)]
-    pub struct BuffPlayerView {
-        attack_amount: i32,
-        health_amount: i32,
-        source_id: BuffSourceId,
-        instance_id: BuffInstanceId,
-        definition_id: Id,
-        is_from_passive: bool,
-    }
+    use super::{Buff, BuffView, Deserialize, Id, Serialize};
+    use crate::game_state::MakePlayerView;
 
     impl<'a> MakePlayerView<'a> for dyn Buff {
         type TOut = BuffPlayerView;
 
-        fn player_view(&'a self, _player_viewing: crate::game_state::PlayerId) -> BuffPlayerView {
+        fn player_view(&'a self, _player_viewing: PlayerId) -> BuffPlayerView {
             BuffPlayerView {
                 attack_amount: self.attack_amount(),
                 health_amount: self.health_amount(),

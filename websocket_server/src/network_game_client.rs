@@ -4,12 +4,13 @@ use crate::network_client_notifier::NetworkClientNotifier;
 use crate::network_prompter::NewtorkPrompter;
 use async_trait::async_trait;
 use log::info;
+use protocol::entities::PlayerId;
+use protocol::ClientAction;
 use salt_engine::game_agent::ClientNotifier;
 use salt_engine::{
     game_agent::Prompter,
-    game_logic::events::ClientActionEvent,
     game_runner::GameClient,
-    game_state::{GameState, GameStatePlayerView, PlayerId},
+    game_state::{GameState, GameStatePlayerView},
 };
 
 pub(crate) struct NetworkGameClient {
@@ -37,7 +38,7 @@ impl GameClient for NetworkGameClient {
             .expect("failed to send turnstart");
     }
 
-    async fn next_action(&mut self, game_state_view: GameStatePlayerView) -> ClientActionEvent {
+    async fn next_action(&mut self, game_state_view: GameStatePlayerView) -> ClientAction {
         // Awaiting response from the client.
 
         let _ping = self

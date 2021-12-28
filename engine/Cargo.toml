@@ -16,6 +16,7 @@ log = "0.4"
 smol = "1.2.5"
 futures = "0.3"
 enum_dispatch = "0.3.7"
+protocol = { path = "../protocol" }
 
 [dev-dependencies]
 mockall = "0.10.2"

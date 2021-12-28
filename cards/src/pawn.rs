@@ -1,7 +1,5 @@
-use salt_engine::{
-    cards::{CardDefinition, Position, UnitCardDefinition},
-    id::Id,
-};
+use protocol::entities::{Id, Position};
+use salt_engine::cards::{CardDefinition, UnitCardDefinition};
 
 #[derive(Debug, Clone)]
 pub struct Pawn;

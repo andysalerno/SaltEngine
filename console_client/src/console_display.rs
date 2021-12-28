@@ -1,5 +1,6 @@
+use protocol::entities::RowId;
 use salt_engine::game_state::{
-    board::{BoardSlotPlayerView, BoardView, RowId},
+    board::{BoardSlotPlayerView, BoardView},
     GameStatePlayerView, GameStateView,
 };
 

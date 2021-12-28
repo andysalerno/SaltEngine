@@ -1,7 +1,9 @@
-use salt_engine::{
-    cards::{CardDefinition, Position, UnitCardDefinition},
-    id::Id,
-};
+use protocol::entities::{Id, Position};
+use salt_engine::cards::{CardDefinition, UnitCardDefinition};
+
+fn create() -> Box<dyn UnitCardDefinition> {
+    Box::new(AttackDog)
+}
 
 #[derive(Debug, Clone)]
 pub struct AttackDog;

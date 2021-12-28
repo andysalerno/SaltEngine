@@ -11,10 +11,11 @@ use super::{
 use crate::{
     game_agent::{ClientNotifier, Prompter},
     game_logic::event_handlers::AddBuffToCardInstanceHandler,
-    game_state::{board::BoardView, GameState, IterAddons, PlayerId},
+    game_state::{board::BoardView, GameState, IterAddons},
 };
 use futures::join;
 use log::{debug, info};
+use protocol::entities::PlayerId;
 
 #[derive(Debug)]
 pub struct EventDispatcher {
@@ -239,9 +240,11 @@ impl EventDispatcher {
 
 #[cfg(test)]
 mod tests {
+    use protocol::entities::PlayerId;
+
     use super::EventDispatcher;
     use crate::game_agent::tests::{MockTestPrompter, StubNotifier};
-    use crate::game_state::{Deck, GameState, PlayerId};
+    use crate::game_state::{Deck, GameState};
 
     pub(crate) fn make_test_state() -> GameState {
         let player_a_deck = Deck::new(Vec::new());

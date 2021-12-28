@@ -1,10 +1,10 @@
 use async_trait::async_trait;
 use log::info;
+use protocol::entities::{Id, Position, UnitCardInstanceId};
 use salt_engine::{
-    cards::{actions::UponTurnEndAction, CardDefinition, Position, UnitCardDefinition},
+    cards::{actions::UponTurnEndAction, CardDefinition, UnitCardDefinition},
     game_logic::{events::CreatureHealedEvent, EventDispatcher},
-    game_state::{board::BoardView, GameState, UnitCardInstanceId},
-    id::Id,
+    game_state::{board::BoardView, GameState},
 };
 
 #[derive(Debug, Clone)]

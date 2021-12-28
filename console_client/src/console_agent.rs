@@ -1,17 +1,17 @@
 use crate::console_display::ConsoleDisplay;
 use async_trait::async_trait;
-
+use protocol::{
+    client_actions::{Attack, EndTurn, SummonCreatureFromHand},
+    entities::{BoardPos, PlayerId, RowId},
+    ClientAction, ClientEventView,
+};
 use salt_engine::{
     cards::{player_view::UnitCardDefinitionPlayerView, UnitCardDefinitionView},
     game_agent::{ClientNotifier, Prompter},
-    game_logic::events::{
-        AttackEvent, ClientActionEvent, ClientEventView, EndTurnEvent, Event,
-        SummonCreatureFromHandEvent,
-    },
+    game_logic::events::{AttackEvent, Event},
     game_runner::GameClient,
     game_state::{
-        board::{BoardPos, BoardView, RowId},
-        GameStatePlayerView, GameStateView, HandView, IterAddons, IteratorAny, PlayerId,
+        board::BoardView, GameStatePlayerView, GameStateView, HandView, IterAddons, IteratorAny,
         UnitCardInstancePlayerView,
     },
 };
@@ -56,7 +56,7 @@ impl GameClient for ConsoleAgent {
         Box::new(ConsoleNotifier)
     }
 
-    async fn next_action(&mut self, game_state: GameStatePlayerView) -> ClientActionEvent {
+    async fn next_action(&mut self, game_state: GameStatePlayerView) -> ClientAction {
         let prompter = ConsolePrompter::new(self.id());
         prompter.show_hand(&game_state);
 
@@ -220,7 +220,7 @@ impl ConsolePrompter {
         self.id
     }
 
-    fn prompt(&self, game_state: &GameStatePlayerView) -> Result<ClientActionEvent, ConsoleError> {
+    fn prompt(&self, game_state: &GameStatePlayerView) -> Result<ClientAction, ConsoleError> {
         let mut input_queue = VecDeque::new();
 
         let mut event = None;
@@ -248,7 +248,9 @@ impl ConsolePrompter {
                     None
                 }
                 "attack" => Some(self.attack(game_state, &mut input_queue)),
-                "end" => Some(Ok(ClientActionEvent::EndTurn(EndTurnEvent(self.id())))),
+                "end" => Some(Ok(ClientAction::EndTurn(EndTurn {
+                    player_id: self.id(),
+                }))),
                 "quit" => panic!(),
                 _ => None,
             };
@@ -261,7 +263,7 @@ impl ConsolePrompter {
         &self,
         game_state: &GameStatePlayerView,
         input_queue: &mut VecDeque<String>,
-    ) -> Result<ClientActionEvent, ConsoleError> {
+    ) -> Result<ClientAction, ConsoleError> {
         let player_id = game_state.cur_player_turn();
 
         let selected_card_id = {
@@ -288,19 +290,26 @@ impl ConsolePrompter {
 
         let board_pos = self.prompt_pos(game_state, input_queue)?;
 
-        let event = SummonCreatureFromHandEvent::new(player_id, board_pos, selected_card_id);
+        // let event = SummonCreatureFromHandEvent::new(player_id, board_pos, selected_card_id);
+        let event = SummonCreatureFromHand {
+            player_id,
+            board_pos,
+            card_id: selected_card_id,
+        };
 
-        event
-            .validate(game_state)
-            .map(|_| ClientActionEvent::SummonCreatureFromHand(event))
-            .map_err(|e| ConsoleError::UserInputError(format!("{:?}", e)))
+        Ok(ClientAction::SummonCreatureFromHand(event))
+
+        // event
+        //     .validate(game_state)
+        //     .map(|_| ClientAction::SummonCreatureFromHand(event))
+        //     .map_err(|e| ConsoleError::UserInputError(format!("{:?}", e)))
     }
 
     fn attack(
         &self,
         game_state: &GameStatePlayerView,
         input_queue: &mut VecDeque<String>,
-    ) -> Result<ClientActionEvent, ConsoleError> {
+    ) -> Result<ClientAction, ConsoleError> {
         let attacker_pos = self.prompt_pos(game_state, input_queue)?;
 
         if !game_state
@@ -333,12 +342,17 @@ impl ConsolePrompter {
 
         let target_id = target_creature.id();
 
-        let event = AttackEvent::new(attacker_id, target_id);
+        Ok(ClientAction::Attack(Attack {
+            attacker: attacker_id,
+            target: target_id,
+        }))
 
-        event
-            .validate(game_state)
-            .map(|_| ClientActionEvent::Attack(event))
-            .map_err(|e| ConsoleError::UserInputError(format!("{:?}", e)))
+        // let event = AttackEvent::new(attacker_id, target_id);
+
+        // event
+        //     .validate(game_state)
+        //     .map(|_| ClientAction::Attack(event))
+        //     .map_err(|e| ConsoleError::UserInputError(format!("{:?}", e)))
     }
 
     fn info(&self, game_state: &GameStatePlayerView, input_queue: &mut VecDeque<String>) {

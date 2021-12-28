@@ -1,7 +1,7 @@
 use super::{
-    board::{Board, BoardSlot, BoardSlotView, BoardView, RowId},
+    board::{Board, BoardSlot, BoardSlotView, BoardView},
     card_instance::UnitCardInstanceView,
-    PlayerId, UnitCardInstanceId,
+    PlayerId,
 };
 use std::borrow::{Borrow, BorrowMut};
 
@@ -104,7 +104,9 @@ use std::borrow::{Borrow, BorrowMut};
 // }
 
 pub mod iter_helpers {
-    use super::{BoardSlotView, PlayerId, RowId, UnitCardInstanceId, UnitCardInstanceView};
+    use protocol::entities::{RowId, UnitCardInstanceId};
+
+    use super::{BoardSlotView, PlayerId, UnitCardInstanceView};
 
     /// A trait containing helpful methods when iterating over board slots.
     pub trait IterAddons<'a, I, S: 'a>

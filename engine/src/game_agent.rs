@@ -1,10 +1,9 @@
-use crate::game_logic::events::ClientEventView;
-use crate::game_state::board::BoardPos;
 use crate::game_state::GameStatePlayerView;
 use async_trait::async_trait;
 
 #[cfg(test)]
 use mockall::{automock, predicate::str};
+use protocol::{entities::BoardPos, ClientEventView};
 
 #[cfg_attr(test, automock)]
 pub trait Prompter: Send + Sync {
@@ -49,9 +48,10 @@ impl std::fmt::Debug for dyn ClientNotifier {
 #[cfg(test)]
 pub mod tests {
     use super::{ClientNotifier, Prompter};
-    use crate::game_state::{board::BoardPos, GameStatePlayerView};
+    use crate::game_state::GameStatePlayerView;
     use async_trait::async_trait;
     use mockall::mock;
+    use protocol::{entities::BoardPos, ClientEventView};
 
     mock! {
         pub(crate) TestPrompter {}
@@ -69,7 +69,7 @@ pub mod tests {
 
     #[async_trait]
     impl ClientNotifier for StubNotifier {
-        async fn notify(&self, _event: crate::game_logic::events::ClientEventView) {
+        async fn notify(&self, _event: ClientEventView) {
             // Do nothing for the stub
         }
     }

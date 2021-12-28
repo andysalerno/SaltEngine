@@ -7,32 +7,30 @@ mod hero;
 pub mod selector;
 
 pub use card_instance::{
-    InstanceState, UnitCardInstance, UnitCardInstanceId, UnitCardInstancePlayerView,
-    UnitCardInstanceView,
+    InstanceState, UnitCardInstance, UnitCardInstancePlayerView, UnitCardInstanceView,
 };
 pub use deck::Deck;
 pub use game_state::{player_view::GameStatePlayerView, GameState, GameStateView};
 pub use hand::{Hand, HandView};
+use protocol::entities::PlayerId;
 pub use selector::iter_helpers::{IterAddons, IteratorAny};
 use serde::{de::DeserializeOwned, Deserialize, Serialize};
 
-use crate::id::Id;
+// #[derive(Debug, Eq, Hash, Clone, Copy, PartialEq, Serialize, Deserialize)]
+// pub struct PlayerId(Id);
 
-#[derive(Debug, Eq, Hash, Clone, Copy, PartialEq, Serialize, Deserialize)]
-pub struct PlayerId(Id);
+// impl PlayerId {
+//     #[must_use]
+//     pub fn new() -> Self {
+//         Self(Id::new())
+//     }
+// }
 
-impl PlayerId {
-    #[must_use]
-    pub fn new() -> Self {
-        Self(Id::new())
-    }
-}
-
-impl Default for PlayerId {
-    fn default() -> Self {
-        Self::new()
-    }
-}
+// impl Default for PlayerId {
+//     fn default() -> Self {
+//         Self::new()
+//     }
+// }
 
 /// A marker trait, indicating that the implementor
 /// is a player-friendly "view" of the associated type.

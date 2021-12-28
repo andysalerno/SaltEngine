@@ -1,5 +1,7 @@
+use protocol::entities::Position;
+
 use super::UnitCardInstance;
-use crate::game_logic::cards::{CardDefinition, Position, UnitCardDefinition};
+use crate::game_logic::cards::{CardDefinition, UnitCardDefinition};
 
 #[derive(Debug)]
 pub struct HeroDefinition;

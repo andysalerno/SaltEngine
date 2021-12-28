@@ -1,13 +1,13 @@
 use async_trait::async_trait;
 use log::info;
+use protocol::entities::{Id, PlayerId, Position, UnitCardInstanceId};
 use salt_engine::{
-    cards::{actions::UponEventAction, CardDefinition, Position, UnitCardDefinition},
+    cards::{actions::UponEventAction, CardDefinition, UnitCardDefinition},
     game_logic::{
         events::{DrawCardEvent, GameEvent},
         EventDispatcher,
     },
-    game_state::{board::BoardView, GameState, PlayerId, UnitCardInstanceId},
-    id::Id,
+    game_state::{board::BoardView, GameState},
 };
 
 #[derive(Debug, Clone)]
@@ -116,10 +116,8 @@ mod tests {
         tests::{make_dispatcher, make_test_state},
         IndoorCat, Pawn,
     };
-    use salt_engine::{
-        game_logic::events::{CreatureTakesDamageEvent, SummonCreatureFromHandEvent},
-        game_state::board::{BoardPos, RowId},
-    };
+    use protocol::entities::{BoardPos, RowId};
+    use salt_engine::game_logic::events::{CreatureTakesDamageEvent, SummonCreatureFromHandEvent};
 
     #[test]
     fn when_companion_takes_damage_and_survives_expects_draws_card() {

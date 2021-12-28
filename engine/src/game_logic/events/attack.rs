@@ -1,4 +1,4 @@
-use crate::game_state::UnitCardInstanceId;
+use protocol::entities::UnitCardInstanceId;
 use serde::{Deserialize, Serialize};
 
 use super::Event;

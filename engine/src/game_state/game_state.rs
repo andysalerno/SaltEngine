@@ -1,9 +1,10 @@
 use super::{
-    board::{Board, BoardPos, BoardView, RowId},
+    board::{Board, BoardView},
     hand::HandView,
-    Deck, Hand, IterAddons, IteratorAny, PlayerId, UnitCardInstance, UnitCardInstanceId,
+    Deck, Hand, IterAddons, IteratorAny, PlayerId, UnitCardInstance,
 };
 use log::debug;
+use protocol::entities::{BoardPos, RowId, UnitCardInstanceId};
 use serde::{Deserialize, Serialize};
 use std::slice::Iter;
 
@@ -498,8 +499,10 @@ pub mod player_view {
 
 #[cfg(test)]
 pub(crate) mod tests {
+    use protocol::entities::Position;
+
     use crate::{
-        cards::{CardDefinition, Position, UnitCardDefinition},
+        cards::{CardDefinition, UnitCardDefinition},
         game_state::MakePlayerView,
     };
 

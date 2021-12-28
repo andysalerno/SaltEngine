@@ -1,13 +1,10 @@
 use super::{ClientEventView, Event};
 use crate::{
     cards::UnitCardDefinitionView,
-    game_logic::cards::Position,
-    game_state::{
-        board::{BoardPos, BoardView, RowId},
-        GameState, GameStateView, HandView, PlayerId, UnitCardInstanceId, UnitCardInstanceView,
-    },
+    game_state::{board::BoardView, GameState, GameStateView, HandView, UnitCardInstanceView},
 };
 use log::debug;
+use protocol::entities::{BoardPos, PlayerId, UnitCardInstanceId};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -61,13 +58,14 @@ impl Event for SummonCreatureFromHandEvent {
         player_id: PlayerId,
         _game_state: &GameState,
     ) -> Option<ClientEventView> {
-        let client_event = SummonCreatureFromHandClientEvent {
-            player_id: self.player_id,
-            board_pos: self.board_pos,
-            hand_card_id: self.hand_card_id,
-        };
+        // let client_event = SummonCreatureFromHandClientEvent {
+        //     player_id: self.player_id,
+        //     board_pos: self.board_pos,
+        //     hand_card_id: self.hand_card_id,
+        // };
 
-        Some(super::ClientEventView::SummonCreatureFromHand(client_event))
+        // Some(ClientEventView::CreatureSummonedFromHand(client_event))
+        None
     }
 }
 
@@ -79,8 +77,10 @@ pub struct SummonCreatureFromHandClientEvent {
 }
 
 mod validation {
+    use protocol::entities::{Position, RowId};
+
     use super::{
-        debug, BoardView, GameStateView, HandView, Position, RowId, SummonCreatureFromHandEvent,
+        debug, BoardView, GameStateView, HandView, SummonCreatureFromHandEvent,
         UnitCardDefinitionView, UnitCardInstanceView,
     };
 

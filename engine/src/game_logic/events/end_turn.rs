@@ -1,6 +1,7 @@
-use crate::game_state::{GameState, PlayerId};
+use crate::game_state::GameState;
 
 use super::{ClientEventView, Event};
+use protocol::entities::PlayerId;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -23,6 +24,7 @@ impl Event for EndTurnEvent {
         player_id: PlayerId,
         _game_state: &GameState,
     ) -> Option<ClientEventView> {
-        Some(ClientEventView::TurnEnded(self.0))
+        None
+        // Some(ClientEventView::TurnEnded(self.0))
     }
 }

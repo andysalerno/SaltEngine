@@ -1,12 +1,9 @@
 use async_trait::async_trait;
+use protocol::entities::{BoardPos, Id, Position, RowId, UnitCardInstanceId};
 use salt_engine::{
-    cards::{actions::UponDeathAction, CardDefinition, Position, UnitCardDefinition},
+    cards::{actions::UponDeathAction, CardDefinition, UnitCardDefinition},
     game_logic::{events::PosTakesDamageEvent, EventDispatcher},
-    game_state::{
-        board::{BoardPos, BoardView, RowId},
-        GameState, UnitCardInstanceId,
-    },
-    id::Id,
+    game_state::{board::BoardView, GameState},
 };
 
 #[derive(Debug, Clone)]

@@ -1,4 +1,4 @@
-use crate::game_state::UnitCardInstanceId;
+use protocol::entities::UnitCardInstanceId;
 
 use super::Event;
 
