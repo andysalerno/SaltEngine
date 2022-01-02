@@ -9,4 +9,4 @@ pub use board::*;
 pub use buff::*;
 pub use id::*;
 pub use passive_effect::*;
-pub use unit_card_instance_view::UnitCardInstancePlayerView;
+pub use unit_card_instance_view::*;
