@@ -15,14 +15,7 @@ pub enum ClientAction {
     // DrawCard(DrawCardEvent), "draw card" is not an action a client can decide to do, it just happens
 }
 
-impl ClientAction {
-    #[must_use]
-    pub fn is_end_turn(&self) -> bool {
-        matches!(self, ClientAction::EndTurn(_))
-    }
-}
-
-// Views of events that can be sent to clients.
+/// Views of events that the server can send to clients.
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub enum ClientEventView {
     CardAddedToHand(CardAddedToHand),
@@ -32,4 +25,11 @@ pub enum ClientEventView {
     TurnStarted(TurnStarted),
     PlayerGainMana(PlayerGainMana),
     PlayerSpendMana(PlayerSpendMana),
+}
+
+impl ClientAction {
+    #[must_use]
+    pub fn is_end_turn(&self) -> bool {
+        matches!(self, ClientAction::EndTurn(_))
+    }
 }

@@ -1,13 +1,12 @@
 use super::{
     card_instance::{UnitCardInstance, UnitCardInstanceView},
     hero::HeroDefinition,
-    selector::iter_helpers::{SlotCreatureFilter, SlotCreatureMap},
-    IterAddons, MakePlayerView, PlayerId, UnitCardInstancePlayerView,
+    MakePlayerView, PlayerId, UnitCardInstancePlayerView,
 };
 use crate::cards::UnitCardDefinition;
 use protocol::entities::{BoardPos, RowId, UnitCardInstanceId};
 use serde::{Deserialize, Serialize};
-use std::{borrow::Borrow, collections::HashMap, fmt::Debug};
+use std::{collections::HashMap, fmt::Debug};
 
 const BOARD_WIDTH: usize = 6;
 const SLOTS_COUNT: usize = BOARD_WIDTH * 4;
@@ -83,37 +82,6 @@ impl BoardSlot {
         self.pos
     }
 }
-
-// #[derive(Debug, Copy, Clone, PartialEq, Serialize, Deserialize)]
-// pub enum RowId {
-//     FrontRow,
-//     BackRow,
-//     Hero,
-// }
-
-// impl RowId {
-//     #[must_use]
-//     pub fn is_back(&self) -> bool {
-//         matches!(self, RowId::BackRow)
-//     }
-
-//     #[must_use]
-//     pub fn is_front(&self) -> bool {
-//         matches!(self, RowId::FrontRow)
-//     }
-
-//     #[must_use]
-//     pub fn is_hero(&self) -> bool {
-//         matches!(self, RowId::Hero)
-//     }
-// }
-
-// #[derive(Debug, Copy, Clone, PartialEq, Serialize, Deserialize)]
-// pub struct BoardPos {
-//     pub player_id: PlayerId,
-//     pub row_id: RowId,
-//     pub row_index: usize,
-// }
 
 enum PlayerAB {
     PlayerA,
@@ -321,57 +289,6 @@ impl<'a> BoardView<'a> for Board {
         &self.player_b_hero_slot
     }
 }
-
-// impl<'a> BoardView<'a> for &'a mut Board {
-//     type SlotView = BoardSlot;
-
-//     fn player_a_id(&self) -> PlayerId {
-//         todo!()
-//     }
-
-//     fn player_b_id(&self) -> PlayerId {
-//         todo!()
-//     }
-
-//     fn player_a_hero(&'a self) -> &'a Self::SlotView {
-//         todo!()
-//     }
-
-//     fn player_b_hero(&'a self) -> &'a Self::SlotView {
-//         todo!()
-//     }
-
-//     fn slots(&self) -> &[Self::SlotView] {
-//         todo!()
-//     }
-// }
-
-// impl<'a, T> BoardView<'a> for T
-// where
-//     T: Borrow<Board>,
-// {
-//     type SlotView = BoardSlot;
-
-//     fn player_a_id(&self) -> PlayerId {
-//         self.borrow().player_a_id
-//     }
-
-//     fn player_b_id(&self) -> PlayerId {
-//         self.borrow().player_b_id
-//     }
-
-//     fn slots(&self) -> &[BoardSlot] {
-//         self.borrow().slots.as_slice()
-//     }
-
-//     fn player_a_hero(&self) -> &Self::SlotView {
-//         &self.borrow().player_a_hero_slot
-//     }
-
-//     fn player_b_hero(&self) -> &Self::SlotView {
-//         &self.borrow().player_b_hero_slot
-//     }
-// }
 
 #[derive(Debug)]
 pub struct Board {

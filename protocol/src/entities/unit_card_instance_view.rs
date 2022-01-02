@@ -1,17 +1,10 @@
 use super::{
-    board::BoardPos,
-    buff::BuffPlayerView,
-    unit_card_definition::{PassiveEffectInstancePlayerView, UnitCardDefinitionPlayerView},
-    UnitCardInstanceId,
+    board::BoardPos, buff::BuffPlayerView, unit_card_definition::UnitCardDefinitionPlayerView,
+    PassiveEffectInstancePlayerView, UnitCardInstanceId,
 };
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
-pub enum InstanceState {
-    Pos(BoardPos),
-    CreatureInstanceId(UnitCardInstanceId),
-}
-
+/// A view of a creature card instance.
 #[derive(Debug, Serialize, Clone, Deserialize)]
 pub struct UnitCardInstancePlayerView {
     definition: UnitCardDefinitionPlayerView,
@@ -22,4 +15,10 @@ pub struct UnitCardInstancePlayerView {
     health: i32,
     width: usize,
     state: Option<InstanceState>,
+}
+
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+pub enum InstanceState {
+    Pos(BoardPos),
+    CreatureInstanceId(UnitCardInstanceId),
 }

@@ -2,10 +2,31 @@ use super::PlayerId;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Copy, Clone, PartialEq, Serialize, Deserialize)]
+pub struct BoardPos {
+    pub player_id: PlayerId,
+    pub row_id: RowId,
+    pub row_index: usize,
+}
+
+#[derive(Debug, Copy, Clone, PartialEq, Serialize, Deserialize)]
 pub enum RowId {
     FrontRow,
     BackRow,
     Hero,
+}
+
+/// Describes which board positions
+/// this creature card may occupy.
+#[derive(Debug, Copy, Clone, PartialEq, Serialize, Deserialize)]
+pub enum Position {
+    /// The front side of the board.
+    Front,
+
+    /// The back side of the board.
+    Back,
+
+    /// Either the front or the back sides of the board.
+    Either,
 }
 
 impl RowId {
@@ -23,13 +44,6 @@ impl RowId {
     pub fn is_hero(&self) -> bool {
         matches!(self, RowId::Hero)
     }
-}
-
-#[derive(Debug, Copy, Clone, PartialEq, Serialize, Deserialize)]
-pub struct BoardPos {
-    pub player_id: PlayerId,
-    pub row_id: RowId,
-    pub row_index: usize,
 }
 
 impl BoardPos {
@@ -55,18 +69,4 @@ impl BoardPos {
     pub fn row(&self) -> RowId {
         self.row_id
     }
-}
-
-/// Describes which board positions
-/// this creature card may occupy.
-#[derive(Debug, Copy, Clone, PartialEq, Serialize, Deserialize)]
-pub enum Position {
-    /// The front side of the board.
-    Front,
-
-    /// The back side of the board.
-    Back,
-
-    /// Either the front or the back sides of the board.
-    Either,
 }
