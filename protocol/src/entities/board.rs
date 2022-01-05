@@ -1,14 +1,16 @@
-use super::PlayerId;
+use std::collections::HashMap;
+
+use super::{PlayerId, UnitCardInstancePlayerView};
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Copy, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub struct BoardPos {
     pub player_id: PlayerId,
     pub row_id: RowId,
     pub row_index: usize,
 }
 
-#[derive(Debug, Copy, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub enum RowId {
     FrontRow,
     BackRow,
@@ -69,4 +71,25 @@ impl BoardPos {
     pub fn row(&self) -> RowId {
         self.row_id
     }
+}
+
+#[derive(Debug, Serialize, Clone, Deserialize)]
+pub struct BoardPlayerView {
+    player_a_id: PlayerId,
+    player_b_id: PlayerId,
+    player_a_hero: BoardSlotPlayerView,
+    player_b_hero: BoardSlotPlayerView,
+    slots: Vec<BoardSlotPlayerView>,
+}
+
+#[derive(Debug, Serialize, Clone, Deserialize)]
+pub struct BoardSlotPlayerView {
+    pos: BoardPos,
+    creature: Option<UnitCardInstancePlayerView>,
+}
+
+#[derive(Clone, Debug, Serialize)]
+pub struct Board {
+    slots_per_row: usize,
+    entities_by_pos: HashMap<BoardPos, UnitCardInstancePlayerView>,
 }
