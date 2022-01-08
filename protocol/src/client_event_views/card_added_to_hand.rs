@@ -1,9 +1,9 @@
-use crate::entities::{PlayerId, UnitCardInstanceId, UnitCardInstancePlayerView};
+use crate::entities::{PlayerId, UnitCardInstance, UnitCardInstanceId};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct CardAddedToHand {
     pub player_id: PlayerId,
     pub card_id: UnitCardInstanceId,
-    pub card: Option<UnitCardInstancePlayerView>,
+    pub card: Option<UnitCardInstance>,
 }

@@ -1,6 +1,7 @@
 pub mod client_actions;
 pub mod client_event_views;
 pub mod entities;
+pub mod full_state;
 
 use client_actions::*;
 use client_event_views::*;

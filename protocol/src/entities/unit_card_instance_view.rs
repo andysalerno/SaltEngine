@@ -1,15 +1,15 @@
 pub use id::*;
 
 use super::{
-    board::BoardPos, buff::BuffPlayerView, unit_card_definition::UnitCardDefinitionPlayerView,
+    board::BoardPos, buff::BuffPlayerView, unit_card_definition::UnitCardDefinition,
     PassiveEffectInstancePlayerView,
 };
 use serde::{Deserialize, Serialize};
 
 /// A view of a creature card instance.
 #[derive(Debug, Serialize, Clone, Deserialize)]
-pub struct UnitCardInstancePlayerView {
-    definition: UnitCardDefinitionPlayerView,
+pub struct UnitCardInstance {
+    definition: UnitCardDefinition,
     buffs: Vec<BuffPlayerView>,
     passive_effect: Option<PassiveEffectInstancePlayerView>,
     id: UnitCardInstanceId,
