@@ -214,7 +214,7 @@ impl EventDispatcher {
                     .handle(e, game_state, self)
                     .await;
             }
-            GameEvent::SummonCreatureFromHandEvent(e) => {
+            GameEvent::CreatureSummonedFromHandEvent(e) => {
                 SummonCreatureFromHandEventHandler::default()
                     .handle(e, game_state, self)
                     .await;

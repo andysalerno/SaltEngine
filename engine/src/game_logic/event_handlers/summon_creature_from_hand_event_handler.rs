@@ -3,7 +3,7 @@ use log::{debug, info};
 use crate::{
     game_logic::{
         event_handlers::EventHandler,
-        events::{CreatureSetEvent, PlayerSpendManaEvent, SummonCreatureFromHandEvent},
+        events::{CreatureSetEvent, CreatureSummonedFromHandEvent, PlayerSpendManaEvent},
         EventDispatcher,
     },
     game_state::GameState,
@@ -15,11 +15,11 @@ pub struct SummonCreatureFromHandEventHandler;
 
 #[async_trait]
 impl EventHandler for SummonCreatureFromHandEventHandler {
-    type Event = SummonCreatureFromHandEvent;
+    type Event = CreatureSummonedFromHandEvent;
 
     async fn handle(
         &self,
-        event: &SummonCreatureFromHandEvent,
+        event: &CreatureSummonedFromHandEvent,
         game_state: &mut GameState,
         dispatcher: &mut EventDispatcher,
     ) {

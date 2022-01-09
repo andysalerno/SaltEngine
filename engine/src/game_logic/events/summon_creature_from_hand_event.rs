@@ -8,13 +8,13 @@ use protocol::entities::{BoardPos, PlayerId, UnitCardInstanceId};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
-pub struct SummonCreatureFromHandEvent {
+pub struct CreatureSummonedFromHandEvent {
     player_id: PlayerId,
     board_pos: BoardPos,
     hand_card_id: UnitCardInstanceId,
 }
 
-impl SummonCreatureFromHandEvent {
+impl CreatureSummonedFromHandEvent {
     #[must_use]
     pub fn new(player_id: PlayerId, board_pos: BoardPos, hand_card_id: UnitCardInstanceId) -> Self {
         Self {
@@ -40,7 +40,7 @@ impl SummonCreatureFromHandEvent {
     }
 }
 
-impl Event for SummonCreatureFromHandEvent {
+impl Event for CreatureSummonedFromHandEvent {
     fn validate<'a, G>(&self, game_state: &'a G) -> super::Result
     where
         G: GameStateView<'a>,
@@ -80,12 +80,12 @@ mod validation {
     use protocol::entities::{Position, RowId};
 
     use super::{
-        debug, BoardView, GameStateView, HandView, SummonCreatureFromHandEvent,
+        debug, BoardView, CreatureSummonedFromHandEvent, GameStateView, HandView,
         UnitCardDefinitionView, UnitCardInstanceView,
     };
 
     pub fn validate_slots_available<'a>(
-        event: &SummonCreatureFromHandEvent,
+        event: &CreatureSummonedFromHandEvent,
         game_state: &'a impl GameStateView<'a>,
     ) -> super::super::Result {
         debug!("Validating the slots for the summon are not already occupied.");
@@ -127,7 +127,7 @@ mod validation {
     }
 
     pub fn validate_is_players_side<'a>(
-        event: &SummonCreatureFromHandEvent,
+        event: &CreatureSummonedFromHandEvent,
         _game_state: &'a impl GameStateView<'a>,
     ) -> super::super::Result {
         debug!("Validating the summon is from the player's own side.");
@@ -146,7 +146,7 @@ mod validation {
     }
 
     pub fn validate_player_has_enough_mana<'a, G>(
-        event: &SummonCreatureFromHandEvent,
+        event: &CreatureSummonedFromHandEvent,
         game_state: &'a G,
     ) -> super::super::Result
     where
@@ -171,7 +171,7 @@ mod validation {
     }
 
     pub fn validate_respects_placeableat<'a>(
-        event: &SummonCreatureFromHandEvent,
+        event: &CreatureSummonedFromHandEvent,
         game_state: &'a impl GameStateView<'a>,
     ) -> super::super::Result {
         debug!("Validating the slots are in the card's placable positions.");

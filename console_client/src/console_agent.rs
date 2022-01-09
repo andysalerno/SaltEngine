@@ -8,7 +8,6 @@ use protocol::{
 use salt_engine::{
     cards::{player_view::UnitCardDefinitionPlayerView, UnitCardDefinitionView},
     game_agent::{ClientNotifier, Prompter},
-    game_logic::events::{AttackEvent, Event},
     game_runner::GameClient,
     game_state::{
         board::BoardView, GameStatePlayerView, GameStateView, HandView, IterAddons, IteratorAny,

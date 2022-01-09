@@ -4,6 +4,7 @@ pub mod full_state;
 pub mod visual_events;
 
 use client_actions::*;
+use entities::Id;
 use serde::{Deserialize, Serialize};
 use visual_events::*;
 
@@ -26,6 +27,14 @@ pub enum VisualEvent {
     TurnStarted(TurnStarted),
     PlayerGainMana(PlayerGainMana),
     PlayerSpendMana(PlayerSpendMana),
+}
+
+/// A message from server to client that informs of an entity's new value.
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct EntityUpdate {
+    id: Id,
+    property_names: Vec<String>,
+    property_values: Vec<String>,
 }
 
 impl ClientAction {
