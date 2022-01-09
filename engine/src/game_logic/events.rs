@@ -30,7 +30,7 @@ pub use end_turn::EndTurnEvent;
 pub use player_gain_mana::PlayerGainManaEvent;
 pub use player_spend_mana::PlayerSpendManaEvent;
 pub use pos_takes_damage_event::PosTakesDamageEvent;
-use protocol::{entities::PlayerId, ClientAction, ClientEventView};
+use protocol::{entities::PlayerId, ClientAction, VisualEvent};
 pub use start_game_event::StartGameEvent;
 pub use summon_creature_from_hand_event::{
     SummonCreatureFromHandClientEvent, SummonCreatureFromHandEvent,
@@ -58,7 +58,7 @@ pub trait Event: Debug {
         &self,
         _player_id: PlayerId,
         _game_state: &GameState,
-    ) -> Option<ClientEventView> {
+    ) -> Option<VisualEvent> {
         None
     }
 }

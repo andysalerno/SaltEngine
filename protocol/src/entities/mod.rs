@@ -11,4 +11,9 @@ pub use buff::*;
 pub use hideable::*;
 pub use id::*;
 pub use passive_effect::*;
+use serde::{Deserialize, Serialize};
 pub use unit_card_instance_view::*;
+
+trait Entity<'a>: Serialize + Deserialize<'a> {
+    fn entity_id(&self) -> Id;
+}

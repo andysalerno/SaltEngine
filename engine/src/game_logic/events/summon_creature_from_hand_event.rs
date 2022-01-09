@@ -1,4 +1,4 @@
-use super::{ClientEventView, Event};
+use super::{Event, VisualEvent};
 use crate::{
     cards::UnitCardDefinitionView,
     game_state::{board::BoardView, GameState, GameStateView, HandView, UnitCardInstanceView},
@@ -57,7 +57,7 @@ impl Event for SummonCreatureFromHandEvent {
         &self,
         player_id: PlayerId,
         _game_state: &GameState,
-    ) -> Option<ClientEventView> {
+    ) -> Option<VisualEvent> {
         // let client_event = SummonCreatureFromHandClientEvent {
         //     player_id: self.player_id,
         //     board_pos: self.board_pos,

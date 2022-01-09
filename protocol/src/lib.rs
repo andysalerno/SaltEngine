@@ -1,11 +1,11 @@
 pub mod client_actions;
-pub mod client_event_views;
 pub mod entities;
 pub mod full_state;
+pub mod visual_events;
 
 use client_actions::*;
-use client_event_views::*;
 use serde::{Deserialize, Serialize};
+use visual_events::*;
 
 /// Actions a client can send to the server for execution.
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -18,7 +18,7 @@ pub enum ClientAction {
 
 /// Views of events that the server can send to clients.
 #[derive(Debug, Serialize, Deserialize, Clone)]
-pub enum ClientEventView {
+pub enum VisualEvent {
     CardAddedToHand(CardAddedToHand),
     CreatureSetOnBoard(CreatureSetOnBoard),
     CreatureSummonedFromHand(CreatureSummonedFromHand),

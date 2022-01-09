@@ -1,4 +1,4 @@
-use super::{ClientEventView, Event};
+use super::{Event, VisualEvent};
 use crate::game_state::{GameState, GameStateView};
 use protocol::entities::PlayerId;
 
@@ -52,7 +52,7 @@ impl Event for PlayerSpendManaEvent {
         &self,
         player_id: PlayerId,
         _game_state: &GameState,
-    ) -> Option<ClientEventView> {
+    ) -> Option<VisualEvent> {
         None
         // Some(ClientEventView::PlayerSpendMana {
         //     player_id: self.player_id,

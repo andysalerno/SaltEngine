@@ -1,6 +1,6 @@
 use protocol::entities::PlayerId;
 
-use super::{ClientEventView, Event};
+use super::{Event, VisualEvent};
 use crate::game_state::GameState;
 
 #[derive(Debug, Clone)]
@@ -34,7 +34,7 @@ impl Event for PlayerGainManaEvent {
         &self,
         player_id: PlayerId,
         _game_state: &GameState,
-    ) -> Option<ClientEventView> {
+    ) -> Option<VisualEvent> {
         // Some(ClientEventView::PlayerGainMana(
         //     self.player_id,
         //     self.gain_count as usize,

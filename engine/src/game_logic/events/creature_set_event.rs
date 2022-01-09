@@ -2,7 +2,7 @@ use crate::game_state::{GameState, MakePlayerView, UnitCardInstancePlayerView};
 use protocol::entities::{BoardPos, PlayerId, UnitCardInstanceId};
 use serde::{Deserialize, Serialize};
 
-use super::{ClientEventView, Event};
+use super::{Event, VisualEvent};
 
 #[derive(Debug)]
 pub struct CreatureSetEvent {
@@ -54,7 +54,7 @@ impl Event for CreatureSetEvent {
         &self,
         player_id: PlayerId,
         game_state: &GameState,
-    ) -> Option<ClientEventView> {
+    ) -> Option<VisualEvent> {
         // let view = game_state
         //     .board()
         //     .creature_instance_all(self.card_id())

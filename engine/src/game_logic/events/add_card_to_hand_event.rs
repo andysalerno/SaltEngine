@@ -1,4 +1,4 @@
-use super::{ClientEventView, Event};
+use super::{Event, VisualEvent};
 use crate::game_state::{board::BoardView, GameState, MakePlayerView, UnitCardInstancePlayerView};
 use protocol::entities::{PlayerId, UnitCardInstanceId};
 use serde::{Deserialize, Serialize};
@@ -31,7 +31,7 @@ impl Event for AddCardToHandEvent {
         &self,
         player_id: PlayerId,
         game_state: &GameState,
-    ) -> Option<ClientEventView> {
+    ) -> Option<VisualEvent> {
         let card = if self.player_id == player_id {
             let card = game_state
                 .board()

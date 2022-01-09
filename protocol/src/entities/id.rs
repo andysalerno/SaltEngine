@@ -32,3 +32,13 @@ impl Default for PlayerId {
         Self::new()
     }
 }
+
+trait AsId {
+    fn as_id(&self) -> Id;
+}
+
+impl AsId for PlayerId {
+    fn as_id(&self) -> Id {
+        self.0
+    }
+}

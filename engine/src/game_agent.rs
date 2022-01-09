@@ -3,7 +3,7 @@ use async_trait::async_trait;
 
 #[cfg(test)]
 use mockall::{automock, predicate::str};
-use protocol::{entities::BoardPos, ClientEventView};
+use protocol::{entities::BoardPos, VisualEvent};
 
 #[cfg_attr(test, automock)]
 pub trait Prompter: Send + Sync {
@@ -36,7 +36,7 @@ impl std::fmt::Debug for dyn Prompter {
 /// Every `GameAgent` will be able to provide one of these.
 #[async_trait]
 pub trait ClientNotifier: Send + Sync {
-    async fn notify(&self, event: ClientEventView);
+    async fn notify(&self, event: VisualEvent);
 }
 
 impl std::fmt::Debug for dyn ClientNotifier {
@@ -51,7 +51,7 @@ pub mod tests {
     use crate::game_state::GameStatePlayerView;
     use async_trait::async_trait;
     use mockall::mock;
-    use protocol::{entities::BoardPos, ClientEventView};
+    use protocol::{entities::BoardPos, VisualEvent};
 
     mock! {
         pub(crate) TestPrompter {}
@@ -69,7 +69,7 @@ pub mod tests {
 
     #[async_trait]
     impl ClientNotifier for StubNotifier {
-        async fn notify(&self, _event: ClientEventView) {
+        async fn notify(&self, _event: VisualEvent) {
             // Do nothing for the stub
         }
     }

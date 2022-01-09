@@ -1,6 +1,6 @@
-use super::{ClientEventView, Event};
+use super::{Event, VisualEvent};
 use crate::game_state::GameState;
-use protocol::{client_event_views::TurnStarted, entities::PlayerId};
+use protocol::{entities::PlayerId, visual_events::TurnStarted};
 
 #[derive(Debug, Clone)]
 pub struct TurnStartEvent(pub PlayerId);
@@ -10,8 +10,8 @@ impl Event for TurnStartEvent {
         &self,
         player_id: PlayerId,
         _game_state: &GameState,
-    ) -> Option<ClientEventView> {
-        Some(ClientEventView::TurnStarted(TurnStarted { player_id }))
+    ) -> Option<VisualEvent> {
+        Some(VisualEvent::TurnStarted(TurnStarted { player_id }))
     }
 
     fn validate<'a, G>(&self, game_state: &'a G) -> super::Result
