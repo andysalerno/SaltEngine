@@ -117,7 +117,9 @@ mod tests {
         IndoorCat, Pawn,
     };
     use protocol::entities::{BoardPos, RowId};
-    use salt_engine::game_logic::events::{CreatureTakesDamageEvent, SummonCreatureFromHandEvent};
+    use salt_engine::game_logic::events::{
+        CreatureSummonedFromHandEvent, CreatureTakesDamageEvent,
+    };
 
     #[test]
     fn when_companion_takes_damage_and_survives_expects_draws_card() {
@@ -134,7 +136,7 @@ mod tests {
             hand.add_card(cat);
 
             let pawn_pos = BoardPos::new(player_id, RowId::FrontRow, 0);
-            let summon_event = SummonCreatureFromHandEvent::new(player_id, pawn_pos, cat_id);
+            let summon_event = CreatureSummonedFromHandEvent::new(player_id, pawn_pos, cat_id);
 
             smol::block_on(async {
                 dispatcher.dispatch(summon_event, &mut state).await;
@@ -148,7 +150,8 @@ mod tests {
             let hand = state.hand_mut(player_id);
             let grandma_pos = BoardPos::new(player_id, RowId::BackRow, 0);
             hand.add_card(grandma);
-            let summon_event = SummonCreatureFromHandEvent::new(player_id, grandma_pos, grandma_id);
+            let summon_event =
+                CreatureSummonedFromHandEvent::new(player_id, grandma_pos, grandma_id);
 
             smol::block_on(async {
                 dispatcher.dispatch(summon_event, &mut state).await;
@@ -187,7 +190,7 @@ mod tests {
             hand.add_card(pawn);
 
             let pawn_pos = BoardPos::new(player_id, RowId::FrontRow, 0);
-            let summon_event = SummonCreatureFromHandEvent::new(player_id, pawn_pos, pawn_id);
+            let summon_event = CreatureSummonedFromHandEvent::new(player_id, pawn_pos, pawn_id);
 
             smol::block_on(async {
                 dispatcher.dispatch(summon_event, &mut state).await;
@@ -202,7 +205,8 @@ mod tests {
             let hand = state.hand_mut(player_id);
             let grandma_pos = BoardPos::new(player_id, RowId::BackRow, 0);
             hand.add_card(grandma);
-            let summon_event = SummonCreatureFromHandEvent::new(player_id, grandma_pos, grandma_id);
+            let summon_event =
+                CreatureSummonedFromHandEvent::new(player_id, grandma_pos, grandma_id);
 
             smol::block_on(async {
                 dispatcher.dispatch(summon_event, &mut state).await;
@@ -240,7 +244,7 @@ mod tests {
             hand.add_card(cat);
 
             let cat_pos = BoardPos::new(player_id, RowId::FrontRow, 0);
-            let summon_event = SummonCreatureFromHandEvent::new(player_id, cat_pos, cat_id);
+            let summon_event = CreatureSummonedFromHandEvent::new(player_id, cat_pos, cat_id);
 
             smol::block_on(async {
                 dispatcher.dispatch(summon_event, &mut state).await;
@@ -255,7 +259,8 @@ mod tests {
             let hand = state.hand_mut(player_id);
             let grandma_pos = BoardPos::new(player_id, RowId::BackRow, 1);
             hand.add_card(grandma);
-            let summon_event = SummonCreatureFromHandEvent::new(player_id, grandma_pos, grandma_id);
+            let summon_event =
+                CreatureSummonedFromHandEvent::new(player_id, grandma_pos, grandma_id);
 
             smol::block_on(async {
                 dispatcher.dispatch(summon_event, &mut state).await;

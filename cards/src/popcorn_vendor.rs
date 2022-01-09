@@ -102,7 +102,7 @@ mod tests {
         Pawn,
     };
     use salt_engine::{
-        game_logic::events::SummonCreatureFromHandEvent, game_state::board::BoardView,
+        game_logic::events::CreatureSummonedFromHandEvent, game_state::board::BoardView,
     };
 
     #[test]
@@ -119,7 +119,7 @@ mod tests {
             hand.add_card(pawn);
 
             let pawn_pos = BoardPos::new(player_id, RowId::FrontRow, 0);
-            let summon_event = SummonCreatureFromHandEvent::new(player_id, pawn_pos, pawn_id);
+            let summon_event = CreatureSummonedFromHandEvent::new(player_id, pawn_pos, pawn_id);
 
             smol::block_on(async {
                 dispatcher.dispatch(summon_event, &mut state).await;
@@ -134,7 +134,7 @@ mod tests {
             let pop_vend_pos = BoardPos::new(player_id, RowId::BackRow, 0);
             hand.add_card(pop_vend);
             let summon_event =
-                SummonCreatureFromHandEvent::new(player_id, pop_vend_pos, pop_vend_id);
+                CreatureSummonedFromHandEvent::new(player_id, pop_vend_pos, pop_vend_id);
 
             smol::block_on(async {
                 dispatcher.dispatch(summon_event, &mut state).await;
@@ -162,7 +162,7 @@ mod tests {
         hand.add_card(popcorn_vendor);
 
         let pos = BoardPos::new(player_a, RowId::FrontRow, 0);
-        let summon_event = SummonCreatureFromHandEvent::new(player_a, pos, popcorn_vendor_id);
+        let summon_event = CreatureSummonedFromHandEvent::new(player_a, pos, popcorn_vendor_id);
         smol::block_on(async {
             dispatcher.dispatch(summon_event, &mut state).await;
         });
