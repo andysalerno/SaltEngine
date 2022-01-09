@@ -55,12 +55,13 @@ impl GameClient for ConsoleAgent {
         Box::new(ConsoleNotifier)
     }
 
-    async fn next_action(&mut self, game_state: GameStatePlayerView) -> ClientAction {
+    // async fn next_action(&mut self, game_state: GameStatePlayerView) -> ClientAction {
+    async fn next_action(&mut self) -> ClientAction {
         let prompter = ConsolePrompter::new(self.id());
-        prompter.show_hand(&game_state);
+        prompter.show_hand();
 
         loop {
-            let result = prompter.prompt(&game_state);
+            let result = prompter.prompt();
 
             match result {
                 Ok(game_event) => break game_event,
@@ -219,7 +220,9 @@ impl ConsolePrompter {
         self.id
     }
 
-    fn prompt(&self, game_state: &GameStatePlayerView) -> Result<ClientAction, ConsoleError> {
+    // fn prompt(&self, game_state: &GameStatePlayerView) -> Result<ClientAction, ConsoleError> {
+    fn prompt(&self) -> Result<ClientAction, ConsoleError> {
+        let game_state: &GameStatePlayerView = todo!();
         let mut input_queue = VecDeque::new();
 
         let mut event = None;
@@ -234,7 +237,8 @@ impl ConsolePrompter {
 
             event = match action.as_str() {
                 "hand" => {
-                    self.show_hand(game_state);
+                    // self.show_hand(game_state);
+                    self.show_hand();
                     None
                 }
                 "board" => {
@@ -266,7 +270,8 @@ impl ConsolePrompter {
         let player_id = game_state.cur_player_turn();
 
         let selected_card_id = {
-            self.show_hand(game_state);
+            // self.show_hand(game_state);
+            self.show_hand();
 
             let hand_size = game_state.hand().len();
 
@@ -362,7 +367,9 @@ impl ConsolePrompter {
         ConsoleDisplay.display(game_state);
     }
 
-    fn show_hand(&self, game_state: &GameStatePlayerView) {
+    fn show_hand(&self) {
+        let game_state: &GameStatePlayerView = todo!();
+
         let mut result = String::new();
 
         let available_mana = game_state.player_mana(self.id());

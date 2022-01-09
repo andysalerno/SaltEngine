@@ -41,7 +41,8 @@ pub enum FromServer {
     OpponentCardDrawnFromDeck(GameStatePlayerView),
 
     /// Hints to the client that the server is waiting for their action. Includes the current state.
-    WaitingForAction(GameStatePlayerView),
+    //WaitingForAction(GameStatePlayerView),
+    WaitingForAction,
 
     /// Indicates the client should prompt for some value (board slot, card, etc).
     Prompt(PromptMessage, GameStatePlayerView),

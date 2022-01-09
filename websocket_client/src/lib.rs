@@ -92,9 +92,10 @@ async fn handle_turn(
             .expect("failed to get a response from the server");
 
         match msg {
-            FromServer::WaitingForAction(state) => {
+            FromServer::WaitingForAction => {
                 info!("Server says: waiting for action.");
-                let player_action = agent.next_action(state).await;
+                // let player_action = agent.next_action(state).await;
+                let player_action = agent.next_action().await;
 
                 let is_turn_ending = player_action.is_end_turn();
 

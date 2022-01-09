@@ -38,13 +38,11 @@ impl GameClient for NetworkGameClient {
             .expect("failed to send turnstart");
     }
 
-    async fn next_action(&mut self, game_state_view: GameStatePlayerView) -> ClientAction {
+    // async fn next_action(&mut self, game_state_view: GameStatePlayerView) -> ClientAction {
+    async fn next_action(&mut self) -> ClientAction {
         // Awaiting response from the client.
 
-        let _ping = self
-            .connection
-            .send(FromServer::WaitingForAction(game_state_view))
-            .await;
+        let _ping = self.connection.send(FromServer::WaitingForAction).await;
         info!("Waiting for the player's next action...");
         let from_client = self
             .connection

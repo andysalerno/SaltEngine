@@ -18,7 +18,8 @@ use protocol::ClientAction;
 #[async_trait]
 pub trait GameClient: Send + Sync {
     async fn on_turn_start(&mut self, game_state: &GameState);
-    async fn next_action(&mut self, game_state_view: GameStatePlayerView) -> ClientAction;
+    // async fn next_action(&mut self, game_state_view: GameStatePlayerView) -> ClientAction;
+    async fn next_action(&mut self) -> ClientAction;
     async fn make_prompter(&self) -> Box<dyn Prompter>;
     async fn make_notifier(&self) -> Box<dyn ClientNotifier>;
 }
@@ -92,7 +93,8 @@ impl GameRunner {
         loop {
             info!("Getting next action from client.");
             let action = handler_player
-                .next_action(game_state.player_view(cur_player_id))
+                // .next_action(game_state.player_view(cur_player_id))
+                .next_action()
                 .await;
 
             let action: GameEvent = action.into();
@@ -150,7 +152,8 @@ pub mod tests {
             }
         }
 
-        async fn next_action(&mut self, _game_state_view: GameStatePlayerView) -> ClientAction {
+        // async fn next_action(&mut self, _game_state_view: GameStatePlayerView) -> ClientAction {
+        async fn next_action(&mut self) -> ClientAction {
             self.action_queue
                 .pop()
                 .expect("No actions left in the queue")
