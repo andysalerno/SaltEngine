@@ -1,6 +1,5 @@
-use crate::{connection::Connection, messages::FromServer};
+use crate::connection::Connection;
 use async_trait::async_trait;
-use protocol::VisualEvent;
 use salt_engine::game_agent::ClientNotifier;
 
 pub(crate) struct NetworkClientNotifier {

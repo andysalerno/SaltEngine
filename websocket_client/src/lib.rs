@@ -6,16 +6,11 @@
     clippy::cast_lossless
 )]
 
-mod local_state;
-
 use log::info;
-use protocol::entities::PlayerId;
+use protocol::{entities::PlayerId, from_client::FromClient, from_server::FromServer};
 use salt_engine::{game_agent::ClientNotifier, game_runner::GameClient};
 use smol::net::TcpStream;
-use websocket_server::{
-    connection::Connection,
-    messages::{FromClient, FromServer, PromptMessage},
-};
+use websocket_server::connection::Connection;
 
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error + Send + Sync>>;
 

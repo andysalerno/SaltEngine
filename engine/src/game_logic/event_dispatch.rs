@@ -15,7 +15,7 @@ use crate::{
 };
 use futures::join;
 use log::{debug, info};
-use protocol::entities::PlayerId;
+use protocol::{entities::PlayerId, from_server::VisualEvent};
 
 #[derive(Debug)]
 pub struct EventDispatcher {
@@ -66,6 +66,11 @@ impl EventDispatcher {
 
             game_state.evaluate_passives();
         }
+    }
+
+    pub async fn notify_players(&self, visual_event: VisualEvent) {
+        self.player_a_notifier.notify(visual_event.clone()).await;
+        self.player_b_notifier.notify(visual_event).await;
     }
 
     #[must_use]

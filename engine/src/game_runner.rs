@@ -8,7 +8,7 @@ use crate::{
 };
 use async_trait::async_trait;
 use log::info;
-use protocol::ClientAction;
+use protocol::from_client::ClientAction;
 
 /// A trait that defines the interaction between the GameRunner
 /// and the client.
@@ -113,7 +113,7 @@ impl GameRunner {
 
 #[cfg(test)]
 pub mod tests {
-    use protocol::{client_actions::EndTurn, ClientAction};
+    use protocol::{client_actions::EndTurn, from_client::ClientAction};
 
     use super::*;
     use crate::{

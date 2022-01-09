@@ -1,5 +1,6 @@
 mod console_agent;
 mod console_display;
+mod local_state;
 
 use console_agent::ConsoleAgent;
 use env_logger::Env;

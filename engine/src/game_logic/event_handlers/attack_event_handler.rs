@@ -1,4 +1,5 @@
 use log::info;
+use protocol::{from_server::VisualEvent, visual_events::CreatureAttacksTarget};
 
 use crate::{
     game_logic::{
@@ -11,7 +12,7 @@ use crate::{
 };
 use async_trait::async_trait;
 
-#[derive(Default)]
+#[derive(Default, Debug)]
 pub struct AttackEventHandler;
 
 fn validate(event: &AttackEvent, game_state: &GameState) {
@@ -43,6 +44,16 @@ impl EventHandler for AttackEventHandler {
                 target_instance.definition().title(),
                 attack_amount
             );
+        }
+
+        // 0. Send visual event to clients
+        {
+            let visual_event = CreatureAttacksTarget {
+                attacker: event.attacker().id(),
+                target: event.target().id(),
+            };
+            let visual_event = VisualEvent::CreatureAttacksTarget(visual_event);
+            dispatcher.notify_players(visual_event).await;
         }
 
         // 1. Attacker deals damage

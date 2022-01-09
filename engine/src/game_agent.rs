@@ -3,7 +3,7 @@ use async_trait::async_trait;
 
 #[cfg(test)]
 use mockall::{automock, predicate::str};
-use protocol::{entities::BoardPos, VisualEvent};
+use protocol::{entities::BoardPos, from_server::VisualEvent};
 
 #[cfg_attr(test, automock)]
 pub trait Prompter: Send + Sync {
@@ -51,7 +51,7 @@ pub mod tests {
     use crate::game_state::GameStatePlayerView;
     use async_trait::async_trait;
     use mockall::mock;
-    use protocol::{entities::BoardPos, VisualEvent};
+    use protocol::{entities::BoardPos, from_server::VisualEvent};
 
     mock! {
         pub(crate) TestPrompter {}

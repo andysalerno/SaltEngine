@@ -305,6 +305,8 @@ dependencies = [
  "log",
  "protocol",
  "salt_engine",
+ "serde",
+ "serde_json",
  "smol",
  "thiserror",
  "websocket_client",

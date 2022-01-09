@@ -42,7 +42,7 @@ mod tests {
     use mockall::mock;
     use protocol::{
         entities::{BoardPos, PlayerId},
-        VisualEvent,
+        from_server::VisualEvent,
     };
     use salt_engine::{
         cards::UnitCardDefinition,

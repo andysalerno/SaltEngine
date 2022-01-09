@@ -1,5 +1,8 @@
-use crate::{connection::Connection, messages::PromptMessage};
-use protocol::entities::{BoardPos, RowId};
+use crate::connection::Connection;
+use protocol::{
+    entities::{BoardPos, RowId},
+    from_server::PromptMessage,
+};
 use salt_engine::{game_agent::Prompter, game_state::GameStatePlayerView};
 
 pub(crate) struct NewtorkPrompter {

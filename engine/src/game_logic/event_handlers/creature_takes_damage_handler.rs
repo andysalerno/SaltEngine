@@ -1,4 +1,5 @@
 use log::info;
+use protocol::{entities::Id, from_server::EntityUpdate};
 
 use crate::{
     game_logic::{
@@ -31,6 +32,12 @@ impl EventHandler for CreatureTakesDamageHandler {
             .title();
 
         info!("{} takes {} damage", title, event.damage_amount());
+
+        let entity_update = EntityUpdate {
+            id: Id::new(),
+            property_names: vec!["testing".into()],
+            property_values: vec!["testing".into()],
+        };
 
         game_state.update_by_id(event.creature_id(), |c| {
             c.take_damage(event.damage_amount());

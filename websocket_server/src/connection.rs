@@ -3,10 +3,10 @@ use std::sync::Arc;
 use async_tungstenite::{tungstenite::Message, WebSocketStream};
 use futures::{SinkExt, StreamExt};
 use log::debug;
+use protocol::GameMessage;
 use serde::de::DeserializeOwned;
 use smol::{lock::Mutex, net::TcpStream};
 
-use crate::messages::GameMessage;
 use crate::Result;
 
 /// A connection to a player.

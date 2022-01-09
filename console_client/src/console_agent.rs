@@ -3,7 +3,6 @@ use async_trait::async_trait;
 use protocol::{
     client_actions::{Attack, EndTurn, SummonCreatureFromHand},
     entities::{BoardPos, PlayerId, RowId},
-    ClientAction, VisualEvent,
 };
 use salt_engine::{
     cards::{player_view::UnitCardDefinitionPlayerView, UnitCardDefinitionView},

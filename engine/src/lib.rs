@@ -8,6 +8,7 @@
     clippy::module_inception,
     clippy::missing_panics_doc,
     clippy::similar_names,
+    clippy::cast_sign_loss,
     dead_code
 )]
 

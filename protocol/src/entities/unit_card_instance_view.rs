@@ -39,6 +39,11 @@ mod id {
         pub fn new() -> Self {
             Self(Id::new())
         }
+
+        #[must_use]
+        pub fn id(&self) -> Id {
+            self.0
+        }
     }
 
     impl Default for UnitCardInstanceId {
