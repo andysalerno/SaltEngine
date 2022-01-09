@@ -5,6 +5,9 @@
     clippy::unused_self,
     clippy::cast_lossless
 )]
+
+mod local_state;
+
 use log::info;
 use protocol::entities::PlayerId;
 use salt_engine::{game_agent::ClientNotifier, game_runner::GameClient};
@@ -68,9 +71,9 @@ async fn handle_connection(
 
         match msg {
             FromServer::TurnStart => {
-                handle_turn(&mut connection, agent.as_mut(), notifier.as_ref()).await?
+                handle_turn(&mut connection, agent.as_mut(), notifier.as_ref()).await?;
             }
-            FromServer::NotifyEvent(event) => notifier.notify(event).await,
+            FromServer::VisualEvent(event) => notifier.notify(event).await,
             _ => panic!("expected a TurnStart message, but received: {:?}", msg),
         }
     }
@@ -129,7 +132,7 @@ async fn handle_turn(
                     .send(FromClient::PromptResponse(player_input))
                     .await?;
             }
-            FromServer::NotifyEvent(event) => agent_notifier.notify(event).await,
+            FromServer::VisualEvent(event) => agent_notifier.notify(event).await,
             _ => panic!("Unexpected message from server: {:?}", msg),
         }
     }

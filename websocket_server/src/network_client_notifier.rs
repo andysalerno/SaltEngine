@@ -17,7 +17,7 @@ impl NetworkClientNotifier {
 impl ClientNotifier for NetworkClientNotifier {
     async fn notify(&self, event: VisualEvent) {
         self.connection
-            .send(FromServer::NotifyEvent(event))
+            .send(FromServer::VisualEvent(event))
             .await
             .expect("Failed to notify the client");
     }

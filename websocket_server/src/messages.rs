@@ -48,7 +48,7 @@ pub enum FromServer {
     Prompt(PromptMessage, GameStatePlayerView),
 
     /// A message from the server notifying the game client about some event.
-    NotifyEvent(VisualEvent),
+    VisualEvent(VisualEvent),
 }
 impl GameMessage for FromServer {}
 
