@@ -3,7 +3,7 @@ use async_trait::async_trait;
 use protocol::{
     client_actions::{Attack, EndTurn, SummonCreatureFromHand},
     entities::{BoardPos, PlayerId, RowId},
-    ClientAction, ClientEventView,
+    ClientAction, VisualEvent,
 };
 use salt_engine::{
     cards::{player_view::UnitCardDefinitionPlayerView, UnitCardDefinitionView},
@@ -547,7 +547,7 @@ struct ConsoleNotifier;
 
 #[async_trait]
 impl ClientNotifier for ConsoleNotifier {
-    async fn notify(&self, event: ClientEventView) {
+    async fn notify(&self, event: VisualEvent) {
         say(format!("Saw client event: {:?}", event));
     }
 }

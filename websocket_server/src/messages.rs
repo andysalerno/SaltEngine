@@ -1,6 +1,6 @@
 use protocol::{
     entities::{BoardPos, Id, PlayerId, UnitCardInstanceId},
-    ClientAction, ClientEventView,
+    ClientAction, VisualEvent,
 };
 use salt_engine::game_state::GameStatePlayerView;
 use serde::{de::DeserializeOwned, Deserialize, Serialize};
@@ -47,7 +47,7 @@ pub enum FromServer {
     Prompt(PromptMessage, GameStatePlayerView),
 
     /// A message from the server notifying the game client about some event.
-    NotifyEvent(ClientEventView),
+    NotifyEvent(VisualEvent),
 }
 impl GameMessage for FromServer {}
 

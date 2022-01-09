@@ -42,7 +42,7 @@ mod tests {
     use mockall::mock;
     use protocol::{
         entities::{BoardPos, PlayerId},
-        ClientEventView,
+        VisualEvent,
     };
     use salt_engine::{
         cards::UnitCardDefinition,
@@ -69,7 +69,7 @@ mod tests {
 
     #[async_trait]
     impl ClientNotifier for TestClientNotifier {
-        async fn notify(&self, _event: ClientEventView) {
+        async fn notify(&self, _event: VisualEvent) {
             // Doing nothing for tests
         }
     }
