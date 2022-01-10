@@ -4,6 +4,8 @@ use crate::network_prompter::NewtorkPrompter;
 use async_trait::async_trait;
 use log::info;
 use protocol::entities::PlayerId;
+use protocol::from_client::{ClientAction, FromClient};
+use protocol::from_server::FromServer;
 use salt_engine::game_agent::ClientNotifier;
 use salt_engine::{
     game_agent::Prompter,

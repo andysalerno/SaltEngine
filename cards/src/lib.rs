@@ -56,12 +56,12 @@ mod tests {
     mock! {
         pub(crate) TestPrompter {}
         impl Prompter for TestPrompter {
-            fn prompt_slot(&self, game_state: &GameStatePlayerView) -> BoardPos;
-            fn prompt_player_slot(&self, game_state: &GameStatePlayerView) -> BoardPos;
-            fn prompt_opponent_slot(&self, game_state: &GameStatePlayerView) -> BoardPos;
-            fn prompt_creature_pos(&self, game_state: &GameStatePlayerView) -> BoardPos;
-            fn prompt_player_creature_pos(&self, game_state: &GameStatePlayerView) -> BoardPos;
-            fn prompt_opponent_creature_pos(&self, game_state: &GameStatePlayerView) -> BoardPos;
+            fn prompt_slot(&self) -> BoardPos;
+            fn prompt_player_slot(&self) -> BoardPos;
+            fn prompt_opponent_slot(&self) -> BoardPos;
+            fn prompt_creature_pos(&self) -> BoardPos;
+            fn prompt_player_creature_pos(&self) -> BoardPos;
+            fn prompt_opponent_creature_pos(&self) -> BoardPos;
         }
     }
 

@@ -7,8 +7,14 @@
 )]
 
 use log::info;
-use protocol::{entities::PlayerId, from_client::FromClient, from_server::FromServer};
-use salt_engine::{game_agent::ClientNotifier, game_runner::GameClient};
+use protocol::{
+    entities::PlayerId,
+    from_client::FromClient,
+    from_server::{FromServer, PromptMessage},
+};
+use salt_engine::{
+    game_agent::ClientNotifier, game_runner::GameClient, game_state::GameStatePlayerView,
+};
 use smol::net::TcpStream;
 use websocket_server::connection::Connection;
 
@@ -51,10 +57,10 @@ async fn handle_connection(
     info!("My opponent's ID is {:?}", opponent_id);
 
     // Expect the game state
-    let _gamestate_view = match connection.recv::<FromServer>().await {
-        Some(FromServer::State(view)) => view,
-        _ => panic!("unexpected response from server"),
-    };
+    // let _gamestate_view = match connection.recv::<FromServer>().await {
+    //     Some(FromServer::State(view)) => view,
+    //     _ => panic!("unexpected response from server"),
+    // };
 
     loop {
         // Wait for signal from server that we can send an action
@@ -106,20 +112,18 @@ async fn handle_turn(
                     return Ok(());
                 }
             }
-            FromServer::Prompt(prompt_msg, game_state) => {
+            FromServer::Prompt(prompt_msg) => {
                 info!("Received prompt request from server. Prompting player.");
                 let prompter = agent.make_prompter().await;
                 let player_input = match prompt_msg {
-                    PromptMessage::PromptSlot => prompter.prompt_slot(&game_state),
-                    PromptMessage::PromptCreaturePos => prompter.prompt_creature_pos(&game_state),
+                    PromptMessage::PromptSlot => prompter.prompt_slot(),
+                    PromptMessage::PromptCreaturePos => prompter.prompt_creature_pos(),
                     PromptMessage::PromptOpponentCreaturePos => {
-                        prompter.prompt_opponent_creature_pos(&game_state)
+                        prompter.prompt_opponent_creature_pos()
                     }
-                    PromptMessage::PromptOpponentSlot => prompter.prompt_opponent_slot(&game_state),
-                    PromptMessage::PromptPlayerCreaturePos => {
-                        prompter.prompt_player_creature_pos(&game_state)
-                    }
-                    PromptMessage::PromptPlayerSlot => prompter.prompt_player_slot(&game_state),
+                    PromptMessage::PromptOpponentSlot => prompter.prompt_opponent_slot(),
+                    PromptMessage::PromptPlayerCreaturePos => prompter.prompt_player_creature_pos(),
+                    PromptMessage::PromptPlayerSlot => prompter.prompt_player_slot(),
                 };
 
                 info!("Responding to server with prompt result.");

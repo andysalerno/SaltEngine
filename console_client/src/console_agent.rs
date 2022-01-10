@@ -3,6 +3,8 @@ use async_trait::async_trait;
 use protocol::{
     client_actions::{Attack, EndTurn, SummonCreatureFromHand},
     entities::{BoardPos, PlayerId, RowId},
+    from_client::ClientAction,
+    from_server::VisualEvent,
 };
 use salt_engine::{
     cards::{player_view::UnitCardDefinitionPlayerView, UnitCardDefinitionView},
@@ -80,60 +82,62 @@ struct ConsolePrompter {
 }
 
 impl Prompter for ConsolePrompter {
-    fn prompt_slot(&self, game_state: &GameStatePlayerView) -> BoardPos {
+    fn prompt_slot(&self) -> BoardPos {
         let mut empty_queue = VecDeque::new();
 
         say("Enter the letter of any board slot.");
 
         loop {
-            match self.prompt_pos(game_state, &mut empty_queue) {
+            match self.prompt_pos(&mut empty_queue) {
                 Ok(board_pos) => return board_pos,
                 Err(e) => say(format!("{}", e)),
             }
         }
     }
 
-    fn prompt_player_slot(&self, game_state: &GameStatePlayerView) -> BoardPos {
+    fn prompt_player_slot(&self) -> BoardPos {
         let mut empty_queue = VecDeque::new();
 
         say("Enter the letter of a slot you control.");
 
         loop {
-            match self.prompt_pos(game_state, &mut empty_queue) {
+            match self.prompt_pos(&mut empty_queue) {
                 Ok(board_pos) => return board_pos,
                 Err(e) => say(format!("{}", e)),
             }
         }
     }
 
-    fn prompt_opponent_slot(&self, game_state: &GameStatePlayerView) -> BoardPos {
+    fn prompt_opponent_slot(&self) -> BoardPos {
         let mut empty_queue = VecDeque::new();
 
         say("Enter the letter of a slot your opponent controls.");
 
         loop {
-            match self.prompt_pos(game_state, &mut empty_queue) {
+            match self.prompt_pos(&mut empty_queue) {
                 Ok(board_pos) => return board_pos,
                 Err(e) => say(format!("{}", e)),
             }
         }
     }
 
-    fn prompt_creature_pos(&self, game_state: &GameStatePlayerView) -> BoardPos {
+    fn prompt_creature_pos(&self) -> BoardPos {
         let mut empty_queue = VecDeque::new();
 
         say("Enter the letter of any slot containing a creature.");
 
         loop {
-            match self.prompt_pos(game_state, &mut empty_queue) {
+            match self.prompt_pos(&mut empty_queue) {
                 Ok(board_pos) => return board_pos,
                 Err(e) => say(format!("{}", e)),
             }
         }
     }
 
-    fn prompt_player_creature_pos(&self, game_state: &GameStatePlayerView) -> BoardPos {
+    fn prompt_player_creature_pos(&self) -> BoardPos {
         let mut empty_queue = VecDeque::new();
+
+        let game_state: &GameStatePlayerView = todo!();
 
         if !game_state
             .iter()
@@ -162,7 +166,7 @@ impl Prompter for ConsolePrompter {
 
         let friendly_creature_pos = loop {
             let any_pos = retry_until_ok(
-                || self.prompt_pos(game_state, &mut empty_queue),
+                || self.prompt_pos(&mut empty_queue),
                 |e| say(format!("{}", e)),
             );
 
@@ -175,8 +179,10 @@ impl Prompter for ConsolePrompter {
         friendly_creature_pos
     }
 
-    fn prompt_opponent_creature_pos(&self, game_state: &GameStatePlayerView) -> BoardPos {
+    fn prompt_opponent_creature_pos(&self) -> BoardPos {
         let mut empty_queue = VecDeque::new();
+
+        let game_state: &GameStatePlayerView = todo!();
 
         say("Enter the letter of a slot containing a creature your opponent controls.");
 
@@ -196,7 +202,7 @@ impl Prompter for ConsolePrompter {
 
         let enemy_creature_pos = loop {
             let any_pos = retry_until_ok(
-                || self.prompt_pos(game_state, &mut empty_queue),
+                || self.prompt_pos(&mut empty_queue),
                 |e| say(format!("{}", e)),
             );
 
@@ -291,7 +297,7 @@ impl ConsolePrompter {
             selected_card.id()
         };
 
-        let board_pos = self.prompt_pos(game_state, input_queue)?;
+        let board_pos = self.prompt_pos(input_queue)?;
 
         // let event = SummonCreatureFromHandEvent::new(player_id, board_pos, selected_card_id);
         let event = SummonCreatureFromHand {
@@ -313,7 +319,7 @@ impl ConsolePrompter {
         game_state: &GameStatePlayerView,
         input_queue: &mut VecDeque<String>,
     ) -> Result<ClientAction, ConsoleError> {
-        let attacker_pos = self.prompt_pos(game_state, input_queue)?;
+        let attacker_pos = self.prompt_pos(input_queue)?;
 
         if !game_state
             .iter()
@@ -326,7 +332,7 @@ impl ConsolePrompter {
             ));
         }
 
-        let target_pos = self.prompt_pos(game_state, input_queue)?;
+        let target_pos = self.prompt_pos(input_queue)?;
 
         let target_creature =
             if let Some(target_creature) = game_state.board().creature_at_pos(target_pos) {
@@ -411,7 +417,7 @@ impl ConsolePrompter {
         input_queue: &mut VecDeque<String>,
     ) -> Option<&'a UnitCardInstancePlayerView> {
         say(ask);
-        let pos = self.prompt_pos(game_state, input_queue).ok()?;
+        let pos = self.prompt_pos(input_queue).ok()?;
         let item_at = game_state.board().creature_at_pos(pos);
 
         say(format!("Selected: {:?}", item_at));
@@ -421,13 +427,15 @@ impl ConsolePrompter {
 
     fn prompt_pos(
         &self,
-        game_state: &GameStatePlayerView,
+        // game_state: &GameStatePlayerView,
         input_queue: &mut VecDeque<String>,
     ) -> Result<BoardPos, ConsoleError> {
         let c = self.ask("Letter position: ", input_queue);
         let input_c = c.chars().next().ok_or_else(|| {
             ConsoleError::UserInputError("Input was not a valid character.".to_owned())
         })?;
+
+        let game_state: &GameStatePlayerView = todo!();
 
         // special case for Y/Z as hero pos
         if input_c == 'Y' {

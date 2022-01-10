@@ -8,22 +8,22 @@ use protocol::{entities::BoardPos, from_server::VisualEvent};
 #[cfg_attr(test, automock)]
 pub trait Prompter: Send + Sync {
     /// Prompt the player for for any position (slot) on the board.
-    fn prompt_slot(&self, game_state: &GameStatePlayerView) -> BoardPos;
+    fn prompt_slot(&self) -> BoardPos;
 
     /// Prompt the player for any position (slot) on the player's side of the board.
-    fn prompt_player_slot(&self, game_state: &GameStatePlayerView) -> BoardPos;
+    fn prompt_player_slot(&self) -> BoardPos;
 
     /// Prompt the player for any position (slot) on the opponent's side of the board.
-    fn prompt_opponent_slot(&self, game_state: &GameStatePlayerView) -> BoardPos;
+    fn prompt_opponent_slot(&self) -> BoardPos;
 
     /// Prompt the player for any slot in the board containing a creature.
-    fn prompt_creature_pos(&self, game_state: &GameStatePlayerView) -> BoardPos;
+    fn prompt_creature_pos(&self) -> BoardPos;
 
     /// Prompt the player for a slot on their side of the board containing a creature.
-    fn prompt_player_creature_pos(&self, game_state: &GameStatePlayerView) -> BoardPos;
+    fn prompt_player_creature_pos(&self) -> BoardPos;
 
     /// Prompt the player for a slot on the opponent's side of the board containing a creature.
-    fn prompt_opponent_creature_pos(&self, game_state: &GameStatePlayerView) -> BoardPos;
+    fn prompt_opponent_creature_pos(&self) -> BoardPos;
 }
 
 impl std::fmt::Debug for dyn Prompter {
@@ -56,12 +56,12 @@ pub mod tests {
     mock! {
         pub(crate) TestPrompter {}
         impl Prompter for TestPrompter {
-            fn prompt_slot(&self, game_state: &GameStatePlayerView) -> BoardPos;
-            fn prompt_player_slot(&self, game_state: &GameStatePlayerView) -> BoardPos;
-            fn prompt_opponent_slot(&self, game_state: &GameStatePlayerView) -> BoardPos;
-            fn prompt_creature_pos(&self, game_state: &GameStatePlayerView) -> BoardPos;
-            fn prompt_player_creature_pos(&self, game_state: &GameStatePlayerView) -> BoardPos;
-            fn prompt_opponent_creature_pos(&self, game_state: &GameStatePlayerView) -> BoardPos;
+            fn prompt_slot(&self) -> BoardPos;
+            fn prompt_player_slot(&self) -> BoardPos;
+            fn prompt_opponent_slot(&self) -> BoardPos;
+            fn prompt_creature_pos(&self) -> BoardPos;
+            fn prompt_player_creature_pos(&self) -> BoardPos;
+            fn prompt_opponent_creature_pos(&self) -> BoardPos;
         }
     }
 

@@ -1,6 +1,6 @@
 use crate::connection::Connection;
 use protocol::{
-    entities::{BoardPos, RowId},
+    entities::{BoardPos, PlayerId, RowId},
     from_server::PromptMessage,
 };
 use salt_engine::{game_agent::Prompter, game_state::GameStatePlayerView};
@@ -14,8 +14,9 @@ impl NewtorkPrompter {
         Self { connection }
     }
 
-    fn send_prompt(&self, message: PromptMessage, game_state: &GameStatePlayerView) -> BoardPos {
-        let player_a = game_state.player_id();
+    fn send_prompt(&self, message: PromptMessage) -> BoardPos {
+        // let player_a = game_state.player_id();
+        let player_a = PlayerId::new();
 
         BoardPos::new(player_a, RowId::BackRow, 0)
 
@@ -42,27 +43,27 @@ impl NewtorkPrompter {
 }
 
 impl Prompter for NewtorkPrompter {
-    fn prompt_slot(&self, game_state: &GameStatePlayerView) -> BoardPos {
-        self.send_prompt(PromptMessage::PromptSlot, game_state)
+    fn prompt_slot(&self) -> BoardPos {
+        self.send_prompt(PromptMessage::PromptSlot)
     }
 
-    fn prompt_player_slot(&self, game_state: &GameStatePlayerView) -> BoardPos {
-        self.send_prompt(PromptMessage::PromptPlayerSlot, game_state)
+    fn prompt_player_slot(&self) -> BoardPos {
+        self.send_prompt(PromptMessage::PromptPlayerSlot)
     }
 
-    fn prompt_opponent_slot(&self, game_state: &GameStatePlayerView) -> BoardPos {
-        self.send_prompt(PromptMessage::PromptOpponentSlot, game_state)
+    fn prompt_opponent_slot(&self) -> BoardPos {
+        self.send_prompt(PromptMessage::PromptOpponentSlot)
     }
 
-    fn prompt_creature_pos(&self, game_state: &GameStatePlayerView) -> BoardPos {
-        self.send_prompt(PromptMessage::PromptCreaturePos, game_state)
+    fn prompt_creature_pos(&self) -> BoardPos {
+        self.send_prompt(PromptMessage::PromptCreaturePos)
     }
 
-    fn prompt_player_creature_pos(&self, game_state: &GameStatePlayerView) -> BoardPos {
-        self.send_prompt(PromptMessage::PromptPlayerCreaturePos, game_state)
+    fn prompt_player_creature_pos(&self) -> BoardPos {
+        self.send_prompt(PromptMessage::PromptPlayerCreaturePos)
     }
 
-    fn prompt_opponent_creature_pos(&self, game_state: &GameStatePlayerView) -> BoardPos {
-        self.send_prompt(PromptMessage::PromptOpponentCreaturePos, game_state)
+    fn prompt_opponent_creature_pos(&self) -> BoardPos {
+        self.send_prompt(PromptMessage::PromptOpponentCreaturePos)
     }
 }

@@ -1,4 +1,3 @@
-use crate::messages::{FromClient, FromServer};
 use crate::network_game_client::NetworkGameClient;
 use crate::websocket_server::SharedContext;
 use crate::{connection::Connection, Result};
@@ -6,6 +5,8 @@ use cards::*;
 use futures::{join, try_join};
 use log::info;
 use protocol::entities::PlayerId;
+use protocol::from_client::FromClient;
+use protocol::from_server::FromServer;
 use salt_engine::{
     cards::UnitCardDefinition,
     game_runner::GameRunner,
@@ -61,13 +62,13 @@ pub(crate) async fn play_game(
 
     // Send the initial gamestate to both players
     {
-        player_a_connection
-            .send(FromServer::State(game_state.player_view(player_a_id)))
-            .await?;
+        // player_a_connection
+        //     .send(FromServer::State(game_state.player_view(player_a_id)))
+        //     .await?;
 
-        player_b_connection
-            .send(FromServer::State(game_state.player_view(player_b_id)))
-            .await?;
+        // player_b_connection
+        //     .send(FromServer::State(game_state.player_view(player_b_id)))
+        //     .await?;
     }
 
     let player_a_runner = Box::new(NetworkGameClient::new(player_a_id, player_a_connection));

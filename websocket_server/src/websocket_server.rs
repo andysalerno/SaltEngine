@@ -1,8 +1,9 @@
+use crate::play_game::play_game;
 use crate::Result;
 use crate::{connection::Connection, matchmaker::MatchMaker};
-use crate::{messages::FromServer, play_game::play_game};
 use log::info;
 use protocol::entities::PlayerId;
+use protocol::from_server::FromServer;
 use smol::net::TcpListener;
 use std::sync::Arc;
 
