@@ -62,6 +62,11 @@ impl LocalState {
         let entity = to_add.as_entity();
         self.entities.insert(entity.id, entity);
     }
+
+    pub fn update<T: IsEntity>(&mut self, to_update: T) {
+        let found = self.entities.get_mut(&to_update.id().as_id()).unwrap();
+        *found = to_update.as_entity();
+    }
 }
 
 #[cfg(test)]
@@ -69,7 +74,7 @@ mod test {
     use super::{BuffInstanceId, BuffPlayerView, BuffSourceId, Id, LocalState};
 
     #[test]
-    fn wtf() {
+    fn can_add_entity() {
         let mut state = LocalState::default();
 
         let buff_view = BuffPlayerView {
@@ -85,7 +90,7 @@ mod test {
     }
 
     #[test]
-    fn wtf_2() {
+    fn can_retrieve_entity() {
         let mut state = LocalState::default();
 
         let buff_view = BuffPlayerView {
@@ -105,5 +110,33 @@ mod test {
 
         assert_eq!(10, retrieved.attack_amount);
         assert_eq!(11, retrieved.health_amount);
+    }
+
+    #[test]
+    fn can_update_entity() {
+        let mut state = LocalState::default();
+
+        let buff_view = BuffPlayerView {
+            attack_amount: 10,
+            health_amount: 11,
+            source_id: BuffSourceId::Other(Id::new()),
+            instance_id: BuffInstanceId::new(),
+            definition_id: Id::new(),
+            is_from_passive: false,
+        };
+
+        let id = buff_view.instance_id;
+
+        state.add(buff_view);
+
+        let mut retrieved = state.find(id);
+
+        retrieved.attack_amount = 9;
+
+        state.update(retrieved);
+
+        let retrieved = state.find(id);
+
+        assert_eq!(9, retrieved.attack_amount);
     }
 }
