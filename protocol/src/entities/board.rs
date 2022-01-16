@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use super::{PlayerId, UnitCardInstance};
+use super::{player::PlayerId, UnitCardInstance};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
@@ -86,10 +86,4 @@ pub struct BoardPlayerView {
 pub struct BoardSlotPlayerView {
     pos: BoardPos,
     creature: Option<UnitCardInstance>,
-}
-
-#[derive(Clone, Debug, Serialize)]
-pub struct Board {
-    slots_per_row: usize,
-    entities_by_pos: HashMap<BoardPos, UnitCardInstance>,
 }

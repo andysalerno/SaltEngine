@@ -11,6 +11,11 @@ impl Id {
     pub fn new() -> Self {
         Id(Uuid::new_v4())
     }
+
+    #[must_use]
+    pub fn parse_str(s: &str) -> Self {
+        Id(Uuid::parse_str(s).unwrap())
+    }
 }
 
 impl Default for Id {
@@ -20,7 +25,7 @@ impl Default for Id {
 }
 
 /// A trait providing an entity's ID.
-pub(crate) trait HasId {
+pub trait HasId {
     type IdType: EntityId;
 
     fn id(&self) -> Self::IdType;
@@ -32,28 +37,20 @@ pub trait AsId {
 }
 
 /// A trait describing an entity's ID of some kind, with an associated type for the specific entity type it represents.
-pub(crate) trait EntityId: AsId {
+pub trait EntityId: AsId {
     type EntityType: IsEntity;
 }
 
-#[derive(Debug, Eq, Hash, Clone, Copy, PartialEq, Serialize, Deserialize)]
-pub struct PlayerId(Id);
+#[cfg(test)]
+mod test {
+    use super::Id;
 
-impl PlayerId {
-    #[must_use]
-    pub fn new() -> Self {
-        Self(Id::new())
-    }
-}
+    #[test]
+    fn can_parse() {
+        let guid_to_parse = "9f19a122-b52f-43b7-b5f4-632d2defb828";
 
-impl Default for PlayerId {
-    fn default() -> Self {
-        Self::new()
-    }
-}
+        let parsed = Id::parse_str(guid_to_parse);
 
-impl AsId for PlayerId {
-    fn as_id(&self) -> Id {
-        self.0
+        // implicit assert: no panic
     }
 }

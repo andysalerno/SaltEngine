@@ -1,6 +1,6 @@
 pub use id::*;
 
-use super::{HasId, Id, IsEntity};
+use super::{EntityTypeId, HasId, Id, IsEntity};
 use serde::{Deserialize, Serialize};
 
 /// A view of a buff.
@@ -24,6 +24,10 @@ impl HasId for BuffPlayerView {
 
 impl IsEntity for BuffPlayerView {
     type IdType = id::BuffInstanceId;
+
+    fn type_id(&self) -> EntityTypeId {
+        EntityTypeId::parse_str("d649f1d5-1181-4c0f-b327-cd7a1186ccee")
+    }
 }
 
 mod id {
@@ -68,6 +72,11 @@ mod id {
         #[must_use]
         pub fn new() -> Self {
             Self(Id::new())
+        }
+
+        #[must_use]
+        pub fn parse_str(s: &str) -> Self {
+            Self(Id::parse_str(s))
         }
     }
 

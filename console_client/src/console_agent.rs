@@ -1,8 +1,8 @@
-use crate::{console_display::ConsoleDisplay, local_state::LocalState};
+use crate::console_display::ConsoleDisplay;
 use async_trait::async_trait;
 use protocol::{
     client_actions::{Attack, EndTurn, SummonCreatureFromHand},
-    entities::{BoardPos, PlayerId, RowId},
+    entities::{BoardPos, LocalState, PlayerId, RowId},
     from_client::ClientAction,
     from_server::VisualEvent,
 };
@@ -247,7 +247,7 @@ impl ConsolePrompter {
             event = match action.as_str() {
                 "hand" => {
                     // self.show_hand(game_state);
-                    self.show_hand();
+                    self.show_hand(self.local_state);
                     None
                 }
                 "board" => {
@@ -280,7 +280,7 @@ impl ConsolePrompter {
 
         let selected_card_id = {
             // self.show_hand(game_state);
-            self.show_hand();
+            self.show_hand(self.local_state);
 
             let hand_size = game_state.hand().len();
 
@@ -376,8 +376,8 @@ impl ConsolePrompter {
         ConsoleDisplay.display(game_state);
     }
 
-    fn show_hand(&self) {
-        let game_state: &GameStatePlayerView = todo!();
+    fn show_hand(&self, state: &LocalState) {
+        // let game_state: &GameStatePlayerView = todo!();
 
         let mut result = String::new();
 
