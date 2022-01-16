@@ -12,9 +12,7 @@ use protocol::{
     from_client::FromClient,
     from_server::{FromServer, PromptMessage},
 };
-use salt_engine::{
-    game_agent::ClientNotifier, game_runner::GameClient, game_state::GameStatePlayerView,
-};
+use salt_engine::{game_agent::ClientNotifier, game_runner::GameClient};
 use smol::net::TcpStream;
 use websocket_server::connection::Connection;
 

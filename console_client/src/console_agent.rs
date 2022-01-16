@@ -1,4 +1,4 @@
-use crate::console_display::ConsoleDisplay;
+use crate::{console_display::ConsoleDisplay, local_state::LocalState};
 use async_trait::async_trait;
 use protocol::{
     client_actions::{Attack, EndTurn, SummonCreatureFromHand},
@@ -30,6 +30,7 @@ fn user_input_err<T: ToString>(msg: T) -> ConsoleError {
 
 pub struct ConsoleAgent {
     id: PlayerId,
+    local_state: LocalState,
 }
 
 impl ConsoleAgent {
@@ -38,7 +39,10 @@ impl ConsoleAgent {
     }
 
     pub fn new_with_id(id: PlayerId) -> Self {
-        Self { id }
+        Self {
+            id,
+            local_state: Default::default(),
+        }
     }
 
     fn id(&self) -> PlayerId {

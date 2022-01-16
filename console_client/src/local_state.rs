@@ -1,9 +1,26 @@
+use std::collections::HashMap;
+
+use protocol::entities::Id;
 use serde::{de::DeserializeOwned, Deserialize, Serialize};
 use serde_json::json;
 
-#[derive(Serialize, Deserialize)]
-struct State {
+#[derive(Serialize, Deserialize, Default)]
+pub(crate) struct Entity {
+    id: Id,
+}
+
+#[derive(Serialize, Deserialize, Default)]
+pub(crate) struct LocalState {
     name: String,
+    entities: HashMap<Id, Entity>,
+}
+
+impl LocalState {
+    pub fn find_entity(&self, id: Id) -> &Entity {
+        self.entities.get(&id).unwrap()
+    }
+
+    pub fn add<T: Serialize + DeserializeOwned>(&mut self, to_add: T) {}
 }
 
 // find the entity with ID == given
@@ -26,12 +43,13 @@ fn update_value<T: Serialize + DeserializeOwned>(
 
 #[cfg(test)]
 mod test {
-    use super::State;
+    use super::LocalState;
 
     #[test]
     fn can_update_value() {
-        let mut state = State {
+        let mut state = LocalState {
             name: "Hello".to_string(),
+            entities: Default::default(),
         };
 
         assert_eq!("Hello", state.name.as_str());
