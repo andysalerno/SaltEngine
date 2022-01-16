@@ -1,18 +1,19 @@
-use self::id::HandId;
+pub use self::id::HandId;
 
-use super::{EntityTypeId, HasId, IsEntity, UnitCardInstance};
+use super::{EntityTypeId, HasId, IsEntity, PlayerId, UnitCardInstance};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Clone, Deserialize)]
 pub struct Hand {
-    id: HandId,
-    cards: Vec<UnitCardInstance>,
+    pub player_id: PlayerId,
+    pub id: HandId,
+    pub cards: Vec<UnitCardInstance>,
 }
 
 impl IsEntity for Hand {
     type IdType = HandId;
 
-    fn type_id(&self) -> EntityTypeId {
+    fn type_id() -> EntityTypeId {
         EntityTypeId::parse_str("0ab64181-26e9-4929-bbcb-8033f4949e78")
     }
 }

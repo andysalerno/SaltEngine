@@ -63,7 +63,7 @@ impl GameClient for ConsoleAgent {
     // async fn next_action(&mut self, game_state: GameStatePlayerView) -> ClientAction {
     async fn next_action(&mut self) -> ClientAction {
         let prompter = ConsolePrompter::new(self.id());
-        prompter.show_hand();
+        prompter.show_hand(&self.local_state);
 
         loop {
             let result = prompter.prompt();
@@ -377,7 +377,7 @@ impl ConsolePrompter {
     }
 
     fn show_hand(&self, state: &LocalState) {
-        // let game_state: &GameStatePlayerView = todo!();
+        let game_state: &GameStatePlayerView = todo!();
 
         let mut result = String::new();
 

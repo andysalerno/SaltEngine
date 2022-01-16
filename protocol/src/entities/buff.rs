@@ -25,7 +25,7 @@ impl HasId for BuffPlayerView {
 impl IsEntity for BuffPlayerView {
     type IdType = id::BuffInstanceId;
 
-    fn type_id(&self) -> EntityTypeId {
+    fn type_id() -> EntityTypeId {
         EntityTypeId::parse_str("d649f1d5-1181-4c0f-b327-cd7a1186ccee")
     }
 }
