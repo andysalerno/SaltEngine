@@ -1,66 +1,6 @@
-// use crate::PlayerId;
-use protocol::entities::AsId;
-use protocol::entities::Entity;
-use protocol::entities::EntityId;
-use protocol::entities::Hand;
-use protocol::entities::HasId;
-use protocol::entities::Id;
-use protocol::entities::IsEntity;
-use protocol::entities::PlayerId;
-use serde::de::DeserializeOwned;
+use protocol::entities::{AsId, Entity, EntityId, Hand, Id, IsEntity, PlayerId};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-
-/// A trait that indicates a type should be considered an `Entity`, and can be transformed into an `Entity`.
-// pub trait IsEntity: HasId + Serialize + DeserializeOwned + 'static {
-//     /// The type of `Id` that describes this entity.
-//     type IdType: EntityId;
-
-//     fn type_id() -> EntityTypeId;
-
-//     /// Creates an `Entity` representation of this object.
-//     fn as_entity(&self) -> Entity {
-//         Entity {
-//             id: self.id().as_id(),
-//             type_id: Self::type_id(),
-//             data: serde_json::to_string(self).unwrap(),
-//         }
-//     }
-// }
-
-// #[derive(Serialize, Deserialize)]
-// pub struct Entity {
-//     id: Id,
-//     type_id: EntityTypeId,
-//     data: String,
-// }
-
-// #[derive(Debug, Eq, Hash, Clone, Copy, PartialEq, Serialize, Deserialize)]
-// pub struct EntityTypeId(Id);
-
-// impl EntityTypeId {
-//     #[must_use]
-//     pub fn new() -> Self {
-//         Self(Id::new())
-//     }
-
-//     #[must_use]
-//     pub fn parse_str(s: &str) -> Self {
-//         Self(Id::parse_str(s))
-//     }
-// }
-
-// impl Default for EntityTypeId {
-//     fn default() -> Self {
-//         Self::new()
-//     }
-// }
-
-// impl AsId for EntityTypeId {
-//     fn as_id(&self) -> Id {
-//         self.0
-//     }
-// }
 
 #[derive(Serialize, Deserialize, Default)]
 pub struct LocalState {
@@ -100,6 +40,7 @@ impl LocalState {
         *found = to_update.as_entity();
     }
 
+    #[must_use]
     pub fn player_hand(&self, player_id: PlayerId) -> Hand {
         let hand = self
             .find_type::<Hand>()

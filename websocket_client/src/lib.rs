@@ -3,7 +3,9 @@
 #![allow(
     clippy::needless_pass_by_value,
     clippy::unused_self,
-    clippy::cast_lossless
+    clippy::cast_lossless,
+    clippy::missing_errors_doc,
+    clippy::missing_panics_doc
 )]
 
 pub mod local_state;
