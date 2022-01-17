@@ -23,7 +23,9 @@ use websocket_server::connection::Connection;
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error + Send + Sync>>;
 
 /// Starts the client, using the provided `GameClient`.
-pub async fn start(make_agent: impl FnOnce(PlayerId) -> Box<dyn GameClient>) -> Result<()> {
+pub async fn start(
+    make_agent: impl FnOnce(PlayerId, PlayerId) -> Box<dyn GameClient>,
+) -> Result<()> {
     info!("Salt client starting.");
     let stream = TcpStream::connect("localhost:9000").await?;
     let (connection, _) = async_tungstenite::client_async("ws://localhost:9000", stream).await?;
@@ -35,17 +37,20 @@ pub async fn start(make_agent: impl FnOnce(PlayerId) -> Box<dyn GameClient>) -> 
 
 async fn handle_connection(
     mut connection: Connection,
-    make_agent: impl FnOnce(PlayerId) -> Box<dyn GameClient>,
+    make_agent: impl FnOnce(PlayerId, PlayerId) -> Box<dyn GameClient>,
 ) -> Result<()> {
     // Expect a Hello
 
-    let my_id = match connection.recv::<FromServer>().await {
-        Some(FromServer::Hello(my_id)) => my_id,
+    let (my_id, opponent_id) = match connection.recv::<FromServer>().await {
+        Some(FromServer::Hello {
+            your_id,
+            opponent_id,
+        }) => (your_id, opponent_id),
         _ => panic!("unexpected response from server"),
     };
     info!("Saw a hello - my id is: {:?}", my_id);
 
-    let mut agent = make_agent(my_id);
+    let mut agent = make_agent(my_id, opponent_id);
     let notifier = agent.make_notifier().await;
 
     // Send Ready
@@ -57,12 +62,6 @@ async fn handle_connection(
         _ => panic!("unexpected response from server"),
     };
     info!("My opponent's ID is {:?}", opponent_id);
-
-    // Expect the game state
-    // let _gamestate_view = match connection.recv::<FromServer>().await {
-    //     Some(FromServer::State(view)) => view,
-    //     _ => panic!("unexpected response from server"),
-    // };
 
     loop {
         // Wait for signal from server that we can send an action

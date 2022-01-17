@@ -23,13 +23,21 @@ async fn queue_player_and_play(connection: Connection, context: SharedContext) -
         };
 
     let player_a_id = PlayerId::new();
+    let player_b_id = PlayerId::new();
+
     player_a_connection
-        .send(FromServer::Hello(player_a_id))
+        // .send(FromServer::Hello(player_a_id))
+        .send(FromServer::Hello {
+            your_id: player_a_id,
+            opponent_id: player_b_id,
+        })
         .await?;
 
-    let player_b_id = PlayerId::new();
     player_b_connection
-        .send(FromServer::Hello(player_b_id))
+        .send(FromServer::Hello {
+            your_id: player_b_id,
+            opponent_id: player_a_id,
+        })
         .await?;
 
     play_game(

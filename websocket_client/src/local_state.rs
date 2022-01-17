@@ -4,13 +4,30 @@ use std::collections::HashMap;
 
 #[derive(Serialize, Deserialize, Default)]
 pub struct LocalState {
-    name: String,
     player_a_id: PlayerId,
     player_b_id: PlayerId,
     entities: HashMap<Id, Entity>,
 }
 
 impl LocalState {
+    #[must_use]
+    pub fn new(player_id: PlayerId, opponent_id: PlayerId) -> Self {
+        let mut state = Self {
+            player_a_id: player_id,
+            player_b_id: opponent_id,
+            entities: HashMap::new(),
+        };
+
+        // both player's have a Hand
+        let player_hand = Hand::new(player_id);
+        let opponent_hand = Hand::new(opponent_id);
+
+        state.add(player_hand);
+        state.add(opponent_hand);
+
+        state
+    }
+
     pub fn find_entity<T: EntityId>(&self, id: T) -> &Entity {
         let id = id.as_id();
         self.entities.get(&id).unwrap()
@@ -55,6 +72,28 @@ impl LocalState {
         let unpacked: T = serde_json::from_str(e.data.as_str()).unwrap();
 
         unpacked
+    }
+
+    /// Get a reference to the local state's player a id.
+    #[must_use]
+    pub fn player_a_id(&self) -> PlayerId {
+        self.player_a_id
+    }
+
+    /// Get a reference to the local state's player b id.
+    #[must_use]
+    pub fn player_b_id(&self) -> PlayerId {
+        self.player_b_id
+    }
+
+    /// Set the local state's player a id.
+    pub fn set_player_a_id(&mut self, player_a_id: PlayerId) {
+        self.player_a_id = player_a_id;
+    }
+
+    /// Set the local state's player b id.
+    pub fn set_player_b_id(&mut self, player_b_id: PlayerId) {
+        self.player_b_id = player_b_id;
     }
 }
 

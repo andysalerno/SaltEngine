@@ -7,12 +7,11 @@ use protocol::{
     from_server::VisualEvent,
 };
 use salt_engine::{
-    cards::{player_view::UnitCardDefinitionPlayerView, UnitCardDefinitionView},
     game_agent::{ClientNotifier, Prompter},
     game_runner::GameClient,
     game_state::{
         board::BoardView, GameStatePlayerView, GameStateView, HandView, IterAddons, IteratorAny,
-        UnitCardInstancePlayerView, UnitCardInstanceView,
+        UnitCardInstancePlayerView,
     },
 };
 use std::collections::VecDeque;
@@ -35,14 +34,10 @@ pub struct ConsoleAgent {
 }
 
 impl ConsoleAgent {
-    pub fn new() -> Self {
-        Self::new_with_id(PlayerId::new())
-    }
-
-    pub fn new_with_id(id: PlayerId) -> Self {
+    pub fn new_with_id(my_id: PlayerId, opponent_id: PlayerId) -> Self {
         Self {
-            id,
-            local_state: Default::default(),
+            id: my_id,
+            local_state: LocalState::new(my_id, opponent_id),
         }
     }
 

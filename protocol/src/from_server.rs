@@ -30,7 +30,10 @@ pub struct EntityUpdate {
 #[derive(Serialize, Deserialize, Debug)]
 pub enum FromServer {
     /// Initial message from the server, providing the player with their ID for the match.
-    Hello(PlayerId),
+    Hello {
+        your_id: PlayerId,
+        opponent_id: PlayerId,
+    },
 
     /// Sent from the server to indicate the game has started, including the opponent's `PlayerId`.
     GameStart {

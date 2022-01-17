@@ -10,6 +10,16 @@ pub struct Hand {
     pub cards: Vec<UnitCardInstance>,
 }
 
+impl Hand {
+    pub fn new(player_id: PlayerId) -> Self {
+        Self {
+            player_id,
+            id: HandId::new(),
+            cards: Vec::new(),
+        }
+    }
+}
+
 impl IsEntity for Hand {
     type IdType = HandId;
 
