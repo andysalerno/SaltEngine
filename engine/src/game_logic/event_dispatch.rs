@@ -15,7 +15,10 @@ use crate::{
 };
 use futures::join;
 use log::{debug, info};
-use protocol::{entities::PlayerId, from_server::VisualEvent};
+use protocol::{
+    entities::PlayerId,
+    from_server::{Notification, VisualEvent},
+};
 
 #[derive(Debug)]
 pub struct EventDispatcher {
@@ -68,9 +71,9 @@ impl EventDispatcher {
         }
     }
 
-    pub async fn notify_players(&self, visual_event: VisualEvent) {
-        self.player_a_notifier.notify(visual_event.clone()).await;
-        self.player_b_notifier.notify(visual_event).await;
+    pub async fn notify_players(&self, notification: Notification) {
+        self.player_a_notifier.notify(notification.clone()).await;
+        self.player_b_notifier.notify(notification).await;
     }
 
     #[must_use]
@@ -147,14 +150,14 @@ impl EventDispatcher {
         if let Some(client_event) = event.maybe_client_event(game_state.player_a_id(), game_state) {
             info!("Notifying player_a of event: {:?}", client_event);
             self.player_notifier(game_state.player_a_id())
-                .notify(client_event)
+                .notify(Notification::VisualEvent(client_event))
                 .await;
         }
 
         if let Some(client_event) = event.maybe_client_event(game_state.player_b_id(), game_state) {
             info!("Notifying player_b of event: {:?}", client_event);
             self.player_notifier(game_state.player_b_id())
-                .notify(client_event)
+                .notify(Notification::VisualEvent(client_event))
                 .await;
         }
 

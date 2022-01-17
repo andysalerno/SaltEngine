@@ -1,5 +1,5 @@
 use crate::{
-    entities::{Id, PlayerId},
+    entities::{Entity, Id, PlayerId},
     visual_events::*,
     GameMessage,
 };
@@ -26,6 +26,13 @@ pub struct EntityUpdate {
     pub property_values: Vec<String>,
 }
 
+/// A message from server to client that informs of an entity's new value.
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct EntityAdded {
+    pub id: Id,
+    pub entity: Entity,
+}
+
 /// Messages that can be sent from the game server to the game client.
 #[derive(Serialize, Deserialize, Debug)]
 pub enum FromServer {
@@ -36,9 +43,7 @@ pub enum FromServer {
     },
 
     /// Sent from the server to indicate the game has started, including the opponent's `PlayerId`.
-    GameStart {
-        opponent_id: PlayerId,
-    },
+    GameStart { opponent_id: PlayerId },
 
     /// Indicates to the client their turn has started.
     TurnStart,
@@ -51,11 +56,16 @@ pub enum FromServer {
     Prompt(PromptMessage),
 
     /// A message from the server notifying the game client about some event.
-    VisualEvent(VisualEvent),
-
-    EntityUpdate(EntityUpdate),
+    Notification(Notification),
 }
 impl GameMessage for FromServer {}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub enum Notification {
+    VisualEvent(VisualEvent),
+    EntityUpdate(EntityUpdate),
+    EntityAdded(EntityAdded),
+}
 
 /// A message requesting the client to prompt for a certain value and provide its result.
 #[derive(Serialize, Deserialize, Debug, Copy, Clone)]

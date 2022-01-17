@@ -4,7 +4,7 @@ use protocol::{
     client_actions::{Attack, EndTurn, SummonCreatureFromHand},
     entities::{BoardPos, PlayerHero, PlayerId, RowId, UnitCardDefinition},
     from_client::ClientAction,
-    from_server::VisualEvent,
+    from_server::{Notification, VisualEvent},
 };
 use salt_engine::{
     game_agent::{ClientNotifier, Prompter},
@@ -56,7 +56,6 @@ impl GameClient for ConsoleAgent {
         Box::new(ConsoleNotifier)
     }
 
-    // async fn next_action(&mut self, game_state: GameStatePlayerView) -> ClientAction {
     async fn next_action(&mut self) -> ClientAction {
         let prompter = ConsolePrompter::new(self.id());
         prompter.show_hand(&self.local_state);
@@ -66,7 +65,7 @@ impl GameClient for ConsoleAgent {
 
             match result {
                 Ok(game_event) => break game_event,
-                Err(e) => say(format!("Invalid input: {}", e.to_string())),
+                Err(e) => say(format!("Invalid input: {}", e)),
             }
         }
     }
@@ -380,9 +379,6 @@ impl ConsolePrompter {
     fn show_hand(&self, state: &LocalState) {
         let mut result = String::new();
 
-        // let available_mana = game_state.player_mana(self.id());
-        let available_mana = 10;
-
         let mut all_cards = state
             .player_hand(self.id)
             .cards
@@ -391,21 +387,6 @@ impl ConsolePrompter {
             .map(|(index, c)| display_card(&c.definition, true, index))
             .map(|s| s.lines().map(|l| l.to_owned()).collect::<Vec<_>>())
             .collect::<Vec<_>>();
-
-        // let mut all_cards = game_state
-        //     .hand()
-        //     .cards()
-        //     .iter()
-        //     .enumerate()
-        //     .map(|(index, c)| {
-        //         display_card(
-        //             c.definition(),
-        //             c.definition().cost() <= available_mana as i32,
-        //             index,
-        //         )
-        //     })
-        //     .map(|s| s.lines().map(|l| l.to_owned()).collect::<Vec<_>>())
-        //     .collect::<Vec<_>>();
 
         loop {
             if !all_cards.iter().any(|c| !c.is_empty()) {
@@ -509,8 +490,6 @@ fn say(message: impl AsRef<str>) {
     println!("{}", message.as_ref());
 }
 
-// fn display_card(card: &dyn UnitCardDefinition, playable: bool, tag: usize) -> String {
-// fn display_card(card: &UnitCardDefinitionPlayerView, playable: bool, tag: usize) -> String {
 fn display_card(card: &UnitCardDefinition, playable: bool, tag: usize) -> String {
     let text_lines = card.text.lines().collect::<Vec<_>>();
 
@@ -574,7 +553,7 @@ struct ConsoleNotifier;
 
 #[async_trait]
 impl ClientNotifier for ConsoleNotifier {
-    async fn notify(&self, event: VisualEvent) {
+    async fn notify(&self, event: Notification) {
         say(format!("Saw client event: {:?}", event));
     }
 }

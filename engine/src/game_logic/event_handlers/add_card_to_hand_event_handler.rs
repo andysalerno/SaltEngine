@@ -4,6 +4,7 @@ use crate::{
 };
 use async_trait::async_trait;
 use log::info;
+use protocol::from_server::Notification;
 
 #[derive(Default)]
 pub struct AddCardToHandEventHandler;
@@ -16,7 +17,7 @@ impl EventHandler for AddCardToHandEventHandler {
         &self,
         event: &AddCardToHandEvent,
         game_state: &mut GameState,
-        _dispatcher: &mut EventDispatcher,
+        dispatcher: &mut EventDispatcher,
     ) {
         let player_id = event.player_id();
         let card = game_state
@@ -25,6 +26,12 @@ impl EventHandler for AddCardToHandEventHandler {
             .expect("Expected to find the tracked pending card");
 
         game_state.hand_mut(event.player_id()).add_card(card);
+
+        let notifier = dispatcher.player_notifier(player_id);
+        //let notification = Notification::
+        let added_card_entity = todo!();
+        let notification = Notification::EntityAdded(added_card_entity);
+        notifier.notify(notification).await;
 
         info!(
             "Player {:?} adds a card to hand. Next hand size: {}",

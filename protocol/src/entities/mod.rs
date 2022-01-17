@@ -38,7 +38,7 @@ pub trait IsEntity: HasId + Serialize + DeserializeOwned + 'static {
     }
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Entity {
     pub id: Id,
     pub type_id: EntityTypeId,

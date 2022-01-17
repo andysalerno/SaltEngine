@@ -1,5 +1,8 @@
 use log::info;
-use protocol::{from_server::VisualEvent, visual_events::CreatureAttacksTarget};
+use protocol::{
+    from_server::{Notification, VisualEvent},
+    visual_events::CreatureAttacksTarget,
+};
 
 use crate::{
     game_logic::{
@@ -53,7 +56,9 @@ impl EventHandler for AttackEventHandler {
                 target: event.target().id(),
             };
             let visual_event = VisualEvent::CreatureAttacksTarget(visual_event);
-            dispatcher.notify_players(visual_event).await;
+            dispatcher
+                .notify_players(Notification::VisualEvent(visual_event))
+                .await;
         }
 
         // 1. Attacker deals damage

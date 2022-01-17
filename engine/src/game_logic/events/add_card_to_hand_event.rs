@@ -1,5 +1,5 @@
 use super::{Event, VisualEvent};
-use crate::game_state::{board::BoardView, GameState, MakePlayerView, UnitCardInstancePlayerView};
+use crate::game_state::{GameState, MakePlayerView, UnitCardInstancePlayerView};
 use protocol::entities::{PlayerId, UnitCardInstanceId};
 use serde::{Deserialize, Serialize};
 
