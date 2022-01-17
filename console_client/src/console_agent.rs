@@ -2,7 +2,7 @@ use crate::console_display::ConsoleDisplay;
 use async_trait::async_trait;
 use protocol::{
     client_actions::{Attack, EndTurn, SummonCreatureFromHand},
-    entities::{BoardPos, PlayerId, RowId},
+    entities::{BoardPos, PlayerId, RowId, UnitCardDefinition},
     from_client::ClientAction,
     from_server::VisualEvent,
 };
@@ -12,7 +12,7 @@ use salt_engine::{
     game_runner::GameClient,
     game_state::{
         board::BoardView, GameStatePlayerView, GameStateView, HandView, IterAddons, IteratorAny,
-        UnitCardInstancePlayerView,
+        UnitCardInstancePlayerView, UnitCardInstanceView,
     },
 };
 use std::collections::VecDeque;
@@ -379,26 +379,34 @@ impl ConsolePrompter {
     }
 
     fn show_hand(&self, state: &LocalState) {
-        let game_state: &GameStatePlayerView = todo!();
-
         let mut result = String::new();
 
-        let available_mana = game_state.player_mana(self.id());
+        // let available_mana = game_state.player_mana(self.id());
+        let available_mana = 10;
 
-        let mut all_cards = game_state
-            .hand()
-            .cards()
+        let mut all_cards = state
+            .player_hand(self.id)
+            .cards
             .iter()
             .enumerate()
-            .map(|(index, c)| {
-                display_card(
-                    c.definition(),
-                    c.definition().cost() <= available_mana as i32,
-                    index,
-                )
-            })
+            .map(|(index, c)| display_card(&c.definition, true, index))
             .map(|s| s.lines().map(|l| l.to_owned()).collect::<Vec<_>>())
             .collect::<Vec<_>>();
+
+        // let mut all_cards = game_state
+        //     .hand()
+        //     .cards()
+        //     .iter()
+        //     .enumerate()
+        //     .map(|(index, c)| {
+        //         display_card(
+        //             c.definition(),
+        //             c.definition().cost() <= available_mana as i32,
+        //             index,
+        //         )
+        //     })
+        //     .map(|s| s.lines().map(|l| l.to_owned()).collect::<Vec<_>>())
+        //     .collect::<Vec<_>>();
 
         loop {
             if !all_cards.iter().any(|c| !c.is_empty()) {
@@ -503,8 +511,9 @@ fn say(message: impl AsRef<str>) {
 }
 
 // fn display_card(card: &dyn UnitCardDefinition, playable: bool, tag: usize) -> String {
-fn display_card(card: &UnitCardDefinitionPlayerView, playable: bool, tag: usize) -> String {
-    let text_lines = card.text().lines().collect::<Vec<_>>();
+// fn display_card(card: &UnitCardDefinitionPlayerView, playable: bool, tag: usize) -> String {
+fn display_card(card: &UnitCardDefinition, playable: bool, tag: usize) -> String {
+    let text_lines = card.text.lines().collect::<Vec<_>>();
 
     const WIDTH: usize = 26;
 
@@ -531,8 +540,8 @@ fn display_card(card: &UnitCardDefinitionPlayerView, playable: bool, tag: usize)
 {}
 {:^26}"#,
         border,
-        card.title(),
-        card.cost(),
+        card.title,
+        card.cost,
         &border[..border.len() - 2],
         text_lines.get(0).unwrap_or(&""),
         text_lines.get(1).unwrap_or(&""),
@@ -542,9 +551,9 @@ fn display_card(card: &UnitCardDefinitionPlayerView, playable: bool, tag: usize)
         text_lines.get(5).unwrap_or(&""),
         text_lines.get(6).unwrap_or(&""),
         text_lines.get(7).unwrap_or(&""),
-        card.row_width(),
-        card.attack(),
-        card.health(),
+        card.row_width,
+        card.attack,
+        card.health,
         border,
         tag
     )

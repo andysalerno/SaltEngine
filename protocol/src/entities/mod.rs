@@ -16,6 +16,7 @@ pub use id::*;
 pub use passive_effect::*;
 pub use player::*;
 use serde::{de::DeserializeOwned, Deserialize, Serialize};
+pub use unit_card_definition::*;
 pub use unit_card_instance_view::*;
 
 /// A trait that indicates a type should be considered an `Entity`, and can be transformed into an `Entity`.

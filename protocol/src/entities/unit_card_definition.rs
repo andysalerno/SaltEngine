@@ -5,12 +5,12 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Serialize, Clone, Deserialize)]
 // pub struct UnitCardDefinitionPlayerView {
 pub struct UnitCardDefinition {
-    title: String,
-    cost: i32,
-    text: String,
-    flavor_text: String,
-    attack: i32,
-    health: i32,
-    row_width: usize,
-    placeable_at: Position,
+    pub title: String,
+    pub cost: i32,
+    pub text: String,
+    pub flavor_text: String,
+    pub attack: i32,
+    pub health: i32,
+    pub row_width: usize,
+    pub placeable_at: Position,
 }

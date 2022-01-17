@@ -9,7 +9,7 @@ use serde::{Deserialize, Serialize};
 /// A view of a creature card instance.
 #[derive(Debug, Serialize, Clone, Deserialize)]
 pub struct UnitCardInstance {
-    definition: UnitCardDefinition,
+    pub definition: UnitCardDefinition,
     buffs: Vec<BuffPlayerView>,
     passive_effect: Option<PassiveEffectInstancePlayerView>,
     id: UnitCardInstanceId,
