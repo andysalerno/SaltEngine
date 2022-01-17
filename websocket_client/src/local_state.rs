@@ -119,6 +119,10 @@ impl LocalState {
 
 #[cfg(test)]
 mod test {
+    use super::LocalState;
+    use protocol::entities::{
+        BuffInstanceId, BuffPlayerView, BuffSourceId, Hand, HandId, HasId, Id, PlayerId,
+    };
 
     #[test]
     fn can_add_entity() {
