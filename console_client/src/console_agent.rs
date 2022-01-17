@@ -2,7 +2,7 @@ use crate::console_display::ConsoleDisplay;
 use async_trait::async_trait;
 use protocol::{
     client_actions::{Attack, EndTurn, SummonCreatureFromHand},
-    entities::{BoardPos, LocalState, PlayerId, RowId},
+    entities::{BoardPos, PlayerId, RowId},
     from_client::ClientAction,
     from_server::VisualEvent,
 };
@@ -17,6 +17,7 @@ use salt_engine::{
 };
 use std::collections::VecDeque;
 use thiserror::Error;
+use websocket_client::local_state::LocalState;
 
 #[derive(Debug, Error)]
 enum ConsoleError {

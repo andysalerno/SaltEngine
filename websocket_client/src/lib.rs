@@ -6,6 +6,8 @@
     clippy::cast_lossless
 )]
 
+pub mod local_state;
+
 use log::info;
 use protocol::{
     entities::PlayerId,
