@@ -66,7 +66,7 @@ impl GameClient for ConsoleAgent {
         prompter.show_hand(&self.local_state);
 
         loop {
-            let result = prompter.prompt();
+            let result = prompter.prompt(&self.local_state);
 
             match result {
                 Ok(game_event) => break game_event,
@@ -230,7 +230,7 @@ impl ConsolePrompter {
     }
 
     // fn prompt(&self, game_state: &GameStatePlayerView) -> Result<ClientAction, ConsoleError> {
-    fn prompt(&self) -> Result<ClientAction, ConsoleError> {
+    fn prompt(&self, local_state: &LocalState) -> Result<ClientAction, ConsoleError> {
         let game_state: &GameStatePlayerView = todo!();
         let mut input_queue = VecDeque::new();
 
@@ -247,14 +247,14 @@ impl ConsolePrompter {
             event = match action.as_str() {
                 "hand" => {
                     // self.show_hand(game_state);
-                    self.show_hand(self.local_state);
+                    self.show_hand(local_state);
                     None
                 }
                 "board" => {
                     self.show_board(game_state);
                     None
                 }
-                "summon" => Some(self.summon(game_state, &mut input_queue)),
+                "summon" => Some(self.summon(game_state, local_state, &mut input_queue)),
                 "info" => {
                     self.info(game_state, &mut input_queue);
                     None
@@ -274,13 +274,14 @@ impl ConsolePrompter {
     fn summon(
         &self,
         game_state: &GameStatePlayerView,
+        local_state: &LocalState,
         input_queue: &mut VecDeque<String>,
     ) -> Result<ClientAction, ConsoleError> {
         let player_id = game_state.cur_player_turn();
 
         let selected_card_id = {
             // self.show_hand(game_state);
-            self.show_hand(self.local_state);
+            self.show_hand(local_state);
 
             let hand_size = game_state.hand().len();
 
