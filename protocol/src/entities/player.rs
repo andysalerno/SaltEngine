@@ -1,6 +1,5 @@
-use serde::{Deserialize, Serialize};
-
 use super::{AsId, Id};
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Eq, Hash, Clone, Copy, PartialEq, Serialize, Deserialize)]
 pub struct PlayerId(Id);

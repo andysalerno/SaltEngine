@@ -2,7 +2,7 @@ use crate::console_display::ConsoleDisplay;
 use async_trait::async_trait;
 use protocol::{
     client_actions::{Attack, EndTurn, SummonCreatureFromHand},
-    entities::{BoardPos, PlayerId, RowId, UnitCardDefinition},
+    entities::{BoardPos, PlayerHero, PlayerId, RowId, UnitCardDefinition},
     from_client::ClientAction,
     from_server::VisualEvent,
 };
@@ -227,16 +227,20 @@ impl ConsolePrompter {
 
     // fn prompt(&self, game_state: &GameStatePlayerView) -> Result<ClientAction, ConsoleError> {
     fn prompt(&self, local_state: &LocalState) -> Result<ClientAction, ConsoleError> {
-        let game_state: &GameStatePlayerView = todo!();
         let mut input_queue = VecDeque::new();
 
         let mut event = None;
 
         while event.is_none() {
-            let available_mana = game_state.player_mana(self.id());
-            let mana_limit = game_state.player_mana_limit(self.id());
+            let my_hero = local_state
+                .find_type::<PlayerHero>()
+                .find(|h| h.player_id() == self.id())
+                .unwrap();
+
+            let mana_available = my_hero.mana_available();
+            let mana_limit = my_hero.mana_limit();
             let action = self.ask(
-                &format!("({}/{} mana) Enter an action: (summon, (show) board, (show) hand, info, attack, end (turn), quit)", available_mana, mana_limit),
+                &format!("({}/{} mana) Enter an action: (summon, (show) board, (show) hand, info, attack, end (turn), quit)", mana_available, mana_limit),
                 &mut input_queue,
             );
 
@@ -247,15 +251,15 @@ impl ConsolePrompter {
                     None
                 }
                 "board" => {
-                    self.show_board(game_state);
+                    self.show_board(todo!());
                     None
                 }
-                "summon" => Some(self.summon(game_state, local_state, &mut input_queue)),
+                "summon" => Some(self.summon(todo!(), local_state, &mut input_queue)),
                 "info" => {
-                    self.info(game_state, &mut input_queue);
+                    self.info(todo!(), &mut input_queue);
                     None
                 }
-                "attack" => Some(self.attack(game_state, &mut input_queue)),
+                "attack" => Some(self.attack(todo!(), &mut input_queue)),
                 "end" => Some(Ok(ClientAction::EndTurn(EndTurn {
                     player_id: self.id(),
                 }))),

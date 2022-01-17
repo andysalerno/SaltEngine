@@ -1,4 +1,4 @@
-use protocol::entities::{AsId, Entity, EntityId, Hand, Id, IsEntity, PlayerId};
+use protocol::entities::{AsId, Entity, EntityId, Hand, Id, IsEntity, PlayerHero, PlayerId};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
@@ -18,12 +18,19 @@ impl LocalState {
             entities: HashMap::new(),
         };
 
-        // both player's have a Hand
+        // both player have a Hand
         let player_hand = Hand::new(player_id);
         let opponent_hand = Hand::new(opponent_id);
 
         state.add(player_hand);
         state.add(opponent_hand);
+
+        // both players have a Hero
+        let player_hero = PlayerHero::new(player_id);
+        let opponent_hero = PlayerHero::new(opponent_id);
+
+        state.add(player_hero);
+        state.add(opponent_hero);
 
         state
     }
@@ -42,9 +49,12 @@ impl LocalState {
         unpacked
     }
 
-    pub fn find_type<T: IsEntity>(&self) -> impl Iterator<Item = &Entity> {
+    pub fn find_type<T: IsEntity>(&self) -> impl Iterator<Item = T> + '_ {
         let type_id = T::type_id();
-        self.entities.values().filter(move |e| e.type_id == type_id)
+        self.entities
+            .values()
+            .filter(move |e| e.type_id == type_id)
+            .map(|e| Self::unpack(e))
     }
 
     pub fn add<T: IsEntity>(&mut self, to_add: T) {
@@ -61,14 +71,14 @@ impl LocalState {
     pub fn player_hand(&self, player_id: PlayerId) -> Hand {
         let hand = self
             .find_type::<Hand>()
-            .map(Self::unpack::<Hand>)
             .find(|h| h.player_id == player_id)
             .unwrap();
 
         hand
     }
 
-    fn unpack<T: IsEntity>(e: &Entity) -> T {
+    #[must_use]
+    pub fn unpack<T: IsEntity>(e: &Entity) -> T {
         let unpacked: T = serde_json::from_str(e.data.as_str()).unwrap();
 
         unpacked

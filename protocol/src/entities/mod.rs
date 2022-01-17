@@ -1,6 +1,7 @@
 mod board;
 mod buff;
 mod hand;
+mod hero;
 mod hideable;
 mod id;
 mod passive_effect;
@@ -11,6 +12,7 @@ mod unit_card_instance_view;
 pub use board::*;
 pub use buff::*;
 pub use hand::*;
+pub use hero::*;
 pub use hideable::*;
 pub use id::*;
 pub use passive_effect::*;
