@@ -1,5 +1,5 @@
 use crate::{
-    entities::{Entity, Id, PlayerId},
+    entities::{AsId, Entity, Id, PlayerId},
     visual_events::*,
     GameMessage,
 };
@@ -31,6 +31,15 @@ pub struct EntityUpdate {
 pub struct EntityAdded {
     pub id: Id,
     pub entity: Entity,
+}
+
+impl EntityAdded {
+    pub fn new(id: impl AsId, entity: Entity) -> Self {
+        Self {
+            id: id.as_id(),
+            entity,
+        }
+    }
 }
 
 /// Messages that can be sent from the game server to the game client.

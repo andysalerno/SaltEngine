@@ -1,8 +1,8 @@
 pub use id::*;
 
 use super::{
-    board::BoardPos, buff::BuffPlayerView, unit_card_definition::UnitCardDefinition,
-    PassiveEffectInstancePlayerView,
+    board::BoardPos, buff::BuffPlayerView, unit_card_definition::UnitCardDefinition, EntityTypeId,
+    HasId, IsEntity, PassiveEffectInstancePlayerView,
 };
 use serde::{Deserialize, Serialize};
 
@@ -19,6 +19,46 @@ pub struct UnitCardInstance {
     state: Option<InstanceState>,
 }
 
+impl UnitCardInstance {
+    pub fn new(
+        id: UnitCardInstanceId,
+        definition: UnitCardDefinition,
+        buffs: Vec<BuffPlayerView>,
+        passive_effect: Option<PassiveEffectInstancePlayerView>,
+    ) -> Self {
+        let width = definition.row_width;
+        let attack = definition.attack;
+        let health = definition.health;
+
+        Self {
+            definition,
+            buffs,
+            passive_effect,
+            id,
+            attack,
+            health,
+            width,
+            state: None,
+        }
+    }
+}
+
+impl HasId for UnitCardInstance {
+    type IdType = UnitCardInstanceId;
+
+    fn id(&self) -> Self::IdType {
+        self.id
+    }
+}
+
+impl IsEntity for UnitCardInstance {
+    type IdType = UnitCardInstanceId;
+
+    fn type_id() -> EntityTypeId {
+        EntityTypeId::parse_str("896a090e-9efd-4cf1-aece-52fb7bb47344")
+    }
+}
+
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub enum InstanceState {
     Pos(BoardPos),
@@ -28,8 +68,10 @@ pub enum InstanceState {
 mod id {
     use std::fmt::Display;
 
-    use crate::entities::Id;
+    use crate::entities::{AsId, EntityId, Id};
     use serde::{Deserialize, Serialize};
+
+    use super::UnitCardInstance;
 
     #[derive(Debug, Copy, Clone, PartialEq, Serialize, Deserialize, Eq, Hash)]
     pub struct UnitCardInstanceId(Id);
@@ -44,6 +86,16 @@ mod id {
         pub fn id(&self) -> Id {
             self.0
         }
+    }
+
+    impl AsId for UnitCardInstanceId {
+        fn as_id(&self) -> Id {
+            self.0
+        }
+    }
+
+    impl EntityId for UnitCardInstanceId {
+        type EntityType = UnitCardInstance;
     }
 
     impl Default for UnitCardInstanceId {

@@ -12,7 +12,7 @@ pub use card_instance::{
 pub use deck::Deck;
 pub use game_state::{player_view::GameStatePlayerView, GameState, GameStateView};
 pub use hand::{Hand, HandView};
-use protocol::entities::PlayerId;
+use protocol::entities::{IsEntity, PlayerId};
 pub use selector::iter_helpers::{IterAddons, IteratorAny};
 use serde::{de::DeserializeOwned, Deserialize, Serialize};
 
@@ -47,6 +47,12 @@ use serde::{de::DeserializeOwned, Deserialize, Serialize};
 pub trait MakePlayerView<'a> {
     type TOut: Serialize + DeserializeOwned + Sized + 'static;
     fn player_view(&'a self, player_viewing: PlayerId) -> <Self as MakePlayerView<'a>>::TOut;
+}
+
+pub trait MakePlayerViewNew<'a> {
+    type TOut: IsEntity;
+    fn player_view_new(&'a self, player_viewing: PlayerId)
+        -> <Self as MakePlayerViewNew<'a>>::TOut;
 }
 
 #[cfg(test)]

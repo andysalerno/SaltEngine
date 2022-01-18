@@ -3,7 +3,6 @@ use serde::{Deserialize, Serialize};
 
 /// The view of a creature card definition.
 #[derive(Debug, Serialize, Clone, Deserialize)]
-// pub struct UnitCardDefinitionPlayerView {
 pub struct UnitCardDefinition {
     pub title: String,
     pub cost: i32,

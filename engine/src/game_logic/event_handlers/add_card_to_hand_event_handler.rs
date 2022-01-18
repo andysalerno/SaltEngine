@@ -1,10 +1,13 @@
 use crate::{
     game_logic::{event_handlers::EventHandler, events::AddCardToHandEvent, EventDispatcher},
-    game_state::GameState,
+    game_state::{GameState, MakePlayerViewNew},
 };
 use async_trait::async_trait;
 use log::info;
-use protocol::from_server::Notification;
+use protocol::{
+    entities::IsEntity,
+    from_server::{EntityAdded, Notification},
+};
 
 #[derive(Default)]
 pub struct AddCardToHandEventHandler;
@@ -25,11 +28,13 @@ impl EventHandler for AddCardToHandEventHandler {
             .take_tracked_pending_card(event.card_id())
             .expect("Expected to find the tracked pending card");
 
+        let card_id = card.id();
+        let v = card.player_view_new(player_id).as_entity();
+
         game_state.hand_mut(event.player_id()).add_card(card);
 
         let notifier = dispatcher.player_notifier(player_id);
-        //let notification = Notification::
-        let added_card_entity = todo!();
+        let added_card_entity = EntityAdded::new(card_id, v);
         let notification = Notification::EntityAdded(added_card_entity);
         notifier.notify(notification).await;
 

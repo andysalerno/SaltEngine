@@ -194,7 +194,7 @@ mod player_view {
     use crate::{
         cards::player_view::UnitCardDefinitionPlayerView,
         game_logic::PassiveEffectInstancePlayerView,
-        game_state::{MakePlayerView, PlayerId},
+        game_state::{MakePlayerView, MakePlayerViewNew, PlayerId},
     };
     use protocol::entities::BuffPlayerView;
     use serde::{Deserialize, Serialize};
@@ -279,6 +279,22 @@ mod player_view {
                 width: self.width(),
                 state: self.state,
             }
+        }
+    }
+
+    impl<'a> MakePlayerViewNew<'a> for UnitCardInstance {
+        type TOut = protocol::entities::UnitCardInstance;
+
+        fn player_view_new(
+            &'a self,
+            player_viewing: PlayerId,
+        ) -> <Self as MakePlayerViewNew>::TOut {
+            protocol::entities::UnitCardInstance::new(
+                self.id(),
+                self.definition(),
+                Vec::new(),
+                None,
+            )
         }
     }
 
