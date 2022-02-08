@@ -1,20 +1,34 @@
-use protocol::entities::RowId;
+use protocol::entities::{RowId, UnitCardInstance};
 use salt_engine::game_state::{
     board::{BoardSlotPlayerView, BoardView},
     GameStatePlayerView, GameStateView,
 };
+use websocket_client::local_state::LocalState;
 
 pub struct ConsoleDisplay;
 
 impl ConsoleDisplay {
-    pub(crate) fn display(&mut self, game_state: &GameStatePlayerView) {
+    pub(crate) fn display(&mut self, game_state: &LocalState) {
         let s = to_string(game_state);
 
         println!("{}", s);
     }
 }
 
-fn to_string(game_state: &GameStatePlayerView) -> String {
+fn to_string(game_state: &LocalState) -> String {
+    let units = game_state.find_type::<UnitCardInstance>();
+
+    let mut result = String::new();
+
+    for unit in units {
+        result.push_str(unit.definition().title.as_str());
+        result.push('\n');
+    }
+
+    result
+}
+
+fn to_string_z(game_state: &GameStatePlayerView) -> String {
     let mut result = String::new();
 
     result.push_str(&row_to_string(

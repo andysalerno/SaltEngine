@@ -1,15 +1,16 @@
 pub use id::*;
 
 use super::{
-    board::BoardPos, buff::BuffPlayerView, unit_card_definition::UnitCardDefinition, EntityTypeId,
-    HasId, IsEntity, PassiveEffectInstancePlayerView,
+    board::BoardPos, buff::BuffPlayerView, unit_card_definition::UnitCardDefinition,
+    EntityPosition, EntityTypeId, HasId, IsEntity, PassiveEffectInstancePlayerView,
 };
 use serde::{Deserialize, Serialize};
 
 /// A view of a creature card instance.
 #[derive(Debug, Serialize, Clone, Deserialize)]
 pub struct UnitCardInstance {
-    pub definition: UnitCardDefinition,
+    //position: EntityPosition,
+    definition: UnitCardDefinition,
     buffs: Vec<BuffPlayerView>,
     passive_effect: Option<PassiveEffectInstancePlayerView>,
     id: UnitCardInstanceId,
@@ -25,6 +26,7 @@ impl UnitCardInstance {
         definition: UnitCardDefinition,
         buffs: Vec<BuffPlayerView>,
         passive_effect: Option<PassiveEffectInstancePlayerView>,
+        //position: EntityPosition,
     ) -> Self {
         let width = definition.row_width;
         let attack = definition.attack;
@@ -39,7 +41,13 @@ impl UnitCardInstance {
             health,
             width,
             state: None,
+            //osition,
         }
+    }
+
+    /// Get a reference to the unit card instance's definition.
+    pub fn definition(&self) -> &UnitCardDefinition {
+        &self.definition
     }
 }
 

@@ -3,7 +3,9 @@ use crate::game_logic::{
     PassiveEffectInstance,
 };
 use crate::game_logic::{Buff, BuffView, PassiveEffectView};
-use protocol::entities::{BoardPos, BuffInstanceId, UnitCardInstanceId};
+use protocol::entities::{
+    BoardPos, BuffInstanceId, Entity, EntityPosition, IsEntity, UnitCardInstanceId,
+};
 use serde::{Deserialize, Serialize};
 use std::borrow::Borrow;
 
@@ -181,6 +183,26 @@ impl UnitCardInstance {
     pub fn set_state(&mut self, state: Option<InstanceState>) {
         self.state = state;
     }
+
+    #[must_use]
+    pub fn as_entity(&self) -> Entity {
+        let local_def = self.definition();
+        let definition = protocol::entities::UnitCardDefinition {
+            title: local_def.title().into(),
+            cost: local_def.cost(),
+            text: local_def.text().into(),
+            flavor_text: local_def.flavor_text().into(),
+            attack: local_def.attack(),
+            health: local_def.health(),
+            row_width: local_def.row_width(),
+            placeable_at: local_def.placeable_at(),
+        };
+
+        let protocol_instance =
+            protocol::entities::UnitCardInstance::new(self.id(), definition, Vec::new(), None);
+
+        protocol_instance.as_entity()
+    }
 }
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
@@ -282,21 +304,21 @@ mod player_view {
         }
     }
 
-    impl<'a> MakePlayerViewNew<'a> for UnitCardInstance {
-        type TOut = protocol::entities::UnitCardInstance;
+    // impl<'a> MakePlayerViewNew<'a> for UnitCardInstance {
+    //     type TOut = protocol::entities::UnitCardInstance;
 
-        fn player_view_new(
-            &'a self,
-            player_viewing: PlayerId,
-        ) -> <Self as MakePlayerViewNew>::TOut {
-            protocol::entities::UnitCardInstance::new(
-                self.id(),
-                self.definition(),
-                Vec::new(),
-                None,
-            )
-        }
-    }
+    //     fn player_view_new(
+    //         &'a self,
+    //         player_viewing: PlayerId,
+    //     ) -> <Self as MakePlayerViewNew>::TOut {
+    //         protocol::entities::UnitCardInstance::new(
+    //             self.id(),
+    //             self.definition(),
+    //             Vec::new(),
+    //             None,
+    //         )
+    //     }
+    // }
 
     impl<'a> UnitCardInstanceView<'a> for UnitCardInstancePlayerView {
         type DefinitionView = UnitCardDefinitionPlayerView;

@@ -1,4 +1,7 @@
-use protocol::entities::{AsId, Entity, EntityId, Hand, Id, IsEntity, PlayerHero, PlayerId};
+use protocol::entities::{
+    AsId, BoardPos, Entity, EntityId, Hand, Id, IsEntity, PlayerHero, PlayerId, UnitCardInstance,
+    UnitCardInstanceId,
+};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
@@ -6,7 +9,18 @@ use std::collections::HashMap;
 pub struct LocalState {
     player_a_id: PlayerId,
     player_b_id: PlayerId,
+
+    // All known entities, mapped by `Id` of the entity.
     entities: HashMap<Id, Entity>,
+
+    /// The entities in the hand for player_a.
+    player_a_hand: Vec<UnitCardInstanceId>,
+
+    /// The entities in the hand for player_b.
+    player_b_hand: Vec<UnitCardInstanceId>,
+
+    /// The entities on the board.
+    board: HashMap<BoardPos, UnitCardInstanceId>,
 }
 
 impl LocalState {
@@ -16,6 +30,9 @@ impl LocalState {
             player_a_id: player_id,
             player_b_id: opponent_id,
             entities: HashMap::new(),
+            player_a_hand: Vec::new(),
+            player_b_hand: Vec::new(),
+            board: HashMap::new(),
         };
 
         // both player have a Hand
@@ -68,6 +85,7 @@ impl LocalState {
     }
 
     #[must_use]
+    #[deprecated]
     pub fn player_hand(&self, player_id: PlayerId) -> Hand {
         let hand = self
             .find_type::<Hand>()
@@ -75,6 +93,21 @@ impl LocalState {
             .unwrap();
 
         hand
+    }
+
+    pub fn cards_in_player_hand(
+        &self,
+        player_id: PlayerId,
+    ) -> impl Iterator<Item = UnitCardInstance> + '_ {
+        let player_hand = if player_id == self.player_a_id {
+            &self.player_a_hand
+        } else if player_id == self.player_b_id {
+            &self.player_b_hand
+        } else {
+            panic!("Unknown player id: {:?}", player_id)
+        };
+
+        player_hand.iter().map(|id| self.find(*id))
     }
 
     #[must_use]

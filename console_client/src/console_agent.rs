@@ -1,5 +1,6 @@
 use crate::console_display::ConsoleDisplay;
 use async_trait::async_trait;
+use log::info;
 use protocol::{
     client_actions::{Attack, EndTurn, SummonCreatureFromHand},
     entities::{BoardPos, PlayerHero, PlayerId, RowId, UnitCardDefinition},
@@ -250,7 +251,7 @@ impl ConsolePrompter {
                     None
                 }
                 "board" => {
-                    self.show_board(todo!());
+                    self.show_board(local_state);
                     None
                 }
                 "summon" => Some(self.summon(todo!(), local_state, &mut input_queue)),
@@ -372,28 +373,28 @@ impl ConsolePrompter {
         let _selected = self.select(game_state, "Select for info.", input_queue);
     }
 
-    fn show_board(&self, game_state: &GameStatePlayerView) {
+    // fn show_board(&self, game_state: &GameStatePlayerView) {
+    fn show_board(&self, game_state: &LocalState) {
         ConsoleDisplay.display(game_state);
     }
 
     fn show_hand(&self, state: &LocalState) {
         let mut result = String::new();
 
-        let mut all_cards = state
-            .player_hand(self.id)
-            .cards
-            .iter()
+        let cards_in_hand = state.cards_in_player_hand(self.id);
+
+        let mut cards_stringified = cards_in_hand
             .enumerate()
-            .map(|(index, c)| display_card(&c.definition, true, index))
+            .map(|(index, c)| display_card(c.definition(), true, index))
             .map(|s| s.lines().map(|l| l.to_owned()).collect::<Vec<_>>())
             .collect::<Vec<_>>();
 
         loop {
-            if !all_cards.iter().any(|c| !c.is_empty()) {
+            if !cards_stringified.iter().any(|c| !c.is_empty()) {
                 break;
             }
 
-            for card_lines in &mut all_cards {
+            for card_lines in &mut cards_stringified {
                 result.push_str(&card_lines.remove(0));
                 result.push_str("   ");
             }
@@ -554,6 +555,6 @@ struct ConsoleNotifier;
 #[async_trait]
 impl ClientNotifier for ConsoleNotifier {
     async fn notify(&self, event: Notification) {
-        say(format!("Saw client event: {:?}", event));
+        info!("Saw client event: {:?}", event);
     }
 }

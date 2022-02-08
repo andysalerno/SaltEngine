@@ -29,12 +29,12 @@ impl EventHandler for AddCardToHandEventHandler {
             .expect("Expected to find the tracked pending card");
 
         let card_id = card.id();
-        let v = card.player_view_new(player_id).as_entity();
+        let entity = card.as_entity();
 
         game_state.hand_mut(event.player_id()).add_card(card);
 
         let notifier = dispatcher.player_notifier(player_id);
-        let added_card_entity = EntityAdded::new(card_id, v);
+        let added_card_entity = EntityAdded::new(card_id, entity);
         let notification = Notification::EntityAdded(added_card_entity);
         notifier.notify(notification).await;
 
