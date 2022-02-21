@@ -2,7 +2,6 @@ use env_logger::Env;
 
 mod connection;
 mod matchmaker;
-pub mod messages;
 mod network_client_notifier;
 mod network_game_client;
 mod network_prompter;

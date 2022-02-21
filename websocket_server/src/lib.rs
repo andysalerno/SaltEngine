@@ -7,7 +7,6 @@
 )]
 
 pub mod connection;
-pub mod messages;
 mod network_prompter;
 
 /// A Result<T, E> where E is a boxed dyn error, plus Send and Sync.

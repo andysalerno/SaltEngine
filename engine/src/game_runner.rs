@@ -1,7 +1,7 @@
 use crate::{
     game_agent::{ClientNotifier, Prompter},
     game_logic::{
-        events::{GameEvent, StartGameEvent},
+        events::{GameEvent, StartGameEvent, TurnStartEvent},
         EventDispatcher,
     },
     game_state::{GameState, GameStatePlayerView, GameStateView, MakePlayerView},
@@ -88,9 +88,18 @@ impl GameRunner {
         let cur_player_id = game_state.cur_player_id();
         info!("Turn starts for player: {:?}", cur_player_id);
 
+        dispatcher
+            .dispatch(TurnStartEvent(cur_player_id), game_state)
+            .await;
+
         handler_player.on_turn_start(game_state).await;
 
         loop {
+            if game_state.is_game_over() {
+                info!("Game is over.");
+                return;
+            }
+
             info!("Getting next action from client.");
             let action = handler_player
                 // .next_action(game_state.player_view(cur_player_id))

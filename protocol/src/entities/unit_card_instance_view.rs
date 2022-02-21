@@ -96,6 +96,12 @@ mod id {
         }
     }
 
+    impl From<Id> for UnitCardInstanceId {
+        fn from(id: Id) -> Self {
+            UnitCardInstanceId(id)
+        }
+    }
+
     impl AsId for UnitCardInstanceId {
         fn as_id(&self) -> Id {
             self.0

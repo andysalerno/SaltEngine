@@ -1,4 +1,5 @@
 use log::info;
+use protocol::from_server::{EntityAdded, Notification};
 
 use crate::{
     game_logic::{
@@ -29,10 +30,29 @@ impl EventHandler for StartGameEventHandler {
         let player_b_id = game_state.player_b_id();
 
         info!(
-            "Game start.\nPlayer A: {:?}\nPlayer B: {:?}",
+            "Game start.\nPlayer A: {:?}\nPlayer B: {:?}.  Adding cards to hand.",
             player_a_id, player_b_id
         );
 
+        // 1. Add entities for player heroes
+        let player_a_hero = game_state.board().hero(player_a_id);
+        let player_b_hero = game_state.board().hero(player_b_id);
+
+        dispatcher
+            .notify_players(Notification::EntityAdded(EntityAdded::new(
+                player_a_hero.id(),
+                player_a_hero.as_entity(),
+            )))
+            .await;
+
+        dispatcher
+            .notify_players(Notification::EntityAdded(EntityAdded::new(
+                player_b_hero.id(),
+                player_b_hero.as_entity(),
+            )))
+            .await;
+
+        // 2. Players draw initial hand
         for _ in 0..START_GAME_CARD_COUNT {
             dispatcher
                 .dispatch(DrawCardEvent::new(player_a_id), game_state)
@@ -41,11 +61,5 @@ impl EventHandler for StartGameEventHandler {
                 .dispatch(DrawCardEvent::new(player_b_id), game_state)
                 .await;
         }
-
-        let first_turn_player = game_state.cur_player_id();
-
-        dispatcher
-            .dispatch(TurnStartEvent(first_turn_player), game_state)
-            .await;
     }
 }

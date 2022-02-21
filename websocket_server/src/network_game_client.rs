@@ -7,11 +7,7 @@ use protocol::entities::PlayerId;
 use protocol::from_client::{ClientAction, FromClient};
 use protocol::from_server::FromServer;
 use salt_engine::game_agent::ClientNotifier;
-use salt_engine::{
-    game_agent::Prompter,
-    game_runner::GameClient,
-    game_state::{GameState, GameStatePlayerView},
-};
+use salt_engine::{game_agent::Prompter, game_runner::GameClient, game_state::GameState};
 
 pub(crate) struct NetworkGameClient {
     player_id: PlayerId,
