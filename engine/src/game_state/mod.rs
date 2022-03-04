@@ -3,7 +3,7 @@ mod card_instance;
 mod deck;
 mod game_state;
 mod hand;
-mod hero;
+pub mod hero;
 pub mod selector;
 
 pub use card_instance::{

@@ -21,9 +21,10 @@ use protocol::{
 };
 
 #[derive(Debug)]
-pub struct EventDispatcher {
+pub struct EventDispatcher<'a> {
     stack: Vec<GameEvent>,
     player_a_notifier: Box<dyn ClientNotifier>,
+    player_a_notifier_z: &'a dyn ClientNotifier,
     player_a_prompter: Box<dyn Prompter>,
     player_a_id: PlayerId,
     player_b_notifier: Box<dyn ClientNotifier>,
@@ -31,10 +32,11 @@ pub struct EventDispatcher {
     player_b_id: PlayerId,
 }
 
-impl EventDispatcher {
+impl<'a> EventDispatcher<'a> {
     #[must_use]
     pub fn new(
         player_a_notifier: Box<dyn ClientNotifier>,
+        player_a_notifier_z: &'a dyn ClientNotifier,
         player_a_prompter: Box<dyn Prompter>,
         player_a_id: PlayerId,
         player_b_notifier: Box<dyn ClientNotifier>,
@@ -44,6 +46,7 @@ impl EventDispatcher {
         Self {
             stack: Vec::new(),
             player_a_notifier,
+            player_a_notifier_z,
             player_a_prompter,
             player_a_id,
             player_b_notifier,

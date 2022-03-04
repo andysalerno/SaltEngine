@@ -22,6 +22,8 @@ pub trait GameClient: Send + Sync {
     async fn next_action(&mut self) -> ClientAction;
     async fn make_prompter(&self) -> Box<dyn Prompter>;
     async fn make_notifier(&self) -> Box<dyn ClientNotifier>;
+
+    fn notifier(&self) -> &dyn ClientNotifier;
 }
 
 /// A runner for a game.
@@ -58,6 +60,7 @@ impl GameRunner {
 
         let mut dispatcher = EventDispatcher::new(
             player_a_notifier,
+            self.player_a_handler.notifier(),
             player_a_prompter,
             self.game_state.player_a_id(),
             player_b_notifier,
@@ -134,6 +137,7 @@ pub mod tests {
     struct TestClient {
         action_queue: Vec<ClientAction>,
         on_turn_start_queue: Vec<Box<dyn FnMut(&GameState) + Send + Sync>>,
+        notifier: StubNotifier,
     }
 
     impl TestClient {
@@ -141,6 +145,7 @@ pub mod tests {
             Self {
                 action_queue: Vec::new(),
                 on_turn_start_queue: Vec::new(),
+                notifier: StubNotifier,
             }
         }
 
@@ -174,6 +179,10 @@ pub mod tests {
 
         async fn make_notifier(&self) -> Box<dyn ClientNotifier> {
             Box::new(StubNotifier)
+        }
+
+        fn notifier(&self) -> &dyn ClientNotifier {
+            &self.notifier
         }
     }
 

@@ -1,5 +1,5 @@
 use crate::{
-    entities::{AsId, Entity, Id, PlayerId},
+    entities::{AsId, Entity, EntityPosition, Id, PlayerId},
     visual_events::*,
     GameMessage,
 };
@@ -31,13 +31,15 @@ pub struct EntityUpdate {
 pub struct EntityAdded {
     pub id: Id,
     pub entity: Entity,
+    pub position: EntityPosition,
 }
 
 impl EntityAdded {
-    pub fn new(id: impl AsId, entity: Entity) -> Self {
+    pub fn new(id: impl AsId, entity: Entity, position: EntityPosition) -> Self {
         Self {
             id: id.as_id(),
             entity,
+            position,
         }
     }
 }

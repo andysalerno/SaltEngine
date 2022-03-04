@@ -24,6 +24,12 @@ impl Default for Id {
     }
 }
 
+impl AsId for Id {
+    fn as_id(&self) -> Id {
+        *self
+    }
+}
+
 /// A trait providing an entity's ID.
 pub trait HasId {
     type IdType: EntityId;

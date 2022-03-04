@@ -342,11 +342,11 @@ impl Board {
             slots.push(BoardSlot::new(pos));
         }
 
-        let mut player_a_hero_slot = BoardSlot::new(BoardPos::hero_pos(player_a_id));
-        player_a_hero_slot.set_creature(HeroDefinition.make_instance());
+        let player_a_hero_slot = BoardSlot::new(BoardPos::hero_pos(player_a_id));
+        // player_a_hero_slot.set_creature(HeroDefinition.make_instance());
 
-        let mut player_b_hero_slot = BoardSlot::new(BoardPos::hero_pos(player_b_id));
-        player_b_hero_slot.set_creature(HeroDefinition.make_instance());
+        let player_b_hero_slot = BoardSlot::new(BoardPos::hero_pos(player_b_id));
+        // player_b_hero_slot.set_creature(HeroDefinition.make_instance());
 
         Self {
             player_a_id,

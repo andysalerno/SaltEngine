@@ -5,7 +5,7 @@ use crate::{
 use async_trait::async_trait;
 use log::info;
 use protocol::{
-    entities::IsEntity,
+    entities::{EntityPosition, IsEntity},
     from_server::{EntityAdded, Notification},
 };
 
@@ -30,11 +30,12 @@ impl EventHandler for AddCardToHandEventHandler {
 
         let card_id = card.id();
         let entity = card.as_entity();
+        let position = EntityPosition::Hand(player_id);
 
         game_state.hand_mut(event.player_id()).add_card(card);
 
         let notifier = dispatcher.player_notifier(player_id);
-        let added_card_entity = EntityAdded::new(card_id, entity);
+        let added_card_entity = EntityAdded::new(card_id, entity, position);
         let notification = Notification::EntityAdded(added_card_entity);
         notifier.notify(notification).await;
 

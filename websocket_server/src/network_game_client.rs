@@ -12,14 +12,20 @@ use salt_engine::{game_agent::Prompter, game_runner::GameClient, game_state::Gam
 pub(crate) struct NetworkGameClient {
     player_id: PlayerId,
     connection: Connection,
+    notifier: NetworkClientNotifier,
 }
 
 impl NetworkGameClient {
     pub(crate) fn new(player_id: PlayerId, connection: Connection) -> Self {
         Self {
             player_id,
-            connection,
+            connection: connection.clone(),
+            notifier: NetworkClientNotifier::new(connection),
         }
+    }
+
+    pub fn notifier(&self) -> &dyn ClientNotifier {
+        &self.notifier
     }
 }
 
