@@ -10,7 +10,7 @@ use protocol::from_server::FromServer;
 use salt_engine::{
     cards::UnitCardDefinition,
     game_runner::GameRunner,
-    game_state::{Deck, GameState, MakePlayerView, UnitCardInstance},
+    game_state::{Deck, GameState, UnitCardInstance},
 };
 
 /// Plays a game to completion.

@@ -1,11 +1,11 @@
 use crate::console_display::ConsoleDisplay;
 use async_trait::async_trait;
-use log::info;
+use log::{error, info};
 use protocol::{
     client_actions::{Attack, EndTurn, SummonCreatureFromHand},
     entities::{BoardPos, PlayerHero, PlayerId, RowId, UnitCardDefinition},
     from_client::ClientAction,
-    from_server::{Notification, VisualEvent},
+    from_server::Notification,
 };
 use salt_engine::{
     game_agent::{ClientNotifier, Prompter},
@@ -15,7 +15,8 @@ use salt_engine::{
         UnitCardInstancePlayerView,
     },
 };
-use std::{collections::VecDeque, sync::Arc};
+use smol::channel::{SendError, Sender};
+use std::collections::VecDeque;
 use thiserror::Error;
 use websocket_client::local_state::LocalState;
 
@@ -54,7 +55,7 @@ impl GameClient for ConsoleAgent {
     }
 
     async fn make_notifier(&self) -> Box<dyn ClientNotifier> {
-        Box::new(ConsoleNotifier::new(self.local_state.clone()))
+        Box::new(ConsoleNotifier::new())
     }
 
     async fn next_action(&mut self) -> ClientAction {
@@ -225,7 +226,6 @@ impl ConsolePrompter {
         self.id
     }
 
-    // fn prompt(&self, game_state: &GameStatePlayerView) -> Result<ClientAction, ConsoleError> {
     fn prompt(&self, local_state: &LocalState) -> Result<ClientAction, ConsoleError> {
         let mut input_queue = VecDeque::new();
 
@@ -391,8 +391,13 @@ impl ConsolePrompter {
         let mut result = String::new();
 
         let cards_in_hand = state.cards_in_player_hand(self.id);
+        let cards_in_hand = cards_in_hand.collect::<Vec<_>>();
+        let cards_count = cards_in_hand.len();
+
+        info!("Found {cards_count} cards in player's hand");
 
         let mut cards_stringified = cards_in_hand
+            .iter()
             .enumerate()
             .map(|(index, c)| display_card(c.definition(), true, index))
             .map(|s| s.lines().map(|l| l.to_owned()).collect::<Vec<_>>())
@@ -560,12 +565,17 @@ fn retry_until_ok<TOut, TErr>(
 }
 
 struct ConsoleNotifier {
-    state: Arc<LocalState>,
+    sender: Sender<Notification>,
 }
 
 impl ConsoleNotifier {
-    fn new(state: Arc<LocalState>) -> Self {
-        Self { state }
+    fn new() -> Self {
+        let (sender, _) = smol::channel::unbounded::<Notification>();
+        Self { sender }
+    }
+
+    async fn send(&self, notification: Notification) -> Result<(), SendError<Notification>> {
+        self.sender.send(notification).await
     }
 }
 
@@ -573,5 +583,10 @@ impl ConsoleNotifier {
 impl ClientNotifier for ConsoleNotifier {
     async fn notify(&self, event: Notification) {
         info!("Saw client event: {:?}", event);
+        let result = self.send(event).await;
+
+        if let Err(e) = result {
+            error!("Could not notify client: {e:?}");
+        }
     }
 }

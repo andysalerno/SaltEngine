@@ -1,16 +1,19 @@
 use protocol::entities::{
-    AsId, BoardPos, Entity, EntityId, Hand, Id, IsEntity, PlayerHero, PlayerId, UnitCardInstance,
-    UnitCardInstanceId,
+    AsId, BoardPos, Entity, EntityId, EntityPosition, Hand, Id, IsEntity, PlayerHero, PlayerId,
+    UnitCardInstance, UnitCardInstanceId,
 };
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
-#[derive(Serialize, Deserialize, Default, Debug)]
+/// A struct that represents the client-side state of the game.
+/// This struct keeps track of all entities.
+/// Entities are indexed by both id and position within the game world.
+#[derive(Serialize, Deserialize, Default)]
 pub struct LocalState {
     player_a_id: PlayerId,
     player_b_id: PlayerId,
 
-    // All known entities, mapped by `Id` of the entity.
+    // All entities, mapped by `Id` of the entity.
     entities: HashMap<Id, Entity>,
 
     /// The entities in the hand for player_a.
@@ -19,44 +22,30 @@ pub struct LocalState {
     /// The entities in the hand for player_b.
     player_b_hand: Vec<UnitCardInstanceId>,
 
-    /// The entities on the board.
-    board: HashMap<BoardPos, UnitCardInstanceId>,
+    /// All entities, mapped by their location.
+    positions: HashMap<EntityPosition, UnitCardInstanceId>,
 }
 
 impl LocalState {
     #[must_use]
     pub fn new(player_id: PlayerId, opponent_id: PlayerId) -> Self {
-        let mut state = Self {
+        Self {
             player_a_id: player_id,
             player_b_id: opponent_id,
             entities: HashMap::new(),
             player_a_hand: Vec::new(),
             player_b_hand: Vec::new(),
-            board: HashMap::new(),
-        };
-
-        // // both player have a Hand
-        // let player_hand = Hand::new(player_id);
-        // let opponent_hand = Hand::new(opponent_id);
-
-        // state.add(player_hand);
-        // state.add(opponent_hand);
-
-        // both players have a Hero
-        let player_hero = PlayerHero::new(player_id);
-        let opponent_hero = PlayerHero::new(opponent_id);
-
-        state.add(player_hero);
-        state.add(opponent_hero);
-
-        state
+            positions: HashMap::new(),
+        }
     }
 
+    /// Given an id, return the matching entity.
     pub fn find_entity<T: EntityId>(&self, id: T) -> &Entity {
         let id = id.as_id();
         self.entities.get(&id).unwrap()
     }
 
+    /// Given an id, return the matching entity, unpacked as the internal type.
     pub fn find<T: EntityId>(&self, id: T) -> T::EntityType {
         let id = id.as_id();
         let entity = self.entities.get(&id).unwrap();
@@ -66,6 +55,7 @@ impl LocalState {
         unpacked
     }
 
+    /// Finds all entities that represent the specified type.
     pub fn find_type<T: IsEntity>(&self) -> impl Iterator<Item = T> + '_ {
         let type_id = T::type_id();
         self.entities
@@ -74,11 +64,33 @@ impl LocalState {
             .map(|e| Self::unpack(e))
     }
 
+    #[deprecated]
     pub fn add<T: IsEntity>(&mut self, to_add: T) {
         let entity = to_add.as_entity();
         self.entities.insert(entity.id, entity);
     }
 
+    /// Adds a new entity at the given position.
+    pub fn add_at<T: IsEntity>(&mut self, to_add: T, position: EntityPosition) {
+        let entity = to_add.as_entity();
+        let id = entity.id;
+        self.entities.insert(id, entity);
+
+        let card_id = UnitCardInstanceId::from(id);
+        self.positions.insert(position, card_id);
+
+        if let EntityPosition::Hand(player_id) = position {
+            if player_id == self.player_a_id {
+                self.player_a_hand.push(card_id);
+            } else if player_id == self.player_b_id {
+                self.player_b_hand.push(card_id);
+            } else {
+                panic!("Unknown player id: {player_id:?}");
+            }
+        }
+    }
+
+    /// Updates the existing entity (found by matching id) by replacing it with `to_update`.
     pub fn update<T: IsEntity>(&mut self, to_update: T) {
         let found = self.entities.get_mut(&to_update.id().as_id()).unwrap();
         *found = to_update.as_entity();
@@ -95,6 +107,7 @@ impl LocalState {
         hand
     }
 
+    /// Gets an iterator over the card instances in the given player's hand.
     pub fn cards_in_player_hand(
         &self,
         player_id: PlayerId,
@@ -144,7 +157,8 @@ impl LocalState {
 mod test {
     use super::LocalState;
     use protocol::entities::{
-        BuffInstanceId, BuffPlayerView, BuffSourceId, Hand, HandId, HasId, Id, PlayerId,
+        BuffInstanceId, BuffPlayerView, BuffSourceId, EntityPosition, Hand, HandId, HasId, Id,
+        PlayerId, UnitCardDefinition, UnitCardInstance, UnitCardInstanceId,
     };
 
     #[test]
@@ -353,5 +367,49 @@ mod test {
             let player_2_hand = state.player_hand(player_id_2);
             assert_eq!(hand_id_2, player_2_hand.id());
         }
+    }
+
+    #[test]
+    fn can_find_player_hand_2() {
+        let player_a = PlayerId::new();
+        let player_b = PlayerId::new();
+        let mut state = LocalState::new(player_a, player_b);
+
+        // Add a few cards to player 1's hand
+        {
+            let card_1 = UnitCardInstance::new(
+                UnitCardInstanceId::new(),
+                UnitCardDefinition::new("hello"),
+                Vec::new(),
+                None,
+            );
+
+            let card_2 = UnitCardInstance::new(
+                UnitCardInstanceId::new(),
+                UnitCardDefinition::new("hello"),
+                Vec::new(),
+                None,
+            );
+
+            let card_3 = UnitCardInstance::new(
+                UnitCardInstanceId::new(),
+                UnitCardDefinition::new("hello"),
+                Vec::new(),
+                None,
+            );
+
+            let player_a_hand = EntityPosition::Hand(player_a);
+
+            state.add_at(card_1, player_a_hand);
+            state.add_at(card_2, player_a_hand);
+            state.add_at(card_3, player_a_hand);
+        }
+
+        // Expect the cards to be found in player 1's hand
+        let hand = state.cards_in_player_hand(player_a);
+        assert!(hand.count() == 3);
+
+        let hand = state.cards_in_player_hand(player_b);
+        assert!(hand.count() == 0);
     }
 }

@@ -69,3 +69,43 @@ Example:
 
 type:visual,event:attack,attacker:fa34,target:4df8
 type:update,id:4df8,key:HEALTH,val:7
+
+
+implementation:
+card instances work like this:
+
+// marker trait
+trait Card {}
+
+#[derive(Serialize, Deserialize, Card)]
+struct AngryBulldog;
+
+clients only see the raw data struct that is serialized/deserialized
+
+server has this:
+trait CardLogic {
+    /// ... all card logic
+}
+
+impl CardLogic for AngryBulldog {
+    /// impl...
+}
+
+or possibly:
+struct CardLogic<T: Card> {
+    card: T
+}
+
+impl CardLogic<AngryBulldog> {
+    /// impl ...
+}
+
+or possibly:
+struct CardLogic<T: Card> {
+    card: T,
+    logic: 
+}
+
+impl CardLogic<AngryBulldog> {
+    /// impl ...
+}

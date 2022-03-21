@@ -10,11 +10,12 @@
 
 pub mod local_state;
 
+use local_state::LocalState;
 use log::info;
 use protocol::{
     entities::PlayerId,
     from_client::FromClient,
-    from_server::{FromServer, PromptMessage},
+    from_server::{FromServer, Notification, PromptMessage},
 };
 use salt_engine::{game_agent::ClientNotifier, game_runner::GameClient};
 use smol::net::TcpStream;
@@ -76,10 +77,12 @@ async fn handle_connection(
                 handle_turn(&mut connection, agent.as_mut(), notifier.as_ref()).await?;
             }
             FromServer::Notification(notification) => notifier.notify(notification).await,
-            _ => panic!("expected a TurnStart message, but received: {:?}", msg),
+            _ => panic!("expected a TurnStart or Notification message, but received: {msg:?}"),
         }
     }
 }
+
+fn handle_notification(notification: Notification) {}
 
 async fn handle_turn(
     connection: &mut Connection,
