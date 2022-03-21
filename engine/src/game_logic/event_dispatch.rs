@@ -11,6 +11,7 @@ use super::{
 use crate::{
     game_agent::{ClientNotifier, Prompter},
     game_logic::event_handlers::AddBuffToCardInstanceHandler,
+    game_runner::GameClient,
     game_state::{board::BoardView, GameState, IterAddons},
 };
 use futures::join;
@@ -34,6 +35,7 @@ pub struct EventDispatcher {
 impl EventDispatcher {
     #[must_use]
     pub fn new(
+        player_a_client: &dyn GameClient,
         player_a_notifier: Box<dyn ClientNotifier>,
         player_a_prompter: Box<dyn Prompter>,
         player_a_id: PlayerId,
@@ -252,7 +254,74 @@ mod tests {
 
     use super::EventDispatcher;
     use crate::game_agent::tests::{MockTestPrompter, StubNotifier};
+    use crate::game_runner::GameClient;
     use crate::game_state::{Deck, GameState};
+
+    struct DummyAgent {}
+
+    impl GameClient for DummyAgent {
+        fn on_turn_start<'life0, 'life1, 'async_trait>(
+            &'life0 mut self,
+            game_state: &'life1 GameState,
+        ) -> core::pin::Pin<
+            Box<dyn core::future::Future<Output = ()> + core::marker::Send + 'async_trait>,
+        >
+        where
+            'life0: 'async_trait,
+            'life1: 'async_trait,
+            Self: 'async_trait,
+        {
+            todo!()
+        }
+
+        fn next_action<'life0, 'async_trait>(
+            &'life0 mut self,
+        ) -> core::pin::Pin<
+            Box<
+                dyn core::future::Future<Output = protocol::from_client::ClientAction>
+                    + core::marker::Send
+                    + 'async_trait,
+            >,
+        >
+        where
+            'life0: 'async_trait,
+            Self: 'async_trait,
+        {
+            todo!()
+        }
+
+        fn make_prompter<'life0, 'async_trait>(
+            &'life0 self,
+        ) -> core::pin::Pin<
+            Box<
+                dyn core::future::Future<Output = Box<dyn crate::game_agent::Prompter>>
+                    + core::marker::Send
+                    + 'async_trait,
+            >,
+        >
+        where
+            'life0: 'async_trait,
+            Self: 'async_trait,
+        {
+            todo!()
+        }
+
+        fn make_notifier<'life0, 'async_trait>(
+            &'life0 self,
+        ) -> core::pin::Pin<
+            Box<
+                dyn core::future::Future<Output = Box<dyn crate::game_agent::ClientNotifier>>
+                    + core::marker::Send
+                    + 'async_trait,
+            >,
+        >
+        where
+            'life0: 'async_trait,
+            Self: 'async_trait,
+        {
+            todo!()
+        }
+    }
 
     pub(crate) fn make_test_state() -> GameState {
         let player_a_deck = Deck::new(Vec::new());
@@ -281,7 +350,10 @@ mod tests {
         let notifier_a = Box::new(StubNotifier);
         let notifier_b = Box::new(StubNotifier);
 
+        let mut dummy = DummyAgent {};
+
         let _dispatcher = EventDispatcher::new(
+            &dummy,
             notifier_a,
             prompter_a,
             PlayerId::new(),

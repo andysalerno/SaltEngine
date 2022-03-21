@@ -15,7 +15,7 @@ use salt_engine::{
         UnitCardInstancePlayerView,
     },
 };
-use std::collections::VecDeque;
+use std::{collections::VecDeque, sync::Arc};
 use thiserror::Error;
 use websocket_client::local_state::LocalState;
 
@@ -31,14 +31,14 @@ fn user_input_err<T: ToString>(msg: T) -> ConsoleError {
 
 pub struct ConsoleAgent {
     id: PlayerId,
-    local_state: LocalState,
+    local_state: Arc<LocalState>,
 }
 
 impl ConsoleAgent {
     pub fn new_with_id(my_id: PlayerId, opponent_id: PlayerId) -> Self {
         Self {
             id: my_id,
-            local_state: LocalState::new(my_id, opponent_id),
+            local_state: Arc::new(LocalState::new(my_id, opponent_id)),
         }
     }
 
@@ -54,7 +54,7 @@ impl GameClient for ConsoleAgent {
     }
 
     async fn make_notifier(&self) -> Box<dyn ClientNotifier> {
-        Box::new(ConsoleNotifier)
+        Box::new(ConsoleNotifier::new(self.local_state.clone()))
     }
 
     async fn next_action(&mut self) -> ClientAction {
@@ -250,6 +250,11 @@ impl ConsolePrompter {
                     self.show_hand(local_state);
                     None
                 }
+                "state" => {
+                    // self.show_hand(game_state);
+                    self.show_state(local_state);
+                    None
+                }
                 "board" => {
                     self.show_board(local_state);
                     None
@@ -376,6 +381,10 @@ impl ConsolePrompter {
     // fn show_board(&self, game_state: &GameStatePlayerView) {
     fn show_board(&self, game_state: &LocalState) {
         ConsoleDisplay.display(game_state);
+    }
+
+    fn show_state(&self, state: &LocalState) {
+        say(format!("{:#?}", state));
     }
 
     fn show_hand(&self, state: &LocalState) {
@@ -550,7 +559,15 @@ fn retry_until_ok<TOut, TErr>(
     }
 }
 
-struct ConsoleNotifier;
+struct ConsoleNotifier {
+    state: Arc<LocalState>,
+}
+
+impl ConsoleNotifier {
+    fn new(state: Arc<LocalState>) -> Self {
+        Self { state }
+    }
+}
 
 #[async_trait]
 impl ClientNotifier for ConsoleNotifier {

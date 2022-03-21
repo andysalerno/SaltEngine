@@ -3,8 +3,14 @@ use uuid::Uuid;
 
 use super::IsEntity;
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Copy, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub struct Id(Uuid);
+
+impl std::fmt::Debug for Id {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        self.0.to_string()[0..8].fmt(f)
+    }
+}
 
 impl Id {
     #[must_use]

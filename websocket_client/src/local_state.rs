@@ -5,7 +5,7 @@ use protocol::entities::{
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
-#[derive(Serialize, Deserialize, Default)]
+#[derive(Serialize, Deserialize, Default, Debug)]
 pub struct LocalState {
     player_a_id: PlayerId,
     player_b_id: PlayerId,
@@ -35,12 +35,12 @@ impl LocalState {
             board: HashMap::new(),
         };
 
-        // both player have a Hand
-        let player_hand = Hand::new(player_id);
-        let opponent_hand = Hand::new(opponent_id);
+        // // both player have a Hand
+        // let player_hand = Hand::new(player_id);
+        // let opponent_hand = Hand::new(opponent_id);
 
-        state.add(player_hand);
-        state.add(opponent_hand);
+        // state.add(player_hand);
+        // state.add(opponent_hand);
 
         // both players have a Hero
         let player_hero = PlayerHero::new(player_id);

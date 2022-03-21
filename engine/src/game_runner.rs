@@ -19,7 +19,11 @@ use protocol::from_client::ClientAction;
 pub trait GameClient: Send + Sync {
     async fn on_turn_start(&mut self, game_state: &GameState);
     // async fn next_action(&mut self, game_state_view: GameStatePlayerView) -> ClientAction;
+
+    // rename to "receive_input"
     async fn next_action(&mut self) -> ClientAction;
+
+    // make "notify"
     async fn make_prompter(&self) -> Box<dyn Prompter>;
     async fn make_notifier(&self) -> Box<dyn ClientNotifier>;
 }
@@ -57,6 +61,7 @@ impl GameRunner {
         let player_b_prompter = self.player_b_handler.make_prompter().await;
 
         let mut dispatcher = EventDispatcher::new(
+            self.player_a_handler.as_mut(),
             player_a_notifier,
             player_a_prompter,
             self.game_state.player_a_id(),

@@ -1,13 +1,19 @@
+#![deny(clippy::all, nonstandard_style, future_incompatible)]
+#![warn(clippy::pedantic)]
+#![allow(
+    clippy::needless_pass_by_value,
+    clippy::unused_self,
+    clippy::cast_lossless
+)]
 use env_logger::Env;
 
-mod connection;
+pub mod connection;
 mod matchmaker;
-pub mod messages;
 mod network_client_notifier;
 mod network_game_client;
 mod network_prompter;
 mod play_game;
-mod websocket_server;
+pub mod websocket_server;
 
 pub type Result<T> = std::result::Result<T, Box<dyn std::error::Error + Send + Sync>>;
 
