@@ -114,9 +114,19 @@ client on very beginning:
 1. Expect FromServer::Hello
 1. Send FromClient::Ready
 1. Expect FromServer::GameStart
-1. Expect (FromServer::TurnStart | FromServer::Notification)
+1. Expect (FromServer::TurnStart:1 | FromServer::Notification:1+)
 
 client on TurnStart:
 loop {
     1. Wait for FromServer::WaitingForAction | Prompt (?) | Notification (?)
+}
+
+client on WaitingForAction:
+1. loop {
+    1. Send Action
+    1. If Action ends turn, break
+    1. loop {
+        1. Wait for WaitingForAction | Notification
+        1. If WaitingForAction, break
+    }
 }

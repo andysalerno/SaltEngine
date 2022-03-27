@@ -59,7 +59,7 @@ async fn handle_connection(
     // Expect a GameStart
     let opponent_id = match connection.recv::<FromServer>().await {
         Some(FromServer::GameStart { opponent_id }) => opponent_id,
-        _ => panic!("unexpected response from server"),
+        other => panic!("Expected GameStart, but saw {other:?}"),
     };
     info!("My opponent's ID is {:?}", opponent_id);
 

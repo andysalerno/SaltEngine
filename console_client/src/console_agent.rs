@@ -5,7 +5,7 @@ use protocol::{
     client_actions::{Attack, EndTurn, SummonCreatureFromHand},
     entities::{BoardPos, PlayerHero, PlayerId, RowId, UnitCardDefinition},
     from_client::ClientAction,
-    from_server::Notification,
+    from_server::{EntityAdded, EntityUpdate, Notification},
 };
 use salt_engine::{
     game_agent::{ClientNotifier, GameClient, Prompter},
@@ -14,8 +14,13 @@ use salt_engine::{
         UnitCardInstancePlayerView,
     },
 };
-use smol::channel::{Receiver, SendError, Sender};
-use std::{collections::VecDeque, sync::Arc};
+use smol::{
+    channel::{Receiver, SendError, Sender},
+    lock::Mutex,
+    LocalExecutor,
+};
+use std::borrow::BorrowMut;
+use std::{borrow::Borrow, collections::VecDeque, sync::Arc};
 use thiserror::Error;
 use websocket_client::local_state::LocalState;
 
@@ -31,17 +36,18 @@ fn user_input_err<T: ToString>(msg: T) -> ConsoleError {
 
 pub struct ConsoleAgent {
     id: PlayerId,
-    local_state: Arc<LocalState>,
+    local_state: Arc<Mutex<LocalState>>,
     notifier: Arc<ConsoleNotifier>,
-    receiver: Receiver<Notification>,
+    receiver: Receiver<Notification>, // not needed?
 }
 
 impl ConsoleAgent {
     pub fn new_with_id(my_id: PlayerId, opponent_id: PlayerId) -> Self {
-        let (notifier, receiver) = ConsoleNotifier::new();
+        let local_state = Arc::new(Mutex::new(LocalState::new(my_id, opponent_id)));
+        let (notifier, receiver) = ConsoleNotifier::new(Arc::clone(&local_state));
         Self {
             id: my_id,
-            local_state: Arc::new(LocalState::new(my_id, opponent_id)),
+            local_state,
             notifier: Arc::new(notifier),
             receiver,
         }
@@ -64,10 +70,13 @@ impl GameClient for ConsoleAgent {
 
     async fn next_action(&mut self) -> ClientAction {
         let prompter = ConsolePrompter::new(self.id());
-        prompter.show_hand(&self.local_state);
+
+        let local_state = self.local_state.lock().await;
+
+        prompter.show_hand(local_state.borrow());
 
         loop {
-            let result = prompter.prompt(&self.local_state);
+            let result = prompter.prompt(local_state.borrow());
 
             match result {
                 Ok(game_event) => break game_event,
@@ -571,27 +580,47 @@ fn retry_until_ok<TOut, TErr>(
 
 struct ConsoleNotifier {
     sender: Sender<Notification>,
+    local_state: Arc<Mutex<LocalState>>,
 }
 
 impl ConsoleNotifier {
-    fn new() -> (Self, Receiver<Notification>) {
+    fn new(local_state: Arc<Mutex<LocalState>>) -> (Self, Receiver<Notification>) {
         let (sender, receiver) = smol::channel::unbounded::<Notification>();
-        (Self { sender }, receiver)
+        (
+            Self {
+                sender,
+                local_state,
+            },
+            receiver,
+        )
     }
 
     async fn send(&self, notification: Notification) -> Result<(), SendError<Notification>> {
         self.sender.send(notification).await
     }
+
+    fn update_entity(entity_update: EntityUpdate, local_state: &mut LocalState) {
+        let mut entity = local_state.find_entity(entity_update.id);
+    }
+
+    fn add_entity(entity_added: EntityAdded, local_state: &mut LocalState) {}
 }
 
 #[async_trait]
 impl ClientNotifier for ConsoleNotifier {
     async fn notify(&self, event: Notification) {
-        info!("Saw client event: {:?}", event);
-        let result = self.send(event).await;
+        info!("Saw client event: {event:?}");
+        // let result = self.send(event).await;
 
-        if let Err(e) = result {
-            error!("Could not notify client: {e:?}");
+        info!("Locking local state...");
+        let mut guard = self.local_state.lock().await;
+        let local_state = guard.borrow_mut();
+        info!("Locked local state.");
+
+        match event {
+            Notification::VisualEvent(e) => info!("Saw visual event: {e:?}"),
+            Notification::EntityUpdate(e) => ConsoleNotifier::update_entity(e, local_state),
+            Notification::EntityAdded(e) => ConsoleNotifier::add_entity(e, local_state),
         }
     }
 }

@@ -40,7 +40,7 @@ impl LocalState {
     }
 
     /// Given an id, return the matching entity.
-    pub fn find_entity<T: EntityId>(&self, id: T) -> &Entity {
+    pub fn find_entity(&self, id: impl AsId) -> &Entity {
         let id = id.as_id();
         self.entities.get(&id).unwrap()
     }
@@ -50,7 +50,7 @@ impl LocalState {
         let id = id.as_id();
         let entity = self.entities.get(&id).unwrap();
 
-        let unpacked: T::EntityType = Self::unpack(entity);
+        let unpacked: T::EntityType = entity.unpack_copy();
 
         unpacked
     }
@@ -60,20 +60,20 @@ impl LocalState {
         let type_id = T::type_id();
         self.entities
             .values()
-            .filter(move |e| e.type_id == type_id)
-            .map(|e| Self::unpack(e))
+            .filter(move |e| e.type_id() == type_id)
+            .map(protocol::entities::Entity::unpack_copy)
     }
 
     #[deprecated]
     pub fn add<T: IsEntity>(&mut self, to_add: T) {
         let entity = to_add.as_entity();
-        self.entities.insert(entity.id, entity);
+        self.entities.insert(entity.id(), entity);
     }
 
     /// Adds a new entity at the given position.
     pub fn add_at<T: IsEntity>(&mut self, to_add: T, position: EntityPosition) {
         let entity = to_add.as_entity();
-        let id = entity.id;
+        let id = entity.id();
         self.entities.insert(id, entity);
 
         let card_id = UnitCardInstanceId::from(id);
@@ -121,13 +121,6 @@ impl LocalState {
         };
 
         player_hand.iter().map(|id| self.find(*id))
-    }
-
-    #[must_use]
-    pub fn unpack<T: IsEntity>(e: &Entity) -> T {
-        let unpacked: T = serde_json::from_str(e.data.as_str()).unwrap();
-
-        unpacked
     }
 
     /// Get a reference to the local state's player a id.

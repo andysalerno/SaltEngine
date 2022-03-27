@@ -1,5 +1,5 @@
 use crate::{
-    entities::{AsId, Entity, EntityPosition, Id, PlayerId},
+    entities::{AsId, Entity, EntityId, EntityPosition, EntityTypeId, Id, PlayerId},
     visual_events::*,
     GameMessage,
 };
@@ -22,6 +22,7 @@ pub enum VisualEvent {
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct EntityUpdate {
     pub id: Id,
+    pub entity_type_id: EntityTypeId,
     pub property_names: Vec<String>,
     pub property_values: Vec<String>,
 }

@@ -57,7 +57,7 @@ impl EventHandler for StartGameEventHandler {
 
         dispatcher
             .notify_players(Notification::EntityAdded(EntityAdded::new(
-                player_a_hero_entity.id,
+                player_a_hero_entity.id(),
                 player_a_hero_entity,
                 player_a_hero_pos,
             )))
@@ -65,7 +65,7 @@ impl EventHandler for StartGameEventHandler {
 
         dispatcher
             .notify_players(Notification::EntityAdded(EntityAdded::new(
-                player_b_hero_entity.id,
+                player_b_hero_entity.id(),
                 player_b_hero_entity,
                 player_b_hero_pos,
             )))
