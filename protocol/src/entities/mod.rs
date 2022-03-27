@@ -127,3 +127,87 @@ impl AsId for EntityTypeId {
         self.0
     }
 }
+
+#[cfg(test)]
+pub mod tests {
+    use super::{AsId, EntityId, EntityTypeId, HasId, Id, IsEntity};
+    use serde::{Deserialize, Serialize};
+
+    #[derive(Serialize, Deserialize)]
+    struct SimpleEntity {
+        id: SimpleEntityId,
+        string: String,
+        int: i32,
+    }
+
+    #[derive(Serialize, Deserialize, Copy, Clone, Debug, PartialEq)]
+    struct SimpleEntityId(Id);
+
+    impl SimpleEntityId {
+        fn new() -> Self {
+            SimpleEntityId(Id::new())
+        }
+    }
+
+    impl AsId for SimpleEntityId {
+        fn as_id(&self) -> Id {
+            self.0
+        }
+    }
+
+    impl EntityId for SimpleEntityId {
+        type EntityType = SimpleEntity;
+    }
+
+    impl HasId for SimpleEntity {
+        type IdType = SimpleEntityId;
+
+        fn id(&self) -> Self::IdType {
+            self.id
+        }
+    }
+
+    impl IsEntity for SimpleEntity {
+        type IdType = SimpleEntityId;
+
+        fn type_id() -> super::EntityTypeId {
+            EntityTypeId::parse_str("d349f9d5-e181-4c0f-b327-cd7afff6ccee")
+        }
+    }
+
+    #[test]
+    pub fn entity_can_serialize_then_deserialize() {
+        let id = SimpleEntityId::new();
+        let entity = SimpleEntity {
+            id,
+            string: "something".into(),
+            int: 42,
+        };
+
+        let e = entity.as_entity();
+
+        let unpacked: SimpleEntity = e.unpack();
+
+        assert_eq!(id, unpacked.id);
+        assert_eq!("something", &unpacked.string);
+        assert_eq!(42, unpacked.int);
+    }
+
+    #[test]
+    pub fn entity_can_update() {
+        let id = SimpleEntityId::new();
+        let entity = SimpleEntity {
+            id,
+            string: "something".into(),
+            int: 42,
+        };
+
+        let mut e = entity.as_entity();
+
+        e.update_property("string", "or other");
+
+        let unpacked: SimpleEntity = e.unpack();
+
+        assert_eq!(&unpacked.string, "or other");
+    }
+}
