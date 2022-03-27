@@ -109,3 +109,14 @@ struct CardLogic<T: Card> {
 impl CardLogic<AngryBulldog> {
     /// impl ...
 }
+
+client on very beginning:
+1. Expect FromServer::Hello
+1. Send FromClient::Ready
+1. Expect FromServer::GameStart
+1. Expect (FromServer::TurnStart | FromServer::Notification)
+
+client on TurnStart:
+loop {
+    1. Wait for FromServer::WaitingForAction | Prompt (?) | Notification (?)
+}

@@ -1,5 +1,5 @@
 use crate::{
-    game_agent::{ClientNotifier, Prompter},
+    game_agent::{ClientNotifier, GameClient, Prompter},
     game_logic::{
         events::{GameEvent, StartGameEvent, TurnStartEvent},
         EventDispatcher,
@@ -9,26 +9,6 @@ use crate::{
 use async_trait::async_trait;
 use log::info;
 use protocol::from_client::ClientAction;
-
-/// A trait that defines the interaction between the GameRunner
-/// and the client.
-/// The GameRunner is the rules engine, and it will use the
-/// GameClient for each player client to alert that client
-/// to events, and to receive input from the player client.
-#[async_trait]
-pub trait GameClient: Send + Sync {
-    async fn on_turn_start(&mut self, game_state: &GameState);
-    // async fn next_action(&mut self, game_state_view: GameStatePlayerView) -> ClientAction;
-
-    // rename to "receive_input"
-    async fn next_action(&mut self) -> ClientAction;
-
-    // make "notify"
-    async fn make_prompter(&self) -> Box<dyn Prompter>;
-    async fn make_notifier(&self) -> Box<dyn ClientNotifier>;
-
-    fn notifier(&self) -> &dyn ClientNotifier;
-}
 
 /// A runner for a game.
 /// Maintains the current `GameState` at any given moment,
@@ -63,9 +43,7 @@ impl GameRunner {
         let player_b_prompter = self.player_b_handler.make_prompter().await;
 
         let mut dispatcher = EventDispatcher::new(
-            self.player_a_handler.as_mut(),
             player_a_notifier,
-            self.player_a_handler.notifier(),
             player_a_prompter,
             self.game_state.player_a_id(),
             player_b_notifier,
@@ -109,10 +87,7 @@ impl GameRunner {
             }
 
             info!("Getting next action from client.");
-            let action = handler_player
-                // .next_action(game_state.player_view(cur_player_id))
-                .next_action()
-                .await;
+            let action = handler_player.next_action().await;
 
             let action: GameEvent = action.into();
 
@@ -130,6 +105,8 @@ impl GameRunner {
 
 #[cfg(test)]
 pub mod tests {
+    use std::sync::Arc;
+
     use protocol::{client_actions::EndTurn, from_client::ClientAction};
 
     use super::*;
@@ -178,16 +155,12 @@ pub mod tests {
                 .expect("No actions left in the queue")
         }
 
-        async fn make_prompter(&self) -> Box<dyn Prompter> {
-            Box::new(MockTestPrompter::new())
+        async fn make_prompter(&self) -> Arc<dyn Prompter> {
+            Arc::new(MockTestPrompter::new())
         }
 
-        async fn make_notifier(&self) -> Box<dyn ClientNotifier> {
-            Box::new(StubNotifier)
-        }
-
-        fn notifier(&self) -> &dyn ClientNotifier {
-            &self.notifier
+        async fn make_notifier(&self) -> Arc<dyn ClientNotifier> {
+            Arc::new(StubNotifier)
         }
     }
 

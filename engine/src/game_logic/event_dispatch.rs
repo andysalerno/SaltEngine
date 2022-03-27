@@ -11,44 +11,36 @@ use super::{
 use crate::{
     game_agent::{ClientNotifier, Prompter},
     game_logic::event_handlers::AddBuffToCardInstanceHandler,
-    game_runner::GameClient,
     game_state::{board::BoardView, GameState, IterAddons},
 };
-use futures::join;
 use log::{debug, info};
-use protocol::{
-    entities::PlayerId,
-    from_server::{Notification, VisualEvent},
-};
+use protocol::{entities::PlayerId, from_server::Notification};
+use std::sync::Arc;
 
 #[derive(Debug)]
-pub struct EventDispatcher<'a> {
+pub struct EventDispatcher {
     stack: Vec<GameEvent>,
-    player_a_notifier: Box<dyn ClientNotifier>,
-    player_a_notifier_z: &'a dyn ClientNotifier,
-    player_a_prompter: Box<dyn Prompter>,
+    player_a_notifier: Arc<dyn ClientNotifier>,
+    player_a_prompter: Arc<dyn Prompter>,
     player_a_id: PlayerId,
-    player_b_notifier: Box<dyn ClientNotifier>,
-    player_b_prompter: Box<dyn Prompter>,
+    player_b_notifier: Arc<dyn ClientNotifier>,
+    player_b_prompter: Arc<dyn Prompter>,
     player_b_id: PlayerId,
 }
 
-impl<'a> EventDispatcher<'a> {
+impl EventDispatcher {
     #[must_use]
     pub fn new(
-        player_a_client: &dyn GameClient,
-        player_a_notifier: Box<dyn ClientNotifier>,
-        player_a_notifier_z: &'a dyn ClientNotifier,
-        player_a_prompter: Box<dyn Prompter>,
+        player_a_notifier: Arc<dyn ClientNotifier>,
+        player_a_prompter: Arc<dyn Prompter>,
         player_a_id: PlayerId,
-        player_b_notifier: Box<dyn ClientNotifier>,
-        player_b_prompter: Box<dyn Prompter>,
+        player_b_notifier: Arc<dyn ClientNotifier>,
+        player_b_prompter: Arc<dyn Prompter>,
         player_b_id: PlayerId,
     ) -> Self {
         Self {
             stack: Vec::new(),
             player_a_notifier,
-            player_a_notifier_z,
             player_a_prompter,
             player_a_id,
             player_b_notifier,
@@ -253,82 +245,11 @@ impl<'a> EventDispatcher<'a> {
 
 #[cfg(test)]
 mod tests {
-    use protocol::entities::PlayerId;
-
     use super::EventDispatcher;
     use crate::game_agent::tests::{MockTestPrompter, StubNotifier};
-    use crate::game_runner::GameClient;
     use crate::game_state::{Deck, GameState};
-
-    struct DummyAgent {}
-
-    impl GameClient for DummyAgent {
-        fn on_turn_start<'life0, 'life1, 'async_trait>(
-            &'life0 mut self,
-            game_state: &'life1 GameState,
-        ) -> core::pin::Pin<
-            Box<dyn core::future::Future<Output = ()> + core::marker::Send + 'async_trait>,
-        >
-        where
-            'life0: 'async_trait,
-            'life1: 'async_trait,
-            Self: 'async_trait,
-        {
-            todo!()
-        }
-
-        fn next_action<'life0, 'async_trait>(
-            &'life0 mut self,
-        ) -> core::pin::Pin<
-            Box<
-                dyn core::future::Future<Output = protocol::from_client::ClientAction>
-                    + core::marker::Send
-                    + 'async_trait,
-            >,
-        >
-        where
-            'life0: 'async_trait,
-            Self: 'async_trait,
-        {
-            todo!()
-        }
-
-        fn make_prompter<'life0, 'async_trait>(
-            &'life0 self,
-        ) -> core::pin::Pin<
-            Box<
-                dyn core::future::Future<Output = Box<dyn crate::game_agent::Prompter>>
-                    + core::marker::Send
-                    + 'async_trait,
-            >,
-        >
-        where
-            'life0: 'async_trait,
-            Self: 'async_trait,
-        {
-            todo!()
-        }
-
-        fn make_notifier<'life0, 'async_trait>(
-            &'life0 self,
-        ) -> core::pin::Pin<
-            Box<
-                dyn core::future::Future<Output = Box<dyn crate::game_agent::ClientNotifier>>
-                    + core::marker::Send
-                    + 'async_trait,
-            >,
-        >
-        where
-            'life0: 'async_trait,
-            Self: 'async_trait,
-        {
-            todo!()
-        }
-
-        fn notifier(&self) -> &dyn crate::game_agent::ClientNotifier {
-            todo!()
-        }
-    }
+    use protocol::entities::PlayerId;
+    use std::sync::Arc;
 
     pub(crate) fn make_test_state() -> GameState {
         let player_a_deck = Deck::new(Vec::new());
@@ -351,16 +272,13 @@ mod tests {
 
     #[test]
     fn dispatcher_uses_stack_ordering() {
-        let prompter_a = Box::new(MockTestPrompter::new());
-        let prompter_b = Box::new(MockTestPrompter::new());
+        let prompter_a = Arc::new(MockTestPrompter::new());
+        let prompter_b = Arc::new(MockTestPrompter::new());
 
-        let notifier_a = Box::new(StubNotifier);
-        let notifier_b = Box::new(StubNotifier);
-
-        let mut dummy = DummyAgent {};
+        let notifier_a = Arc::new(StubNotifier);
+        let notifier_b = Arc::new(StubNotifier);
 
         let _dispatcher = EventDispatcher::new(
-            &dummy,
             notifier_a,
             prompter_a,
             PlayerId::new(),

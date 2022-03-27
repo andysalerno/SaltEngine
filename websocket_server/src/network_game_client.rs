@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use crate::connection::Connection;
 use crate::network_client_notifier::NetworkClientNotifier;
 use crate::network_prompter::NewtorkPrompter;
@@ -6,8 +8,8 @@ use log::info;
 use protocol::entities::PlayerId;
 use protocol::from_client::{ClientAction, FromClient};
 use protocol::from_server::FromServer;
-use salt_engine::game_agent::ClientNotifier;
-use salt_engine::{game_agent::Prompter, game_runner::GameClient, game_state::GameState};
+use salt_engine::game_agent::{ClientNotifier, GameClient};
+use salt_engine::{game_agent::Prompter, game_state::GameState};
 
 pub(crate) struct NetworkGameClient {
     player_id: PlayerId,
@@ -23,10 +25,6 @@ impl NetworkGameClient {
             notifier: NetworkClientNotifier::new(connection),
         }
     }
-
-    pub fn notifier(&self) -> &dyn ClientNotifier {
-        &self.notifier
-    }
 }
 
 #[async_trait]
@@ -40,7 +38,6 @@ impl GameClient for NetworkGameClient {
             .expect("failed to send turnstart");
     }
 
-    // async fn next_action(&mut self, game_state_view: GameStatePlayerView) -> ClientAction {
     async fn next_action(&mut self) -> ClientAction {
         // Awaiting response from the client.
 
@@ -62,11 +59,11 @@ impl GameClient for NetworkGameClient {
         action
     }
 
-    async fn make_prompter(&self) -> Box<dyn Prompter> {
-        Box::new(NewtorkPrompter::new(self.connection.clone()))
+    async fn make_prompter(&self) -> Arc<dyn Prompter> {
+        Arc::new(NewtorkPrompter::new(self.connection.clone()))
     }
 
-    async fn make_notifier(&self) -> Box<dyn ClientNotifier> {
-        Box::new(NetworkClientNotifier::new(self.connection.clone()))
+    async fn make_notifier(&self) -> Arc<dyn ClientNotifier> {
+        Arc::new(NetworkClientNotifier::new(self.connection.clone()))
     }
 }

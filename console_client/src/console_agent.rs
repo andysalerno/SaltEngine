@@ -8,15 +8,14 @@ use protocol::{
     from_server::Notification,
 };
 use salt_engine::{
-    game_agent::{ClientNotifier, Prompter},
-    game_runner::GameClient,
+    game_agent::{ClientNotifier, GameClient, Prompter},
     game_state::{
         board::BoardView, GameStatePlayerView, GameStateView, HandView, IterAddons, IteratorAny,
         UnitCardInstancePlayerView,
     },
 };
-use smol::channel::{SendError, Sender};
-use std::collections::VecDeque;
+use smol::channel::{Receiver, SendError, Sender};
+use std::{collections::VecDeque, sync::Arc};
 use thiserror::Error;
 use websocket_client::local_state::LocalState;
 
@@ -33,13 +32,18 @@ fn user_input_err<T: ToString>(msg: T) -> ConsoleError {
 pub struct ConsoleAgent {
     id: PlayerId,
     local_state: Arc<LocalState>,
+    notifier: Arc<ConsoleNotifier>,
+    receiver: Receiver<Notification>,
 }
 
 impl ConsoleAgent {
     pub fn new_with_id(my_id: PlayerId, opponent_id: PlayerId) -> Self {
+        let (notifier, receiver) = ConsoleNotifier::new();
         Self {
             id: my_id,
             local_state: Arc::new(LocalState::new(my_id, opponent_id)),
+            notifier: Arc::new(notifier),
+            receiver,
         }
     }
 
@@ -50,12 +54,12 @@ impl ConsoleAgent {
 
 #[async_trait]
 impl GameClient for ConsoleAgent {
-    async fn make_prompter(&self) -> Box<dyn Prompter> {
-        Box::new(ConsolePrompter::new(self.id()))
+    async fn make_prompter(&self) -> Arc<dyn Prompter> {
+        Arc::new(ConsolePrompter::new(self.id()))
     }
 
-    async fn make_notifier(&self) -> Box<dyn ClientNotifier> {
-        Box::new(ConsoleNotifier::new())
+    async fn make_notifier(&self) -> Arc<dyn ClientNotifier> {
+        Arc::clone(&self.notifier) as Arc<dyn ClientNotifier>
     }
 
     async fn next_action(&mut self) -> ClientAction {
@@ -232,6 +236,7 @@ impl ConsolePrompter {
         let mut event = None;
 
         while event.is_none() {
+            info!("Current state: {local_state:?}");
             let my_hero = local_state
                 .find_type::<PlayerHero>()
                 .find(|h| h.player_id() == self.id())
@@ -569,9 +574,9 @@ struct ConsoleNotifier {
 }
 
 impl ConsoleNotifier {
-    fn new() -> Self {
-        let (sender, _) = smol::channel::unbounded::<Notification>();
-        Self { sender }
+    fn new() -> (Self, Receiver<Notification>) {
+        let (sender, receiver) = smol::channel::unbounded::<Notification>();
+        (Self { sender }, receiver)
     }
 
     async fn send(&self, notification: Notification) -> Result<(), SendError<Notification>> {

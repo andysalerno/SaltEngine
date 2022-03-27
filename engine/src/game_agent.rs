@@ -1,11 +1,33 @@
+use std::sync::Arc;
+
 use async_trait::async_trait;
 
 #[cfg(test)]
 use mockall::{automock, predicate::str};
 use protocol::{
     entities::BoardPos,
+    from_client::ClientAction,
     from_server::{Notification, VisualEvent},
 };
+
+use crate::game_state::GameState;
+
+/// A trait that defines the interaction between the GameRunner
+/// and the client.
+/// The GameRunner is the rules engine, and it will use the
+/// GameClient for each player client to alert that client
+/// to events, and to receive input from the player client.
+#[async_trait]
+pub trait GameClient: Send + Sync {
+    async fn on_turn_start(&mut self, game_state: &GameState);
+
+    // rename to "receive_input"
+    async fn next_action(&mut self) -> ClientAction;
+
+    // make "notify"
+    async fn make_prompter(&self) -> Arc<dyn Prompter>;
+    async fn make_notifier(&self) -> Arc<dyn ClientNotifier>;
+}
 
 #[cfg_attr(test, automock)]
 pub trait Prompter: Send + Sync {

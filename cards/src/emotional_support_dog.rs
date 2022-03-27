@@ -62,56 +62,56 @@ impl UnitCardDefinition for EmotionalSupportDog {
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use super::EmotionalSupportDog;
-    use crate::{
-        tests::{make_dispatcher, make_test_state},
-        ReallyBigRock,
-    };
-    use protocol::entities::{BoardPos, RowId};
-    use salt_engine::{
-        cards::UnitCardDefinition, game_logic::events::CreatureSetEvent,
-        game_state::board::BoardView,
-    };
+// #[cfg(test)]
+// mod tests {
+//     use super::EmotionalSupportDog;
+//     use crate::{
+//         tests::{make_dispatcher, make_test_state},
+//         ReallyBigRock,
+//     };
+//     use protocol::entities::{BoardPos, RowId};
+//     use salt_engine::{
+//         cards::UnitCardDefinition, game_logic::events::CreatureSetEvent,
+//         game_state::board::BoardView,
+//     };
 
-    #[test]
-    fn when_summoned_expects_provides_buff() {
-        let mut state = make_test_state();
-        let mut dispatcher = make_dispatcher(state.player_a_id(), state.player_b_id());
+//     #[test]
+//     fn when_summoned_expects_provides_buff() {
+//         let mut state = make_test_state();
+//         let mut dispatcher = make_dispatcher(state.player_a_id(), state.player_b_id());
 
-        // Summon the thing that will get buffed.
-        let rock = ReallyBigRock.make_instance();
-        let attack_start = rock.attack();
-        let health_start = rock.health();
-        let buffed_id = rock.id();
-        {
-            state.board_mut().track_pending_card(rock);
-            let summon_at = BoardPos::new(state.player_a_id(), RowId::FrontRow, 3);
-            let summon_doggy_event =
-                CreatureSetEvent::new(state.player_a_id(), buffed_id, summon_at);
-            smol::block_on(async {
-                dispatcher.dispatch(summon_doggy_event, &mut state).await;
-            });
-        }
+//         // Summon the thing that will get buffed.
+//         let rock = ReallyBigRock.make_instance();
+//         let attack_start = rock.attack();
+//         let health_start = rock.health();
+//         let buffed_id = rock.id();
+//         {
+//             state.board_mut().track_pending_card(rock);
+//             let summon_at = BoardPos::new(state.player_a_id(), RowId::FrontRow, 3);
+//             let summon_doggy_event =
+//                 CreatureSetEvent::new(state.player_a_id(), buffed_id, summon_at);
+//             smol::block_on(async {
+//                 dispatcher.dispatch(summon_doggy_event, &mut state).await;
+//             });
+//         }
 
-        {
-            let doggy = EmotionalSupportDog.make_instance();
-            let doggy_id = doggy.id();
-            state.board_mut().track_pending_card(doggy);
-            let summon_at = BoardPos::new(state.player_a_id(), RowId::BackRow, 3);
-            let summon_doggy_event =
-                CreatureSetEvent::new(state.player_a_id(), doggy_id, summon_at);
+//         {
+//             let doggy = EmotionalSupportDog.make_instance();
+//             let doggy_id = doggy.id();
+//             state.board_mut().track_pending_card(doggy);
+//             let summon_at = BoardPos::new(state.player_a_id(), RowId::BackRow, 3);
+//             let summon_doggy_event =
+//                 CreatureSetEvent::new(state.player_a_id(), doggy_id, summon_at);
 
-            smol::block_on(async {
-                dispatcher.dispatch(summon_doggy_event, &mut state).await;
-            });
-        }
+//             smol::block_on(async {
+//                 dispatcher.dispatch(summon_doggy_event, &mut state).await;
+//             });
+//         }
 
-        let rock_updated_attack = state.board().creature_instance(buffed_id).attack();
-        let rock_updated_health = state.board().creature_instance(buffed_id).health();
+//         let rock_updated_attack = state.board().creature_instance(buffed_id).attack();
+//         let rock_updated_health = state.board().creature_instance(buffed_id).health();
 
-        assert_eq!(attack_start + 1, rock_updated_attack);
-        assert_eq!(health_start + 1, rock_updated_health);
-    }
-}
+//         assert_eq!(attack_start + 1, rock_updated_attack);
+//         assert_eq!(health_start + 1, rock_updated_health);
+//     }
+// }

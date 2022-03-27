@@ -17,7 +17,7 @@ use protocol::{
     from_client::FromClient,
     from_server::{FromServer, Notification, PromptMessage},
 };
-use salt_engine::{game_agent::ClientNotifier, game_runner::GameClient};
+use salt_engine::game_agent::{ClientNotifier, GameClient};
 use smol::net::TcpStream;
 use websocket_server::connection::Connection;
 
@@ -41,7 +41,6 @@ async fn handle_connection(
     make_agent: impl FnOnce(PlayerId, PlayerId) -> Box<dyn GameClient>,
 ) -> Result<()> {
     // Expect a Hello
-
     let (my_id, opponent_id) = match connection.recv::<FromServer>().await {
         Some(FromServer::Hello {
             your_id,
@@ -82,16 +81,15 @@ async fn handle_connection(
     }
 }
 
-fn handle_notification(notification: Notification) {}
-
 async fn handle_turn(
     connection: &mut Connection,
-    // agent: &dyn GameAgent,
     agent: &mut dyn GameClient,
     agent_notifier: &dyn ClientNotifier,
 ) -> Result<()> {
     // Continuously receive actions from the client, until they end their turn.
     info!("Server says my turn has started.");
+
+    // Loop for the duration of the turn...
     loop {
         // Wait for signal from server that we can send an action
         let msg = connection
@@ -99,10 +97,13 @@ async fn handle_turn(
             .await
             .expect("failed to get a response from the server");
 
+        // Expect either:
+        // - WaitingForAction => and get input from player
+        // - Prompt => prompt player
+        // - Notification => notify client
         match msg {
             FromServer::WaitingForAction => {
                 info!("Server says: waiting for action.");
-                // let player_action = agent.next_action(state).await;
                 let player_action = agent.next_action().await;
 
                 let is_turn_ending = player_action.is_end_turn();
@@ -114,6 +115,29 @@ async fn handle_turn(
 
                 if is_turn_ending {
                     return Ok(());
+                }
+
+                // Turn is not ending, so wait for server to tell us it wants more input
+                loop {
+                    info!("Waiting for server to respond to our action...");
+                    let from_server = connection
+                        .recv::<FromServer>()
+                        .await
+                        .expect("Expected response after sending our action");
+
+                    match from_server {
+                        FromServer::WaitingForAction => {
+                            info!("Server is done responding, is expecting our next input now.");
+                            break;
+                        }
+                        FromServer::Notification(notification) => {
+                            agent_notifier.notify(notification).await;
+                        }
+                        _ => panic!(
+                            "Expected WaitingForAction or Notification from server, but saw {:?}",
+                            from_server
+                        ),
+                    }
                 }
             }
             FromServer::Prompt(prompt_msg) => {
@@ -136,7 +160,10 @@ async fn handle_turn(
                     .await?;
             }
             FromServer::Notification(notification) => agent_notifier.notify(notification).await,
-            _ => panic!("Unexpected message from server: {:?}", msg),
+            _ => panic!(
+                "Expected WaitingForAction, Prompt, or Notification from server, but saw: {:?}",
+                msg
+            ),
         }
     }
 }

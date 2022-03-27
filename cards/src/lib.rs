@@ -38,6 +38,8 @@ pub use sleeping_dog::SleepingDog;
 
 #[cfg(test)]
 mod tests {
+    use std::sync::Arc;
+
     use async_trait::async_trait;
     use mockall::mock;
     use protocol::{
@@ -93,20 +95,20 @@ mod tests {
         state
     }
 
-    pub fn make_dispatcher(player_a_id: PlayerId, player_b_id: PlayerId) -> EventDispatcher {
-        let notifier_a = Box::new(TestClientNotifier);
-        let notifier_b = Box::new(TestClientNotifier);
+    // pub fn make_dispatcher(player_a_id: PlayerId, player_b_id: PlayerId) -> EventDispatcher {
+    //     let notifier_a = Arc::new(TestClientNotifier);
+    //     let notifier_b = Arc::new(TestClientNotifier);
 
-        let prompter_a = Box::new(MockTestPrompter::new());
-        let prompter_b = Box::new(MockTestPrompter::new());
+    //     let prompter_a = Arc::new(MockTestPrompter::new());
+    //     let prompter_b = Arc::new(MockTestPrompter::new());
 
-        EventDispatcher::new(
-            notifier_a,
-            prompter_a,
-            player_a_id,
-            notifier_b,
-            prompter_b,
-            player_b_id,
-        )
-    }
+    //     EventDispatcher::new(
+    //         notifier_a,
+    //         prompter_a,
+    //         player_a_id,
+    //         notifier_b,
+    //         prompter_b,
+    //         player_b_id,
+    //     )
+    // }
 }

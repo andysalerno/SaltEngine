@@ -8,7 +8,7 @@ use std::collections::HashMap;
 /// A struct that represents the client-side state of the game.
 /// This struct keeps track of all entities.
 /// Entities are indexed by both id and position within the game world.
-#[derive(Serialize, Deserialize, Default)]
+#[derive(Debug, Serialize, Deserialize, Default)]
 pub struct LocalState {
     player_a_id: PlayerId,
     player_b_id: PlayerId,
