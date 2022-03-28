@@ -9,6 +9,8 @@ mod player;
 mod unit_card_definition;
 mod unit_card_instance_view;
 
+use std::any::Any;
+
 pub use board::*;
 pub use buff::*;
 pub use hand::*;
@@ -28,13 +30,17 @@ pub trait IsEntity: HasId + Serialize + DeserializeOwned + 'static {
     type IdType: EntityId;
 
     fn type_id() -> EntityTypeId;
+}
 
-    /// Creates an `Entity` representation of this object.
-    fn as_entity(&self) -> Entity {
+impl<T> From<T> for Entity
+where
+    T: IsEntity,
+{
+    fn from(entity_type: T) -> Self {
         Entity {
-            id: self.id().as_id(),
-            type_id: Self::type_id(),
-            data: serde_json::to_value(self).unwrap(),
+            id: entity_type.id().as_id(),
+            type_id: T::type_id(),
+            data: serde_json::to_value(entity_type).unwrap(),
         }
     }
 }
@@ -45,6 +51,12 @@ pub struct Entity {
     type_id: EntityTypeId,
     data: serde_json::Value,
 }
+
+// impl AsEntity for Entity {
+//     fn as_entity(&self) -> Entity {
+//         self.clone()
+//     }
+// }
 
 impl Entity {
     pub fn as_json(&self) -> String {
@@ -130,6 +142,8 @@ impl AsId for EntityTypeId {
 
 #[cfg(test)]
 pub mod tests {
+    use crate::entities::Entity;
+
     use super::{AsId, EntityId, EntityTypeId, HasId, Id, IsEntity};
     use serde::{Deserialize, Serialize};
 
@@ -186,7 +200,7 @@ pub mod tests {
             nested_entity: None,
         };
 
-        let e = entity.as_entity();
+        let e: Entity = entity.into();
 
         let unpacked: SimpleEntity = e.unpack();
 
@@ -211,7 +225,7 @@ pub mod tests {
             })),
         };
 
-        let e = entity.as_entity();
+        let e: Entity = entity.into();
 
         let unpacked: SimpleEntity = e.unpack();
 
@@ -233,7 +247,7 @@ pub mod tests {
             nested_entity: None,
         };
 
-        let mut e = entity.as_entity();
+        let mut e: Entity = entity.into();
 
         e.update_property("string", "or other");
 
@@ -252,7 +266,7 @@ pub mod tests {
             nested_entity: None,
         };
 
-        let mut e = entity.as_entity();
+        let mut e: Entity = entity.into();
 
         e.update_property("int", 99);
 

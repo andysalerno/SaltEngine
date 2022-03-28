@@ -603,7 +603,9 @@ impl ConsoleNotifier {
         let mut entity = local_state.find_entity(entity_update.id);
     }
 
-    fn add_entity(entity_added: EntityAdded, local_state: &mut LocalState) {}
+    fn add_entity(entity_added: EntityAdded, local_state: &mut LocalState) {
+        local_state.add_at(entity_added.entity, entity_added.position);
+    }
 }
 
 #[async_trait]

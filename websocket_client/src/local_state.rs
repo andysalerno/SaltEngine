@@ -66,13 +66,13 @@ impl LocalState {
 
     #[deprecated]
     pub fn add<T: IsEntity>(&mut self, to_add: T) {
-        let entity = to_add.as_entity();
+        let entity: Entity = to_add.into();
         self.entities.insert(entity.id(), entity);
     }
 
     /// Adds a new entity at the given position.
-    pub fn add_at<T: IsEntity>(&mut self, to_add: T, position: EntityPosition) {
-        let entity = to_add.as_entity();
+    pub fn add_at(&mut self, to_add: impl Into<Entity>, position: EntityPosition) {
+        let entity: Entity = to_add.into();
         let id = entity.id();
         self.entities.insert(id, entity);
 
@@ -93,7 +93,7 @@ impl LocalState {
     /// Updates the existing entity (found by matching id) by replacing it with `to_update`.
     pub fn update<T: IsEntity>(&mut self, to_update: T) {
         let found = self.entities.get_mut(&to_update.id().as_id()).unwrap();
-        *found = to_update.as_entity();
+        *found = to_update.into();
     }
 
     #[must_use]

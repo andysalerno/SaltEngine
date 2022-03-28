@@ -201,7 +201,7 @@ impl UnitCardInstance {
         let protocol_instance =
             protocol::entities::UnitCardInstance::new(self.id(), definition, Vec::new(), None);
 
-        protocol_instance.as_entity()
+        protocol_instance.into()
     }
 }
 
