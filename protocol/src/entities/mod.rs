@@ -51,7 +51,7 @@ impl Entity {
         self.data.to_string()
     }
 
-    pub fn update_property(&mut self, property_name: &str, next_value: &str) {
+    pub fn update_property(&mut self, property_name: &str, next_value: impl Serialize) {
         let got = self
             .data
             .get_mut(property_name)
@@ -138,6 +138,7 @@ pub mod tests {
         id: SimpleEntityId,
         string: String,
         int: i32,
+        nested_entity: Option<Box<SimpleEntity>>,
     }
 
     #[derive(Serialize, Deserialize, Copy, Clone, Debug, PartialEq)]
@@ -182,6 +183,7 @@ pub mod tests {
             id,
             string: "something".into(),
             int: 42,
+            nested_entity: None,
         };
 
         let e = entity.as_entity();
@@ -194,12 +196,41 @@ pub mod tests {
     }
 
     #[test]
-    pub fn entity_can_update() {
+    pub fn entity_can_serialize_then_deserialize_nested() {
+        let id = SimpleEntityId::new();
+        let nested_id = SimpleEntityId::new();
+        let entity = SimpleEntity {
+            id,
+            string: "something".into(),
+            int: 42,
+            nested_entity: Some(Box::new(SimpleEntity {
+                id: nested_id,
+                string: "nested_string".into(),
+                int: 43,
+                nested_entity: None,
+            })),
+        };
+
+        let e = entity.as_entity();
+
+        let unpacked: SimpleEntity = e.unpack();
+
+        assert_eq!(nested_id, unpacked.nested_entity.as_ref().unwrap().id());
+        assert_eq!(
+            "nested_string",
+            unpacked.nested_entity.unwrap().as_ref().string
+        );
+        assert_eq!(42, unpacked.int);
+    }
+
+    #[test]
+    pub fn entity_can_update_string() {
         let id = SimpleEntityId::new();
         let entity = SimpleEntity {
             id,
             string: "something".into(),
             int: 42,
+            nested_entity: None,
         };
 
         let mut e = entity.as_entity();
@@ -210,4 +241,45 @@ pub mod tests {
 
         assert_eq!(&unpacked.string, "or other");
     }
+
+    #[test]
+    pub fn entity_can_update_i32() {
+        let id = SimpleEntityId::new();
+        let entity = SimpleEntity {
+            id,
+            string: "something".into(),
+            int: 42,
+            nested_entity: None,
+        };
+
+        let mut e = entity.as_entity();
+
+        e.update_property("int", 99);
+
+        let unpacked: SimpleEntity = e.unpack();
+
+        assert_eq!(unpacked.int, 99);
+    }
+
+    // #[test]
+    // pub fn entity_can_update_nested() {
+    //     let id = SimpleEntityId::new();
+    //     let entity = SimpleEntity {
+    //         id,
+    //         string: "something".into(),
+    //         int: 42,
+    //         nested_entity: Some(Box::new(SimpleEntity {
+    //             id: SimpleEntityId::new(),
+    //             string: "nested_string".into(),
+    //             int: 99,
+    //             nested_entity: None,
+    //         })),
+    //     };
+
+    //     let mut e = entity.as_entity();
+
+    //     let unpacked: SimpleEntity = e.unpack();
+
+    //     assert_eq!(&unpacked.string, "or other");
+    // }
 }
