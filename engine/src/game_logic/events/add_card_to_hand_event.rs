@@ -1,17 +1,17 @@
 use super::{Event, VisualEvent};
 use crate::game_state::{GameState, MakePlayerView, UnitCardInstancePlayerView};
-use protocol::entities::{PlayerId, UnitCardInstanceId};
+use protocol::entities::{CreatureInstanceId, PlayerId};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug)]
 pub struct AddCardToHandEvent {
     player_id: PlayerId,
-    card_id: UnitCardInstanceId,
+    card_id: CreatureInstanceId,
 }
 
 impl AddCardToHandEvent {
     #[must_use]
-    pub fn new(player_id: PlayerId, card_id: UnitCardInstanceId) -> Self {
+    pub fn new(player_id: PlayerId, card_id: CreatureInstanceId) -> Self {
         Self { player_id, card_id }
     }
 
@@ -21,7 +21,7 @@ impl AddCardToHandEvent {
     }
 
     #[must_use]
-    pub fn card_id(&self) -> UnitCardInstanceId {
+    pub fn card_id(&self) -> CreatureInstanceId {
         self.card_id
     }
 }
@@ -56,6 +56,6 @@ impl Event for AddCardToHandEvent {
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct AddCardToHandClientEvent {
     pub player_id: PlayerId,
-    pub card_id: UnitCardInstanceId,
+    pub card_id: CreatureInstanceId,
     pub card: Option<UnitCardInstancePlayerView>,
 }

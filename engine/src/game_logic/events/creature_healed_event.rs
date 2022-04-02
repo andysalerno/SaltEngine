@@ -1,16 +1,16 @@
-use protocol::entities::UnitCardInstanceId;
+use protocol::entities::CreatureInstanceId;
 
 use super::Event;
 
 #[derive(Debug, Clone)]
 pub struct CreatureHealedEvent {
-    creature_id: UnitCardInstanceId,
+    creature_id: CreatureInstanceId,
     heal_amount: usize,
 }
 
 impl CreatureHealedEvent {
     #[must_use]
-    pub fn new(creature_id: UnitCardInstanceId, heal_amount: usize) -> Self {
+    pub fn new(creature_id: CreatureInstanceId, heal_amount: usize) -> Self {
         Self {
             creature_id,
             heal_amount,
@@ -18,7 +18,7 @@ impl CreatureHealedEvent {
     }
 
     #[must_use]
-    pub fn creature_id(&self) -> UnitCardInstanceId {
+    pub fn creature_id(&self) -> CreatureInstanceId {
         self.creature_id
     }
 

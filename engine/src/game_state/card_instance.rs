@@ -4,7 +4,7 @@ use crate::game_logic::{
 };
 use crate::game_logic::{Buff, BuffView, PassiveEffectView};
 use protocol::entities::{
-    BoardPos, BuffInstanceId, Entity, EntityPosition, IsEntity, UnitCardInstanceId,
+    BoardPos, BuffInstanceId, CreatureInstanceId, Entity, EntityPosition, IsEntity,
 };
 use serde::{Deserialize, Serialize};
 use std::borrow::Borrow;
@@ -27,7 +27,7 @@ pub trait UnitCardInstanceView<'a> {
     fn passive_effect(&self) -> Option<&Self::PassiveEffect>;
 
     /// Gets the identifier for this instance.
-    fn id(&self) -> UnitCardInstanceId;
+    fn id(&self) -> CreatureInstanceId;
 
     /// The current attack of this instance.
     fn attack(&self) -> i32;
@@ -48,7 +48,7 @@ pub struct UnitCardInstance {
     definition: Box<dyn UnitCardDefinition>,
     buffs: Vec<Box<dyn Buff>>,
     passive_effect: Option<PassiveEffectInstance>,
-    id: UnitCardInstanceId,
+    id: CreatureInstanceId,
     attack: i32,
     health: i32,
     width: usize,
@@ -72,7 +72,7 @@ impl<'a> UnitCardInstanceView<'a> for UnitCardInstance {
         self.passive_effect.as_ref()
     }
 
-    fn id(&self) -> UnitCardInstanceId {
+    fn id(&self) -> CreatureInstanceId {
         self.id()
     }
 
@@ -96,7 +96,7 @@ impl<'a> UnitCardInstanceView<'a> for UnitCardInstance {
 impl UnitCardInstance {
     #[must_use]
     pub fn new(definition: Box<dyn UnitCardDefinition>) -> Self {
-        let id = UnitCardInstanceId::new();
+        let id = CreatureInstanceId::new();
 
         let passive_effect = definition
             .passive_effect()
@@ -171,7 +171,7 @@ impl UnitCardInstance {
     }
 
     #[must_use]
-    pub fn id(&self) -> UnitCardInstanceId {
+    pub fn id(&self) -> CreatureInstanceId {
         self.id
     }
 
@@ -199,7 +199,7 @@ impl UnitCardInstance {
         };
 
         let protocol_instance =
-            protocol::entities::UnitCardInstance::new(self.id(), definition, Vec::new(), None);
+            protocol::entities::CreatureInstance::new(self.id(), definition, Vec::new(), None);
 
         protocol_instance.into()
     }
@@ -208,11 +208,11 @@ impl UnitCardInstance {
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub enum InstanceState {
     Pos(BoardPos),
-    CreatureInstanceId(UnitCardInstanceId),
+    CreatureInstanceId(CreatureInstanceId),
 }
 
 mod player_view {
-    use super::{InstanceState, UnitCardInstance, UnitCardInstanceId, UnitCardInstanceView};
+    use super::{CreatureInstanceId, InstanceState, UnitCardInstance, UnitCardInstanceView};
     use crate::{
         cards::player_view::UnitCardDefinitionPlayerView,
         game_logic::PassiveEffectInstancePlayerView,
@@ -226,7 +226,7 @@ mod player_view {
         definition: UnitCardDefinitionPlayerView,
         buffs: Vec<BuffPlayerView>,
         passive_effect: Option<PassiveEffectInstancePlayerView>,
-        id: UnitCardInstanceId,
+        id: CreatureInstanceId,
         attack: i32,
         health: i32,
         width: usize,
@@ -235,7 +235,7 @@ mod player_view {
 
     impl UnitCardInstancePlayerView {
         #[must_use]
-        pub fn id(&self) -> UnitCardInstanceId {
+        pub fn id(&self) -> CreatureInstanceId {
             self.id
         }
 
@@ -337,7 +337,7 @@ mod player_view {
             UnitCardInstancePlayerView::passive_effect(self)
         }
 
-        fn id(&self) -> UnitCardInstanceId {
+        fn id(&self) -> CreatureInstanceId {
             UnitCardInstancePlayerView::id(self)
         }
 

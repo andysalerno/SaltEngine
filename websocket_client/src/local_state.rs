@@ -1,6 +1,6 @@
 use protocol::entities::{
-    AsId, BoardPos, Entity, EntityId, EntityPosition, Hand, Id, IsEntity, PlayerHero, PlayerId,
-    UnitCardInstance, UnitCardInstanceId,
+    AsId, BoardPos, CreatureInstance, CreatureInstanceId, Entity, EntityId, EntityPosition, Hand,
+    Id, IsEntity, PlayerHero, PlayerId,
 };
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
@@ -17,13 +17,13 @@ pub struct LocalState {
     entities: HashMap<Id, Entity>,
 
     /// The entities in the hand for player_a.
-    player_a_hand: Vec<UnitCardInstanceId>,
+    player_a_hand: Vec<CreatureInstanceId>,
 
     /// The entities in the hand for player_b.
-    player_b_hand: Vec<UnitCardInstanceId>,
+    player_b_hand: Vec<CreatureInstanceId>,
 
     /// All entities, mapped by their location.
-    positions: HashMap<EntityPosition, UnitCardInstanceId>,
+    positions: HashMap<EntityPosition, CreatureInstanceId>,
 }
 
 impl LocalState {
@@ -76,7 +76,7 @@ impl LocalState {
         let id = entity.id();
         self.entities.insert(id, entity);
 
-        let card_id = UnitCardInstanceId::from(id);
+        let card_id = CreatureInstanceId::from(id);
         self.positions.insert(position, card_id);
 
         if let EntityPosition::Hand(player_id) = position {
@@ -111,7 +111,7 @@ impl LocalState {
     pub fn cards_in_player_hand(
         &self,
         player_id: PlayerId,
-    ) -> impl Iterator<Item = UnitCardInstance> + '_ {
+    ) -> impl Iterator<Item = CreatureInstance> + '_ {
         let player_hand = if player_id == self.player_a_id {
             &self.player_a_hand
         } else if player_id == self.player_b_id {
@@ -150,8 +150,8 @@ impl LocalState {
 mod test {
     use super::LocalState;
     use protocol::entities::{
-        BuffInstanceId, BuffPlayerView, BuffSourceId, EntityPosition, Hand, HandId, HasId, Id,
-        PlayerId, UnitCardDefinition, UnitCardInstance, UnitCardInstanceId,
+        BuffInstanceId, BuffPlayerView, BuffSourceId, CreatureInstance, CreatureInstanceId,
+        EntityPosition, Hand, HandId, HasId, Id, PlayerId, UnitCardDefinition,
     };
 
     #[test]
@@ -370,22 +370,22 @@ mod test {
 
         // Add a few cards to player 1's hand
         {
-            let card_1 = UnitCardInstance::new(
-                UnitCardInstanceId::new(),
+            let card_1 = CreatureInstance::new(
+                CreatureInstanceId::new(),
                 UnitCardDefinition::new("hello"),
                 Vec::new(),
                 None,
             );
 
-            let card_2 = UnitCardInstance::new(
-                UnitCardInstanceId::new(),
+            let card_2 = CreatureInstance::new(
+                CreatureInstanceId::new(),
                 UnitCardDefinition::new("hello"),
                 Vec::new(),
                 None,
             );
 
-            let card_3 = UnitCardInstance::new(
-                UnitCardInstanceId::new(),
+            let card_3 = CreatureInstance::new(
+                CreatureInstanceId::new(),
                 UnitCardDefinition::new("hello"),
                 Vec::new(),
                 None,

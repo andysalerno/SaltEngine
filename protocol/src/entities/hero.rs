@@ -19,17 +19,14 @@ impl PlayerHero {
         }
     }
 
-    /// Get a reference to the player hero's player id.
     pub fn player_id(&self) -> PlayerId {
         self.player_id
     }
 
-    /// Get a reference to the player hero's mana limit.
     pub fn mana_limit(&self) -> u32 {
         self.mana_limit
     }
 
-    /// Get a reference to the player hero's mana available.
     pub fn mana_available(&self) -> u32 {
         self.mana_available
     }

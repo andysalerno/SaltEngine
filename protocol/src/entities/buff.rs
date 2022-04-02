@@ -31,7 +31,7 @@ impl IsEntity for BuffPlayerView {
 }
 
 mod id {
-    use crate::entities::{AsId, EntityId, Id, PassiveEffectInstanceId, UnitCardInstanceId};
+    use crate::entities::{AsId, CreatureInstanceId, EntityId, Id, PassiveEffectInstanceId};
     use serde::{Deserialize, Serialize};
 
     use super::BuffPlayerView;
@@ -39,7 +39,7 @@ mod id {
     #[derive(Debug, Copy, Clone, PartialEq, Serialize, Deserialize)]
     pub enum BuffSourceId {
         Passive(PassiveEffectInstanceId),
-        CreatureInstance(UnitCardInstanceId),
+        CreatureInstance(CreatureInstanceId),
         Other(Id),
     }
 
@@ -56,8 +56,8 @@ mod id {
         type EntityType = BuffPlayerView;
     }
 
-    impl From<UnitCardInstanceId> for BuffSourceId {
-        fn from(id: UnitCardInstanceId) -> Self {
+    impl From<CreatureInstanceId> for BuffSourceId {
+        fn from(id: CreatureInstanceId) -> Self {
             BuffSourceId::CreatureInstance(id)
         }
     }

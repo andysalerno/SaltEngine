@@ -8,25 +8,23 @@ use serde::{Deserialize, Serialize};
 
 /// A view of a creature card instance.
 #[derive(Debug, Serialize, Clone, Deserialize)]
-pub struct UnitCardInstance {
-    //position: EntityPosition,
+pub struct CreatureInstance {
     definition: UnitCardDefinition,
     buffs: Vec<BuffPlayerView>,
     passive_effect: Option<PassiveEffectInstancePlayerView>,
-    id: UnitCardInstanceId,
+    id: CreatureInstanceId,
     attack: i32,
     health: i32,
     width: usize,
     state: Option<InstanceState>,
 }
 
-impl UnitCardInstance {
+impl CreatureInstance {
     pub fn new(
-        id: UnitCardInstanceId,
+        id: CreatureInstanceId,
         definition: UnitCardDefinition,
         buffs: Vec<BuffPlayerView>,
         passive_effect: Option<PassiveEffectInstancePlayerView>,
-        //position: EntityPosition,
     ) -> Self {
         let width = definition.row_width;
         let attack = definition.attack;
@@ -41,7 +39,6 @@ impl UnitCardInstance {
             health,
             width,
             state: None,
-            //osition,
         }
     }
 
@@ -51,16 +48,16 @@ impl UnitCardInstance {
     }
 }
 
-impl HasId for UnitCardInstance {
-    type IdType = UnitCardInstanceId;
+impl HasId for CreatureInstance {
+    type IdType = CreatureInstanceId;
 
     fn id(&self) -> Self::IdType {
         self.id
     }
 }
 
-impl IsEntity for UnitCardInstance {
-    type IdType = UnitCardInstanceId;
+impl IsEntity for CreatureInstance {
+    type IdType = CreatureInstanceId;
 
     fn type_id() -> EntityTypeId {
         EntityTypeId::parse_str("896a090e-9efd-4cf1-aece-52fb7bb47344")
@@ -70,7 +67,7 @@ impl IsEntity for UnitCardInstance {
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub enum InstanceState {
     Pos(BoardPos),
-    CreatureInstanceId(UnitCardInstanceId),
+    CreatureInstanceId(CreatureInstanceId),
 }
 
 mod id {
@@ -79,12 +76,12 @@ mod id {
     use crate::entities::{AsId, EntityId, Id};
     use serde::{Deserialize, Serialize};
 
-    use super::UnitCardInstance;
+    use super::CreatureInstance;
 
     #[derive(Debug, Copy, Clone, PartialEq, Serialize, Deserialize, Eq, Hash)]
-    pub struct UnitCardInstanceId(Id);
+    pub struct CreatureInstanceId(Id);
 
-    impl UnitCardInstanceId {
+    impl CreatureInstanceId {
         #[must_use]
         pub fn new() -> Self {
             Self(Id::new())
@@ -96,29 +93,29 @@ mod id {
         }
     }
 
-    impl From<Id> for UnitCardInstanceId {
+    impl From<Id> for CreatureInstanceId {
         fn from(id: Id) -> Self {
-            UnitCardInstanceId(id)
+            CreatureInstanceId(id)
         }
     }
 
-    impl AsId for UnitCardInstanceId {
+    impl AsId for CreatureInstanceId {
         fn as_id(&self) -> Id {
             self.0
         }
     }
 
-    impl EntityId for UnitCardInstanceId {
-        type EntityType = UnitCardInstance;
+    impl EntityId for CreatureInstanceId {
+        type EntityType = CreatureInstance;
     }
 
-    impl Default for UnitCardInstanceId {
+    impl Default for CreatureInstanceId {
         fn default() -> Self {
             Self::new()
         }
     }
 
-    impl Display for UnitCardInstanceId {
+    impl Display for CreatureInstanceId {
         fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
             use std::fmt::Debug;
             self.0.fmt(f)

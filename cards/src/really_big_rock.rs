@@ -1,5 +1,5 @@
 use async_trait::async_trait;
-use protocol::entities::{BoardPos, Id, Position, RowId, UnitCardInstanceId};
+use protocol::entities::{BoardPos, CreatureInstanceId, Id, Position, RowId};
 use salt_engine::{
     cards::{actions::UponDeathAction, CardDefinition, UnitCardDefinition},
     game_logic::{events::PosTakesDamageEvent, EventDispatcher},
@@ -67,7 +67,7 @@ struct DeathAction;
 impl UponDeathAction for DeathAction {
     async fn action(
         &self,
-        instance_id: UnitCardInstanceId,
+        instance_id: CreatureInstanceId,
         died_at_pos: BoardPos,
         state: &mut GameState,
         dispatcher: &mut EventDispatcher,

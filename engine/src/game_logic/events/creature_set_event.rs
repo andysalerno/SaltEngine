@@ -1,5 +1,5 @@
 use crate::game_state::{GameState, MakePlayerView, UnitCardInstancePlayerView};
-use protocol::entities::{BoardPos, PlayerId, UnitCardInstanceId};
+use protocol::entities::{BoardPos, CreatureInstanceId, PlayerId};
 use serde::{Deserialize, Serialize};
 
 use super::{Event, VisualEvent};
@@ -7,7 +7,7 @@ use super::{Event, VisualEvent};
 #[derive(Debug)]
 pub struct CreatureSetEvent {
     player_id: PlayerId,
-    card_id: UnitCardInstanceId,
+    card_id: CreatureInstanceId,
     target_position: BoardPos,
 }
 
@@ -15,7 +15,7 @@ impl CreatureSetEvent {
     #[must_use]
     pub fn new(
         player_id: PlayerId,
-        card_id: UnitCardInstanceId,
+        card_id: CreatureInstanceId,
         target_position: BoardPos,
     ) -> Self {
         Self {
@@ -31,7 +31,7 @@ impl CreatureSetEvent {
     }
 
     #[must_use]
-    pub fn card_id(&self) -> UnitCardInstanceId {
+    pub fn card_id(&self) -> CreatureInstanceId {
         self.card_id
     }
 
@@ -44,7 +44,7 @@ impl CreatureSetEvent {
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct CreatureSetClientEvent {
     pub player_id: PlayerId,
-    pub card_id: UnitCardInstanceId,
+    pub card_id: CreatureInstanceId,
     pub pos: BoardPos,
     pub card: UnitCardInstancePlayerView,
 }

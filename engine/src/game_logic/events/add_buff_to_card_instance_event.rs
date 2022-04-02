@@ -1,17 +1,17 @@
 use super::Event;
 use crate::game_logic::buff::BuiltBuff;
-use protocol::entities::UnitCardInstanceId;
+use protocol::entities::CreatureInstanceId;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct AddBuffToCardInstanceEvent {
     buff: BuiltBuff,
-    recipient_id: UnitCardInstanceId,
+    recipient_id: CreatureInstanceId,
 }
 
 impl AddBuffToCardInstanceEvent {
     #[must_use]
-    pub fn new(buff: BuiltBuff, recipient_id: UnitCardInstanceId) -> Self {
+    pub fn new(buff: BuiltBuff, recipient_id: CreatureInstanceId) -> Self {
         Self { buff, recipient_id }
     }
 
@@ -21,7 +21,7 @@ impl AddBuffToCardInstanceEvent {
     }
 
     #[must_use]
-    pub fn recipient(&self) -> UnitCardInstanceId {
+    pub fn recipient(&self) -> CreatureInstanceId {
         self.recipient_id
     }
 }

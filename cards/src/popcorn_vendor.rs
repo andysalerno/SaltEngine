@@ -1,6 +1,6 @@
 use async_trait::async_trait;
 use protocol::entities::{
-    BoardPos, Id, PassiveEffectInstanceId, Position, RowId, UnitCardInstanceId,
+    BoardPos, CreatureInstanceId, Id, PassiveEffectInstanceId, Position, RowId,
 };
 use salt_engine::{
     cards::{actions::UponSummonAction, CardDefinition, UnitCardDefinition},
@@ -80,7 +80,7 @@ struct SummonAction;
 impl UponSummonAction for SummonAction {
     async fn action(
         &self,
-        card_id: UnitCardInstanceId,
+        card_id: CreatureInstanceId,
         pos: BoardPos,
         game_state: &mut GameState,
         dispatcher: &mut EventDispatcher,

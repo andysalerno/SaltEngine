@@ -1,7 +1,5 @@
-use protocol::entities::Position;
-
-use super::UnitCardInstance;
 use crate::game_logic::cards::{CardDefinition, UnitCardDefinition};
+use protocol::entities::Position;
 
 #[derive(Debug)]
 pub struct HeroDefinition;
@@ -43,8 +41,4 @@ impl UnitCardDefinition for HeroDefinition {
         // so this abstraction is wrong
         Position::Back
     }
-}
-
-pub fn make_hero_instance() -> UnitCardInstance {
-    HeroDefinition.make_instance()
 }

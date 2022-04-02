@@ -4,7 +4,7 @@ use super::{
     MakePlayerView, PlayerId, UnitCardInstancePlayerView,
 };
 use crate::cards::UnitCardDefinition;
-use protocol::entities::{BoardPos, RowId, UnitCardInstanceId};
+use protocol::entities::{BoardPos, CreatureInstanceId, RowId};
 use serde::{Deserialize, Serialize};
 use std::{collections::HashMap, fmt::Debug};
 
@@ -157,7 +157,7 @@ pub trait BoardView<'a> {
 
     /// A slice starting at the slot where the creature instance exists,
     /// and including all subsequent slots it occupies (if the creature has a Width of more than 1 slot).
-    fn slots_with_creature(&self, id: UnitCardInstanceId) -> &[<Self as BoardView<'a>>::SlotView] {
+    fn slots_with_creature(&self, id: CreatureInstanceId) -> &[<Self as BoardView<'a>>::SlotView] {
         let (start_index, slot) = self
             .slots_iter()
             .enumerate()
@@ -169,7 +169,7 @@ pub trait BoardView<'a> {
         &self.slots()[start_index..start_index + creature_width]
     }
 
-    fn slot_with_creature(&'a self, id: UnitCardInstanceId) -> &<Self as BoardView<'a>>::SlotView {
+    fn slot_with_creature(&'a self, id: CreatureInstanceId) -> &<Self as BoardView<'a>>::SlotView {
         if self.player_a_hero().maybe_creature().unwrap().id() == id {
             self.player_a_hero()
         } else if self.player_b_hero().maybe_creature().unwrap().id() == id {
@@ -187,13 +187,13 @@ pub trait BoardView<'a> {
             .expect("The position was not a valid board slot.")
     }
 
-    fn pos_with_creature(&'a self, id: UnitCardInstanceId) -> BoardPos {
+    fn pos_with_creature(&'a self, id: CreatureInstanceId) -> BoardPos {
         self.slot_with_creature(id).pos()
     }
 
     fn creature_instance(
         &'a self,
-        id: UnitCardInstanceId,
+        id: CreatureInstanceId,
     ) -> &<<Self as BoardView<'a>>::SlotView as BoardSlotView<'a>>::CardInstanceView {
         self.slot_with_creature(id).maybe_creature().unwrap()
     }
@@ -292,7 +292,7 @@ impl<'a> BoardView<'a> for Board {
 
 #[derive(Debug)]
 pub struct Board {
-    arena: HashMap<UnitCardInstanceId, UnitCardInstance>,
+    arena: HashMap<CreatureInstanceId, UnitCardInstance>,
     player_a_id: PlayerId,
     player_a_hero_slot: BoardSlot,
     player_b_hero_slot: BoardSlot,
@@ -380,7 +380,7 @@ impl Board {
 
     pub fn take_tracked_pending_card(
         &mut self,
-        id: UnitCardInstanceId,
+        id: CreatureInstanceId,
     ) -> Option<UnitCardInstance> {
         self.tracked_pending_cards
             .iter()
@@ -419,7 +419,7 @@ impl Board {
         &mut self.slots[range]
     }
 
-    pub fn take_creature_by_id(&mut self, id: UnitCardInstanceId) -> UnitCardInstance {
+    pub fn take_creature_by_id(&mut self, id: CreatureInstanceId) -> UnitCardInstance {
         self.slot_with_creature_mut(id).take_creature()
     }
 
@@ -472,7 +472,7 @@ impl Board {
         }
     }
 
-    pub fn slot_with_creature_mut(&mut self, id: UnitCardInstanceId) -> &mut BoardSlot {
+    pub fn slot_with_creature_mut(&mut self, id: CreatureInstanceId) -> &mut BoardSlot {
         self.slots_iter_mut()
             .collect::<Vec<_>>()
             .into_iter()
@@ -488,7 +488,7 @@ impl Board {
 
     /// Returns a mutable reference to the `UnitCardInstance` on the board with the given ID.
     /// This includes searching the pre-summon section, unlike the other methods of this pattern.
-    pub fn creature_instance_mut(&mut self, id: UnitCardInstanceId) -> &mut UnitCardInstance {
+    pub fn creature_instance_mut(&mut self, id: CreatureInstanceId) -> &mut UnitCardInstance {
         let index = self.tracked_pending_cards.iter().position(|c| c.id() == id);
         if let Some(index) = index {
             return self.tracked_pending_cards.get_mut(index).unwrap();
@@ -503,7 +503,7 @@ impl Board {
     /// Returns a mutable reference to the `UnitCardInstance` on the board with the given ID.
     /// This includes searching the pre-summon section, unlike the other methods of this pattern.
     #[must_use]
-    pub fn creature_instance_all(&self, id: UnitCardInstanceId) -> &UnitCardInstance {
+    pub fn creature_instance_all(&self, id: CreatureInstanceId) -> &UnitCardInstance {
         let index = self.tracked_pending_cards.iter().position(|c| c.id() == id);
         if let Some(index) = index {
             return self.tracked_pending_cards.get(index).unwrap();

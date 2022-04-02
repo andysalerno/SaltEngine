@@ -1,6 +1,6 @@
 use super::Buff;
 use crate::game_state::{board::BoardView, GameState};
-use protocol::entities::{Id, PassiveEffectInstanceId, RowId, UnitCardInstanceId};
+use protocol::entities::{CreatureInstanceId, Id, PassiveEffectInstanceId, RowId};
 use serde::{Deserialize, Serialize};
 use std::borrow::Borrow;
 
@@ -11,7 +11,7 @@ pub trait PassiveEffectDefinition: Send + Sync {
     fn definition_id(&self) -> Id;
     fn update(
         &self,
-    ) -> Box<dyn FnOnce(PassiveEffectInstanceId, UnitCardInstanceId, &mut GameState)>;
+    ) -> Box<dyn FnOnce(PassiveEffectInstanceId, CreatureInstanceId, &mut GameState)>;
 }
 
 impl std::fmt::Debug for dyn PassiveEffectDefinition {
@@ -40,7 +40,7 @@ impl std::fmt::Debug for dyn PassiveEffectDefinition {
 pub trait PassiveEffectView {
     fn definition_id(&self) -> Id;
     fn instance_id(&self) -> PassiveEffectInstanceId;
-    fn originator_id(&self) -> UnitCardInstanceId;
+    fn originator_id(&self) -> CreatureInstanceId;
 }
 
 impl PassiveEffectView for PassiveEffectInstance {
@@ -52,7 +52,7 @@ impl PassiveEffectView for PassiveEffectInstance {
         self.instance_id
     }
 
-    fn originator_id(&self) -> UnitCardInstanceId {
+    fn originator_id(&self) -> CreatureInstanceId {
         self.originator_id
     }
 }
@@ -69,14 +69,14 @@ pub struct PassiveEffectInstance {
     instance_id: PassiveEffectInstanceId,
 
     /// The ID of the card instance that originated this passive effect.
-    originator_id: UnitCardInstanceId,
+    originator_id: CreatureInstanceId,
 }
 
 impl PassiveEffectInstance {
     #[must_use]
     pub fn new(
         definition: Box<dyn PassiveEffectDefinition>,
-        originator_id: UnitCardInstanceId,
+        originator_id: CreatureInstanceId,
     ) -> Self {
         Self {
             definition,
@@ -93,7 +93,7 @@ impl PassiveEffectInstance {
 
     /// The ID of the card instance that originated this passive effect.
     #[must_use]
-    pub fn originator_id(&self) -> UnitCardInstanceId {
+    pub fn originator_id(&self) -> CreatureInstanceId {
         self.originator_id
     }
 
@@ -149,7 +149,7 @@ where
 
     fn update(
         &self,
-    ) -> Box<dyn FnOnce(PassiveEffectInstanceId, UnitCardInstanceId, &mut GameState)> {
+    ) -> Box<dyn FnOnce(PassiveEffectInstanceId, CreatureInstanceId, &mut GameState)> {
         let buff = self.buff.clone();
         let for_row = self.for_row;
 
@@ -177,8 +177,8 @@ pub mod player_view {
     use protocol::entities::PlayerId;
 
     use super::{
-        Deserialize, Id, PassiveEffectDefinition, PassiveEffectInstance, PassiveEffectInstanceId,
-        PassiveEffectView, Serialize, UnitCardInstanceId,
+        CreatureInstanceId, Deserialize, Id, PassiveEffectDefinition, PassiveEffectInstance,
+        PassiveEffectInstanceId, PassiveEffectView, Serialize,
     };
     use crate::game_state::MakePlayerView;
 
@@ -206,7 +206,7 @@ pub mod player_view {
         instance_id: PassiveEffectInstanceId,
 
         /// The ID of the card instance that originated this passive effect.
-        originator_id: UnitCardInstanceId,
+        originator_id: CreatureInstanceId,
     }
 
     impl<'a> MakePlayerView<'a> for PassiveEffectInstance {
@@ -232,7 +232,7 @@ pub mod player_view {
             self.instance_id
         }
 
-        fn originator_id(&self) -> UnitCardInstanceId {
+        fn originator_id(&self) -> CreatureInstanceId {
             self.originator_id
         }
     }

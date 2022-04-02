@@ -1,4 +1,4 @@
-use protocol::entities::{RowId, UnitCardInstance};
+use protocol::entities::{CreatureInstance, RowId};
 use salt_engine::game_state::{
     board::{BoardSlotPlayerView, BoardView},
     GameStatePlayerView, GameStateView,
@@ -16,7 +16,7 @@ impl ConsoleDisplay {
 }
 
 fn to_string(game_state: &LocalState) -> String {
-    let units = game_state.find_type::<UnitCardInstance>();
+    let units = game_state.find_type::<CreatureInstance>();
 
     let mut result = String::new();
 

@@ -104,7 +104,7 @@ use std::borrow::{Borrow, BorrowMut};
 // }
 
 pub mod iter_helpers {
-    use protocol::entities::{RowId, UnitCardInstanceId};
+    use protocol::entities::{CreatureInstanceId, RowId};
 
     use super::{BoardSlotView, PlayerId, UnitCardInstanceView};
 
@@ -175,7 +175,7 @@ pub mod iter_helpers {
         I: Iterator<Item = &'a S>,
         S: BoardSlotView<'a>,
     {
-        type Item = UnitCardInstanceId;
+        type Item = CreatureInstanceId;
 
         fn next(&mut self) -> Option<Self::Item> {
             self.iter.find_map(|s| s.maybe_creature()).map(|c| c.id())

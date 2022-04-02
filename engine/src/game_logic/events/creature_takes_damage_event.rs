@@ -1,16 +1,16 @@
-use protocol::entities::UnitCardInstanceId;
+use protocol::entities::CreatureInstanceId;
 
 use super::Event;
 
 #[derive(Debug, Clone)]
 pub struct CreatureTakesDamageEvent {
-    creature_id: UnitCardInstanceId,
+    creature_id: CreatureInstanceId,
     damage_amount: usize,
 }
 
 impl CreatureTakesDamageEvent {
     #[must_use]
-    pub fn new(creature_id: UnitCardInstanceId, damage_amount: usize) -> Self {
+    pub fn new(creature_id: CreatureInstanceId, damage_amount: usize) -> Self {
         Self {
             creature_id,
             damage_amount,
@@ -18,7 +18,7 @@ impl CreatureTakesDamageEvent {
     }
 
     #[must_use]
-    pub fn creature_id(&self) -> UnitCardInstanceId {
+    pub fn creature_id(&self) -> CreatureInstanceId {
         self.creature_id
     }
 

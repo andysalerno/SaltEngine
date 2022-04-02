@@ -2,7 +2,7 @@ use super::{
     card_instance::{UnitCardInstancePlayerView, UnitCardInstanceView},
     MakePlayerView, PlayerId, UnitCardInstance,
 };
-use protocol::entities::UnitCardInstanceId;
+use protocol::entities::CreatureInstanceId;
 use serde::{Deserialize, Serialize};
 
 pub trait HandView<'a> {
@@ -10,7 +10,7 @@ pub trait HandView<'a> {
 
     fn cards(&self) -> &[Self::TCard];
 
-    fn card(&self, id: UnitCardInstanceId) -> &Self::TCard {
+    fn card(&self, id: CreatureInstanceId) -> &Self::TCard {
         self.cards()
             .iter()
             .find(|c| c.id() == id)
@@ -65,11 +65,11 @@ impl Hand {
     }
 
     #[must_use]
-    pub fn card(&self, id: UnitCardInstanceId) -> &UnitCardInstance {
+    pub fn card(&self, id: CreatureInstanceId) -> &UnitCardInstance {
         HandView::card(self, id)
     }
 
-    pub fn take_card(&mut self, id: UnitCardInstanceId) -> UnitCardInstance {
+    pub fn take_card(&mut self, id: CreatureInstanceId) -> UnitCardInstance {
         let (index, _) = self
             .cards
             .iter()

@@ -4,7 +4,7 @@ use super::{
     Deck, Hand, IterAddons, IteratorAny, PlayerId, UnitCardInstance,
 };
 use log::debug;
-use protocol::entities::{BoardPos, RowId, UnitCardInstanceId};
+use protocol::entities::{BoardPos, CreatureInstanceId, RowId};
 use serde::{Deserialize, Serialize};
 use std::slice::Iter;
 
@@ -270,7 +270,7 @@ impl GameState {
 
     pub fn update_by_id(
         &mut self,
-        id: UnitCardInstanceId,
+        id: CreatureInstanceId,
         update: impl FnOnce(&mut UnitCardInstance),
     ) {
         let creature = self
@@ -308,7 +308,7 @@ impl GameState {
     pub fn active_attackers(
         &self,
         player_id: PlayerId,
-    ) -> impl Iterator<Item = UnitCardInstanceId> + '_ {
+    ) -> impl Iterator<Item = CreatureInstanceId> + '_ {
         self.board()
             .slots_iter()
             .for_player(player_id)

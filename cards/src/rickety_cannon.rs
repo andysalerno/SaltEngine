@@ -1,6 +1,6 @@
 use async_trait::async_trait;
 use log::info;
-use protocol::entities::{BoardPos, Id, Position, UnitCardInstanceId};
+use protocol::entities::{BoardPos, CreatureInstanceId, Id, Position};
 use salt_engine::{
     cards::{
         actions::{UponSummonAction, UponTurnStartAction},
@@ -70,7 +70,7 @@ struct TurnStartAction;
 impl UponTurnStartAction for TurnStartAction {
     async fn action(
         &self,
-        instance_id: UnitCardInstanceId,
+        instance_id: CreatureInstanceId,
         state: &mut GameState,
         dispatcher: &mut EventDispatcher,
     ) {
@@ -91,7 +91,7 @@ struct SummonAction;
 impl UponSummonAction for SummonAction {
     async fn action(
         &self,
-        _card_id: UnitCardInstanceId,
+        _card_id: CreatureInstanceId,
         summoned_to_pos: BoardPos,
         state: &mut GameState,
         dispatcher: &mut EventDispatcher,

@@ -1,6 +1,6 @@
 use async_trait::async_trait;
 use log::info;
-use protocol::entities::{Id, PlayerId, Position, UnitCardInstanceId};
+use protocol::entities::{CreatureInstanceId, Id, PlayerId, Position};
 use salt_engine::{
     cards::{actions::UponEventAction, CardDefinition, UnitCardDefinition},
     game_logic::{
@@ -60,7 +60,7 @@ impl UnitCardDefinition for GrandmaTheSoother {
 
     fn post_event_action(
         &self,
-        card_instance_id: UnitCardInstanceId,
+        card_instance_id: CreatureInstanceId,
         event: &GameEvent,
         game_state: &GameState,
         _dispatcher: &mut EventDispatcher,

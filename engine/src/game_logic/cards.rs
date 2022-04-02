@@ -1,7 +1,7 @@
 use super::{events::GameEvent, EventDispatcher, PassiveEffectDefinition};
 use crate::game_state::{GameState, MakePlayerView, UnitCardInstance};
 use async_trait::async_trait;
-use protocol::entities::{Position, UnitCardInstanceId};
+use protocol::entities::{CreatureInstanceId, Position};
 use serde::{Deserialize, Serialize};
 
 /// The most general definition that cards of all types must implement.
@@ -54,7 +54,7 @@ pub trait UnitCardDefinition: CardDefinition {
     /// Invoked on each instance before every event is executed.
     fn pre_event_action(
         &self,
-        _card_instance_id: UnitCardInstanceId,
+        _card_instance_id: CreatureInstanceId,
         _event: &GameEvent,
         _game_state: &GameState,
         _dispatcher: &mut EventDispatcher,
@@ -65,7 +65,7 @@ pub trait UnitCardDefinition: CardDefinition {
     /// Invoked on each instance after every event is executed.
     fn post_event_action(
         &self,
-        _card_instance_id: UnitCardInstanceId,
+        _card_instance_id: CreatureInstanceId,
         _event: &GameEvent,
         _game_state: &GameState,
         _dispatcher: &mut EventDispatcher,
@@ -218,14 +218,14 @@ pub mod player_view {
 pub mod actions {
     use protocol::entities::BoardPos;
 
-    use super::{async_trait, EventDispatcher, GameState, UnitCardInstanceId};
+    use super::{async_trait, CreatureInstanceId, EventDispatcher, GameState};
     use crate::game_logic::events::GameEvent;
 
     #[async_trait]
     pub trait UponSummonAction: Send + Sync {
         async fn action(
             &self,
-            instance_id: UnitCardInstanceId,
+            instance_id: CreatureInstanceId,
             pos: BoardPos,
             state: &mut GameState,
             dispatcher: &mut EventDispatcher,
@@ -236,7 +236,7 @@ pub mod actions {
     pub trait UponDeathAction: Send + Sync {
         async fn action(
             &self,
-            instance_id: UnitCardInstanceId,
+            instance_id: CreatureInstanceId,
             pos: BoardPos,
             state: &mut GameState,
             dispatcher: &mut EventDispatcher,
@@ -247,7 +247,7 @@ pub mod actions {
     pub trait UponReceiveDamageAction: Send + Sync {
         async fn action(
             &self,
-            instance_id: UnitCardInstanceId,
+            instance_id: CreatureInstanceId,
             state: &mut GameState,
             dispatcher: &mut EventDispatcher,
         );
@@ -257,7 +257,7 @@ pub mod actions {
     pub trait UponTurnStartAction: Send + Sync {
         async fn action(
             &self,
-            instance_id: UnitCardInstanceId,
+            instance_id: CreatureInstanceId,
             state: &mut GameState,
             dispatcher: &mut EventDispatcher,
         );
@@ -267,7 +267,7 @@ pub mod actions {
     pub trait UponTurnEndAction: Send + Sync {
         async fn action(
             &self,
-            instance_id: UnitCardInstanceId,
+            instance_id: CreatureInstanceId,
             state: &mut GameState,
             dispatcher: &mut EventDispatcher,
         );
@@ -277,7 +277,7 @@ pub mod actions {
     pub trait UponCompanionDamagedAction: Send + Sync {
         async fn action(
             &self,
-            instance_id: UnitCardInstanceId,
+            instance_id: CreatureInstanceId,
             state: &mut GameState,
             dispatcher: &mut EventDispatcher,
         );
@@ -299,7 +299,7 @@ pub mod actions {
     impl UponSummonAction for DoNothingAction {
         async fn action(
             &self,
-            _instance_id: UnitCardInstanceId,
+            _instance_id: CreatureInstanceId,
             _pos: BoardPos,
             _state: &mut GameState,
             _dispatcher: &mut EventDispatcher,
@@ -312,7 +312,7 @@ pub mod actions {
     impl UponDeathAction for DoNothingAction {
         async fn action(
             &self,
-            _instance_id: UnitCardInstanceId,
+            _instance_id: CreatureInstanceId,
             _pos: BoardPos,
             _state: &mut GameState,
             _dispatcher: &mut EventDispatcher,
@@ -325,7 +325,7 @@ pub mod actions {
     impl UponReceiveDamageAction for DoNothingAction {
         async fn action(
             &self,
-            _instance_id: UnitCardInstanceId,
+            _instance_id: CreatureInstanceId,
             _state: &mut GameState,
             _dispatcher: &mut EventDispatcher,
         ) {
@@ -337,7 +337,7 @@ pub mod actions {
     impl UponTurnStartAction for DoNothingAction {
         async fn action(
             &self,
-            _instance_id: UnitCardInstanceId,
+            _instance_id: CreatureInstanceId,
             _state: &mut GameState,
             _dispatcher: &mut EventDispatcher,
         ) {
@@ -349,7 +349,7 @@ pub mod actions {
     impl UponTurnEndAction for DoNothingAction {
         async fn action(
             &self,
-            _instance_id: UnitCardInstanceId,
+            _instance_id: CreatureInstanceId,
             _state: &mut GameState,
             _dispatcher: &mut EventDispatcher,
         ) {
@@ -359,7 +359,7 @@ pub mod actions {
 }
 
 mod builder {
-    use protocol::entities::UnitCardInstanceId;
+    use protocol::entities::CreatureInstanceId;
 
     use super::{
         actions::{
@@ -525,7 +525,7 @@ mod builder {
 
         fn pre_event_action(
             &self,
-            _card_instance_id: UnitCardInstanceId,
+            _card_instance_id: CreatureInstanceId,
             _event: &GameEvent,
             _game_state: &GameState,
             _dispatcher: &mut EventDispatcher,
@@ -535,7 +535,7 @@ mod builder {
 
         fn post_event_action(
             &self,
-            _card_instance_id: UnitCardInstanceId,
+            _card_instance_id: CreatureInstanceId,
             _event: &GameEvent,
             _game_state: &GameState,
             _dispatcher: &mut EventDispatcher,

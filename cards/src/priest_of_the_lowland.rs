@@ -1,6 +1,6 @@
 use async_trait::async_trait;
 use log::info;
-use protocol::entities::{Id, Position, UnitCardInstanceId};
+use protocol::entities::{CreatureInstanceId, Id, Position};
 use salt_engine::{
     cards::{actions::UponTurnEndAction, CardDefinition, UnitCardDefinition},
     game_logic::{events::CreatureHealedEvent, EventDispatcher},
@@ -66,7 +66,7 @@ struct TurnEndAction;
 impl UponTurnEndAction for TurnEndAction {
     async fn action(
         &self,
-        instance_id: UnitCardInstanceId,
+        instance_id: CreatureInstanceId,
         state: &mut GameState,
         dispatcher: &mut EventDispatcher,
     ) {

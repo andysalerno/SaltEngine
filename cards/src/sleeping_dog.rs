@@ -64,7 +64,7 @@ impl UnitCardDefinition for SleepingDog {
 
 mod actions {
     use super::{async_trait, buffs, BoardView, EventDispatcher, GameState};
-    use protocol::entities::{RowId, UnitCardInstanceId};
+    use protocol::entities::{CreatureInstanceId, RowId};
     use salt_engine::cards::actions::UponReceiveDamageAction;
 
     pub(super) struct ReceiveDamageAction;
@@ -73,7 +73,7 @@ mod actions {
     impl UponReceiveDamageAction for ReceiveDamageAction {
         async fn action(
             &self,
-            instance_id: UnitCardInstanceId,
+            instance_id: CreatureInstanceId,
             state: &mut GameState,
             _dispatcher: &mut EventDispatcher,
         ) {
@@ -112,7 +112,7 @@ mod actions {
 }
 
 mod buffs {
-    use protocol::entities::{BuffInstanceId, BuffSourceId, UnitCardInstanceId};
+    use protocol::entities::{BuffInstanceId, BuffSourceId, CreatureInstanceId};
 
     use super::{Buff, Id};
 
@@ -123,7 +123,7 @@ mod buffs {
     }
 
     impl SleepingDogBuff {
-        pub fn new(source_id: UnitCardInstanceId) -> Self {
+        pub fn new(source_id: CreatureInstanceId) -> Self {
             Self {
                 instance_id: BuffInstanceId::new(),
                 source_id: BuffSourceId::CreatureInstance(source_id),

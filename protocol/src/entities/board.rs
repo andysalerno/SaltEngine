@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use super::{player::PlayerId, UnitCardInstance};
+use super::{player::PlayerId, CreatureInstance};
 use serde::{Deserialize, Serialize};
 
 /// Represents the position of an entity in the game world.
@@ -10,7 +10,7 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Copy, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub enum EntityPosition {
     BoardPos(BoardPos),
-    Hand(PlayerId),
+    Hand(PlayerId, u8),
 }
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
@@ -95,5 +95,5 @@ pub struct BoardPlayerView {
 #[derive(Debug, Serialize, Clone, Deserialize)]
 pub struct BoardSlotPlayerView {
     pos: BoardPos,
-    creature: Option<UnitCardInstance>,
+    creature: Option<CreatureInstance>,
 }

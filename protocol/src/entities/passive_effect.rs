@@ -1,6 +1,6 @@
 pub use id::*;
 
-use super::{Id, UnitCardInstanceId};
+use super::{CreatureInstanceId, Id};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Clone, Deserialize)]
@@ -12,7 +12,7 @@ pub struct PassiveEffectInstancePlayerView {
     instance_id: PassiveEffectInstanceId,
 
     /// The ID of the card instance that originated this passive effect.
-    originator_id: UnitCardInstanceId,
+    originator_id: CreatureInstanceId,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]

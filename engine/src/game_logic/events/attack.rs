@@ -1,27 +1,27 @@
-use protocol::entities::UnitCardInstanceId;
+use protocol::entities::CreatureInstanceId;
 use serde::{Deserialize, Serialize};
 
 use super::Event;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct AttackEvent {
-    attacker: UnitCardInstanceId,
-    target: UnitCardInstanceId,
+    attacker: CreatureInstanceId,
+    target: CreatureInstanceId,
 }
 
 impl AttackEvent {
     #[must_use]
-    pub fn new(attacker: UnitCardInstanceId, target: UnitCardInstanceId) -> Self {
+    pub fn new(attacker: CreatureInstanceId, target: CreatureInstanceId) -> Self {
         Self { attacker, target }
     }
 
     #[must_use]
-    pub fn attacker(&self) -> UnitCardInstanceId {
+    pub fn attacker(&self) -> CreatureInstanceId {
         self.attacker
     }
 
     #[must_use]
-    pub fn target(&self) -> UnitCardInstanceId {
+    pub fn target(&self) -> CreatureInstanceId {
         self.target
     }
 }

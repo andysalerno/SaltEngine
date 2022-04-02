@@ -4,19 +4,19 @@ use crate::{
     game_state::{board::BoardView, GameState, GameStateView, HandView, UnitCardInstanceView},
 };
 use log::debug;
-use protocol::entities::{BoardPos, PlayerId, UnitCardInstanceId};
+use protocol::entities::{BoardPos, CreatureInstanceId, PlayerId};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct CreatureSummonedFromHandEvent {
     player_id: PlayerId,
     board_pos: BoardPos,
-    hand_card_id: UnitCardInstanceId,
+    hand_card_id: CreatureInstanceId,
 }
 
 impl CreatureSummonedFromHandEvent {
     #[must_use]
-    pub fn new(player_id: PlayerId, board_pos: BoardPos, hand_card_id: UnitCardInstanceId) -> Self {
+    pub fn new(player_id: PlayerId, board_pos: BoardPos, hand_card_id: CreatureInstanceId) -> Self {
         Self {
             player_id,
             board_pos,
@@ -35,7 +35,7 @@ impl CreatureSummonedFromHandEvent {
     }
 
     #[must_use]
-    pub fn hand_card_id(&self) -> UnitCardInstanceId {
+    pub fn hand_card_id(&self) -> CreatureInstanceId {
         self.hand_card_id
     }
 }
@@ -73,7 +73,7 @@ impl Event for CreatureSummonedFromHandEvent {
 pub struct SummonCreatureFromHandClientEvent {
     pub player_id: PlayerId,
     pub board_pos: BoardPos,
-    pub hand_card_id: UnitCardInstanceId,
+    pub hand_card_id: CreatureInstanceId,
 }
 
 mod validation {

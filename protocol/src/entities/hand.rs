@@ -1,13 +1,13 @@
 pub use self::id::HandId;
 
-use super::{EntityTypeId, HasId, IsEntity, PlayerId, UnitCardInstance};
+use super::{CreatureInstance, EntityTypeId, HasId, IsEntity, PlayerId};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Clone, Deserialize)]
 pub struct Hand {
     pub player_id: PlayerId,
     pub id: HandId,
-    pub cards: Vec<UnitCardInstance>,
+    pub cards: Vec<CreatureInstance>,
 }
 
 impl Hand {

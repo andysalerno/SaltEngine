@@ -245,7 +245,7 @@ impl ConsolePrompter {
         let mut event = None;
 
         while event.is_none() {
-            info!("Current state: {local_state:?}");
+            info!("Current state: {local_state:#?}");
             let my_hero = local_state
                 .find_type::<PlayerHero>()
                 .find(|h| h.player_id() == self.id())
@@ -612,7 +612,6 @@ impl ConsoleNotifier {
 impl ClientNotifier for ConsoleNotifier {
     async fn notify(&self, event: Notification) {
         info!("Saw client event: {event:?}");
-        // let result = self.send(event).await;
 
         info!("Locking local state...");
         let mut guard = self.local_state.lock().await;

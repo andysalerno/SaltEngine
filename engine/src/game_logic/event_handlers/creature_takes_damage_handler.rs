@@ -1,6 +1,6 @@
 use log::info;
 use protocol::{
-    entities::{Id, IsEntity, UnitCardDefinition, UnitCardInstance},
+    entities::{CreatureInstance, Id, IsEntity, UnitCardDefinition},
     from_server::EntityUpdate,
 };
 
@@ -35,7 +35,7 @@ impl EventHandler for CreatureTakesDamageHandler {
 
         let entity_update = EntityUpdate {
             id: Id::new(),
-            entity_type_id: UnitCardInstance::type_id(),
+            entity_type_id: CreatureInstance::type_id(),
             property_names: vec!["testing".into()],
             property_values: vec!["testing".into()],
         };
