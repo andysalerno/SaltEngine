@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 
 /// The view of a creature card definition.
 #[derive(Debug, Serialize, Clone, Deserialize)]
-pub struct UnitCardDefinition {
+pub struct CreatureDefinition {
     pub title: String,
     pub cost: i32,
     pub text: String,
@@ -14,7 +14,7 @@ pub struct UnitCardDefinition {
     pub placeable_at: Position,
 }
 
-impl UnitCardDefinition {
+impl CreatureDefinition {
     pub fn new(title: impl Into<String>) -> Self {
         Self {
             title: title.into(),

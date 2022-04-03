@@ -1,7 +1,7 @@
 pub use id::*;
 
 use super::{
-    board::BoardPos, buff::BuffPlayerView, unit_card_definition::UnitCardDefinition,
+    board::BoardPos, buff::BuffPlayerView, unit_card_definition::CreatureDefinition,
     EntityPosition, EntityTypeId, HasId, IsEntity, PassiveEffectInstancePlayerView,
 };
 use serde::{Deserialize, Serialize};
@@ -9,7 +9,7 @@ use serde::{Deserialize, Serialize};
 /// A view of a creature card instance.
 #[derive(Debug, Serialize, Clone, Deserialize)]
 pub struct CreatureInstance {
-    definition: UnitCardDefinition,
+    definition: CreatureDefinition,
     buffs: Vec<BuffPlayerView>,
     passive_effect: Option<PassiveEffectInstancePlayerView>,
     id: CreatureInstanceId,
@@ -22,7 +22,7 @@ pub struct CreatureInstance {
 impl CreatureInstance {
     pub fn new(
         id: CreatureInstanceId,
-        definition: UnitCardDefinition,
+        definition: CreatureDefinition,
         buffs: Vec<BuffPlayerView>,
         passive_effect: Option<PassiveEffectInstancePlayerView>,
     ) -> Self {
@@ -43,7 +43,7 @@ impl CreatureInstance {
     }
 
     /// Get a reference to the unit card instance's definition.
-    pub fn definition(&self) -> &UnitCardDefinition {
+    pub fn definition(&self) -> &CreatureDefinition {
         &self.definition
     }
 }

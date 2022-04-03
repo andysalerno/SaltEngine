@@ -72,14 +72,17 @@ impl LocalState {
 
     /// Adds a new entity at the given position.
     pub fn add_at(&mut self, to_add: impl Into<Entity>, position: EntityPosition) {
+        // Update global entities mapping
         let entity: Entity = to_add.into();
         let id = entity.id();
         self.entities.insert(id, entity);
 
+        // Update positions mapping
         let card_id = CreatureInstanceId::from(id);
         self.positions.insert(position, card_id);
 
-        if let EntityPosition::Hand(player_id) = position {
+        // Update hand if needed
+        if let EntityPosition::Hand(player_id, _) = position {
             if player_id == self.player_a_id {
                 self.player_a_hand.push(card_id);
             } else if player_id == self.player_b_id {
@@ -150,8 +153,8 @@ impl LocalState {
 mod test {
     use super::LocalState;
     use protocol::entities::{
-        BuffInstanceId, BuffPlayerView, BuffSourceId, CreatureInstance, CreatureInstanceId,
-        EntityPosition, Hand, HandId, HasId, Id, PlayerId, UnitCardDefinition,
+        BuffInstanceId, BuffPlayerView, BuffSourceId, CreatureDefinition, CreatureInstance,
+        CreatureInstanceId, EntityPosition, Hand, HandId, HasId, Id, PlayerId,
     };
 
     #[test]
@@ -372,30 +375,28 @@ mod test {
         {
             let card_1 = CreatureInstance::new(
                 CreatureInstanceId::new(),
-                UnitCardDefinition::new("hello"),
+                CreatureDefinition::new("hello"),
                 Vec::new(),
                 None,
             );
 
             let card_2 = CreatureInstance::new(
                 CreatureInstanceId::new(),
-                UnitCardDefinition::new("hello"),
+                CreatureDefinition::new("hello"),
                 Vec::new(),
                 None,
             );
 
             let card_3 = CreatureInstance::new(
                 CreatureInstanceId::new(),
-                UnitCardDefinition::new("hello"),
+                CreatureDefinition::new("hello"),
                 Vec::new(),
                 None,
             );
 
-            let player_a_hand = EntityPosition::Hand(player_a);
-
-            state.add_at(card_1, player_a_hand);
-            state.add_at(card_2, player_a_hand);
-            state.add_at(card_3, player_a_hand);
+            state.add_at(card_1, EntityPosition::Hand(player_a, 0));
+            state.add_at(card_2, EntityPosition::Hand(player_a, 1));
+            state.add_at(card_3, EntityPosition::Hand(player_a, 2));
         }
 
         // Expect the cards to be found in player 1's hand

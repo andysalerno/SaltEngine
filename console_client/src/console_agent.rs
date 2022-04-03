@@ -3,7 +3,7 @@ use async_trait::async_trait;
 use log::{error, info};
 use protocol::{
     client_actions::{Attack, EndTurn, SummonCreatureFromHand},
-    entities::{BoardPos, PlayerHero, PlayerId, RowId, UnitCardDefinition},
+    entities::{BoardPos, CreatureDefinition, PlayerHero, PlayerId, RowId},
     from_client::ClientAction,
     from_server::{EntityAdded, EntityUpdate, Notification},
 };
@@ -519,7 +519,7 @@ fn say(message: impl AsRef<str>) {
     println!("{}", message.as_ref());
 }
 
-fn display_card(card: &UnitCardDefinition, playable: bool, tag: usize) -> String {
+fn display_card(card: &CreatureDefinition, playable: bool, tag: usize) -> String {
     let text_lines = card.text.lines().collect::<Vec<_>>();
 
     const WIDTH: usize = 26;

@@ -30,7 +30,8 @@ impl EventHandler for AddCardToHandEventHandler {
 
         let card_id = card.id();
         let entity = card.as_entity();
-        let position = EntityPosition::Hand(player_id);
+        let hand_len = game_state.hand(player_id).len();
+        let position = EntityPosition::Hand(player_id, hand_len as u8);
 
         game_state.hand_mut(event.player_id()).add_card(card);
 

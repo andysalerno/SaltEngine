@@ -1,6 +1,6 @@
 use log::info;
 use protocol::{
-    entities::{CreatureInstance, Id, IsEntity, UnitCardDefinition},
+    entities::{CreatureDefinition, CreatureInstance, Id, IsEntity},
     from_server::EntityUpdate,
 };
 

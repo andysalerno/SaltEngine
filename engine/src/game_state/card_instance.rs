@@ -187,7 +187,7 @@ impl UnitCardInstance {
     #[must_use]
     pub fn as_entity(&self) -> Entity {
         let local_def = self.definition();
-        let definition = protocol::entities::UnitCardDefinition {
+        let definition = protocol::entities::CreatureDefinition {
             title: local_def.title().into(),
             cost: local_def.cost(),
             text: local_def.text().into(),
