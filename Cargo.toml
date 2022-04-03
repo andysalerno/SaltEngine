@@ -5,6 +5,7 @@ members = [
 	"console_client",
 	"websocket_server",
 	"engine",
+	"game_state",
 	"cards",
 	"protocol"
 ]
