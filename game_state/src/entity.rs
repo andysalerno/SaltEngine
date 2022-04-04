@@ -1,7 +1,6 @@
-use std::borrow::{Borrow, BorrowMut};
-
 use crate::id::Id;
 use serde::{de::DeserializeOwned, Serialize};
+use std::borrow::{Borrow, BorrowMut};
 
 /// A marker trait indicating that the tyep is considered an entity.
 /// Implies the type is serializeable / deserializeable.
@@ -44,6 +43,10 @@ impl Entity {
             _phantom: std::marker::PhantomData::default(),
         }
     }
+
+    pub fn id(&self) -> Id {
+        self.id
+    }
 }
 
 pub struct TypedEntity<T: IsEntity, I> {
@@ -80,12 +83,12 @@ where
 }
 
 #[cfg(test)]
-mod tests {
+pub(crate) mod tests {
     use super::{Entity, IsEntity};
     use serde::{Deserialize, Serialize};
 
     #[derive(Default, Serialize, Deserialize)]
-    struct TestEntity {
+    pub(crate) struct TestEntity {
         s: String,
         i: i32,
         t: Option<usize>,
@@ -95,7 +98,7 @@ mod tests {
     impl IsEntity for TestEntity {}
 
     #[derive(Default, Serialize, Deserialize)]
-    struct NestedEntity {
+    pub(crate) struct NestedEntity {
         s: String,
         i: i32,
         t: Option<usize>,
