@@ -74,7 +74,10 @@ impl EntityArena {
 #[cfg(test)]
 mod tests {
     use super::EntityArena;
-    use crate::{entity::tests::TestEntity, id::EntityId};
+    use crate::{
+        entity::tests::{AnotherTestEntity, TestEntity},
+        id::EntityId,
+    };
 
     #[test]
     fn entity_can_be_added() {
@@ -143,5 +146,47 @@ mod tests {
         let read = retrieved.get(|e| e.i32_val());
 
         assert_eq!(100, read);
+    }
+
+    #[test]
+    fn entity_can_all_be_listed() {
+        let mut state = EntityArena::new();
+
+        let test_entity_1 = TestEntity::new();
+        let test_entity_2 = TestEntity::new();
+        let test_entity_3 = TestEntity::new();
+
+        let different_entity_type = AnotherTestEntity;
+
+        state.add(test_entity_1);
+        state.add(test_entity_2);
+        state.add(test_entity_3);
+        state.add(different_entity_type);
+
+        let all_entities_count = state.entities().count();
+
+        assert_eq!(4, all_entities_count);
+    }
+
+    #[test]
+    fn entity_can_be_found_by_type() {
+        let mut state = EntityArena::new();
+
+        let test_entity_1 = TestEntity::new();
+        let test_entity_2 = TestEntity::new();
+        let test_entity_3 = TestEntity::new();
+
+        let different_entity_type = AnotherTestEntity;
+
+        state.add(test_entity_1);
+        state.add(test_entity_2);
+        state.add(test_entity_3);
+        state.add(different_entity_type);
+
+        let test_entities_count = state.of_type::<TestEntity>().count();
+        assert_eq!(3, test_entities_count);
+
+        let another_entity_count = state.of_type::<AnotherTestEntity>().count();
+        assert_eq!(1, another_entity_count);
     }
 }

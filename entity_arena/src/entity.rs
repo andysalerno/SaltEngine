@@ -154,6 +154,19 @@ pub(crate) mod tests {
         t: Option<usize>,
     }
 
+    #[derive(Serialize, Deserialize)]
+    pub(crate) struct AnotherTestEntity;
+
+    impl IsEntity for AnotherTestEntity {
+        fn id(&self) -> EntityId {
+            EntityId::new()
+        }
+
+        fn entity_type_id() -> EntityTypeId {
+            EntityTypeId::parse_str("25068336-7a85-42cf-bf2f-d168bfb81692")
+        }
+    }
+
     #[test]
     fn test_entity_can_be_stored_as_entity() {
         let test_entity = TestEntity::new();
