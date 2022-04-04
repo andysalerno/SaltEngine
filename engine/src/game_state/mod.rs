@@ -1,6 +1,8 @@
 // pub mod board;
 // mod card_instance;
 // mod deck;
+mod creature_definition;
+mod creature_instance;
 mod game_state;
 // mod hand;
 // pub mod hero;
