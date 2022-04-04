@@ -67,6 +67,10 @@ where
         let local: T = serde_json::from_value(self.data.borrow().clone()).unwrap();
         f(&local)
     }
+
+    pub fn id(&self) -> Id {
+        self.id
+    }
 }
 
 impl<T, I> TypedEntity<T, I>
@@ -96,10 +100,6 @@ pub(crate) mod tests {
     }
 
     impl TestEntity {
-        pub fn str_val(&self) -> &str {
-            &self.s
-        }
-
         pub fn i32_val(&self) -> i32 {
             self.i
         }
