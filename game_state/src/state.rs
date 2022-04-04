@@ -34,6 +34,10 @@ impl State {
     pub fn get(&self, id: impl Borrow<Id>) -> &Entity {
         self.entities.get(id.borrow()).unwrap()
     }
+
+    pub fn get_mut(&mut self, id: impl Borrow<Id>) -> &mut Entity {
+        self.entities.get_mut(id.borrow()).unwrap()
+    }
 }
 
 #[cfg(test)]
@@ -73,5 +77,40 @@ mod tests {
         let some_other_id = Id::new();
 
         let _retrieved = state.get(some_other_id);
+    }
+
+    #[test]
+    fn entity_can_be_added_retrieved_and_read() {
+        let mut state = State::new();
+
+        let mut test_entity = TestEntity::default();
+
+        test_entity.set_i32_val(49);
+
+        let id = state.add(test_entity);
+
+        let retrieved = state.get(id).as_typed::<TestEntity>();
+
+        let read = retrieved.get(|e| e.i32_val());
+
+        assert_eq!(49, read);
+    }
+
+    #[test]
+    fn entity_can_be_added_retrieved_and_updated() {
+        let mut state = State::new();
+
+        let mut test_entity = TestEntity::default();
+
+        test_entity.set_i32_val(49);
+
+        let id = state.add(test_entity);
+
+        let mut retrieved = state.get_mut(id).as_typed_mut::<TestEntity>();
+
+        retrieved.get_mut(|e| e.set_i32_val(100));
+        let read = retrieved.get(|e| e.i32_val());
+
+        assert_eq!(100, read);
     }
 }

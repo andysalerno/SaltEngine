@@ -95,6 +95,20 @@ pub(crate) mod tests {
         ne: Option<NestedEntity>,
     }
 
+    impl TestEntity {
+        pub fn str_val(&self) -> &str {
+            &self.s
+        }
+
+        pub fn i32_val(&self) -> i32 {
+            self.i
+        }
+
+        pub fn set_i32_val(&mut self, next: i32) {
+            self.i = next;
+        }
+    }
+
     impl IsEntity for TestEntity {}
 
     #[derive(Default, Serialize, Deserialize)]
