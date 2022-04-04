@@ -5,7 +5,8 @@ members = [
 	"console_client",
 	"websocket_server",
 	"engine",
-	"game_state",
+	"entity_arena",
 	"cards",
-	"protocol"
+	"protocol",
+	"derive_id_macro"
 ]

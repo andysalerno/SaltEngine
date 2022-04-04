@@ -1,21 +1,32 @@
-use crate::id::Id;
+use crate::id::{EntityId, EntityTypeId};
 use serde::{de::DeserializeOwned, Serialize};
 use std::borrow::{Borrow, BorrowMut};
 
 /// A marker trait indicating that the tyep is considered an entity.
 /// Implies the type is serializeable / deserializeable.
-pub trait IsEntity: Serialize + DeserializeOwned {}
+pub trait IsEntity: Serialize + DeserializeOwned {
+    /// The type of EntityTypeId representing this entity type.
+    // type TypeId: EntityTypeId;
+
+    /// The id of this entity instance.
+    fn id(&self) -> EntityId;
+
+    /// The type ID of this entity type.
+    fn entity_type_id() -> EntityTypeId;
+}
 
 #[derive(Clone, Debug)]
 pub struct Entity {
-    id: Id,
+    id: EntityId,
+    entity_type_id: EntityTypeId,
     data: serde_json::Value,
 }
 
 impl Entity {
-    pub fn new(data: impl IsEntity) -> Self {
+    pub fn new<T: IsEntity>(data: T) -> Self {
         Self {
-            id: Id::new(),
+            id: data.id(),
+            entity_type_id: T::entity_type_id(),
             data: serde_json::to_value(data).expect("The given entity could not be serialized"),
         }
     }
@@ -44,13 +55,17 @@ impl Entity {
         }
     }
 
-    pub fn id(&self) -> Id {
+    pub fn id(&self) -> EntityId {
         self.id
+    }
+
+    pub fn entity_type_id(&self) -> EntityTypeId {
+        self.entity_type_id
     }
 }
 
 pub struct TypedEntity<T: IsEntity, I> {
-    id: Id,
+    id: EntityId,
     data: I,
     _phantom: std::marker::PhantomData<T>,
 }
@@ -68,7 +83,7 @@ where
         f(&local)
     }
 
-    pub fn id(&self) -> Id {
+    pub fn id(&self) -> EntityId {
         self.id
     }
 }
@@ -88,11 +103,14 @@ where
 
 #[cfg(test)]
 pub(crate) mod tests {
+    use crate::id::{EntityId, EntityTypeId};
+
     use super::{Entity, IsEntity};
     use serde::{Deserialize, Serialize};
 
-    #[derive(Default, Serialize, Deserialize)]
+    #[derive(Serialize, Deserialize)]
     pub(crate) struct TestEntity {
+        id: EntityId,
         s: String,
         i: i32,
         t: Option<usize>,
@@ -100,6 +118,16 @@ pub(crate) mod tests {
     }
 
     impl TestEntity {
+        pub(crate) fn new() -> Self {
+            Self {
+                id: EntityId::new(),
+                s: String::new(),
+                i: 0,
+                t: None,
+                ne: None,
+            }
+        }
+
         pub fn i32_val(&self) -> i32 {
             self.i
         }
@@ -109,7 +137,15 @@ pub(crate) mod tests {
         }
     }
 
-    impl IsEntity for TestEntity {}
+    impl IsEntity for TestEntity {
+        fn id(&self) -> EntityId {
+            self.id
+        }
+
+        fn entity_type_id() -> crate::id::EntityTypeId {
+            EntityTypeId::parse_str("d85d8676-9c49-464c-8d14-4bb7d76f9c57")
+        }
+    }
 
     #[derive(Default, Serialize, Deserialize)]
     pub(crate) struct NestedEntity {
@@ -120,17 +156,15 @@ pub(crate) mod tests {
 
     #[test]
     fn test_entity_can_be_stored_as_entity() {
-        let test_entity = TestEntity::default();
+        let test_entity = TestEntity::new();
 
         let _entity = Entity::new(test_entity);
     }
 
     #[test]
     fn test_entity_can_be_read_as_entity() {
-        let test_entity = TestEntity {
-            i: 99,
-            ..Default::default()
-        };
+        let mut test_entity = TestEntity::new();
+        test_entity.set_i32_val(99);
 
         let entity = Entity::new(test_entity);
 
@@ -141,10 +175,7 @@ pub(crate) mod tests {
 
     #[test]
     fn test_entity_can_be_updated_as_entity() {
-        let test_entity = TestEntity {
-            i: 99,
-            ..Default::default()
-        };
+        let test_entity = TestEntity::new();
 
         let entity = Entity::new(test_entity);
 
@@ -158,10 +189,9 @@ pub(crate) mod tests {
 
     #[test]
     fn test_entity_as_typed_can_be_read() {
-        let test_entity = TestEntity {
-            i: 99,
-            ..Default::default()
-        };
+        let mut test_entity = TestEntity::new();
+
+        test_entity.set_i32_val(99);
 
         let entity = Entity::new(test_entity);
 
@@ -174,10 +204,7 @@ pub(crate) mod tests {
 
     #[test]
     fn test_entity_as_typed_mut_can_be_updated() {
-        let test_entity = TestEntity {
-            i: 99,
-            ..Default::default()
-        };
+        let test_entity = TestEntity::new();
 
         let mut entity = Entity::new(test_entity);
 

@@ -28,6 +28,31 @@ impl Default for Id {
     }
 }
 
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
+pub struct EntityId(Id);
+
+impl EntityId {
+    #[must_use]
+    pub fn new() -> Self {
+        EntityId(Id::new())
+    }
+
+    #[must_use]
+    pub fn parse_str(s: &str) -> Self {
+        EntityId(Id::parse_str(s))
+    }
+}
+
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
+pub struct EntityTypeId(Id);
+
+impl EntityTypeId {
+    #[must_use]
+    pub fn parse_str(s: &str) -> Self {
+        EntityTypeId(Id::parse_str(s))
+    }
+}
+
 #[cfg(test)]
 mod test {
     use super::Id;
