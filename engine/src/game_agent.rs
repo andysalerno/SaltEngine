@@ -10,7 +10,7 @@ use protocol::{
     from_server::{Notification, VisualEvent},
 };
 
-use crate::game_state::GameState;
+use crate::game_state::game_state::GameState;
 
 /// A trait that defines the interaction between the GameRunner
 /// and the client.

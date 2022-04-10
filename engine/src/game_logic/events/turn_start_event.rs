@@ -1,5 +1,6 @@
+use crate::game_state::game_state::GameState;
+
 use super::{Event, VisualEvent};
-use crate::game_state::GameState;
 use protocol::{entities::PlayerId, visual_events::TurnStarted};
 
 #[derive(Debug, Clone)]
@@ -14,10 +15,7 @@ impl Event for TurnStartEvent {
         Some(VisualEvent::TurnStarted(TurnStarted { player_id }))
     }
 
-    fn validate<'a, G>(&self, game_state: &'a G) -> super::Result
-    where
-        G: crate::game_state::GameStateView<'a>,
-    {
+    fn validate(&self, game_state: &GameState) -> super::Result {
         if game_state.cur_player_turn() == self.0 {
             Ok(())
         } else {

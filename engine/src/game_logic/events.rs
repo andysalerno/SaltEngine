@@ -1,4 +1,4 @@
-mod add_buff_to_card_instance_event;
+// mod add_buff_to_card_instance_event;
 mod add_card_to_hand_event;
 mod attack;
 mod creature_deals_damage_event;
@@ -15,10 +15,8 @@ mod start_game_event;
 mod summon_creature_from_hand_event;
 mod turn_start_event;
 
-use std::fmt::Debug;
-
-pub use add_buff_to_card_instance_event::AddBuffToCardInstanceEvent;
-pub use add_card_to_hand_event::{AddCardToHandClientEvent, AddCardToHandEvent};
+// pub use add_buff_to_card_instance_event::AddBuffToCardInstanceEvent;
+pub use add_card_to_hand_event::AddCardToHandEvent;
 pub use attack::AttackEvent;
 pub use creature_deals_damage_event::CreatureDealsDamageEvent;
 pub use creature_destroyed::CreatureDestroyedEvent;
@@ -30,15 +28,15 @@ pub use end_turn::EndTurnEvent;
 pub use player_gain_mana::PlayerGainManaEvent;
 pub use player_spend_mana::PlayerSpendManaEvent;
 pub use pos_takes_damage_event::PosTakesDamageEvent;
-use protocol::{entities::PlayerId, from_client::ClientAction, from_server::VisualEvent};
+use protocol::{entities::PlayerId, from_server::VisualEvent};
 pub use start_game_event::StartGameEvent;
-pub use summon_creature_from_hand_event::{
-    CreatureSummonedFromHandEvent, SummonCreatureFromHandClientEvent,
-};
+pub use summon_creature_from_hand_event::CreatureSummonedFromHandEvent;
 pub use turn_start_event::TurnStartEvent;
 
-use crate::game_state::{GameState, GameStateView};
 use enum_dispatch::enum_dispatch;
+use std::fmt::Debug;
+
+use crate::game_state::game_state::GameState;
 
 pub type Result = std::result::Result<(), Box<dyn std::error::Error>>;
 
@@ -46,10 +44,7 @@ pub type Result = std::result::Result<(), Box<dyn std::error::Error>>;
 #[enum_dispatch(GameEvent)]
 pub trait Event: Debug {
     /// Returns a result indicating if the game event is valid given the current game state.
-    fn validate<'a, G>(&self, _game_state: &'a G) -> Result
-    where
-        G: GameStateView<'a>,
-    {
+    fn validate(&self, _game_state: &GameState) -> Result {
         Ok(())
     }
 
@@ -70,7 +65,7 @@ pub enum GameEvent {
     AttackEvent,
     EndTurnEvent,
     CreatureSetEvent,
-    AddBuffToCardInstanceEvent,
+    // AddBuffToCardInstanceEvent,
     CreatureDealsDamageEvent,
     CreatureTakesDamageEvent,
     CreatureDestroyedEvent,
@@ -91,19 +86,20 @@ impl Debug for GameEvent {
             Self::AttackEvent(e) => e.fmt(f),
             Self::EndTurnEvent(e) => e.fmt(f),
             Self::CreatureSetEvent(e) => e.fmt(f),
-            Self::AddBuffToCardInstanceEvent(e) => e.fmt(f),
+            // Self::AddBuffToCardInstanceEvent(e) => e.fmt(f),
             Self::CreatureDealsDamageEvent(e) => e.fmt(f),
-            Self::CreatureTakesDamageEvent(e) => e.fmt(f),
-            Self::CreatureDestroyedEvent(e) => e.fmt(f),
-            Self::TurnStartEvent(e) => e.fmt(f),
-            Self::DrawCardEvent(e) => e.fmt(f),
-            Self::AddCardToHandEvent(e) => e.fmt(f),
-            Self::StartGameEvent(e) => e.fmt(f),
-            Self::PlayerGainManaEvent(e) => e.fmt(f),
-            Self::PlayerSpendManaEvent(e) => e.fmt(f),
-            Self::CreatureSummonedFromHandEvent(e) => e.fmt(f),
-            Self::PosTakesDamageEvent(e) => e.fmt(f),
-            Self::CreatureHealedEvent(e) => e.fmt(f),
+            // Self::CreatureTakesDamageEvent(e) => e.fmt(f),
+            // Self::CreatureDestroyedEvent(e) => e.fmt(f),
+            // Self::TurnStartEvent(e) => e.fmt(f),
+            // Self::DrawCardEvent(e) => e.fmt(f),
+            // Self::AddCardToHandEvent(e) => e.fmt(f),
+            // Self::StartGameEvent(e) => e.fmt(f),
+            // Self::PlayerGainManaEvent(e) => e.fmt(f),
+            // Self::PlayerSpendManaEvent(e) => e.fmt(f),
+            // Self::CreatureSummonedFromHandEvent(e) => e.fmt(f),
+            // Self::PosTakesDamageEvent(e) => e.fmt(f),
+            // Self::CreatureHealedEvent(e) => e.fmt(f),
+            _ => panic!("todo"),
         }
     }
 }
@@ -111,21 +107,22 @@ impl Debug for GameEvent {
 impl GameEvent {
     #[must_use]
     pub fn is_end_turn(&self) -> bool {
-        matches!(self, GameEvent::EndTurnEvent(_))
+        false
+        // matches!(self, GameEvent::EndTurnEvent(_))
     }
 }
 
-/// This implementation is responsible for converting the client-provided actions
-/// to the `GameEvent`s that the engine will execute.
-impl From<ClientAction> for GameEvent {
-    fn from(e: ClientAction) -> Self {
-        match e {
-            ClientAction::EndTurn(e) => EndTurnEvent(e.player_id).into(),
-            ClientAction::SummonCreatureFromHand(e) => {
-                CreatureSummonedFromHandEvent::new(e.player_id, e.board_pos, e.card_id).into()
-            }
-            ClientAction::Attack(e) => AttackEvent::new(e.attacker, e.target).into(),
-            // ClientAction::DrawCard(e) => e.into(),
-        }
-    }
-}
+///// This implementation is responsible for converting the client-provided actions
+///// to the `GameEvent`s that the engine will execute.
+// impl From<ClientAction> for GameEvent {
+//     fn from(e: ClientAction) -> Self {
+//         match e {
+//             ClientAction::EndTurn(e) => EndTurnEvent(e.player_id).into(),
+//             ClientAction::SummonCreatureFromHand(e) => {
+//                 CreatureSummonedFromHandEvent::new(e.player_id, e.board_pos, e.card_id).into()
+//             }
+//             ClientAction::Attack(e) => AttackEvent::new(e.attacker, e.target).into(),
+//             // ClientAction::DrawCard(e) => e.into(),
+//         }
+//     }
+// }

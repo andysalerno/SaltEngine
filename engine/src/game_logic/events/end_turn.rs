@@ -1,4 +1,4 @@
-use crate::game_state::GameState;
+use crate::game_state::game_state::GameState;
 
 use super::{Event, VisualEvent};
 use protocol::entities::PlayerId;
@@ -8,10 +8,7 @@ use serde::{Deserialize, Serialize};
 pub struct EndTurnEvent(pub PlayerId);
 
 impl Event for EndTurnEvent {
-    fn validate<'a, G>(&self, game_state: &'a G) -> super::Result
-    where
-        G: crate::game_state::GameStateView<'a>,
-    {
+    fn validate(&self, game_state: &GameState) -> super::Result {
         if game_state.cur_player_turn() == self.0 {
             Ok(())
         } else {

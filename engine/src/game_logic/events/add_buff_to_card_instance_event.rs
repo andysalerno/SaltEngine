@@ -1,5 +1,4 @@
 use super::Event;
-use crate::game_logic::buff::BuiltBuff;
 use protocol::entities::CreatureInstanceId;
 use serde::{Deserialize, Serialize};
 

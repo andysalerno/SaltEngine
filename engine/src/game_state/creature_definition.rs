@@ -42,3 +42,9 @@ impl CreatureDefinitionId {
         Self(Id::new())
     }
 }
+
+impl Default for CreatureDefinitionId {
+    fn default() -> Self {
+        Self::new()
+    }
+}

@@ -5,7 +5,7 @@ mod card_in_deck_entity;
 mod creature_definition;
 mod creature_instance;
 mod deck;
-mod game_state;
+pub mod game_state;
 // mod hand;
 // pub mod hero;
 // pub mod selector;

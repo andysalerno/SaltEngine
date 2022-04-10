@@ -6,12 +6,13 @@ use super::{
         PlayerGainManaEventHandler, PlayerSpendManaEventHandler, PosTakesDamageHandler,
         StartGameEventHandler, SummonCreatureFromHandEventHandler, TurnStartHandler,
     },
-    events::{Event, GameEvent},
+    events::GameEvent,
 };
+use crate::game_logic::events::Event;
 use crate::{
     game_agent::{ClientNotifier, Prompter},
     game_logic::event_handlers::AddBuffToCardInstanceHandler,
-    game_state::{board::BoardView, GameState, IterAddons},
+    game_state::game_state::GameState,
 };
 use log::{debug, info};
 use protocol::{entities::PlayerId, from_server::Notification};
@@ -243,48 +244,48 @@ impl EventDispatcher {
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use super::EventDispatcher;
-    use crate::game_agent::tests::{MockTestPrompter, StubNotifier};
-    use crate::game_state::{Deck, GameState};
-    use protocol::entities::PlayerId;
-    use std::sync::Arc;
+// #[cfg(test)]
+// mod tests {
+//     use super::EventDispatcher;
+//     use crate::game_agent::tests::{MockTestPrompter, StubNotifier};
+//     use crate::game_state::{Deck, GameState};
+//     use protocol::entities::PlayerId;
+//     use std::sync::Arc;
 
-    pub(crate) fn make_test_state() -> GameState {
-        let player_a_deck = Deck::new(Vec::new());
-        let player_b_deck = Deck::new(Vec::new());
+//     pub(crate) fn make_test_state() -> GameState {
+//         let player_a_deck = Deck::new(Vec::new());
+//         let player_b_deck = Deck::new(Vec::new());
 
-        let mut state = GameState::initial_state(
-            PlayerId::new(),
-            player_a_deck,
-            PlayerId::new(),
-            player_b_deck,
-        );
+//         let mut state = GameState::initial_state(
+//             PlayerId::new(),
+//             player_a_deck,
+//             PlayerId::new(),
+//             player_b_deck,
+//         );
 
-        state.raise_mana_limit(state.player_a_id(), 10);
-        state.raise_mana_limit(state.player_b_id(), 10);
-        state.refresh_player_mana(state.player_a_id());
-        state.refresh_player_mana(state.player_b_id());
+//         state.raise_mana_limit(state.player_a_id(), 10);
+//         state.raise_mana_limit(state.player_b_id(), 10);
+//         state.refresh_player_mana(state.player_a_id());
+//         state.refresh_player_mana(state.player_b_id());
 
-        state
-    }
+//         state
+//     }
 
-    #[test]
-    fn dispatcher_uses_stack_ordering() {
-        let prompter_a = Arc::new(MockTestPrompter::new());
-        let prompter_b = Arc::new(MockTestPrompter::new());
+//     #[test]
+//     fn dispatcher_uses_stack_ordering() {
+//         let prompter_a = Arc::new(MockTestPrompter::new());
+//         let prompter_b = Arc::new(MockTestPrompter::new());
 
-        let notifier_a = Arc::new(StubNotifier);
-        let notifier_b = Arc::new(StubNotifier);
+//         let notifier_a = Arc::new(StubNotifier);
+//         let notifier_b = Arc::new(StubNotifier);
 
-        let _dispatcher = EventDispatcher::new(
-            notifier_a,
-            prompter_a,
-            PlayerId::new(),
-            notifier_b,
-            prompter_b,
-            PlayerId::new(),
-        );
-    }
-}
+//         let _dispatcher = EventDispatcher::new(
+//             notifier_a,
+//             prompter_a,
+//             PlayerId::new(),
+//             notifier_b,
+//             prompter_b,
+//             PlayerId::new(),
+//         );
+//     }
+// }

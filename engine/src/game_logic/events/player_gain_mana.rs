@@ -1,7 +1,7 @@
-use protocol::entities::PlayerId;
+use crate::game_state::game_state::GameState;
 
 use super::{Event, VisualEvent};
-use crate::game_state::GameState;
+use protocol::entities::PlayerId;
 
 #[derive(Debug, Clone)]
 pub struct PlayerGainManaEvent {

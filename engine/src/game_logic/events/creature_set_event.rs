@@ -1,8 +1,6 @@
-use crate::game_state::{GameState, MakePlayerView, UnitCardInstancePlayerView};
-use protocol::entities::{BoardPos, CreatureInstanceId, PlayerId};
-use serde::{Deserialize, Serialize};
-
 use super::{Event, VisualEvent};
+use crate::game_state::game_state::GameState;
+use protocol::entities::{BoardPos, CreatureInstanceId, PlayerId};
 
 #[derive(Debug)]
 pub struct CreatureSetEvent {
@@ -41,13 +39,13 @@ impl CreatureSetEvent {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
-pub struct CreatureSetClientEvent {
-    pub player_id: PlayerId,
-    pub card_id: CreatureInstanceId,
-    pub pos: BoardPos,
-    pub card: UnitCardInstancePlayerView,
-}
+// #[derive(Debug, Serialize, Deserialize, Clone)]
+// pub struct CreatureSetClientEvent {
+//     pub player_id: PlayerId,
+//     pub card_id: CreatureInstanceId,
+//     pub pos: BoardPos,
+//     pub card: UnitCardInstancePlayerView,
+// }
 
 impl Event for CreatureSetEvent {
     fn maybe_client_event(

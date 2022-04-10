@@ -18,7 +18,7 @@ struct CardEntity<T: IsEntity> {
 /// of all state (cards in both players hands, deck content, etc)
 /// and will create a sanitized copy that is sent to players
 #[derive(Debug)]
-struct GameState {
+pub struct GameState {
     player_a_id: PlayerId,
     player_b_id: PlayerId,
     entity_arena: EntityArena,
@@ -41,6 +41,10 @@ impl GameState {
         state
     }
 
+    pub fn cur_player_turn(&self) -> PlayerId {
+        todo!()
+    }
+
     pub fn deck(&self, player_id: PlayerId) -> TypedEntity<DeckEntity, &Value> {
         self.entity_arena
             .of_type::<DeckEntity>()
@@ -53,6 +57,14 @@ impl GameState {
             .of_type_mut::<DeckEntity>()
             .find(|d| d.get(|d| d.player_id() == player_id))
             .unwrap()
+    }
+
+    pub fn player_a_id(&self) -> PlayerId {
+        self.player_a_id
+    }
+
+    pub fn player_b_id(&self) -> PlayerId {
+        self.player_b_id
     }
 }
 
