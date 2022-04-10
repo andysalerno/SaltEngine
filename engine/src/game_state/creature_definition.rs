@@ -36,3 +36,9 @@ impl CreatureDefinition {}
 
 #[derive(Copy, Clone, PartialEq, Debug, Eq, Hash, Serialize, Deserialize)]
 pub struct CreatureDefinitionId(Id);
+
+impl CreatureDefinitionId {
+    pub fn new() -> Self {
+        Self(Id::new())
+    }
+}

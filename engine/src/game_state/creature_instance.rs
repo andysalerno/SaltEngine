@@ -28,6 +28,6 @@ impl IsEntity for CreatureInstance {
     }
 
     fn entity_type_id() -> EntityTypeId {
-        EntityTypeId::parse_str("...")
+        EntityTypeId::parse_str("f8891722-a910-47cd-8220-b10368b0b537")
     }
 }

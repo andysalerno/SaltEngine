@@ -1,7 +1,7 @@
 use crate::{
     entity::{Entity, IsEntity},
     id::EntityId,
-    TypedEntity,
+    TypedEntity, Value,
 };
 use std::{borrow::Borrow, collections::HashMap};
 
@@ -54,16 +54,14 @@ impl EntityArena {
         self.entities.values_mut()
     }
 
-    pub fn of_type<T: IsEntity>(&self) -> impl Iterator<Item = TypedEntity<T, &serde_json::Value>> {
+    pub fn of_type<T: IsEntity>(&self) -> impl Iterator<Item = TypedEntity<T, &Value>> {
         self.entities
             .values()
             .filter(|e| e.entity_type_id() == T::entity_type_id())
             .map(|e| e.as_typed::<T>())
     }
 
-    pub fn of_type_mut<T: IsEntity>(
-        &mut self,
-    ) -> impl Iterator<Item = TypedEntity<T, &mut serde_json::Value>> {
+    pub fn of_type_mut<T: IsEntity>(&mut self) -> impl Iterator<Item = TypedEntity<T, &mut Value>> {
         self.entities
             .values_mut()
             .filter(|e| e.entity_type_id() == T::entity_type_id())

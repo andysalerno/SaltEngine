@@ -15,11 +15,13 @@ pub trait IsEntity: Serialize + DeserializeOwned {
     fn entity_type_id() -> EntityTypeId;
 }
 
+pub type Value = serde_json::Value;
+
 #[derive(Clone, Debug)]
 pub struct Entity {
     id: EntityId,
     entity_type_id: EntityTypeId,
-    data: serde_json::Value,
+    data: Value,
 }
 
 impl Entity {
@@ -31,7 +33,7 @@ impl Entity {
         }
     }
 
-    pub fn into_typed<T: IsEntity>(self) -> TypedEntity<T, serde_json::Value> {
+    pub fn into_typed<T: IsEntity>(self) -> TypedEntity<T, Value> {
         TypedEntity {
             id: self.id,
             data: self.data,
@@ -39,7 +41,7 @@ impl Entity {
         }
     }
 
-    pub fn as_typed_mut<T: IsEntity>(&mut self) -> TypedEntity<T, &mut serde_json::Value> {
+    pub fn as_typed_mut<T: IsEntity>(&mut self) -> TypedEntity<T, &mut Value> {
         TypedEntity {
             id: self.id,
             data: &mut self.data,
@@ -47,7 +49,7 @@ impl Entity {
         }
     }
 
-    pub fn as_typed<T: IsEntity>(&self) -> TypedEntity<T, &serde_json::Value> {
+    pub fn as_typed<T: IsEntity>(&self) -> TypedEntity<T, &Value> {
         TypedEntity {
             id: self.id,
             data: &self.data,
@@ -73,12 +75,13 @@ pub struct TypedEntity<T: IsEntity, I> {
 impl<T, I> TypedEntity<T, I>
 where
     T: IsEntity,
-    I: Borrow<serde_json::Value>,
+    I: Borrow<Value>,
 {
     pub fn get<F, R>(&self, f: F) -> R
     where
         F: FnOnce(&T) -> R,
     {
+        // todo - surely possible without cloning?
         let local: T = serde_json::from_value(self.data.borrow().clone()).unwrap();
         f(&local)
     }
@@ -91,9 +94,10 @@ where
 impl<T, I> TypedEntity<T, I>
 where
     T: IsEntity,
-    I: BorrowMut<serde_json::Value>,
+    I: BorrowMut<Value>,
 {
     pub fn get_mut(&mut self, f: impl FnOnce(&mut T)) {
+        // todo - surely possible without cloning?
         let mut local: T = serde_json::from_value(self.data.borrow().clone()).unwrap();
         f(&mut local);
 
