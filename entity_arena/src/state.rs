@@ -38,7 +38,7 @@ where
             panic!("An entity with key {id:?} already existed");
         }
 
-        self.custom_index.insert(index_value, id).unwrap();
+        _ = self.custom_index.insert(index_value, id);
 
         id
     }
@@ -86,11 +86,16 @@ mod tests {
     use crate::{
         entity::tests::{AnotherTestEntity, TestEntity},
         id::EntityId,
+        Entity,
     };
+
+    fn indexer(entity: &Entity) -> u8 {
+        42
+    }
 
     #[test]
     fn entity_can_be_added() {
-        let mut state = EntityArena::new();
+        let mut state = EntityArena::new(indexer);
 
         let test_entity = TestEntity::new();
 
@@ -99,7 +104,7 @@ mod tests {
 
     #[test]
     fn entity_can_be_added_retrieved() {
-        let mut state = EntityArena::new();
+        let mut state = EntityArena::new(indexer);
 
         let test_entity = TestEntity::new();
 
@@ -111,7 +116,7 @@ mod tests {
     #[test]
     #[should_panic]
     fn expect_panic_when_entity_not_exist() {
-        let mut state = EntityArena::new();
+        let mut state = EntityArena::new(indexer);
 
         let test_entity = TestEntity::new();
 
@@ -124,7 +129,7 @@ mod tests {
 
     #[test]
     fn entity_can_be_added_retrieved_and_read() {
-        let mut state = EntityArena::new();
+        let mut state = EntityArena::new(indexer);
 
         let mut test_entity = TestEntity::new();
 
@@ -141,7 +146,7 @@ mod tests {
 
     #[test]
     fn entity_can_be_added_retrieved_and_updated() {
-        let mut state = EntityArena::new();
+        let mut state = EntityArena::new(indexer);
 
         let mut test_entity = TestEntity::new();
 
@@ -159,7 +164,7 @@ mod tests {
 
     #[test]
     fn entity_can_all_be_listed() {
-        let mut state = EntityArena::new();
+        let mut state = EntityArena::new(indexer);
 
         let test_entity_1 = TestEntity::new();
         let test_entity_2 = TestEntity::new();
@@ -179,7 +184,7 @@ mod tests {
 
     #[test]
     fn entity_can_be_found_by_type() {
-        let mut state = EntityArena::new();
+        let mut state = EntityArena::new(indexer);
 
         let test_entity_1 = TestEntity::new();
         let test_entity_2 = TestEntity::new();
