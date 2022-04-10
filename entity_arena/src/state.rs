@@ -3,23 +3,32 @@ use crate::{
     id::EntityId,
     TypedEntity, Value,
 };
-use std::{borrow::Borrow, collections::HashMap};
+use std::{borrow::Borrow, collections::HashMap, fmt::Debug};
 
 /// A global state, defining all known entities mapped from their ID.
-#[derive(Clone, Debug, Default)]
-pub struct EntityArena {
+#[derive(Clone)]
+pub struct EntityArena<TIndex> {
     entities: HashMap<EntityId, Entity>,
+    custom_index: HashMap<TIndex, EntityId>,
+    mapper: fn(&Entity) -> TIndex,
 }
 
-impl EntityArena {
-    pub fn new() -> Self {
+impl<TIndex> EntityArena<TIndex>
+where
+    TIndex: std::cmp::Eq + std::hash::Hash,
+{
+    pub fn new(mapper: fn(&Entity) -> TIndex) -> Self {
         Self {
             entities: HashMap::new(),
+            custom_index: HashMap::new(),
+            mapper,
         }
     }
 
     pub fn add(&mut self, entity: impl IsEntity) -> EntityId {
         let entity = Entity::new(entity);
+
+        let index_value = (self.mapper)(&entity);
 
         let id = entity.id();
 
@@ -28,6 +37,8 @@ impl EntityArena {
         if already_existed {
             panic!("An entity with key {id:?} already existed");
         }
+
+        self.custom_index.insert(index_value, id).unwrap();
 
         id
     }
@@ -186,5 +197,15 @@ mod tests {
 
         let another_entity_count = state.of_type::<AnotherTestEntity>().count();
         assert_eq!(1, another_entity_count);
+    }
+}
+
+impl<T: Debug> Debug for EntityArena<T> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("EntityArena")
+            .field("entities", &self.entities)
+            .field("custom_index", &self.custom_index)
+            .field("mapper", &"(mapper fn)")
+            .finish()
     }
 }
