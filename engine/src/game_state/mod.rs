@@ -1,4 +1,4 @@
-// pub mod board;
+mod board;
 // mod card_instance;
 // mod deck;
 mod card_in_deck_entity;

@@ -11,7 +11,6 @@ use super::{
 use crate::game_logic::events::Event;
 use crate::{
     game_agent::{ClientNotifier, Prompter},
-    game_logic::event_handlers::AddBuffToCardInstanceHandler,
     game_state::game_state::GameState,
 };
 use log::{debug, info};
@@ -234,12 +233,11 @@ impl EventDispatcher {
                 CreatureHealedEventHandler::default()
                     .handle(e, game_state, self)
                     .await;
-            }
-            GameEvent::AddBuffToCardInstanceEvent(e) => {
-                AddBuffToCardInstanceHandler::default()
-                    .handle(e, game_state, self)
-                    .await;
-            }
+            } // GameEvent::AddBuffToCardInstanceEvent(e) => {
+              //     AddBuffToCardInstanceHandler::default()
+              //         .handle(e, game_state, self)
+              //         .await;
+              // }
         }
     }
 }

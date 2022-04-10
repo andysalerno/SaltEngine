@@ -1,9 +1,10 @@
-use entity_arena::{EntityArena, IsEntity, TypedEntity, Value};
+use entity_arena::{Entity, EntityArena, IsEntity, TypedEntity, Value};
 use protocol::entities::PlayerId;
 
-use super::deck::DeckEntity;
+use super::{board::Board, deck::DeckEntity};
 
-enum Position {
+#[derive(Debug, std::cmp::PartialEq, std::cmp::Eq, std::hash::Hash)]
+pub enum Position {
     Hand,
     Board,
     Abyss,
@@ -21,7 +22,12 @@ struct CardEntity<T: IsEntity> {
 pub struct GameState {
     player_a_id: PlayerId,
     player_b_id: PlayerId,
-    entity_arena: EntityArena,
+    cur_player_turn: PlayerId,
+    entity_arena: EntityArena<Position>,
+}
+
+fn indexer(_entity: &Entity) -> Position {
+    Position::Hand
 }
 
 impl GameState {
@@ -29,7 +35,8 @@ impl GameState {
         let mut state = Self {
             player_a_id,
             player_b_id,
-            entity_arena: EntityArena::new(),
+            cur_player_turn: player_a_id,
+            entity_arena: EntityArena::new(indexer),
         };
 
         let deck_a = DeckEntity::new(player_a_id);
@@ -42,6 +49,18 @@ impl GameState {
     }
 
     pub fn cur_player_turn(&self) -> PlayerId {
+        todo!()
+    }
+
+    pub fn board(&self) -> Board<&GameState> {
+        Board::new(self)
+    }
+
+    pub fn board_mut(&mut self) -> Board<&mut GameState> {
+        Board::new(self)
+    }
+
+    pub fn evaluate_passives(&mut self) {
         todo!()
     }
 
@@ -65,6 +84,10 @@ impl GameState {
 
     pub fn player_b_id(&self) -> PlayerId {
         self.player_b_id
+    }
+
+    pub(crate) fn entity_arena(&self) -> &EntityArena<Position> {
+        &self.entity_arena
     }
 }
 
