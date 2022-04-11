@@ -20,10 +20,6 @@ pub fn entity(args: TokenStream, mut input: TokenStream) -> TokenStream {
 
     let q: TokenStream = quote! {
        impl IsEntity for #name {
-            fn id(&self) -> entity_arena::id::EntityId {
-                self.id
-            }
-
             fn entity_type_id() -> entity_arena::id::EntityTypeId {
                 EntityTypeId::parse_str(#a)
             }

@@ -1,7 +1,7 @@
 use super::{AsId, Id};
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Eq, Hash, Clone, Copy, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, PartialEq, Eq, Hash, Clone, Copy, Serialize, Deserialize)]
 pub struct PlayerId(Id);
 
 impl PlayerId {

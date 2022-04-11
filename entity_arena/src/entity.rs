@@ -9,7 +9,7 @@ pub trait IsEntity: Serialize + DeserializeOwned {
     // type TypeId: EntityTypeId;
 
     /// The id of this entity instance.
-    fn id(&self) -> EntityId;
+    // fn id(&self) -> EntityId;
 
     /// The type ID of this entity type.
     fn entity_type_id() -> EntityTypeId;
@@ -27,7 +27,7 @@ pub struct Entity {
 impl Entity {
     pub fn new<T: IsEntity>(data: T) -> Self {
         Self {
-            id: data.id(),
+            id: EntityId::new(),
             entity_type_id: T::entity_type_id(),
             data: serde_json::to_value(data).expect("The given entity could not be serialized"),
         }
@@ -142,10 +142,6 @@ pub(crate) mod tests {
     }
 
     impl IsEntity for TestEntity {
-        fn id(&self) -> EntityId {
-            self.id
-        }
-
         fn entity_type_id() -> crate::id::EntityTypeId {
             EntityTypeId::parse_str("d85d8676-9c49-464c-8d14-4bb7d76f9c57")
         }
@@ -162,10 +158,6 @@ pub(crate) mod tests {
     pub(crate) struct AnotherTestEntity;
 
     impl IsEntity for AnotherTestEntity {
-        fn id(&self) -> EntityId {
-            EntityId::new()
-        }
-
         fn entity_type_id() -> EntityTypeId {
             EntityTypeId::parse_str("25068336-7a85-42cf-bf2f-d168bfb81692")
         }

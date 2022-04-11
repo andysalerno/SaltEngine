@@ -6,29 +6,20 @@ use crate::{
 use std::{borrow::Borrow, collections::HashMap, fmt::Debug};
 
 /// A global state, defining all known entities mapped from their ID.
-#[derive(Clone)]
-pub struct EntityArena<TIndex> {
+#[derive(Clone, Debug)]
+pub struct EntityArena {
     entities: HashMap<EntityId, Entity>,
-    custom_index: HashMap<TIndex, EntityId>,
-    mapper: fn(&Entity) -> TIndex,
 }
 
-impl<TIndex> EntityArena<TIndex>
-where
-    TIndex: std::cmp::Eq + std::hash::Hash,
-{
-    pub fn new(mapper: fn(&Entity) -> TIndex) -> Self {
+impl EntityArena {
+    pub fn new() -> Self {
         Self {
             entities: HashMap::new(),
-            custom_index: HashMap::new(),
-            mapper,
         }
     }
 
     pub fn add(&mut self, entity: impl IsEntity) -> EntityId {
         let entity = Entity::new(entity);
-
-        let index_value = (self.mapper)(&entity);
 
         let id = entity.id();
 
@@ -37,8 +28,6 @@ where
         if already_existed {
             panic!("An entity with key {id:?} already existed");
         }
-
-        _ = self.custom_index.insert(index_value, id);
 
         id
     }
@@ -89,13 +78,9 @@ mod tests {
         Entity,
     };
 
-    fn indexer(entity: &Entity) -> u8 {
-        42
-    }
-
     #[test]
     fn entity_can_be_added() {
-        let mut state = EntityArena::new(indexer);
+        let mut state = EntityArena::new();
 
         let test_entity = TestEntity::new();
 
@@ -104,7 +89,7 @@ mod tests {
 
     #[test]
     fn entity_can_be_added_retrieved() {
-        let mut state = EntityArena::new(indexer);
+        let mut state = EntityArena::new();
 
         let test_entity = TestEntity::new();
 
@@ -116,7 +101,7 @@ mod tests {
     #[test]
     #[should_panic]
     fn expect_panic_when_entity_not_exist() {
-        let mut state = EntityArena::new(indexer);
+        let mut state = EntityArena::new();
 
         let test_entity = TestEntity::new();
 
@@ -129,7 +114,7 @@ mod tests {
 
     #[test]
     fn entity_can_be_added_retrieved_and_read() {
-        let mut state = EntityArena::new(indexer);
+        let mut state = EntityArena::new();
 
         let mut test_entity = TestEntity::new();
 
@@ -146,7 +131,7 @@ mod tests {
 
     #[test]
     fn entity_can_be_added_retrieved_and_updated() {
-        let mut state = EntityArena::new(indexer);
+        let mut state = EntityArena::new();
 
         let mut test_entity = TestEntity::new();
 
@@ -164,7 +149,7 @@ mod tests {
 
     #[test]
     fn entity_can_all_be_listed() {
-        let mut state = EntityArena::new(indexer);
+        let mut state = EntityArena::new();
 
         let test_entity_1 = TestEntity::new();
         let test_entity_2 = TestEntity::new();
@@ -184,7 +169,7 @@ mod tests {
 
     #[test]
     fn entity_can_be_found_by_type() {
-        let mut state = EntityArena::new(indexer);
+        let mut state = EntityArena::new();
 
         let test_entity_1 = TestEntity::new();
         let test_entity_2 = TestEntity::new();
@@ -202,15 +187,5 @@ mod tests {
 
         let another_entity_count = state.of_type::<AnotherTestEntity>().count();
         assert_eq!(1, another_entity_count);
-    }
-}
-
-impl<T: Debug> Debug for EntityArena<T> {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.debug_struct("EntityArena")
-            .field("entities", &self.entities)
-            .field("custom_index", &self.custom_index)
-            .field("mapper", &"(mapper fn)")
-            .finish()
     }
 }
