@@ -2,11 +2,12 @@ mod board;
 // mod card_instance;
 // mod deck;
 mod card_in_deck_entity;
+mod card_in_hand_entity;
 mod creature_definition;
 mod creature_instance;
 mod deck;
 pub mod game_state;
-// mod hand;
+mod hand;
 // pub mod hero;
 // pub mod selector;
 

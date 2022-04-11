@@ -1,11 +1,13 @@
-use entity_arena::{Entity, EntityArena, IsEntity, TypedEntity, Value};
+use std::collections::HashMap;
+
+use entity_arena::{id::EntityId, Entity, EntityArena, IsEntity, TypedEntity, Value};
 use protocol::entities::PlayerId;
 
-use super::{board::Board, deck::DeckEntity};
+use super::{board::Board, card_in_hand_entity::CardInHand, deck::DeckEntity};
 
 #[derive(Debug, std::cmp::PartialEq, std::cmp::Eq, std::hash::Hash)]
 pub enum Position {
-    Hand,
+    Hand(PlayerId),
     Board,
     Abyss,
 }
@@ -23,11 +25,8 @@ pub struct GameState {
     player_a_id: PlayerId,
     player_b_id: PlayerId,
     cur_player_turn: PlayerId,
-    entity_arena: EntityArena<Position>,
-}
-
-fn indexer(_entity: &Entity) -> Position {
-    Position::Hand
+    entity_arena: EntityArena,
+    entity_positions: HashMap<Position, EntityId>,
 }
 
 impl GameState {
@@ -36,7 +35,8 @@ impl GameState {
             player_a_id,
             player_b_id,
             cur_player_turn: player_a_id,
-            entity_arena: EntityArena::new(indexer),
+            entity_arena: EntityArena::new(),
+            entity_positions: HashMap::new(),
         };
 
         let deck_a = DeckEntity::new(player_a_id);
@@ -86,8 +86,16 @@ impl GameState {
         self.player_b_id
     }
 
-    pub(crate) fn entity_arena(&self) -> &EntityArena<Position> {
+    pub(crate) fn entity_arena(&self) -> &EntityArena {
         &self.entity_arena
+    }
+
+    pub(crate) fn positions_map(&self) -> &HashMap<Position, EntityId> {
+        &self.entity_positions
+    }
+
+    pub(crate) fn positions_map_mut(&mut self) -> &mut HashMap<Position, EntityId> {
+        &mut self.entity_positions
     }
 }
 

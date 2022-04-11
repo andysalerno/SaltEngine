@@ -1,8 +1,10 @@
 use std::borrow::Borrow;
 
+use entity_arena::{id::EntityId, Entity, TypedEntity, Value};
+
 use super::{
     creature_instance::CreatureInstance,
-    game_state::{self, GameState},
+    game_state::{GameState, Position},
 };
 
 pub struct Board<T>
@@ -20,9 +22,28 @@ where
         Self { game_state }
     }
 
-    pub fn creature_at_pos(&self) {
+    pub fn creature_at_pos(
+        &self,
+        position: impl Borrow<Position>,
+    ) -> Option<TypedEntity<CreatureInstance, &Value>> {
+        let entity = self.entity_at_pos(position)?;
+
+        Some(entity.as_typed::<CreatureInstance>())
+    }
+
+    pub fn entity_at_pos(&self, position: impl Borrow<Position>) -> Option<&Entity> {
         let game_state: &GameState = self.game_state.borrow();
 
-        // game_state.entity_arena().of_type::<CreatureInstance>().find(|c|);
+        let entity_id = self.entity_id_at_pos(position)?;
+
+        let entity = game_state.entity_arena().get(entity_id);
+
+        Some(entity)
+    }
+
+    pub fn entity_id_at_pos(&self, position: impl Borrow<Position>) -> Option<EntityId> {
+        let game_state: &GameState = self.game_state.borrow();
+
+        game_state.positions_map().get(position.borrow()).copied()
     }
 }

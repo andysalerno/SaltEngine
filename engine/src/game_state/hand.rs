@@ -1,125 +1,48 @@
 use super::{
-    card_instance::{UnitCardInstancePlayerView, UnitCardInstanceView},
-    MakePlayerView, PlayerId, UnitCardInstance,
+    card_in_hand_entity::CardInHand,
+    game_state::{GameState, Position},
 };
-use protocol::entities::CreatureInstanceId;
-use serde::{Deserialize, Serialize};
+use entity_arena::{id::EntityId, TypedEntity, Value};
+use protocol::entities::PlayerId;
+use std::borrow::Borrow;
 
-pub trait HandView<'a> {
-    type TCard: UnitCardInstanceView<'a>;
+pub struct Hand<T>
+where
+    T: Borrow<GameState>,
+{
+    player_id: PlayerId,
+    game_state: T,
+}
 
-    fn cards(&self) -> &[Self::TCard];
+impl<T> Hand<T>
+where
+    T: Borrow<GameState>,
+{
+    pub fn new(game_state: T, player_id: PlayerId) -> Self {
+        Self {
+            player_id,
+            game_state,
+        }
+    }
 
-    fn card(&self, id: CreatureInstanceId) -> &Self::TCard {
-        self.cards()
+    pub fn entity_ids(&self) -> Vec<EntityId> {
+        self.game_state
+            .borrow()
+            .positions_map()
             .iter()
-            .find(|c| c.id() == id)
-            .unwrap_or_else(|| {
-                panic!(
-                    "Attempted to find card with id {:?} in hand, but no such card was found.",
-                    id
-                )
-            })
+            .filter(|(k, _)| matches!(k, Position::Hand(p) if *p == self.player_id))
+            .map(|(_, v)| v)
+            .copied()
+            .collect()
     }
 
-    fn nth(&self, n: usize) -> Option<&Self::TCard> {
-        self.cards().get(n)
-    }
+    pub fn cards(&self) -> impl Iterator<Item = TypedEntity<CardInHand, &Value>> {
+        let ids = self.entity_ids();
 
-    fn len(&self) -> usize {
-        self.cards().len()
-    }
+        let arena = self.game_state.borrow().entity_arena();
 
-    fn is_empty(&self) -> bool {
-        self.len() == 0
-    }
-}
-
-#[derive(Debug, Default)]
-pub struct Hand {
-    cards: Vec<UnitCardInstance>,
-}
-
-impl Hand {
-    #[must_use]
-    pub fn len(&self) -> usize {
-        self.cards.len()
-    }
-
-    #[must_use]
-    pub fn is_empty(&self) -> bool {
-        self.len() == 0
-    }
-
-    #[must_use]
-    pub fn cards(&self) -> &[UnitCardInstance] {
-        self.cards.as_slice()
-    }
-
-    pub fn cards_mut(&mut self) -> &mut [UnitCardInstance] {
-        self.cards.as_mut_slice()
-    }
-
-    pub fn add_card(&mut self, card: UnitCardInstance) {
-        self.cards.push(card);
-    }
-
-    #[must_use]
-    pub fn card(&self, id: CreatureInstanceId) -> &UnitCardInstance {
-        HandView::card(self, id)
-    }
-
-    pub fn take_card(&mut self, id: CreatureInstanceId) -> UnitCardInstance {
-        let (index, _) = self
-            .cards
-            .iter()
-            .enumerate()
-            .find(|(_i, c)| c.id() == id)
-            .unwrap_or_else(|| {
-                panic!(
-                    "Attempted to take card with id {:?} from hand, but no such card was found.",
-                    id
-                )
-            });
-
-        let card = self.cards.remove(index);
-        assert!(card.id() == id);
-
-        card
-    }
-}
-
-impl<'a> HandView<'a> for Hand {
-    type TCard = UnitCardInstance;
-
-    fn cards(&self) -> &[UnitCardInstance] {
-        Hand::cards(self)
-    }
-}
-
-#[derive(Debug, Serialize, Clone, Deserialize)]
-pub struct HandPlayerView {
-    cards: Vec<UnitCardInstancePlayerView>,
-}
-
-impl<'a> MakePlayerView<'a> for Hand {
-    type TOut = HandPlayerView;
-
-    fn player_view(&'a self, player_viewing: PlayerId) -> HandPlayerView {
-        let cards = self
-            .cards()
-            .iter()
-            .map(|c| c.player_view(player_viewing))
-            .collect();
-
-        HandPlayerView { cards }
-    }
-}
-
-impl<'a> HandView<'a> for HandPlayerView {
-    type TCard = UnitCardInstancePlayerView;
-
-    fn cards(&self) -> &[UnitCardInstancePlayerView] {
-        self.cards.as_slice()
+        arena
+            .of_type::<CardInHand>()
+            .filter(move |c| ids.contains(&c.id()))
     }
 }
