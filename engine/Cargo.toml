@@ -18,6 +18,8 @@ futures = "0.3"
 enum_dispatch = "0.3.7"
 protocol = { path = "../protocol" }
 entity_arena = { path = "../entity_arena" }
+id = { path = "../id" }
+id_macro = { path = "../id/id_macro" }
 isentity_macro_derive = { path = "../entity_arena/isentity_macro_derive" }
 
 [dev-dependencies]

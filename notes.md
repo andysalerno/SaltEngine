@@ -130,3 +130,9 @@ client on WaitingForAction:
         1. If WaitingForAction, break
     }
 }
+
+
+transport entities are types like CreatureInstance, with a DefinitionId and a body that shows the current content
+these transport types are "no code", just json, but have IDs to things like BigRedDogOnDeath, etc
+the engine operates on these
+each card definition is a builder that can build one of these entities

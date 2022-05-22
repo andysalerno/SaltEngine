@@ -8,5 +8,5 @@ members = [
 	"entity_arena",
 	"cards",
 	"protocol",
-	"derive_id_macro"
+	"id"
 ]
