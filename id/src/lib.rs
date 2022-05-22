@@ -8,6 +8,11 @@ impl Id {
     pub fn new() -> Self {
         Self(Uuid::new_v4())
     }
+
+    #[must_use]
+    pub fn parse_str(s: &str) -> Self {
+        Id(Uuid::parse_str(s).unwrap())
+    }
 }
 
 impl std::fmt::Debug for Id {

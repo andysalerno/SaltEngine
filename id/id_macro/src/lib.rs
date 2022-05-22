@@ -24,9 +24,18 @@ pub fn id(args: TokenStream, input: TokenStream) -> TokenStream {
         #item_struct
 
         impl #name {
+            #[must_use]
             pub fn new() -> Self {
                 Self {
                     id: id::Id::new()
+                }
+            }
+
+            #[must_use]
+            pub fn parse_str(s: &str) -> Self {
+                let id = id::Id::parse_str(s);
+                Self {
+                    id
                 }
             }
         }

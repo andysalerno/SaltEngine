@@ -1,4 +1,4 @@
-use super::creature_definition::CreatureDefinitionId;
+use crate::v2::CreatureDefinitionId;
 use entity_arena::{
     id::{EntityId, EntityTypeId},
     IsEntity,

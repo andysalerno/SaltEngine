@@ -36,33 +36,3 @@ impl DeckEntity {
         self.cards.len()
     }
 }
-
-// #[derive(Debug, Default)]
-// pub struct Deck {
-//     cards: Vec<CreatureInstance>,
-// }
-
-// impl Deck {
-//     #[must_use]
-//     pub fn len(&self) -> usize {
-//         self.cards.len()
-//     }
-
-//     #[must_use]
-//     pub fn is_empty(&self) -> bool {
-//         self.len() == 0
-//     }
-
-//     pub fn draw_card(&mut self) -> Option<CreatureInstance> {
-//         self.cards.pop()
-//     }
-
-//     #[must_use]
-//     pub fn new(cards: Vec<CreatureInstance>) -> Self {
-//         Self { cards }
-//     }
-
-//     pub fn shuffle(&mut self) {
-//         self.cards.shuffle(&mut rand::thread_rng());
-//     }
-// }

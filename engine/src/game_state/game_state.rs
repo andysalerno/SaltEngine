@@ -101,9 +101,9 @@ impl GameState {
 
 #[cfg(test)]
 mod tests {
-    use crate::game_state::{
-        card_in_deck_entity::CardInDeck, creature_definition::CreatureDefinitionId,
-        deck::DeckEntity,
+    use crate::{
+        game_state::{card_in_deck_entity::CardInDeck, deck::DeckEntity},
+        v2::CreatureDefinitionId,
     };
 
     use super::GameState;

@@ -1,4 +1,4 @@
-use super::creature_definition::CreatureDefinitionId;
+use crate::v2::CreatureDefinitionId;
 use entity_arena::{
     id::{EntityId, EntityTypeId},
     IsEntity,
@@ -21,16 +21,6 @@ impl CardInDeck {
         }
     }
 }
-
-// impl IsEntity for CardInDeck {
-//     fn id(&self) -> entity_arena::id::EntityId {
-//         self.id
-//     }
-
-//     fn entity_type_id() -> entity_arena::id::EntityTypeId {
-//         EntityTypeId::parse_str("...")
-//     }
-// }
 
 #[cfg(test)]
 mod tests {
