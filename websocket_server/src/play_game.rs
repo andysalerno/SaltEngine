@@ -88,17 +88,17 @@ fn get_deck() -> Deck {
         let cards: Vec<UnitCardInstance> = (0..8)
             .flat_map(|_| {
                 let cards = vec![
-                    RicketyCannon.make_instance(),
-                    Pawn.make_instance(),
-                    EmotionalSupportDog.make_instance(),
-                    ReallyBigRock.make_instance(),
-                    AttackDog.make_instance(),
-                    SleepingDog.make_instance(),
-                    PopcornVendor.make_instance(),
-                    PriestOfTheLowland.make_instance(),
-                    FraidyCat.make_instance(),
-                    OutdoorCat.make_instance(),
-                    IndoorCat.make_instance(),
+                    // RicketyCannon.make_instance(),
+                    // Pawn.make_instance(),
+                    // EmotionalSupportDog.make_instance(),
+                    // ReallyBigRock.make_instance(),
+                    // AttackDog.make_instance(),
+                    // SleepingDog.make_instance(),
+                    // PopcornVendor.make_instance(),
+                    // PriestOfTheLowland.make_instance(),
+                    // FraidyCat.make_instance(),
+                    // OutdoorCat.make_instance(),
+                    // IndoorCat.make_instance(),
                 ];
 
                 cards

@@ -7,6 +7,7 @@ use syn::{parse, parse_macro_input, ItemStruct};
 #[proc_macro_attribute]
 pub fn id(args: TokenStream, input: TokenStream) -> TokenStream {
     let mut item_struct = parse_macro_input!(input as ItemStruct);
+    let name = item_struct.ident.clone();
     let _ = parse_macro_input!(args as parse::Nothing);
 
     if let syn::Fields::Unit = item_struct.fields {
@@ -19,8 +20,17 @@ pub fn id(args: TokenStream, input: TokenStream) -> TokenStream {
     }
 
     let stream: TokenStream = quote! {
-        #[derive(Copy, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
+        #[derive(Debug, Copy, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
         #item_struct
+
+        impl #name {
+            pub fn new() -> Self {
+                Self {
+                    id: id::Id::new()
+                }
+            }
+        }
+
     }
     .into();
 

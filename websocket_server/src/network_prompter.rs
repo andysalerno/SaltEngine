@@ -3,7 +3,8 @@ use protocol::{
     entities::{BoardPos, PlayerId, RowId},
     from_server::PromptMessage,
 };
-use salt_engine::{game_agent::Prompter, game_state::GameStatePlayerView};
+// use salt_engine::{game_agent::Prompter, game_state::GameStatePlayerView};
+use salt_engine::game_agent::Prompter;
 
 pub(crate) struct NewtorkPrompter {
     connection: Connection,

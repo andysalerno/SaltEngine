@@ -1,3 +1,4 @@
+use entity_arena::IsEntity;
 use id_macro::id;
 use serde::{Deserialize, Serialize};
 
@@ -16,12 +17,22 @@ pub struct CreatureDefinition {
     // placeable_at: Position,
 }
 
+#[id]
+pub struct CreatureInstanceId;
+
+#[derive(Clone, Serialize, Deserialize)]
 pub struct CreatureInstance {
-    instance_id: CreatureDefinitionId,
+    instance_id: CreatureInstanceId,
     definition_id: CreatureDefinitionId,
     cost: i32,
     attack: i32,
     health: i32,
+}
+
+impl IsEntity for CreatureInstance {
+    fn entity_type_id() -> entity_arena::id::EntityTypeId {
+        todo!()
+    }
 }
 
 mod builder {

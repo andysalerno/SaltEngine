@@ -1,9 +1,6 @@
 [workspace]
 
 members = [
-	"websocket_client",
-	"console_client",
-	"websocket_server",
 	"engine",
 	"entity_arena",
 	"cards",
