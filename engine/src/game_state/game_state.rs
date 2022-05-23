@@ -30,7 +30,7 @@ pub struct GameState {
 }
 
 impl GameState {
-    fn new(player_a_id: PlayerId, player_b_id: PlayerId) -> Self {
+    pub fn new(player_a_id: PlayerId, player_b_id: PlayerId) -> Self {
         let mut state = Self {
             player_a_id,
             player_b_id,

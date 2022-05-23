@@ -1,8 +1,9 @@
 use crate::{
     client_actions::{Attack, EndTurn, SummonCreatureFromHand},
-    entities::{BoardPos, Id},
+    entities::BoardPos,
     GameMessage,
 };
+use id::Id;
 use serde::{Deserialize, Serialize};
 
 /// Messages that can be sent from the game client to the game server.

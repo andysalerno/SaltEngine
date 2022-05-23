@@ -1,8 +1,9 @@
 use crate::{
-    entities::{AsId, Entity, EntityId, EntityPosition, EntityTypeId, Id, PlayerId},
+    entities::{AsId, Entity, EntityId, EntityPosition, EntityTypeId, PlayerId},
     visual_events::*,
     GameMessage,
 };
+use id::Id;
 use serde::{Deserialize, Serialize};
 
 /// Views of events that the server can send to clients.

@@ -1,11 +1,7 @@
+use super::game_state::{GameState, Position};
+use crate::v2::CreatureInstance;
+use entity_arena::{id::EntityId, Entity, IsEntity, TypedEntity, Value};
 use std::borrow::Borrow;
-
-use entity_arena::{id::EntityId, Entity, TypedEntity, Value};
-
-use super::{
-    creature_instance::CreatureInstance,
-    game_state::{GameState, Position},
-};
 
 pub struct Board<T>
 where
@@ -27,6 +23,15 @@ where
         position: impl Borrow<Position>,
     ) -> Option<TypedEntity<CreatureInstance, &Value>> {
         let entity = self.entity_at_pos(position)?;
+
+        if entity.entity_type_id() != CreatureInstance::entity_type_id() {
+            panic!(
+                "Expected entity {:?} to have type id {:?} but had type id {:?}",
+                entity.id(),
+                CreatureInstance::entity_type_id(),
+                entity.entity_type_id()
+            );
+        }
 
         Some(entity.as_typed::<CreatureInstance>())
     }

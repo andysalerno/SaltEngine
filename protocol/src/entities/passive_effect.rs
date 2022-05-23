@@ -1,4 +1,4 @@
-pub use id::*;
+pub use self::id::*;
 
 use super::{CreatureInstanceId, Id};
 use serde::{Deserialize, Serialize};

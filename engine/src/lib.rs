@@ -17,6 +17,19 @@ pub mod game_logic;
 // pub mod game_runner;
 pub mod game_state;
 mod v2;
-// pub mod id;
 
 // pub use game_logic::cards;
+
+#[cfg(test)]
+mod tests {
+    use protocol::entities::PlayerId;
+
+    use crate::game_state::game_state::GameState;
+
+    #[test]
+    fn test() {
+        let player_a = PlayerId::new();
+        let player_b = PlayerId::new();
+        let game_state = GameState::new(player_a, player_b);
+    }
+}

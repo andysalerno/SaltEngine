@@ -1,4 +1,4 @@
-pub use id::*;
+pub use self::id::*;
 
 use super::{EntityTypeId, HasId, Id, IsEntity};
 use serde::{Deserialize, Serialize};

@@ -1,24 +1,17 @@
 use crate::v2::CreatureDefinitionId;
-use entity_arena::{
-    id::{EntityId, EntityTypeId},
-    IsEntity,
-};
+use entity_arena::{id::EntityTypeId, IsEntity};
 use isentity_macro_derive::entity;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]
 #[entity("05ca041b-8779-4dcf-9e39-42ca823076fc")]
 pub struct CardInDeck {
-    id: EntityId,
     definition_id: CreatureDefinitionId,
 }
 
 impl CardInDeck {
     pub fn new(definition_id: CreatureDefinitionId) -> Self {
-        Self {
-            id: EntityId::new(),
-            definition_id,
-        }
+        Self { definition_id }
     }
 }
 

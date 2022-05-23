@@ -1,4 +1,4 @@
-pub use id::*;
+pub use self::id::*;
 
 use super::{
     board::BoardPos, buff::BuffPlayerView, unit_card_definition::CreatureDefinition,

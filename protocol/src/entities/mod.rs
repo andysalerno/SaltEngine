@@ -11,12 +11,13 @@ mod unit_card_instance_view;
 
 use std::any::Any;
 
+pub use crate::entities::id::*;
+use ::id::Id;
 pub use board::*;
 pub use buff::*;
 pub use hand::*;
 pub use hero::*;
 pub use hideable::*;
-pub use id::*;
 pub use passive_effect::*;
 pub use player::*;
 use serde::{de::DeserializeOwned, Deserialize, Serialize};

@@ -34,6 +34,7 @@ impl Entity {
     }
 
     pub fn into_typed<T: IsEntity>(self) -> TypedEntity<T, Value> {
+        self.assert_type_id_matches::<T>();
         TypedEntity {
             id: self.id,
             data: self.data,
@@ -42,6 +43,7 @@ impl Entity {
     }
 
     pub fn as_typed_mut<T: IsEntity>(&mut self) -> TypedEntity<T, &mut Value> {
+        self.assert_type_id_matches::<T>();
         TypedEntity {
             id: self.id,
             data: &mut self.data,
@@ -50,6 +52,7 @@ impl Entity {
     }
 
     pub fn as_typed<T: IsEntity>(&self) -> TypedEntity<T, &Value> {
+        self.assert_type_id_matches::<T>();
         TypedEntity {
             id: self.id,
             data: &self.data,
@@ -63,6 +66,17 @@ impl Entity {
 
     pub fn entity_type_id(&self) -> EntityTypeId {
         self.entity_type_id
+    }
+
+    fn assert_type_id_matches<T: IsEntity>(&self) {
+        if self.entity_type_id() != T::entity_type_id() {
+            panic!(
+                "Expected entity {:?} to have type id {:?} but had type id {:?}",
+                self.id(),
+                T::entity_type_id(),
+                self.entity_type_id()
+            );
+        }
     }
 }
 
