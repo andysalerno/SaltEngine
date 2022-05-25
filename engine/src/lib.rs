@@ -22,14 +22,30 @@ mod v2;
 
 #[cfg(test)]
 mod tests {
-    use protocol::entities::PlayerId;
-
-    use crate::game_state::game_state::GameState;
+    use crate::{
+        game_state::game_state::GameState,
+        v2::{CreatureDefinitionId, CreatureInstance},
+    };
+    use protocol::entities::{BoardPos, EntityPosition, PlayerId, RowId};
 
     #[test]
     fn test() {
         let player_a = PlayerId::new();
         let player_b = PlayerId::new();
-        let game_state = GameState::new(player_a, player_b);
+        let mut game_state = GameState::new(player_a, player_b);
+
+        let mut board = game_state.board_mut();
+        let board_pos = BoardPos {
+            player_id: PlayerId::new(),
+            row_id: RowId::FrontRow,
+            row_index: 5,
+        };
+        let pos = EntityPosition::BoardPos(board_pos);
+        let creature = CreatureInstance::new_from_definition_id(CreatureDefinitionId::new());
+        board.set_creature_at_pos(creature, pos);
+
+        let creature = board.creature_at_pos(pos);
+
+        assert!(creature.is_some());
     }
 }

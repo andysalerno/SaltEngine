@@ -1,9 +1,6 @@
-use super::{
-    card_in_hand_entity::CardInHand,
-    game_state::{GameState, Position},
-};
+use super::{card_in_hand_entity::CardInHand, game_state::GameState};
 use entity_arena::{id::EntityId, TypedEntity, Value};
-use protocol::entities::PlayerId;
+use protocol::entities::{EntityPosition, PlayerId};
 use std::borrow::Borrow;
 
 pub struct Hand<T>
@@ -30,7 +27,7 @@ where
             .borrow()
             .positions_map()
             .iter()
-            .filter(|(k, _)| matches!(k, Position::Hand(p) if *p == self.player_id))
+            .filter(|(k, _)| matches!(k, EntityPosition::Hand(p, _) if *p == self.player_id))
             .map(|(_, v)| v)
             .copied()
             .collect()

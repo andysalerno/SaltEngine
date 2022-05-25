@@ -1,20 +1,21 @@
 use std::collections::HashMap;
 
 use entity_arena::{id::EntityId, Entity, EntityArena, IsEntity, TypedEntity, Value};
-use protocol::entities::PlayerId;
+use protocol::entities::{EntityPosition, PlayerId};
 
 use super::{board::Board, card_in_hand_entity::CardInHand, deck::DeckEntity};
 
-#[derive(Debug, std::cmp::PartialEq, std::cmp::Eq, std::hash::Hash)]
-pub enum Position {
-    Hand(PlayerId),
-    Board,
-    Abyss,
-}
+// pub struct BoardPos {}
+// #[derive(Debug, Clone, Copy, std::cmp::PartialEq, std::cmp::Eq, std::hash::Hash)]
+// pub enum Position {
+//     Hand(PlayerId),
+//     Board,
+//     Abyss,
+// }
 
 struct CardEntity<T: IsEntity> {
     obj: T,
-    position: Position,
+    position: EntityPosition,
 }
 
 /// Engine will internally maintain one GameState, with full visibility
@@ -26,7 +27,7 @@ pub struct GameState {
     player_b_id: PlayerId,
     cur_player_turn: PlayerId,
     entity_arena: EntityArena,
-    entity_positions: HashMap<Position, EntityId>,
+    entity_positions: HashMap<EntityPosition, EntityId>,
 }
 
 impl GameState {
@@ -90,11 +91,15 @@ impl GameState {
         &self.entity_arena
     }
 
-    pub(crate) fn positions_map(&self) -> &HashMap<Position, EntityId> {
+    pub(crate) fn entity_arena_mut(&mut self) -> &mut EntityArena {
+        &mut self.entity_arena
+    }
+
+    pub(crate) fn positions_map(&self) -> &HashMap<EntityPosition, EntityId> {
         &self.entity_positions
     }
 
-    pub(crate) fn positions_map_mut(&mut self) -> &mut HashMap<Position, EntityId> {
+    pub(crate) fn positions_map_mut(&mut self) -> &mut HashMap<EntityPosition, EntityId> {
         &mut self.entity_positions
     }
 }

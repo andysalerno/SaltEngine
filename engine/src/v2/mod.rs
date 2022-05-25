@@ -1,5 +1,6 @@
-use entity_arena::IsEntity;
+use entity_arena::{id::EntityTypeId, IsEntity};
 use id_macro::id;
+use isentity_macro_derive::entity;
 use serde::{Deserialize, Serialize};
 
 #[id]
@@ -21,6 +22,7 @@ pub struct CreatureDefinition {
 pub struct CreatureInstanceId;
 
 #[derive(Clone, Serialize, Deserialize)]
+#[entity("95b2cf09-d49a-4a18-93f2-5a75e8e13d38")]
 pub struct CreatureInstance {
     instance_id: CreatureInstanceId,
     definition_id: CreatureDefinitionId,
@@ -29,13 +31,23 @@ pub struct CreatureInstance {
     health: i32,
 }
 
-impl IsEntity for CreatureInstance {
-    fn entity_type_id() -> entity_arena::id::EntityTypeId {
-        todo!()
+impl CreatureInstance {
+    pub fn new_from_definition_id(definition_id: CreatureDefinitionId) -> Self {
+        Self {
+            instance_id: CreatureInstanceId::new(),
+            definition_id,
+            cost: 0,
+            attack: 0,
+            health: 0,
+        }
+    }
+
+    pub fn definition_id(&self) -> CreatureDefinitionId {
+        self.definition_id
     }
 }
 
-mod builder {
+pub mod builder {
     use super::{CreatureDefinition, CreatureDefinitionId};
 
     pub struct CreatureDefinitionBuilder {
@@ -50,6 +62,19 @@ mod builder {
     }
 
     impl CreatureDefinitionBuilder {
+        pub fn new() -> Self {
+            Self {
+                definition_id: CreatureDefinitionId::new(),
+                title: String::new(),
+                base_cost: 0,
+                text: String::new(),
+                flavor_text: String::new(),
+                base_attack: 0,
+                base_health: 0,
+                width: 0,
+            }
+        }
+
         pub fn definition_id(&mut self, id: CreatureDefinitionId) -> &mut Self {
             self.definition_id = id;
             self
