@@ -3,9 +3,11 @@ use id_macro::id;
 use isentity_macro_derive::entity;
 use serde::{Deserialize, Serialize};
 
+/// An `id` identifying a creature definition.
 #[id]
 pub struct CreatureDefinitionId;
 
+/// A struct representing a creature definition.
 pub struct CreatureDefinition {
     definition_id: CreatureDefinitionId,
     title: String,
@@ -18,9 +20,12 @@ pub struct CreatureDefinition {
     // placeable_at: Position,
 }
 
+/// An `id` identifying a creature instance.
 #[id]
 pub struct CreatureInstanceId;
 
+/// A struct representing a creature instance.
+/// Has an id that indicates its `CreatureDefinition`.
 #[derive(Clone, Serialize, Deserialize)]
 #[entity("95b2cf09-d49a-4a18-93f2-5a75e8e13d38")]
 pub struct CreatureInstance {

@@ -40,11 +40,10 @@ mod tests {
             row_id: RowId::FrontRow,
             row_index: 5,
         };
-        let pos = EntityPosition::BoardPos(board_pos);
         let creature = CreatureInstance::new_from_definition_id(CreatureDefinitionId::new());
-        board.set_creature_at_pos(creature, pos);
+        board.set_creature_at_pos(creature, board_pos);
 
-        let creature = board.creature_at_pos(pos);
+        let creature = board.creature_at_pos(board_pos);
 
         assert!(creature.is_some());
     }

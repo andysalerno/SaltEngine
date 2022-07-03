@@ -1,26 +1,11 @@
+use super::{board::Board, deck::DeckEntity};
+use entity_arena::{id::EntityId, EntityArena, TypedEntity, Value};
+use protocol::entities::{EntityPosition, PlayerId};
 use std::collections::HashMap;
 
-use entity_arena::{id::EntityId, Entity, EntityArena, IsEntity, TypedEntity, Value};
-use protocol::entities::{EntityPosition, PlayerId};
-
-use super::{board::Board, card_in_hand_entity::CardInHand, deck::DeckEntity};
-
-// pub struct BoardPos {}
-// #[derive(Debug, Clone, Copy, std::cmp::PartialEq, std::cmp::Eq, std::hash::Hash)]
-// pub enum Position {
-//     Hand(PlayerId),
-//     Board,
-//     Abyss,
-// }
-
-struct CardEntity<T: IsEntity> {
-    obj: T,
-    position: EntityPosition,
-}
-
-/// Engine will internally maintain one GameState, with full visibility
-/// of all state (cards in both players hands, deck content, etc)
-/// and will create a sanitized copy that is sent to players
+/// A struct representing the full state of a game at any given point in time.
+/// The `GameState` knows the `PlayerId`s of the two players, whose turn it currently is,
+/// and maintains the state of all entities.
 #[derive(Debug)]
 pub struct GameState {
     player_a_id: PlayerId,

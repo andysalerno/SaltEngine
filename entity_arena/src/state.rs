@@ -18,6 +18,7 @@ impl EntityArena {
         }
     }
 
+    /// Add an entity to the arena.
     pub fn add(&mut self, entity: impl IsEntity) -> EntityId {
         let entity = Entity::new(entity);
 
@@ -66,6 +67,12 @@ impl EntityArena {
             .values_mut()
             .filter(|e| e.entity_type_id() == T::entity_type_id())
             .map(|e| e.as_typed_mut::<T>())
+    }
+}
+
+impl Default for EntityArena {
+    fn default() -> Self {
+        Self::new()
     }
 }
 

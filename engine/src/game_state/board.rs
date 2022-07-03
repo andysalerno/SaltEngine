@@ -1,9 +1,11 @@
 use super::game_state::GameState;
 use crate::v2::CreatureInstance;
 use entity_arena::{id::EntityId, Entity, IsEntity, TypedEntity, Value};
-use protocol::entities::EntityPosition;
+use protocol::entities::{BoardPos, EntityPosition};
 use std::borrow::{Borrow, BorrowMut};
 
+/// A view over a `GameState` that provides board-level functionality,
+/// such as getting and setting `CreatureInstance`s at positions.
 pub struct Board<T>
 where
     T: Borrow<GameState>,
@@ -21,7 +23,7 @@ where
 
     pub fn creature_at_pos(
         &self,
-        position: impl Borrow<EntityPosition>,
+        position: impl Borrow<BoardPos>,
     ) -> Option<TypedEntity<CreatureInstance, &Value>> {
         let entity = self.entity_at_pos(position)?;
 
@@ -36,7 +38,7 @@ where
         Some(entity.as_typed::<CreatureInstance>())
     }
 
-    pub fn entity_at_pos(&self, position: impl Borrow<EntityPosition>) -> Option<&Entity> {
+    pub fn entity_at_pos(&self, position: impl Borrow<BoardPos>) -> Option<&Entity> {
         let game_state: &GameState = self.game_state.borrow();
 
         let entity_id = self.entity_id_at_pos(position)?;
@@ -46,10 +48,12 @@ where
         Some(entity)
     }
 
-    pub fn entity_id_at_pos(&self, position: impl Borrow<EntityPosition>) -> Option<EntityId> {
+    pub fn entity_id_at_pos(&self, position: impl Borrow<BoardPos>) -> Option<EntityId> {
         let game_state: &GameState = self.game_state.borrow();
 
-        game_state.positions_map().get(position.borrow()).copied()
+        let entity_pos = EntityPosition::BoardPos(*position.borrow());
+
+        game_state.positions_map().get(&entity_pos).copied()
     }
 }
 
@@ -60,17 +64,123 @@ where
     pub fn set_creature_at_pos(
         &mut self,
         creature: CreatureInstance,
-        position: impl Borrow<EntityPosition>,
+        position: impl Borrow<BoardPos>,
     ) {
         let game_state: &mut GameState = self.game_state.borrow_mut();
         let entity_arena = game_state.entity_arena_mut();
         let entity_id = entity_arena.add(creature);
 
+        let entity_pos = EntityPosition::BoardPos(*position.borrow());
         let position_mapping = game_state.positions_map_mut();
-        position_mapping.insert(*position.borrow(), entity_id);
-        // let pos_val = position_mapping
-        //     .entry(*position.borrow())
-        //     .or_insert(entity_id);
-        // *pos_val = entity_id;
+        position_mapping.insert(entity_pos, entity_id);
+    }
+
+    pub fn remove_entity_at_pos(&mut self, position: impl Borrow<BoardPos>) {
+        let game_state: &mut GameState = self.game_state.borrow_mut();
+        let position_mapping = game_state.positions_map_mut();
+
+        // What entity is in that position?
+        let entity_pos = EntityPosition::BoardPos(*position.borrow());
+        let entity_id = position_mapping
+            .remove(entity_pos.borrow())
+            .expect("Attempted to remove at a position that had no entity.");
+
+        let entity_arena = game_state.entity_arena_mut();
+        entity_arena.remove(entity_id);
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::{
+        game_state::{card_in_deck_entity::CardInDeck, deck::DeckEntity},
+        v2::{CreatureDefinitionId, CreatureInstance},
+    };
+
+    use super::GameState;
+    use protocol::entities::{BoardPos, PlayerId, RowId};
+
+    #[test]
+    fn game_state_new_expects_can_get_board() {
+        let player_a = PlayerId::new();
+        let player_b = PlayerId::new();
+
+        let game_state = GameState::new(player_a, player_b);
+
+        let _board = game_state.board();
+    }
+
+    #[test]
+    fn board_expects_can_set_creature_at_pos() {
+        let player_a = PlayerId::new();
+        let player_b = PlayerId::new();
+
+        let mut game_state = GameState::new(player_a, player_b);
+
+        let mut board = game_state.board_mut();
+
+        let creature = CreatureInstance::new_from_definition_id(CreatureDefinitionId::new());
+
+        let position = BoardPos::new(player_a, RowId::FrontRow, 0);
+
+        board.set_creature_at_pos(creature, position);
+    }
+
+    #[test]
+    fn board_expects_can_get_creature_at_pos() {
+        let player_a = PlayerId::new();
+        let player_b = PlayerId::new();
+
+        let mut game_state = GameState::new(player_a, player_b);
+
+        let mut board = game_state.board_mut();
+
+        let position = BoardPos::new(player_a, RowId::FrontRow, 0);
+        let found = board.creature_at_pos(position);
+
+        assert!(
+            found.is_none(),
+            "Expected no creature since none was inserted yet."
+        );
+
+        let creature = CreatureInstance::new_from_definition_id(CreatureDefinitionId::new());
+
+        board.set_creature_at_pos(creature, position);
+
+        let found = board.creature_at_pos(position);
+
+        assert!(found.is_some());
+    }
+
+    #[test]
+    fn game_state_new_expects_can_add_cards_to_deck() {
+        let player_a = PlayerId::new();
+        let player_b = PlayerId::new();
+
+        let mut game_state = GameState::new(player_a, player_b);
+
+        let player_a_card_1 = CardInDeck::new(CreatureDefinitionId::new());
+        let player_a_card_2 = CardInDeck::new(CreatureDefinitionId::new());
+        let player_a_card_3 = CardInDeck::new(CreatureDefinitionId::new());
+
+        game_state.deck_mut(player_a).get_mut(|d| {
+            d.add_card(player_a_card_1);
+            d.add_card(player_a_card_2);
+            d.add_card(player_a_card_3);
+        });
+
+        let player_b_card_1 = CardInDeck::new(CreatureDefinitionId::new());
+        let player_b_card_2 = CardInDeck::new(CreatureDefinitionId::new());
+
+        game_state.deck_mut(player_b).get_mut(|d| {
+            d.add_card(player_b_card_1);
+            d.add_card(player_b_card_2);
+        });
+
+        let player_a_deck_len = game_state.deck(player_a).get(DeckEntity::len);
+        let player_b_deck_len = game_state.deck(player_b).get(DeckEntity::len);
+
+        assert_eq!(3, player_a_deck_len);
+        assert_eq!(2, player_b_deck_len);
     }
 }

@@ -2,21 +2,16 @@ use crate::id::{EntityId, EntityTypeId};
 use serde::{de::DeserializeOwned, Serialize};
 use std::borrow::{Borrow, BorrowMut};
 
-/// A marker trait indicating that the tyep is considered an entity.
+/// A marker trait indicating that the type is considered an entity.
 /// Implies the type is serializeable / deserializeable.
 pub trait IsEntity: Serialize + DeserializeOwned {
-    /// The type of EntityTypeId representing this entity type.
-    // type TypeId: EntityTypeId;
-
-    /// The id of this entity instance.
-    // fn id(&self) -> EntityId;
-
     /// The type ID of this entity type.
     fn entity_type_id() -> EntityTypeId;
 }
 
 pub type Value = serde_json::Value;
 
+/// Represents an entity, with a globally unique instance ID, a type ID, and the raw entity value.
 #[derive(Clone, Debug)]
 pub struct Entity {
     id: EntityId,
@@ -86,6 +81,7 @@ pub struct TypedEntity<T: IsEntity, I> {
     _phantom: std::marker::PhantomData<T>,
 }
 
+/// A handle to an entity that can represent the entity as its true type.
 impl<T, I> TypedEntity<T, I>
 where
     T: IsEntity,

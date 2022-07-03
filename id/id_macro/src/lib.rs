@@ -4,6 +4,9 @@ use quote::quote;
 use syn::parse::{Parse, Parser};
 use syn::{parse, parse_macro_input, ItemStruct};
 
+/// Indicates the decorated type is an ID type.
+/// This supplies methods for `new()` and `parse_str(&str)`.
+/// It also supplies the following derives: Debug, Copy, Clone, PartialEq, Eq, Hash, Serialize, Deserialize.
 #[proc_macro_attribute]
 pub fn id(args: TokenStream, input: TokenStream) -> TokenStream {
     let mut item_struct = parse_macro_input!(input as ItemStruct);
