@@ -117,7 +117,7 @@ pub mod builder {
 
         pub fn build(&self) -> CreatureDefinition {
             CreatureDefinition {
-                definition_id: self.definition_id.clone(),
+                definition_id: self.definition_id,
                 title: self.title.clone(),
                 base_cost: self.base_cost,
                 text: self.text.clone(),

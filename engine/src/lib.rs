@@ -29,7 +29,7 @@ mod tests {
     use protocol::entities::{BoardPos, EntityPosition, PlayerId, RowId};
 
     #[test]
-    fn test() {
+    fn can_set_and_get_creature() {
         let player_a = PlayerId::new();
         let player_b = PlayerId::new();
         let mut game_state = GameState::new(player_a, player_b);
