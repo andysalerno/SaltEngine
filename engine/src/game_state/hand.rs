@@ -56,10 +56,9 @@ where
 {
     pub fn add_card(&mut self, card: CardInHand) {
         let game_state = self.game_state.borrow_mut();
-        let entity_arena = game_state.entity_arena_mut();
-        let entity_id = entity_arena.add(card);
+        let entity_id = game_state.entity_arena_mut().add(card);
 
-        let entity_pos = EntityPosition::Hand(self.player_id, 9);
+        let entity_pos = EntityPosition::Hand(self.player_id, 0);
         game_state.positions_map_mut().insert(entity_pos, entity_id);
     }
 }
