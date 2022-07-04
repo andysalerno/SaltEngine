@@ -16,6 +16,12 @@ where
     T: Borrow<GameState>,
 {
     pub fn new(game_state: T, player_id: PlayerId) -> Self {
+        let g = game_state.borrow();
+        assert!(
+            !(player_id != g.player_a_id() && player_id != g.player_b_id()),
+            "PlayerId {player_id:?} was not part of the GameState."
+        );
+
         Self {
             player_id,
             game_state,

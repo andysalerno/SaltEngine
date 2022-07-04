@@ -92,10 +92,7 @@ where
 
 #[cfg(test)]
 mod tests {
-    use crate::{
-        game_state::{card_in_deck_entity::CardInDeck, deck::DeckEntity},
-        v2::{CreatureDefinitionId, CreatureInstance},
-    };
+    use crate::v2::{CreatureDefinitionId, CreatureInstance};
 
     use super::GameState;
     use protocol::entities::{BoardPos, PlayerId, RowId};
@@ -153,34 +150,34 @@ mod tests {
     }
 
     #[test]
-    fn game_state_new_expects_can_add_cards_to_deck() {
+    fn board_expects_can_remove_creature_at_pos() {
         let player_a = PlayerId::new();
         let player_b = PlayerId::new();
 
         let mut game_state = GameState::new(player_a, player_b);
 
-        let player_a_card_1 = CardInDeck::new(CreatureDefinitionId::new());
-        let player_a_card_2 = CardInDeck::new(CreatureDefinitionId::new());
-        let player_a_card_3 = CardInDeck::new(CreatureDefinitionId::new());
+        let mut board = game_state.board_mut();
 
-        game_state.deck_mut(player_a).get_mut(|d| {
-            d.add_card(player_a_card_1);
-            d.add_card(player_a_card_2);
-            d.add_card(player_a_card_3);
-        });
+        let position = BoardPos::new(player_a, RowId::FrontRow, 0);
 
-        let player_b_card_1 = CardInDeck::new(CreatureDefinitionId::new());
-        let player_b_card_2 = CardInDeck::new(CreatureDefinitionId::new());
+        let creature = CreatureInstance::new_from_definition_id(CreatureDefinitionId::new());
 
-        game_state.deck_mut(player_b).get_mut(|d| {
-            d.add_card(player_b_card_1);
-            d.add_card(player_b_card_2);
-        });
+        board.set_creature_at_pos(creature, position);
 
-        let player_a_deck_len = game_state.deck(player_a).get(DeckEntity::len);
-        let player_b_deck_len = game_state.deck(player_b).get(DeckEntity::len);
+        let found = board.creature_at_pos(position);
 
-        assert_eq!(3, player_a_deck_len);
-        assert_eq!(2, player_b_deck_len);
+        assert!(
+            found.is_some(),
+            "The creature was inserted, so expected it to be found."
+        );
+
+        board.remove_entity_at_pos(position);
+
+        let found = board.creature_at_pos(position);
+
+        assert!(
+            found.is_none(),
+            "The creature was removed, so expected it to not be found."
+        );
     }
 }

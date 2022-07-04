@@ -1,4 +1,4 @@
-use super::{board::Board, deck::DeckEntity};
+use super::{board::Board, deck::DeckEntity, hand::Hand};
 use entity_arena::{id::EntityId, EntityArena, TypedEntity, Value};
 use protocol::entities::{EntityPosition, PlayerId};
 use std::collections::HashMap;
@@ -62,6 +62,14 @@ impl GameState {
             .of_type_mut::<DeckEntity>()
             .find(|d| d.get(|d| d.player_id() == player_id))
             .unwrap()
+    }
+
+    pub fn hand(&self, player_id: PlayerId) -> Hand<&GameState> {
+        Hand::new(self, player_id)
+    }
+
+    pub fn hand_mut(&mut self, player_id: PlayerId) -> Hand<&mut GameState> {
+        Hand::new(self, player_id)
     }
 
     pub fn player_a_id(&self) -> PlayerId {
@@ -142,5 +150,15 @@ mod tests {
 
         assert_eq!(3, player_a_deck_len);
         assert_eq!(2, player_b_deck_len);
+    }
+
+    #[test]
+    fn game_state_can_get_hand() {
+        let player_a = PlayerId::new();
+        let player_b = PlayerId::new();
+
+        let game_state = GameState::new(player_a, player_b);
+
+        let hand = game_state.hand(player_a);
     }
 }
