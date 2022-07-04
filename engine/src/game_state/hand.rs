@@ -1,7 +1,7 @@
 use super::{card_in_hand_entity::CardInHand, game_state::GameState};
 use entity_arena::{id::EntityId, TypedEntity, Value};
 use protocol::entities::{EntityPosition, PlayerId};
-use std::borrow::Borrow;
+use std::borrow::{Borrow, BorrowMut};
 
 pub struct Hand<T>
 where
@@ -47,5 +47,19 @@ where
         arena
             .of_type::<CardInHand>()
             .filter(move |c| ids.contains(&c.id()))
+    }
+}
+
+impl<T> Hand<T>
+where
+    T: BorrowMut<GameState>,
+{
+    pub fn add_card(&mut self, card: CardInHand) {
+        let game_state = self.game_state.borrow_mut();
+        let entity_arena = game_state.entity_arena_mut();
+        let entity_id = entity_arena.add(card);
+
+        let entity_pos = EntityPosition::Hand(self.player_id, 9);
+        game_state.positions_map_mut().insert(entity_pos, entity_id);
     }
 }

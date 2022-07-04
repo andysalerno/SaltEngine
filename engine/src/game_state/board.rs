@@ -71,8 +71,7 @@ where
         let entity_id = entity_arena.add(creature);
 
         let entity_pos = EntityPosition::BoardPos(*position.borrow());
-        let position_mapping = game_state.positions_map_mut();
-        position_mapping.insert(entity_pos, entity_id);
+        game_state.positions_map_mut().insert(entity_pos, entity_id);
     }
 
     pub fn remove_entity_at_pos(&mut self, position: impl Borrow<BoardPos>) {
@@ -85,8 +84,7 @@ where
             .remove(entity_pos.borrow())
             .expect("Attempted to remove at a position that had no entity.");
 
-        let entity_arena = game_state.entity_arena_mut();
-        entity_arena.remove(entity_id);
+        game_state.entity_arena_mut().remove(entity_id);
     }
 }
 

@@ -100,7 +100,9 @@ impl GameState {
 #[cfg(test)]
 mod tests {
     use crate::{
-        game_state::{card_in_deck_entity::CardInDeck, deck::DeckEntity},
+        game_state::{
+            card_in_deck_entity::CardInDeck, card_in_hand_entity::CardInHand, deck::DeckEntity,
+        },
         v2::CreatureDefinitionId,
     };
 
@@ -159,6 +161,22 @@ mod tests {
 
         let game_state = GameState::new(player_a, player_b);
 
-        let hand = game_state.hand(player_a);
+        let _hand = game_state.hand(player_a);
+    }
+
+    #[test]
+    fn game_state_hand_can_add_card() {
+        let player_a = PlayerId::new();
+        let player_b = PlayerId::new();
+
+        let mut game_state = GameState::new(player_a, player_b);
+
+        let mut hand = game_state.hand_mut(player_a);
+
+        assert_eq!(0, hand.cards().count());
+
+        hand.add_card(CardInHand::new(CreatureDefinitionId::new()));
+
+        assert_eq!(1, hand.cards().count());
     }
 }
