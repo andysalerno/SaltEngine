@@ -1,4 +1,4 @@
-use super::{board::Board, deck::DeckEntity, hand::Hand};
+use super::{board::Board, deck::DeckEntity, hand::Hand, hero::HeroInstance};
 use entity_arena::{id::EntityId, EntityArena, TypedEntity, Value};
 use protocol::entities::{EntityPosition, PlayerId};
 use std::collections::HashMap;
@@ -30,6 +30,9 @@ impl GameState {
 
         state.entity_arena.add(deck_a);
         state.entity_arena.add(deck_b);
+
+        state.entity_arena.add(HeroInstance::new(player_a_id));
+        state.entity_arena.add(HeroInstance::new(player_b_id));
 
         state
     }
@@ -178,5 +181,36 @@ mod tests {
         hand.add_card(CardInHand::new(CreatureDefinitionId::new()));
 
         assert_eq!(1, hand.cards().count());
+    }
+
+    #[test]
+    fn game_state_can_get_player_hero() {
+        let player_a = PlayerId::new();
+        let player_b = PlayerId::new();
+
+        let mut game_state = GameState::new(player_a, player_b);
+
+        // check before updating
+        {
+            let board = game_state.board();
+            let hero = board.player_hero(player_a);
+
+            assert_eq!(0, hero.get(|h| h.mana()));
+        }
+
+        // update
+        {
+            let mut board = game_state.board_mut();
+            let mut hero = board.player_hero_mut(player_a);
+            hero.get_mut(|h| h.set_mana(100));
+        }
+
+        // check after updating
+        {
+            let board = game_state.board();
+            let hero = board.player_hero(player_a);
+
+            assert_eq!(100, hero.get(|h| h.mana()));
+        }
     }
 }

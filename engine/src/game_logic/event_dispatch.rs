@@ -1,13 +1,4 @@
-use super::{
-    event_handlers::{
-        AddCardToHandEventHandler, AttackEventHandler, CreatureDealsDamageHandler,
-        CreatureDestroyedEventHandler, CreatureHealedEventHandler, CreatureSetEventHandler,
-        CreatureTakesDamageHandler, DrawCardEventHandler, EndTurnEventHandler, EventHandler,
-        PlayerGainManaEventHandler, PlayerSpendManaEventHandler, PosTakesDamageHandler,
-        StartGameEventHandler, SummonCreatureFromHandEventHandler, TurnStartHandler,
-    },
-    events::GameEvent,
-};
+use super::events::GameEvent;
 use crate::game_logic::events::Event;
 use crate::{
     game_agent::{ClientNotifier, Prompter},
@@ -110,35 +101,37 @@ impl EventDispatcher {
     }
 
     async fn pre_handle(&mut self, event: &GameEvent, game_state: &mut GameState) {
-        let pre_existing_actions = game_state
-            .board()
-            .all_characters_slots()
-            .creatures()
-            .filter_map(|c| {
-                c.definition()
-                    .pre_event_action(c.id(), event, game_state, self)
-            })
-            .collect::<Vec<_>>();
+        todo!()
+        // let pre_existing_actions = game_state
+        //     .board()
+        //     .all_characters_slots()
+        //     .creatures()
+        //     .filter_map(|c| {
+        //         c.definition()
+        //             .pre_event_action(c.id(), event, game_state, self)
+        //     })
+        //     .collect::<Vec<_>>();
 
-        for action in pre_existing_actions {
-            action.action(event, game_state, self).await;
-        }
+        // for action in pre_existing_actions {
+        //     action.action(event, game_state, self).await;
+        // }
     }
 
     async fn post_handle(&mut self, event: &GameEvent, game_state: &mut GameState) {
-        let pre_existing_actions = game_state
-            .board()
-            .all_characters_slots()
-            .creatures()
-            .filter_map(|c| {
-                c.definition()
-                    .post_event_action(c.id(), event, game_state, self)
-            })
-            .collect::<Vec<_>>();
+        todo!()
+        // let pre_existing_actions = game_state
+        //     .board()
+        //     .all_characters_slots()
+        //     .creatures()
+        //     .filter_map(|c| {
+        //         c.definition()
+        //             .post_event_action(c.id(), event, game_state, self)
+        //     })
+        //     .collect::<Vec<_>>();
 
-        for action in pre_existing_actions {
-            action.action(event, game_state, self).await;
-        }
+        // for action in pre_existing_actions {
+        //     action.action(event, game_state, self).await;
+        // }
     }
 
     async fn handle(&mut self, event: &GameEvent, game_state: &mut GameState) {
@@ -159,85 +152,21 @@ impl EventDispatcher {
         }
 
         match event {
-            GameEvent::AttackEvent(e) => {
-                AttackEventHandler::default()
-                    .handle(e, game_state, self)
-                    .await;
-            }
-            GameEvent::EndTurnEvent(e) => {
-                EndTurnEventHandler::default()
-                    .handle(e, game_state, self)
-                    .await;
-            }
-            GameEvent::CreatureSetEvent(e) => {
-                CreatureSetEventHandler::default()
-                    .handle(e, game_state, self)
-                    .await;
-            }
-            GameEvent::CreatureDealsDamageEvent(e) => {
-                CreatureDealsDamageHandler::default()
-                    .handle(e, game_state, self)
-                    .await;
-            }
-            GameEvent::CreatureTakesDamageEvent(e) => {
-                CreatureTakesDamageHandler::default()
-                    .handle(e, game_state, self)
-                    .await;
-            }
-            GameEvent::CreatureDestroyedEvent(e) => {
-                CreatureDestroyedEventHandler::default()
-                    .handle(e, game_state, self)
-                    .await;
-            }
-            GameEvent::TurnStartEvent(e) => {
-                TurnStartHandler::default()
-                    .handle(e, game_state, self)
-                    .await;
-            }
-            GameEvent::DrawCardEvent(e) => {
-                DrawCardEventHandler::default()
-                    .handle(e, game_state, self)
-                    .await;
-            }
-            GameEvent::AddCardToHandEvent(e) => {
-                AddCardToHandEventHandler::default()
-                    .handle(e, game_state, self)
-                    .await;
-            }
-            GameEvent::StartGameEvent(e) => {
-                StartGameEventHandler::default()
-                    .handle(e, game_state, self)
-                    .await;
-            }
-            GameEvent::PlayerGainManaEvent(e) => {
-                PlayerGainManaEventHandler::default()
-                    .handle(e, game_state, self)
-                    .await;
-            }
-            GameEvent::PlayerSpendManaEvent(e) => {
-                PlayerSpendManaEventHandler::default()
-                    .handle(e, game_state, self)
-                    .await;
-            }
-            GameEvent::CreatureSummonedFromHandEvent(e) => {
-                SummonCreatureFromHandEventHandler::default()
-                    .handle(e, game_state, self)
-                    .await;
-            }
-            GameEvent::PosTakesDamageEvent(e) => {
-                PosTakesDamageHandler::default()
-                    .handle(e, game_state, self)
-                    .await;
-            }
-            GameEvent::CreatureHealedEvent(e) => {
-                CreatureHealedEventHandler::default()
-                    .handle(e, game_state, self)
-                    .await;
-            } // GameEvent::AddBuffToCardInstanceEvent(e) => {
-              //     AddBuffToCardInstanceHandler::default()
-              //         .handle(e, game_state, self)
-              //         .await;
-              // }
+            GameEvent::AttackEvent(_) => todo!(),
+            GameEvent::EndTurnEvent(_) => todo!(),
+            GameEvent::CreatureSetEvent(_) => todo!(),
+            GameEvent::CreatureDealsDamageEvent(_) => todo!(),
+            GameEvent::CreatureTakesDamageEvent(_) => todo!(),
+            GameEvent::CreatureDestroyedEvent(_) => todo!(),
+            GameEvent::TurnStartEvent(_) => todo!(),
+            GameEvent::DrawCardEvent(_) => todo!(),
+            GameEvent::AddCardToHandEvent(_) => todo!(),
+            GameEvent::StartGameEvent(_) => todo!(),
+            GameEvent::PlayerGainManaEvent(_) => todo!(),
+            GameEvent::PlayerSpendManaEvent(_) => todo!(),
+            GameEvent::CreatureSummonedFromHandEvent(_) => todo!(),
+            GameEvent::PosTakesDamageEvent(_) => todo!(),
+            GameEvent::CreatureHealedEvent(_) => todo!(),
         }
     }
 }

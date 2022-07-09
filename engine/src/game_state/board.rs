@@ -1,7 +1,7 @@
-use super::game_state::GameState;
+use super::{game_state::GameState, hero::HeroInstance};
 use crate::v2::CreatureInstance;
 use entity_arena::{id::EntityId, Entity, IsEntity, TypedEntity, Value};
-use protocol::entities::{BoardPos, EntityPosition};
+use protocol::entities::{BoardPos, EntityPosition, PlayerId};
 use std::borrow::{Borrow, BorrowMut};
 
 /// A view over a `GameState` that provides board-level functionality,
@@ -55,6 +55,16 @@ where
 
         game_state.positions_map().get(&entity_pos).copied()
     }
+
+    pub fn player_hero(&self, player_id: PlayerId) -> TypedEntity<HeroInstance, &Value> {
+        let game_state: &GameState = self.game_state.borrow();
+
+        game_state
+            .entity_arena()
+            .of_type::<HeroInstance>()
+            .find(|h| h.get(|h| h.player_id() == player_id))
+            .expect("There must be a hero with the given id.")
+    }
 }
 
 impl<T> Board<T>
@@ -85,6 +95,19 @@ where
             .expect("Attempted to remove at a position that had no entity.");
 
         game_state.entity_arena_mut().remove(entity_id);
+    }
+
+    pub fn player_hero_mut(
+        &mut self,
+        player_id: PlayerId,
+    ) -> TypedEntity<HeroInstance, &mut Value> {
+        let game_state: &mut GameState = self.game_state.borrow_mut();
+
+        game_state
+            .entity_arena_mut()
+            .of_type_mut::<HeroInstance>()
+            .find(|h| h.get(|h| h.player_id() == player_id))
+            .expect("There must be a hero with the given id.")
     }
 }
 

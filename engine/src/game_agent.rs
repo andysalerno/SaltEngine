@@ -3,11 +3,7 @@ use std::sync::Arc;
 
 #[cfg(test)]
 use mockall::{automock, predicate::str};
-use protocol::{
-    entities::BoardPos,
-    from_client::ClientAction,
-    from_server::{Notification, VisualEvent},
-};
+use protocol::{entities::BoardPos, from_client::ClientAction, from_server::Notification};
 
 use crate::game_state::game_state::GameState;
 
