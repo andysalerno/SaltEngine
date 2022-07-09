@@ -28,7 +28,7 @@ pub use end_turn::EndTurnEvent;
 pub use player_gain_mana::PlayerGainManaEvent;
 pub use player_spend_mana::PlayerSpendManaEvent;
 pub use pos_takes_damage_event::PosTakesDamageEvent;
-use protocol::{entities::PlayerId, from_server::VisualEvent};
+use protocol::{entities::PlayerId, from_client::ClientAction, from_server::VisualEvent};
 pub use start_game_event::StartGameEvent;
 pub use summon_creature_from_hand_event::CreatureSummonedFromHandEvent;
 pub use turn_start_event::TurnStartEvent;
@@ -114,15 +114,15 @@ impl GameEvent {
 
 ///// This implementation is responsible for converting the client-provided actions
 ///// to the `GameEvent`s that the engine will execute.
-// impl From<ClientAction> for GameEvent {
-//     fn from(e: ClientAction) -> Self {
-//         match e {
-//             ClientAction::EndTurn(e) => EndTurnEvent(e.player_id).into(),
-//             ClientAction::SummonCreatureFromHand(e) => {
-//                 CreatureSummonedFromHandEvent::new(e.player_id, e.board_pos, e.card_id).into()
-//             }
-//             ClientAction::Attack(e) => AttackEvent::new(e.attacker, e.target).into(),
-//             // ClientAction::DrawCard(e) => e.into(),
-//         }
-//     }
-// }
+impl From<ClientAction> for GameEvent {
+    fn from(e: ClientAction) -> Self {
+        match e {
+            ClientAction::EndTurn(e) => EndTurnEvent(e.player_id).into(),
+            ClientAction::SummonCreatureFromHand(e) => {
+                CreatureSummonedFromHandEvent::new(e.player_id, e.board_pos, e.card_id).into()
+            }
+            ClientAction::Attack(e) => AttackEvent::new(e.attacker, e.target).into(),
+            // ClientAction::DrawCard(e) => e.into(),
+        }
+    }
+}

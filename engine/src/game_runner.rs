@@ -1,8 +1,12 @@
-use async_trait::async_trait;
+use crate::{
+    game_agent::GameClient,
+    game_logic::{
+        event_dispatch::EventDispatcher,
+        events::{GameEvent, StartGameEvent, TurnStartEvent},
+    },
+    game_state::game_state::GameState,
+};
 use log::info;
-use protocol::from_client::ClientAction;
-
-use crate::{game_agent::GameClient, game_state::game_state::GameState};
 
 /// A runner for a game.
 /// Maintains the current `GameState` at any given moment,
@@ -65,7 +69,7 @@ impl GameRunner {
         game_state: &mut GameState,
         dispatcher: &mut EventDispatcher,
     ) {
-        let cur_player_id = game_state.cur_player_id();
+        let cur_player_id = game_state.cur_player_turn();
         info!("Turn starts for player: {:?}", cur_player_id);
 
         dispatcher

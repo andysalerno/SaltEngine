@@ -1,6 +1,6 @@
 // mod buff;
 // pub mod cards;
-mod event_dispatch;
+pub mod event_dispatch;
 mod event_handlers;
 pub mod events;
 // mod keywords;

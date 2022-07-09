@@ -37,6 +37,10 @@ impl GameState {
         state
     }
 
+    pub fn is_game_over(&self) -> bool {
+        true
+    }
+
     pub fn cur_player_turn(&self) -> PlayerId {
         todo!()
     }
@@ -184,7 +188,7 @@ mod tests {
     }
 
     #[test]
-    fn game_state_can_get_player_hero() {
+    fn game_state_can_get_player_hero_and_update_mana() {
         let player_a = PlayerId::new();
         let player_b = PlayerId::new();
 
