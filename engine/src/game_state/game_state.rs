@@ -54,7 +54,7 @@ impl GameState {
     }
 
     pub fn evaluate_passives(&mut self) {
-        todo!()
+        // todo!()
     }
 
     pub fn deck(&self, player_id: PlayerId) -> TypedEntity<DeckEntity, &Value> {

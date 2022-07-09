@@ -4,14 +4,13 @@ use protocol::{
     from_server::{EntityAdded, Notification},
 };
 
-use crate::game_logic::cards::UnitCardDefinition;
 use crate::{
     game_logic::{
+        event_dispatch::EventDispatcher,
         event_handlers::EventHandler,
         events::{DrawCardEvent, StartGameEvent, TurnStartEvent},
-        EventDispatcher,
     },
-    game_state::{hero::HeroDefinition, GameState},
+    game_state::game_state::GameState,
 };
 use async_trait::async_trait;
 

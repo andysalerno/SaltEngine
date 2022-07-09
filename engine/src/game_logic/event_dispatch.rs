@@ -1,4 +1,7 @@
 use super::events::GameEvent;
+use crate::game_logic::event_handlers::{
+    DrawCardEventHandler, EventHandler, StartGameEventHandler,
+};
 use crate::game_logic::events::Event;
 use crate::{
     game_agent::{ClientNotifier, Prompter},
@@ -101,7 +104,7 @@ impl EventDispatcher {
     }
 
     async fn pre_handle(&mut self, event: &GameEvent, game_state: &mut GameState) {
-        todo!()
+        // todo!()
         // let pre_existing_actions = game_state
         //     .board()
         //     .all_characters_slots()
@@ -118,7 +121,7 @@ impl EventDispatcher {
     }
 
     async fn post_handle(&mut self, event: &GameEvent, game_state: &mut GameState) {
-        todo!()
+        // todo!()
         // let pre_existing_actions = game_state
         //     .board()
         //     .all_characters_slots()
@@ -159,9 +162,17 @@ impl EventDispatcher {
             GameEvent::CreatureTakesDamageEvent(_) => todo!(),
             GameEvent::CreatureDestroyedEvent(_) => todo!(),
             GameEvent::TurnStartEvent(_) => todo!(),
-            GameEvent::DrawCardEvent(_) => todo!(),
+            GameEvent::DrawCardEvent(event) => {
+                DrawCardEventHandler::default()
+                    .handle(event, game_state, self)
+                    .await
+            }
             GameEvent::AddCardToHandEvent(_) => todo!(),
-            GameEvent::StartGameEvent(_) => todo!(),
+            GameEvent::StartGameEvent(event) => {
+                StartGameEventHandler::default()
+                    .handle(event, game_state, self)
+                    .await
+            }
             GameEvent::PlayerGainManaEvent(_) => todo!(),
             GameEvent::PlayerSpendManaEvent(_) => todo!(),
             GameEvent::CreatureSummonedFromHandEvent(_) => todo!(),
