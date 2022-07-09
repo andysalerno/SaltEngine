@@ -97,101 +97,101 @@ impl GameRunner {
     }
 }
 
-// #[cfg(test)]
-// pub mod tests {
-//     use std::sync::Arc;
+#[cfg(test)]
+pub mod tests {
+    // use std::sync::Arc;
 
-//     use protocol::{client_actions::EndTurn, from_client::ClientAction};
+    // use protocol::{client_actions::EndTurn, from_client::ClientAction};
 
-//     use super::*;
-//     use crate::{
-//         game_agent::tests::{MockTestPrompter, StubNotifier},
-//         game_logic::events::EndTurnEvent,
-//         game_state::{board::BoardView, make_test_state, IterAddons},
-//     };
+    // use super::*;
+    // use crate::{
+    //     game_agent::tests::{MockTestPrompter, StubNotifier},
+    //     game_logic::events::EndTurnEvent,
+    //     game_state::{board::BoardView, make_test_state, IterAddons},
+    // };
 
-//     struct TestClient {
-//         action_queue: Vec<ClientAction>,
-//         on_turn_start_queue: Vec<Box<dyn FnMut(&GameState) + Send + Sync>>,
-//         notifier: StubNotifier,
-//     }
+    // struct TestClient {
+    //     action_queue: Vec<ClientAction>,
+    //     on_turn_start_queue: Vec<Box<dyn FnMut(&GameState) + Send + Sync>>,
+    //     notifier: StubNotifier,
+    // }
 
-//     impl TestClient {
-//         fn new() -> Self {
-//             Self {
-//                 action_queue: Vec::new(),
-//                 on_turn_start_queue: Vec::new(),
-//                 notifier: StubNotifier,
-//             }
-//         }
+    // impl TestClient {
+    //     fn new() -> Self {
+    //         Self {
+    //             action_queue: Vec::new(),
+    //             on_turn_start_queue: Vec::new(),
+    //             notifier: StubNotifier,
+    //         }
+    //     }
 
-//         fn add_action(&mut self, action: ClientAction) {
-//             self.action_queue.push(action);
-//         }
+    //     fn add_action(&mut self, action: ClientAction) {
+    //         self.action_queue.push(action);
+    //     }
 
-//         fn add_turn_start_check(&mut self, check: Box<dyn FnMut(&GameState) + Send + Sync>) {
-//             self.on_turn_start_queue.push(check);
-//         }
-//     }
+    //     fn add_turn_start_check(&mut self, check: Box<dyn FnMut(&GameState) + Send + Sync>) {
+    //         self.on_turn_start_queue.push(check);
+    //     }
+    // }
 
-//     #[async_trait]
-//     impl GameClient for TestClient {
-//         async fn on_turn_start(&mut self, game_state: &GameState) {
-//             if let Some(mut check) = self.on_turn_start_queue.pop() {
-//                 check(game_state);
-//             }
-//         }
+    // #[async_trait]
+    // impl GameClient for TestClient {
+    //     async fn on_turn_start(&mut self, game_state: &GameState) {
+    //         if let Some(mut check) = self.on_turn_start_queue.pop() {
+    //             check(game_state);
+    //         }
+    //     }
 
-//         // async fn next_action(&mut self, _game_state_view: GameStatePlayerView) -> ClientAction {
-//         async fn next_action(&mut self) -> ClientAction {
-//             self.action_queue
-//                 .pop()
-//                 .expect("No actions left in the queue")
-//         }
+    //     // async fn next_action(&mut self, _game_state_view: GameStatePlayerView) -> ClientAction {
+    //     async fn next_action(&mut self) -> ClientAction {
+    //         self.action_queue
+    //             .pop()
+    //             .expect("No actions left in the queue")
+    //     }
 
-//         async fn make_prompter(&self) -> Arc<dyn Prompter> {
-//             Arc::new(MockTestPrompter::new())
-//         }
+    //     async fn make_prompter(&self) -> Arc<dyn Prompter> {
+    //         Arc::new(MockTestPrompter::new())
+    //     }
 
-//         async fn make_notifier(&self) -> Arc<dyn ClientNotifier> {
-//             Arc::new(StubNotifier)
-//         }
-//     }
+    //     async fn make_notifier(&self) -> Arc<dyn ClientNotifier> {
+    //         Arc::new(StubNotifier)
+    //     }
+    // }
 
-//     #[test]
-//     pub fn gamerunner_when_game_run_expects_game_ends() {
-//         let _ = env_logger::builder().is_test(true).try_init();
-//         let mut client_a = Box::new(TestClient::new());
-//         let mut client_b = Box::new(TestClient::new());
-//         let game_state = make_test_state();
+    // #[test]
+    // pub fn gamerunner_when_game_run_expects_game_ends() {
+    //     let _ = env_logger::builder().is_test(true).try_init();
+    //     let mut client_a = Box::new(TestClient::new());
+    //     let mut client_b = Box::new(TestClient::new());
+    //     let game_state = make_test_state();
 
-//         client_a.add_turn_start_check(Box::new(|game_state| {
-//             let anything_on_board = game_state
-//                 .board()
-//                 .all_characters_slots()
-//                 .exclude_heroes()
-//                 .creatures()
-//                 .next();
-//             assert!(
-//                 anything_on_board.is_none(),
-//                 "Expected no creatures on board since none were ever played."
-//             );
-//         }));
+    //     client_a.add_turn_start_check(Box::new(|game_state| {
+    //         let anything_on_board = game_state
+    //             .board()
+    //             .all_characters_slots()
+    //             .exclude_heroes()
+    //             .creatures()
+    //             .next();
+    //         assert!(
+    //             anything_on_board.is_none(),
+    //             "Expected no creatures on board since none were ever played."
+    //         );
+    //     }));
 
-//         for _ in 0..100 {
-//             client_a.add_action(ClientAction::EndTurn(EndTurn {
-//                 player_id: game_state.player_a_id(),
-//             }));
+    //     for _ in 0..100 {
+    //         client_a.add_action(ClientAction::EndTurn(EndTurn {
+    //             player_id: game_state.player_a_id(),
+    //         }));
 
-//             client_b.add_action(ClientAction::EndTurn(EndTurn {
-//                 player_id: game_state.player_b_id(),
-//             }));
-//         }
+    //         client_b.add_action(ClientAction::EndTurn(EndTurn {
+    //             player_id: game_state.player_b_id(),
+    //         }));
+    //     }
 
-//         let runner = GameRunner::new(client_a, client_b, game_state);
+    //     let runner = GameRunner::new(client_a, client_b, game_state);
 
-//         smol::block_on(async {
-//             runner.run_game().await;
-//         });
-//     }
-// }
+    //     smol::block_on(async {
+    //         runner.run_game().await;
+    //     });
+    // }
+}

@@ -1,6 +1,5 @@
-use std::sync::Arc;
-
 use async_trait::async_trait;
+use std::sync::Arc;
 
 #[cfg(test)]
 use mockall::{automock, predicate::str};
