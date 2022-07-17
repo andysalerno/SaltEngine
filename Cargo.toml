@@ -1,9 +1,0 @@
-[workspace]
-
-members = [
-	"engine",
-	"entity_arena",
-	"cards",
-	"protocol",
-	"id"
-]
