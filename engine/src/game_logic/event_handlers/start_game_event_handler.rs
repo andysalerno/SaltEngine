@@ -33,7 +33,7 @@ impl EventHandler for StartGameEventHandler {
         let player_b_id = game_state.player_b_id();
 
         info!(
-            "Game start.\nPlayer A: {:?}\nPlayer B: {:?}.  Adding cards to hand.",
+            "Game start. Player A: {:?} Player B: {:?}. Adding cards to hand.",
             player_a_id, player_b_id
         );
 

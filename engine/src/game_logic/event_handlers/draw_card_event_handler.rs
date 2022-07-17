@@ -22,7 +22,11 @@ impl EventHandler for DrawCardEventHandler {
         game_state: &mut GameState,
         dispatcher: &mut EventDispatcher,
     ) {
-        // let player_id = event.player_id();
+        let player_id = event.player_id();
+        let deck = game_state.deck(player_id);
+        let len = deck.get(|d| d.len());
+        info!("Player {player_id:?} draws a card. New deck len: {len}");
+
         // info!(
         //     "Player {:?} draws a card. Deck size before draw: {}",
         //     player_id,

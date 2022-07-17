@@ -9,7 +9,8 @@
     clippy::missing_panics_doc,
     clippy::similar_names,
     clippy::cast_sign_loss,
-    dead_code
+    dead_code,
+    clippy::redundant_closure_for_method_calls
 )]
 
 pub mod game_agent;

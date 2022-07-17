@@ -62,6 +62,8 @@ impl GameRunner {
 
             GameRunner::player_take_turn_stage(client, &mut game_state, &mut dispatcher).await;
         }
+
+        info!("Game is over.");
     }
 
     async fn player_take_turn_stage(
@@ -165,10 +167,11 @@ pub mod tests {
     #[test]
     pub fn gamerunner_when_game_run_expects_game_ends() {
         let _ = env_logger::builder().is_test(true).try_init();
+        info!("starting...");
         let mut client_a = Box::new(TestClient::new());
         let mut client_b = Box::new(TestClient::new());
 
-        let mut game_state = GameState::new(PlayerId::new(), PlayerId::new());
+        let game_state = GameState::new(PlayerId::new(), PlayerId::new());
 
         for _ in 0..100 {
             client_a.add_action(ClientAction::EndTurn(EndTurn {
