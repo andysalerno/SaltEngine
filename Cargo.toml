@@ -1,0 +1,11 @@
+[workspace]
+
+members = [
+    "engine",
+    "cards",
+    "events",
+    "game_client",
+    "game_runner",
+    "websocket_console_client",
+    "websocket_server"
+]
