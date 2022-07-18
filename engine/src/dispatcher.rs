@@ -8,6 +8,9 @@ pub struct Dispatcher {
 }
 
 impl Dispatcher {
+    /// # Panics
+    /// Panics if there is a problem registering handlers for events.
+    #[must_use]
     pub fn new(handlers: Vec<Box<dyn EventHandler>>) -> Self {
         // consume the handlers and map them.
         let handlers_provided = handlers.len();
@@ -30,6 +33,8 @@ impl Dispatcher {
         }
     }
 
+    /// # Panics
+    /// Panics if there is no valid handler for the event.
     pub fn dispatch(&mut self, event: &EventMessage) {
         let event_type = event.event_type();
 

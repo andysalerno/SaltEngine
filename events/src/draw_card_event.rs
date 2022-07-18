@@ -1,4 +1,5 @@
 use engine::event::{Event, EventHandler, EventMessage, EventType};
+use log::info;
 use serde::{Deserialize, Serialize};
 
 const HANDLER_NAME: &str = "DrawCardEventHandler";
@@ -45,6 +46,8 @@ impl EventHandler for DrawCardEventHandler {
 
     fn handle(&mut self, event: &EventMessage) {
         let draw_card_event: DrawCardEvent = event.unpack();
+
+        info!("Player is drawing a card.");
 
         // ... do stuff
     }
