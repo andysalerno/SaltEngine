@@ -1,3 +1,5 @@
+mod draw_card_event;
+
 #[cfg(test)]
 mod tests {
     #[test]
