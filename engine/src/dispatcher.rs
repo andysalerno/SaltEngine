@@ -1,4 +1,7 @@
-use crate::event::{EventHandler, EventMessage, EventType};
+use crate::{
+    event::{EventHandler, EventMessage, EventType},
+    game_state, GameState,
+};
 use log::info;
 use std::collections::HashMap;
 
@@ -35,7 +38,7 @@ impl Dispatcher {
 
     /// # Panics
     /// Panics if there is no valid handler for the event.
-    pub fn dispatch(&mut self, event: &EventMessage) {
+    pub fn dispatch(&mut self, event: &EventMessage, game_state: &mut GameState) {
         let event_type = event.event_type();
 
         let matching_handler = self
@@ -47,6 +50,6 @@ impl Dispatcher {
 
         info!("Dispatching event {event:?}");
 
-        matching_handler.handle(event);
+        matching_handler.handle(event, game_state);
     }
 }

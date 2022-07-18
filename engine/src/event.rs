@@ -1,5 +1,7 @@
 use serde::{de::DeserializeOwned, Deserialize, Serialize};
 
+use crate::{game_state, GameState};
+
 #[derive(Serialize, Deserialize, Debug)]
 pub struct EventMessage {
     kind: EventType,
@@ -51,5 +53,5 @@ pub trait EventHandler {
     fn event_type(&self) -> EventType;
 
     /// Handle the given event.
-    fn handle(&mut self, event: &EventMessage);
+    fn handle(&mut self, event: &EventMessage, game_state: &mut GameState);
 }
