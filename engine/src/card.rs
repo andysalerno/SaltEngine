@@ -1,5 +1,46 @@
+/// An instance of a card in the game,
+/// created from some definition.
 #[derive(Debug)]
-pub struct Card {}
+pub struct Card {
+    definition: Box<CardDefinition>,
+    title: String,
+    current_cost: usize,
+    current_attack: i16,
+    current_health: i16,
+}
+
+impl Card {
+    #[must_use]
+    pub fn new(definition: Box<CardDefinition>) -> Self {
+        Self {
+            title: definition.title().to_owned(),
+            current_attack: definition.attack(),
+            current_cost: definition.cost(),
+            current_health: definition.health(),
+            definition,
+        }
+    }
+
+    #[must_use]
+    pub fn definition(&self) -> &CardDefinition {
+        self.definition.as_ref()
+    }
+
+    #[must_use]
+    pub const fn current_cost(&self) -> usize {
+        self.current_cost
+    }
+
+    #[must_use]
+    pub const fn current_attack(&self) -> i16 {
+        self.current_attack
+    }
+
+    #[must_use]
+    pub const fn current_health(&self) -> i16 {
+        self.current_health
+    }
+}
 
 #[derive(Debug)]
 pub struct CardDefinition {
@@ -93,7 +134,7 @@ impl Default for CardDefinitionBuilder {
 
 #[cfg(test)]
 mod tests {
-    use crate::CardDefinition;
+    use crate::{Card, CardDefinition};
 
     #[test]
     fn card_definition_builder_can_build_definition() {
@@ -106,5 +147,19 @@ mod tests {
         assert_eq!(1, built_definition.attack());
         assert_eq!(4, built_definition.health());
         assert_eq!("TestCard", built_definition.title());
+    }
+
+    #[test]
+    fn card_can_be_created_from_definition() {
+        let mut builder = CardDefinition::builder();
+        builder.title("TestCard").cost(3).attack(1).health(4);
+
+        let built_definition = builder.build();
+
+        let card = Card::new(Box::new(built_definition));
+
+        assert_eq!(3, card.current_cost());
+        assert_eq!(1, card.current_attack());
+        assert_eq!(4, card.current_health());
     }
 }
