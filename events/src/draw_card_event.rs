@@ -47,8 +47,8 @@ impl EventHandler for DrawCardEventHandler {
         EventType::new(HANDLER_NAME)
     }
 
-    fn handle(&mut self, event: &EventMessage, game_state: &mut GameState) {
-        let draw_card_event: DrawCardEvent = event.unpack();
+    fn handle(&mut self, event: &EventMessage, _game_state: &mut GameState) {
+        let _draw_card_event: DrawCardEvent = event.unpack();
 
         info!("Player is drawing a card.");
 

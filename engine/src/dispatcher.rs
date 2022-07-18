@@ -1,6 +1,6 @@
 use crate::{
     event::{EventHandler, EventMessage, EventType},
-    game_state, GameState,
+    GameState,
 };
 use log::info;
 use std::collections::HashMap;

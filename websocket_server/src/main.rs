@@ -9,7 +9,7 @@ fn main() {
 
     let event = DrawCardEvent::new();
 
-    let mut game_state = GameState {};
+    let mut game_state = GameState::new();
 
     dispatcher.dispatch(&event.into(), &mut game_state);
 }

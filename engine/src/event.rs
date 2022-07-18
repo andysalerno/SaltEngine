@@ -1,6 +1,5 @@
+use crate::GameState;
 use serde::{de::DeserializeOwned, Deserialize, Serialize};
-
-use crate::{game_state, GameState};
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct EventMessage {
