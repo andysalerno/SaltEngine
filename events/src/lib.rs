@@ -1,5 +1,7 @@
 mod draw_card_event;
 
+pub use draw_card_event::{DrawCardEvent, DrawCardEventHandler};
+
 #[cfg(test)]
 mod tests {
     #[test]

@@ -1,8 +1,8 @@
-use crate::event::{self, Event, EventHandler, EventMessage, EventType};
+use crate::event::{EventHandler, EventMessage, EventType};
 use log::info;
 use std::collections::HashMap;
 
-struct Dispatcher {
+pub struct Dispatcher {
     // event_stack: ...
     event_handler_mapping: HashMap<EventType, Box<dyn EventHandler>>,
 }

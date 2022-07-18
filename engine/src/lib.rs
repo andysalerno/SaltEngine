@@ -10,3 +10,6 @@ mod deck;
 mod dispatcher;
 pub mod event;
 mod game_state;
+
+pub use dispatcher::Dispatcher;
+pub use game_state::GameState;

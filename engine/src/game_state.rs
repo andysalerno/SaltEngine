@@ -1,1 +1,1 @@
-struct GameState {}
+pub struct GameState {}

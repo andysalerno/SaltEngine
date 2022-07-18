@@ -12,6 +12,7 @@ impl EventMessage {
         &self.kind
     }
 
+    #[must_use]
     pub fn unpack<T: Event>(&self) -> T {
         serde_json::from_str(&self.body).expect("Unpacking (deserializion) failed for this entity")
     }

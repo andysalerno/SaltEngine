@@ -1,20 +1,46 @@
 use engine::event::{Event, EventHandler, EventMessage, EventType};
 use serde::{Deserialize, Serialize};
 
+const HANDLER_NAME: &str = "DrawCardEventHandler";
+
 #[derive(Serialize, Deserialize, Debug)]
 pub struct DrawCardEvent {}
 
-impl Event for DrawCardEvent {
-    fn event_type(&self) -> EventType {
-        EventType::new("DrawCardEventHandler")
+impl DrawCardEvent {
+    pub fn new() -> Self {
+        Self {}
     }
 }
 
-pub struct DrawCardEventHandler {}
+impl Default for DrawCardEvent {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl Event for DrawCardEvent {
+    fn event_type(&self) -> EventType {
+        EventType::new(HANDLER_NAME)
+    }
+}
+
+pub struct DrawCardEventHandler;
+
+impl DrawCardEventHandler {
+    pub fn new() -> Self {
+        Self
+    }
+}
+
+impl Default for DrawCardEventHandler {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 
 impl EventHandler for DrawCardEventHandler {
     fn event_type(&self) -> EventType {
-        EventType::new(String::from("DrawCardEventHandler"))
+        EventType::new(HANDLER_NAME)
     }
 
     fn handle(&mut self, event: &EventMessage) {
