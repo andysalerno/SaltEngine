@@ -1,4 +1,4 @@
-use engine::{event::EventHandler, Dispatcher, GameState};
+use engine::{event::EventHandler, Dispatcher, GameState, PlayerId};
 use events::{DrawCardEvent, DrawCardEventHandler};
 
 fn main() {
@@ -9,7 +9,7 @@ fn main() {
 
     let event = DrawCardEvent::new();
 
-    let mut game_state = GameState::new();
+    let mut game_state = GameState::new(PlayerId::new(), PlayerId::new());
 
     dispatcher.dispatch(&event.into(), &mut game_state);
 }
