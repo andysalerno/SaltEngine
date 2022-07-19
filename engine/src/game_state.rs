@@ -1,4 +1,4 @@
-use crate::{deck::Deck, Card, PlayerId};
+use crate::{deck::Deck, hand::Hand, Card, PlayerId};
 use std::collections::HashMap;
 
 #[derive(Debug, PartialEq, Eq, Hash, Copy, Clone)]
@@ -9,6 +9,8 @@ pub struct GameState {
     cards_on_board: HashMap<GamePos, Card>,
     deck_player_a: Deck,
     deck_player_b: Deck,
+    hand_player_a: Hand,
+    hand_player_b: Hand,
     player_id_a: PlayerId,
     player_id_b: PlayerId,
 }
@@ -20,6 +22,8 @@ impl GameState {
             cards_on_board: HashMap::new(),
             deck_player_a: Deck::new(Vec::new()),
             deck_player_b: Deck::new(Vec::new()),
+            hand_player_a: Hand::new_empty(),
+            hand_player_b: Hand::new_empty(),
             player_id_a,
             player_id_b,
         }

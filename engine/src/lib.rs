@@ -10,6 +10,7 @@ mod deck;
 mod dispatcher;
 pub mod event;
 mod game_state;
+mod hand;
 mod player_id;
 
 pub use card::{Card, CardDefinition};
