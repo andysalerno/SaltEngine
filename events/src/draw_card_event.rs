@@ -1,6 +1,6 @@
 use engine::{
     event::{Event, EventHandler, EventMessage, EventType},
-    GameState,
+    Dispatcher, GameState, PlayerId,
 };
 use log::info;
 use serde::{Deserialize, Serialize};
@@ -8,17 +8,17 @@ use serde::{Deserialize, Serialize};
 const HANDLER_NAME: &str = "DrawCardEventHandler";
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct DrawCardEvent {}
-
-impl DrawCardEvent {
-    pub fn new() -> Self {
-        Self {}
-    }
+pub struct DrawCardEvent {
+    player_id: PlayerId,
 }
 
-impl Default for DrawCardEvent {
-    fn default() -> Self {
-        Self::new()
+impl DrawCardEvent {
+    pub fn new(player_id: PlayerId) -> Self {
+        Self { player_id }
+    }
+
+    pub fn player_id(&self) -> PlayerId {
+        self.player_id
     }
 }
 
@@ -47,10 +47,11 @@ impl EventHandler for DrawCardEventHandler {
         EventType::new(HANDLER_NAME)
     }
 
-    fn handle(&mut self, event: &EventMessage, _game_state: &mut GameState) {
-        let _draw_card_event: DrawCardEvent = event.unpack();
+    fn handle(&self, event: &EventMessage, _game_state: &mut GameState, _dispatcher: &Dispatcher) {
+        let draw_card_event: DrawCardEvent = event.unpack();
+        let player_id = draw_card_event.player_id();
 
-        info!("Player is drawing a card.");
+        info!("Player {player_id:?} is drawing a card.");
 
         // ... do stuff
     }

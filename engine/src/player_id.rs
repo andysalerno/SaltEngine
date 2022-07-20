@@ -1,7 +1,8 @@
+use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 /// A unique ID for addressing players.
-#[derive(Copy, Clone, PartialEq, Eq, Hash, Debug)]
+#[derive(Serialize, Deserialize, Copy, Clone, PartialEq, Eq, Hash, Debug)]
 pub struct PlayerId {
     guid: Uuid,
 }

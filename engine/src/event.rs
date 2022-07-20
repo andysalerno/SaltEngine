@@ -1,4 +1,4 @@
-use crate::GameState;
+use crate::{dispatcher, Dispatcher, GameState};
 use serde::{de::DeserializeOwned, Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -52,5 +52,5 @@ pub trait EventHandler {
     fn event_type(&self) -> EventType;
 
     /// Handle the given event.
-    fn handle(&mut self, event: &EventMessage, game_state: &mut GameState);
+    fn handle(&self, event: &EventMessage, game_state: &mut GameState, dispatcher: &Dispatcher);
 }

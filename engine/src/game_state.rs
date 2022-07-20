@@ -39,6 +39,16 @@ impl GameState {
         self.cards_on_board.get_mut(&pos)
     }
 
+    #[must_use]
+    pub const fn player_id_a(&self) -> PlayerId {
+        self.player_id_a
+    }
+
+    #[must_use]
+    pub const fn player_id_b(&self) -> PlayerId {
+        self.player_id_b
+    }
+
     /// Inserts the `Card` at the given `GamePos`. Returns the previous `Card` in that position
     /// if there was one.
     #[must_use]

@@ -38,18 +38,18 @@ impl Dispatcher {
 
     /// # Panics
     /// Panics if there is no valid handler for the event.
-    pub fn dispatch(&mut self, event: &EventMessage, game_state: &mut GameState) {
+    pub fn dispatch(&self, event: &EventMessage, game_state: &mut GameState) {
         let event_type = event.event_type();
 
         let matching_handler = self
             .event_handler_mapping
-            .get_mut(event_type)
+            .get(event_type)
             .unwrap_or_else(|| {
                 panic!("no matching handler was found for event type {event_type:?}")
             });
 
         info!("Dispatching event {event:?}");
 
-        matching_handler.handle(event, game_state);
+        matching_handler.handle(event, game_state, self);
     }
 }

@@ -1,13 +1,16 @@
 use engine::{event::EventHandler, Dispatcher, GameState, PlayerId};
-use events::{DrawCardEvent, DrawCardEventHandler};
+use events::{DrawCardEventHandler, StartGameEvent, StartGameEventHandler};
 
 fn main() {
     env_logger::init();
 
-    let handlers: Vec<Box<dyn EventHandler>> = vec![Box::new(DrawCardEventHandler::new())];
-    let mut dispatcher = Dispatcher::new(handlers);
+    let handlers: Vec<Box<dyn EventHandler>> = vec![
+        Box::new(DrawCardEventHandler::new()),
+        Box::new(StartGameEventHandler::new()),
+    ];
+    let dispatcher = Dispatcher::new(handlers);
 
-    let event = DrawCardEvent::new();
+    let event = StartGameEvent::new();
 
     let mut game_state = GameState::new(PlayerId::new(), PlayerId::new());
 
