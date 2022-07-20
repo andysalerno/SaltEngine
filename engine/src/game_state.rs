@@ -49,10 +49,41 @@ impl GameState {
         self.player_id_b
     }
 
+    #[must_use]
+    pub fn deck(&self, player_id: PlayerId) -> &Deck {
+        match self.player(player_id) {
+            Player::PlayerA => &self.deck_player_a,
+            Player::PlayerB => &self.deck_player_b,
+        }
+    }
+
+    #[must_use]
+    pub fn deck_mut(&mut self, player_id: PlayerId) -> &mut Deck {
+        match self.player(player_id) {
+            Player::PlayerA => &mut self.deck_player_a,
+            Player::PlayerB => &mut self.deck_player_b,
+        }
+    }
+
     /// Inserts the `Card` at the given `GamePos`. Returns the previous `Card` in that position
     /// if there was one.
     #[must_use]
     pub fn set_card_at_pos(&mut self, pos: GamePos, card: Card) -> Option<Card> {
         self.cards_on_board.insert(pos, card)
     }
+
+    fn player(&self, player_id: PlayerId) -> Player {
+        if player_id == self.player_id_a {
+            Player::PlayerA
+        } else if player_id == self.player_id_b {
+            Player::PlayerB
+        } else {
+            panic!("Player id was not recognized: {player_id:?}")
+        }
+    }
+}
+
+enum Player {
+    PlayerA,
+    PlayerB,
 }

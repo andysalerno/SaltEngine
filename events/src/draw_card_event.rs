@@ -47,11 +47,19 @@ impl EventHandler for DrawCardEventHandler {
         EventType::new(HANDLER_NAME)
     }
 
-    fn handle(&self, event: &EventMessage, _game_state: &mut GameState, _dispatcher: &Dispatcher) {
+    fn handle(&self, event: &EventMessage, game_state: &mut GameState, _dispatcher: &Dispatcher) {
         let draw_card_event: DrawCardEvent = event.unpack();
         let player_id = draw_card_event.player_id();
 
         info!("Player {player_id:?} is drawing a card.");
+
+        let deck = game_state.deck_mut(player_id);
+
+        if let Some(drew_card) = deck.take_from_top() {
+            info!("Player drew: {drew_card:?}");
+        } else {
+            info!("Player had no cards in deck left to draw.");
+        }
 
         // ... do stuff
     }
