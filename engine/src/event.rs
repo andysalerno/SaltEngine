@@ -1,7 +1,7 @@
-use crate::{dispatcher, Dispatcher, GameState};
+use crate::{Dispatcher, GameState};
 use serde::{de::DeserializeOwned, Deserialize, Serialize};
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct EventMessage {
     kind: EventType,
     body: String,
@@ -37,7 +37,7 @@ impl<T: Event> From<T> for EventMessage {
 
 /// An identifier for a type of event.
 /// Each `Event` must have a unique `EventType`.
-#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Hash)]
+#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Hash, Clone)]
 pub struct EventType(String);
 
 impl EventType {

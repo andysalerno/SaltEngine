@@ -9,11 +9,13 @@ mod card;
 mod deck;
 mod dispatcher;
 pub mod event;
+mod game_client;
 mod game_state;
 mod hand;
 mod player_id;
 
 pub use card::{Card, CardDefinition};
 pub use dispatcher::Dispatcher;
+pub use game_client::{ClientChannel, FromClient};
 pub use game_state::GameState;
 pub use player_id::PlayerId;

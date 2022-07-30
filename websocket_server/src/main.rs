@@ -1,14 +1,30 @@
-use engine::{event::EventHandler, Dispatcher, GameState, PlayerId};
+use engine::{event::EventHandler, ClientChannel, Dispatcher, FromClient, GameState, PlayerId};
 use events::{DrawCardEventHandler, StartGameEvent, StartGameEventHandler};
 
+struct DummyClient;
+
+impl ClientChannel for DummyClient {
+    fn push_message(&self, message: &engine::event::EventMessage) {
+        //
+    }
+
+    fn try_receive_message(&self) -> Option<FromClient> {
+        None
+    }
+}
+
 fn main() {
-    env_logger::init();
+    let mut builder = env_logger::Builder::from_default_env();
+    builder.format_timestamp_millis();
+    builder.init();
 
     let handlers: Vec<Box<dyn EventHandler>> = vec![
         Box::new(DrawCardEventHandler::new()),
         Box::new(StartGameEventHandler::new()),
     ];
-    let dispatcher = Dispatcher::new(handlers);
+    let player_a = Box::new(DummyClient);
+    let player_b = Box::new(DummyClient);
+    let dispatcher = Dispatcher::new(handlers, player_a, player_b);
 
     let event = StartGameEvent::new();
 

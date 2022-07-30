@@ -1,5 +1,6 @@
 use crate::{
     event::{EventHandler, EventMessage, EventType},
+    game_client::ClientChannel,
     GameState,
 };
 use log::info;
@@ -8,13 +9,19 @@ use std::collections::HashMap;
 pub struct Dispatcher {
     // event_stack: ...
     event_handler_mapping: HashMap<EventType, Box<dyn EventHandler>>,
+    player_a: Box<dyn ClientChannel>,
+    player_b: Box<dyn ClientChannel>,
 }
 
 impl Dispatcher {
     /// # Panics
     /// Panics if there is a problem registering handlers for events.
     #[must_use]
-    pub fn new(handlers: Vec<Box<dyn EventHandler>>) -> Self {
+    pub fn new(
+        handlers: Vec<Box<dyn EventHandler>>,
+        player_a: Box<dyn ClientChannel>,
+        player_b: Box<dyn ClientChannel>,
+    ) -> Self {
         // consume the handlers and map them.
         let handlers_provided = handlers.len();
 
@@ -33,6 +40,8 @@ impl Dispatcher {
 
         Self {
             event_handler_mapping: mapping,
+            player_a,
+            player_b,
         }
     }
 
@@ -50,6 +59,19 @@ impl Dispatcher {
 
         info!("Dispatching event {event:?}");
 
+        self.player_a.push_message(event);
+        self.player_b.push_message(event);
+
         matching_handler.handle(event, game_state, self);
+    }
+
+    #[must_use]
+    pub fn player_a(&self) -> &dyn ClientChannel {
+        self.player_a.as_ref()
+    }
+
+    #[must_use]
+    pub fn player_b(&self) -> &dyn ClientChannel {
+        self.player_b.as_ref()
     }
 }
