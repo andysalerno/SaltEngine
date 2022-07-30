@@ -7,37 +7,30 @@ mod tests {
         ClientChannel, Dispatcher, GameState, PlayerId,
     };
     use events::{DrawCardEventHandler, StartGameEvent, StartGameEventHandler};
+    use log::info;
 
     struct DummyClient<'a> {
-        observed_events: Mutex<Vec<EventMessage>>,
-        on_push_message: Box<dyn FnMut(EventMessage) + 'a>,
+        on_push_message: Box<dyn Fn(EventMessage) + 'a>,
     }
 
     impl<'a> DummyClient<'a> {
         fn new() -> Self {
             Self {
-                observed_events: Mutex::new(Vec::new()),
                 on_push_message: Box::new(|_| {}),
             }
         }
 
         fn on_push_message<TFn>(&mut self, action: TFn)
         where
-            TFn: FnMut(EventMessage) + 'a,
+            TFn: Fn(EventMessage) + 'a,
         {
-            // self.on_push_message(Box::new(action))
             self.on_push_message = Box::new(action);
-        }
-
-        fn saw_events(&self) -> Vec<EventMessage> {
-            self.observed_events.lock().unwrap().clone()
         }
     }
 
     impl<'a> ClientChannel for DummyClient<'a> {
         fn push_message(&self, message: &EventMessage) {
-            let mut v = self.observed_events.lock().unwrap();
-            v.push(message.clone());
+            (self.on_push_message)(message.clone());
         }
 
         fn try_receive_message(&self) -> Option<engine::FromClient> {
@@ -61,22 +54,27 @@ mod tests {
             ];
 
             let mut player_a = Box::new(DummyClient::new());
+            let messages = Rc::clone(&a_messages);
             player_a.on_push_message(move |message| {
-                a_messages.lock().unwrap().push(message);
+                info!("player_a saw message: {message:?}");
+                messages.lock().unwrap().push(message);
             });
 
             let mut player_b = Box::new(DummyClient::new());
+            let messages = Rc::clone(&b_messages);
             player_b.on_push_message(move |message| {
-                b_messages.lock().unwrap().push(message);
+                info!("player_b saw message: {message:?}");
+                messages.lock().unwrap().push(message);
             });
 
             Dispatcher::new(handlers, player_a, player_b)
         };
 
-        let event = StartGameEvent::new();
-
         let mut game_state = GameState::new(PlayerId::new(), PlayerId::new());
 
-        dispatcher.dispatch(&event.into(), &mut game_state);
+        dispatcher.dispatch(&StartGameEvent::new().into(), &mut game_state);
+
+        let l = a_messages.lock().unwrap().len();
+        info!("final count of messages for player_a: {l}");
     }
 }
