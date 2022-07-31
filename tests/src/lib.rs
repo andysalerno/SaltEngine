@@ -3,8 +3,9 @@ mod tests {
     use std::{rc::Rc, sync::Mutex};
 
     use engine::{
+        deck::Deck,
         event::{EventHandler, EventMessage},
-        ClientChannel, Dispatcher, GameState, PlayerId,
+        CardDefinition, ClientChannel, Dispatcher, GameState, PlayerId,
     };
     use events::{DrawCardEventHandler, StartGameEvent, StartGameEventHandler};
     use log::info;
@@ -70,11 +71,24 @@ mod tests {
             Dispatcher::new(handlers, player_a, player_b)
         };
 
-        let mut game_state = GameState::new(PlayerId::new(), PlayerId::new());
+        let mut builder = GameState::builder(PlayerId::new(), PlayerId::new());
+        builder
+            .with_player_a_deck(make_deck())
+            .with_player_b_deck(make_deck());
 
-        dispatcher.dispatch(&StartGameEvent::new().into(), &mut game_state);
+        dispatcher.dispatch(&StartGameEvent::new().into(), &mut builder.build());
+    }
 
-        let l = a_messages.lock().unwrap().len();
-        info!("final count of messages for player_a: {l}");
+    fn make_deck() -> Deck {
+        let mut deck = Deck::new_empty();
+
+        let mut builder = CardDefinition::builder();
+        builder.title("test_card");
+
+        for _ in 0..10 {
+            deck.add_card_to_bottom(builder.build());
+        }
+
+        deck
     }
 }

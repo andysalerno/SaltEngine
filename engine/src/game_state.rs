@@ -72,6 +72,11 @@ impl GameState {
         self.cards_on_board.insert(pos, card)
     }
 
+    #[must_use]
+    pub const fn builder(player_id_a: PlayerId, player_id_b: PlayerId) -> GameStateBuilder {
+        GameStateBuilder::new(player_id_a, player_id_b)
+    }
+
     fn player(&self, player_id: PlayerId) -> Player {
         if player_id == self.player_id_a {
             Player::PlayerA
@@ -80,6 +85,43 @@ impl GameState {
         } else {
             panic!("Player id was not recognized: {player_id:?}")
         }
+    }
+}
+
+pub struct GameStateBuilder {
+    deck_player_a: Deck,
+    deck_player_b: Deck,
+    player_id_a: PlayerId,
+    player_id_b: PlayerId,
+}
+
+impl GameStateBuilder {
+    pub const fn new(player_id_a: PlayerId, player_id_b: PlayerId) -> Self {
+        Self {
+            player_id_a,
+            player_id_b,
+            deck_player_a: Deck::new_empty(),
+            deck_player_b: Deck::new_empty(),
+        }
+    }
+
+    pub fn with_player_a_deck(&mut self, deck: Deck) -> &mut Self {
+        self.deck_player_a = deck;
+        self
+    }
+
+    pub fn with_player_b_deck(&mut self, deck: Deck) -> &mut Self {
+        self.deck_player_b = deck;
+        self
+    }
+
+    pub fn build(self) -> GameState {
+        let mut gamestate = GameState::new(self.player_id_a, self.player_id_b);
+
+        *gamestate.deck_mut(self.player_id_a) = self.deck_player_a;
+        *gamestate.deck_mut(self.player_id_b) = self.deck_player_b;
+
+        gamestate
     }
 }
 

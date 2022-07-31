@@ -6,7 +6,7 @@
 )]
 
 mod card;
-mod deck;
+pub mod deck;
 mod dispatcher;
 pub mod event;
 mod game_client;

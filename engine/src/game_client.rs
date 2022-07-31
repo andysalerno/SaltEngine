@@ -1,6 +1,11 @@
+use serde::{Deserialize, Serialize};
+
 use crate::event::EventMessage;
 
-pub struct FromClient;
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub enum FromClient {
+    EndTurn,
+}
 
 pub trait ClientChannel {
     fn push_message(&self, message: &EventMessage);

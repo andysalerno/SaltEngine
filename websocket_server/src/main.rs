@@ -4,7 +4,7 @@ use events::{DrawCardEventHandler, StartGameEvent, StartGameEventHandler};
 struct DummyClient;
 
 impl ClientChannel for DummyClient {
-    fn push_message(&self, message: &engine::event::EventMessage) {
+    fn push_message(&self, _message: &engine::event::EventMessage) {
         //
     }
 
