@@ -18,4 +18,8 @@ impl Hand {
     pub fn add_to_right(&mut self, card: CardDefinition) {
         self.cards.push(card);
     }
+
+    pub fn len(&self) -> usize {
+        self.cards.len()
+    }
 }

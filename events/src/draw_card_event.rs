@@ -56,7 +56,9 @@ impl EventHandler for DrawCardEventHandler {
         let deck = game_state.deck_mut(player_id);
 
         if let Some(drew_card) = deck.take_from_top() {
+            let hand = game_state.hand_mut(player_id);
             info!("Player drew: {drew_card:?}");
+            hand.add_to_right(drew_card);
         } else {
             info!("Player had no cards in deck left to draw.");
         }

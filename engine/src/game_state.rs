@@ -65,6 +65,22 @@ impl GameState {
         }
     }
 
+    #[must_use]
+    pub fn hand(&self, player_id: PlayerId) -> &Hand {
+        match self.player(player_id) {
+            Player::PlayerA => &self.hand_player_a,
+            Player::PlayerB => &self.hand_player_b,
+        }
+    }
+
+    #[must_use]
+    pub fn hand_mut(&mut self, player_id: PlayerId) -> &mut Hand {
+        match self.player(player_id) {
+            Player::PlayerA => &mut self.hand_player_a,
+            Player::PlayerB => &mut self.hand_player_b,
+        }
+    }
+
     /// Inserts the `Card` at the given `GamePos`. Returns the previous `Card` in that position
     /// if there was one.
     #[must_use]

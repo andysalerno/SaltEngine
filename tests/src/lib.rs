@@ -44,6 +44,9 @@ mod tests {
         let mut builder = env_logger::Builder::from_default_env();
         builder.is_test(true).format_timestamp_millis().init();
 
+        let player_a_id = PlayerId::new();
+        let player_b_id = PlayerId::new();
+
         // Keep track of messages received by both players.
         let a_messages = Rc::new(Mutex::new(Vec::new()));
         let b_messages = Rc::new(Mutex::new(Vec::new()));
@@ -71,12 +74,19 @@ mod tests {
             Dispatcher::new(handlers, player_a, player_b)
         };
 
-        let mut builder = GameState::builder(PlayerId::new(), PlayerId::new());
-        builder
-            .with_player_a_deck(make_deck())
-            .with_player_b_deck(make_deck());
+        let mut game_state = {
+            let mut builder = GameState::builder(player_a_id, player_b_id);
+            builder
+                .with_player_a_deck(make_deck())
+                .with_player_b_deck(make_deck());
+            builder.build()
+        };
 
-        dispatcher.dispatch(&StartGameEvent::new().into(), &mut builder.build());
+        dispatcher.dispatch(&StartGameEvent::new().into(), &mut game_state);
+
+        let hand_len = game_state.hand(player_a_id).len();
+
+        assert!(hand_len > 0);
     }
 
     fn make_deck() -> Deck {
