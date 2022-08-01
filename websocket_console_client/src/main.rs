@@ -15,6 +15,7 @@ fn main() {
     info!("Connected.");
 
     loop {
+        info!("Trying to receive a message...");
         let received = socket.read_message().unwrap();
         info!("Received message: {received:?}");
     }
