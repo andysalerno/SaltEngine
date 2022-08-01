@@ -8,10 +8,12 @@ pub struct Deck {
 }
 
 impl Deck {
+    #[must_use]
     pub fn new(cards: Vec<CardDefinition>) -> Self {
         Self { cards }
     }
 
+    #[must_use]
     pub const fn new_empty() -> Self {
         Self { cards: Vec::new() }
     }
