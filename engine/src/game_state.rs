@@ -93,6 +93,11 @@ impl GameState {
         GameStateBuilder::new(player_id_a, player_id_b)
     }
 
+    #[must_use]
+    pub fn is_game_over(&self) -> bool {
+        false
+    }
+
     fn player(&self, player_id: PlayerId) -> Player {
         if player_id == self.player_id_a {
             Player::PlayerA
