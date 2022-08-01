@@ -5,13 +5,13 @@ mod tests {
     use engine::{
         deck::Deck,
         event::{EventHandler, EventMessage},
-        CardDefinition, ClientChannel, Dispatcher, GameState, PlayerId,
+        CardDefinition, ClientChannel, Dispatcher, FromServer, GameState, PlayerId,
     };
     use events::{DrawCardEventHandler, StartGameEvent, StartGameEventHandler};
     use log::info;
 
     struct DummyClient<'a> {
-        on_push_message: Box<dyn Fn(EventMessage) + 'a>,
+        on_push_message: Box<dyn Fn(FromServer) + 'a>,
     }
 
     impl<'a> DummyClient<'a> {
@@ -23,15 +23,15 @@ mod tests {
 
         fn on_push_message<TFn>(&mut self, action: TFn)
         where
-            TFn: Fn(EventMessage) + 'a,
+            TFn: Fn(FromServer) + 'a,
         {
             self.on_push_message = Box::new(action);
         }
     }
 
     impl<'a> ClientChannel for DummyClient<'a> {
-        fn push_message(&self, message: &EventMessage) {
-            (self.on_push_message)(message.clone());
+        fn push_message(&self, message: FromServer) {
+            (self.on_push_message)(message);
         }
 
         fn try_receive_message(&self) -> Option<engine::FromClient> {

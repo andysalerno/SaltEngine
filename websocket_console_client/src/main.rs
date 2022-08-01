@@ -1,9 +1,8 @@
+use env_logger::init;
 use log::info;
 
 fn main() {
-    let mut builder = env_logger::Builder::from_default_env();
-    builder.format_timestamp_millis();
-    builder.init();
+    init_logger();
 
     info!("Connecting...");
     let mut socket = loop {
@@ -19,4 +18,10 @@ fn main() {
         let received = socket.read_message().unwrap();
         info!("Received message: {received:?}");
     }
+}
+
+fn init_logger() {
+    let mut builder = env_logger::Builder::from_default_env();
+    builder.format_timestamp_millis();
+    builder.init();
 }

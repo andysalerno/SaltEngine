@@ -1,6 +1,6 @@
 use crate::{
     event::{EventHandler, EventMessage, EventType},
-    game_client::ClientChannel,
+    game_client::{ClientChannel, FromServer},
     GameState,
 };
 use log::info;
@@ -59,8 +59,8 @@ impl Dispatcher {
 
         info!("Dispatching event {event:?}");
 
-        self.player_a.push_message(event);
-        self.player_b.push_message(event);
+        self.player_a.push_message(FromServer::Event(event.clone()));
+        self.player_b.push_message(FromServer::Event(event.clone()));
 
         matching_handler.handle(event, game_state, self);
     }

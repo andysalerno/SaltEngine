@@ -16,6 +16,6 @@ mod player_id;
 
 pub use card::{Card, CardDefinition};
 pub use dispatcher::Dispatcher;
-pub use game_client::{ClientChannel, FromClient};
+pub use game_client::{ClientChannel, FromClient, FromServer};
 pub use game_state::GameState;
 pub use player_id::PlayerId;
