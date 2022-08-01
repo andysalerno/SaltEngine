@@ -1,4 +1,4 @@
-use engine::{event::EventHandler, Dispatcher, GameState, PlayerId};
+use engine::{event::EventHandler, ClientChannel, Dispatcher, FromServer, GameState, PlayerId};
 use events::{
     DrawCardEventHandler, PlayerStartTurnEvent, PlayerStartTurnEventHandler, StartGameEvent,
     StartGameEventHandler,
@@ -11,6 +11,11 @@ fn main() {
     init_logger();
 
     let (player_a, player_b) = websocket_player::accept_connections();
+
+    let player_a_id = PlayerId::new();
+    let player_b_id = PlayerId::new();
+    player_a.push_message(FromServer::Hello(player_a_id, player_b_id));
+    player_b.push_message(FromServer::Hello(player_b_id, player_a_id));
 
     info!("Both players connected. Starting game.");
     let dispatcher = {
@@ -25,7 +30,7 @@ fn main() {
     };
 
     // First, dispatch the StartGame event. Both players draw cards to prepare for gameplay.
-    let mut game_state = GameState::new(PlayerId::new(), PlayerId::new());
+    let mut game_state = GameState::new(player_a_id, player_b_id);
     dispatcher.dispatch(&StartGameEvent::new().into(), &mut game_state);
 
     // Then, keep getting player input until the game is over.

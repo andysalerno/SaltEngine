@@ -1,22 +1,27 @@
-use env_logger::init;
+use engine::GameState;
 use log::info;
+
+mod websocket_receiver;
 
 fn main() {
     init_logger();
 
-    info!("Connecting...");
-    let mut socket = loop {
-        match tungstenite::connect("ws://localhost:9001") {
-            Ok((socket, _)) => break socket,
-            _ => continue,
-        }
+    let receiver = websocket_receiver::connect();
+
+    // First, we expect a Hello message, with our player IDs.
+    let (my_id, enemy_id) = match receiver.receive().expect("connection must be open.") {
+        engine::FromServer::Event(_) => panic!("Expected Hello."),
+        engine::FromServer::Hello(a, b) => (a, b),
     };
-    info!("Connected.");
+
+    let game_state = GameState::new(my_id, enemy_id);
+
+    info!("I am: {my_id:?}. Enemy is: {enemy_id:?}");
 
     loop {
-        info!("Trying to receive a message...");
-        let received = socket.read_message().unwrap();
-        info!("Received message: {received:?}");
+        info!("waiting for message...");
+        let message = receiver.receive();
+        info!("received message: {message:?}");
     }
 }
 

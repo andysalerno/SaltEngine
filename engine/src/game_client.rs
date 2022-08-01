@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use crate::event::EventMessage;
+use crate::{event::EventMessage, PlayerId};
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub enum FromClient {
@@ -10,6 +10,7 @@ pub enum FromClient {
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub enum FromServer {
     Event(EventMessage),
+    Hello(PlayerId, PlayerId),
 }
 
 pub trait ClientChannel {
