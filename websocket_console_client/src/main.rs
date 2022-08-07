@@ -1,16 +1,17 @@
 use engine::{
-    event::{Event, EventHandler, EventType},
-    FromClient, GameState,
+    event::{Event, EventHandler, EventMessage, EventType},
+    FromClient, FromServer, GameState, PlayerId,
 };
 use events::PlayerStartTurnEvent;
 use log::info;
+use websocket_channel::WebSocketChannel;
 
-mod websocket_receiver;
+mod websocket_channel;
 
 fn main() {
     init_logger();
 
-    let receiver = websocket_receiver::connect();
+    let receiver = websocket_channel::connect();
 
     let handlers: Vec<Box<dyn EventHandler>> = Vec::new();
 
@@ -30,22 +31,26 @@ fn main() {
         info!("received message: {message:?}");
 
         let event = match message {
-            engine::FromServer::Event(e) => e,
+            FromServer::Event(e) => e,
             _ => panic!("unexpected FromServer message"),
         };
 
-        if event.event_type() == &PlayerStartTurnEvent::et() {
-            let event: PlayerStartTurnEvent = event.unpack();
-            if event.player_id() == my_id {
-                info!("My turn has started!");
+        handle_event(event, my_id, &receiver);
+    }
+}
 
-                info!("Sending end turn action...");
-                let my_action = player_next_action();
-                receiver.send(my_action);
-                info!("Sent.");
-            } else {
-                info!("Enemy turn has started.")
-            }
+fn handle_event(event: EventMessage, my_id: PlayerId, receiver: &WebSocketChannel) {
+    if event.event_type() == &PlayerStartTurnEvent::et() {
+        let event: PlayerStartTurnEvent = event.unpack();
+        if event.player_id() == my_id {
+            info!("My turn has started!");
+
+            info!("Sending end turn action...");
+            let my_action = player_next_action();
+            receiver.send(my_action);
+            info!("Sent.");
+        } else {
+            info!("Enemy turn has started.")
         }
     }
 }

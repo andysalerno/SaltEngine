@@ -1,12 +1,11 @@
-use std::{net::TcpStream, sync::Mutex};
-
 use engine::{event::EventMessage, FromClient, FromServer};
 use log::info;
+use std::{net::TcpStream, sync::Mutex};
 use tungstenite::{stream::MaybeTlsStream, WebSocket};
 
-pub(crate) struct WebSocketReceiver(Mutex<WebSocket<MaybeTlsStream<TcpStream>>>);
+pub(crate) struct WebSocketChannel(Mutex<WebSocket<MaybeTlsStream<TcpStream>>>);
 
-impl WebSocketReceiver {
+impl WebSocketChannel {
     pub fn new(ws: WebSocket<MaybeTlsStream<TcpStream>>) -> Self {
         Self(Mutex::new(ws))
     }
@@ -30,7 +29,7 @@ impl WebSocketReceiver {
     }
 }
 
-pub(crate) fn connect() -> WebSocketReceiver {
+pub(crate) fn connect() -> WebSocketChannel {
     info!("Connecting...");
     let socket = loop {
         match tungstenite::connect("ws://localhost:9001") {
@@ -40,5 +39,5 @@ pub(crate) fn connect() -> WebSocketReceiver {
     };
     info!("Connected.");
 
-    WebSocketReceiver::new(socket)
+    WebSocketChannel::new(socket)
 }
