@@ -1,4 +1,4 @@
-use engine::{event::EventHandler, ClientChannel, Dispatcher, FromServer, GameState, PlayerId};
+use engine::{event::EventHandler, Dispatcher, FromServer, GameState, MessageChannel, PlayerId};
 use events::{
     DrawCardEventHandler, PlayerEndTurnEvent, PlayerEndTurnEventHandler, PlayerStartTurnEvent,
     PlayerStartTurnEventHandler, StartGameEvent, StartGameEventHandler,
@@ -14,8 +14,8 @@ fn main() {
 
     let player_a_id = PlayerId::new();
     let player_b_id = PlayerId::new();
-    player_a.push_message(FromServer::Hello(player_a_id, player_b_id));
-    player_b.push_message(FromServer::Hello(player_b_id, player_a_id));
+    player_a.send(FromServer::Hello(player_a_id, player_b_id));
+    player_b.send(FromServer::Hello(player_b_id, player_a_id));
 
     info!("Both players connected. Starting game.");
     let dispatcher = {
@@ -46,9 +46,9 @@ fn player_take_turn(game_state: &mut GameState, dispatcher: &Dispatcher) {
     dispatcher.dispatch(&event.into(), game_state);
 
     let message = if player_turn == game_state.player_id_a() {
-        dispatcher.player_a().try_receive_message()
+        dispatcher.player_a().try_receive()
     } else if player_turn == game_state.player_id_b() {
-        dispatcher.player_b().try_receive_message()
+        dispatcher.player_b().try_receive()
     } else {
         panic!("Unknown player id.")
     };

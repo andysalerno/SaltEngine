@@ -1,10 +1,9 @@
+use engine::{FromClient, FromServer, MessageChannel};
+use log::info;
 use std::{
     net::{TcpListener, TcpStream},
     sync::Mutex,
 };
-
-use engine::{ClientChannel, FromClient, FromServer};
-use log::info;
 use tungstenite::WebSocket;
 
 pub(crate) struct WebSocketPlayer(Mutex<WebSocket<TcpStream>>);
@@ -15,8 +14,10 @@ impl WebSocketPlayer {
     }
 }
 
-impl ClientChannel for WebSocketPlayer {
-    fn push_message(&self, message: FromServer) {
+impl MessageChannel for WebSocketPlayer {
+    type Receive = FromClient;
+    type Send = FromServer;
+    fn send(&self, message: FromServer) {
         let text = serde_json::to_string(&message).unwrap();
         info!("Sending message to player: {text}");
         let ws_message = tungstenite::Message::Text(text);
@@ -24,7 +25,7 @@ impl ClientChannel for WebSocketPlayer {
         info!("Sent.");
     }
 
-    fn try_receive_message(&self) -> Option<FromClient> {
+    fn try_receive(&self) -> Option<Self::Receive> {
         info!("Starting receive from client...");
         let message = self
             .0
@@ -41,7 +42,10 @@ impl ClientChannel for WebSocketPlayer {
     }
 }
 
-pub(crate) fn accept_connections() -> (impl ClientChannel, impl ClientChannel) {
+pub(crate) fn accept_connections() -> (
+    impl MessageChannel<Send = FromServer, Receive = FromClient>,
+    impl MessageChannel<Send = FromServer, Receive = FromClient>,
+) {
     let server = TcpListener::bind("127.0.0.1:9001").unwrap();
 
     info!("Waiting for first player to connect...");

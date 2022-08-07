@@ -5,7 +5,7 @@ mod tests {
     use engine::{
         deck::Deck,
         event::{EventHandler, EventMessage},
-        CardDefinition, ClientChannel, Dispatcher, FromServer, GameState, PlayerId,
+        CardDefinition, Dispatcher, FromClient, FromServer, GameState, MessageChannel, PlayerId,
     };
     use events::{DrawCardEventHandler, StartGameEvent, StartGameEventHandler};
     use log::info;
@@ -29,12 +29,14 @@ mod tests {
         }
     }
 
-    impl<'a> ClientChannel for DummyClient<'a> {
-        fn push_message(&self, message: FromServer) {
+    impl<'a> MessageChannel for DummyClient<'a> {
+        type Send = FromServer;
+        type Receive = FromClient;
+        fn send(&self, message: FromServer) {
             (self.on_push_message)(message);
         }
 
-        fn try_receive_message(&self) -> Option<engine::FromClient> {
+        fn try_receive(&self) -> Option<Self::Receive> {
             None
         }
     }
