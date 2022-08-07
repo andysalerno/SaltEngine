@@ -1,6 +1,6 @@
 use std::{net::TcpStream, sync::Mutex};
 
-use engine::{event::EventMessage, FromServer};
+use engine::{event::EventMessage, FromClient, FromServer};
 use log::info;
 use tungstenite::{stream::MaybeTlsStream, WebSocket};
 
@@ -23,11 +23,16 @@ impl WebSocketReceiver {
 
         Some(from_server)
     }
+
+    pub fn send(&self, from_client: FromClient) {
+        let message = tungstenite::Message::Text(serde_json::to_string(&from_client).unwrap());
+        self.0.lock().unwrap().write_message(message).unwrap();
+    }
 }
 
 pub(crate) fn connect() -> WebSocketReceiver {
     info!("Connecting...");
-    let mut socket = loop {
+    let socket = loop {
         match tungstenite::connect("ws://localhost:9001") {
             Ok((socket, _)) => break socket,
             _ => continue,
@@ -35,7 +40,5 @@ pub(crate) fn connect() -> WebSocketReceiver {
     };
     info!("Connected.");
 
-    let receiver = WebSocketReceiver::new(socket);
-
-    receiver
+    WebSocketReceiver::new(socket)
 }

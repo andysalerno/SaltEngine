@@ -23,6 +23,7 @@ impl EventMessage {
 /// and provides a unique `EventType` so that exactly one correct handler can be picked.
 pub trait Event: Serialize + DeserializeOwned {
     fn event_type(&self) -> EventType;
+    fn et() -> EventType;
 }
 
 impl<T: Event> From<T> for EventMessage {

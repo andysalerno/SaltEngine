@@ -5,14 +5,14 @@ use engine::{
 use log::info;
 use serde::{Deserialize, Serialize};
 
-const HANDLER_NAME: &str = "DrawCardEventHandler";
+const HANDLER_NAME: &str = "PlayerEndTurnEvent";
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct DrawCardEvent {
+pub struct PlayerEndTurnEvent {
     player_id: PlayerId,
 }
 
-impl DrawCardEvent {
+impl PlayerEndTurnEvent {
     pub fn new(player_id: PlayerId) -> Self {
         Self { player_id }
     }
@@ -22,7 +22,7 @@ impl DrawCardEvent {
     }
 }
 
-impl Event for DrawCardEvent {
+impl Event for PlayerEndTurnEvent {
     fn event_type(&self) -> EventType {
         EventType::new(HANDLER_NAME)
     }
@@ -32,41 +32,30 @@ impl Event for DrawCardEvent {
     }
 }
 
-pub struct DrawCardEventHandler;
+pub struct PlayerEndTurnEventHandler;
 
-impl DrawCardEventHandler {
+impl PlayerEndTurnEventHandler {
     pub fn new() -> Self {
         Self
     }
 }
 
-impl Default for DrawCardEventHandler {
+impl Default for PlayerEndTurnEventHandler {
     fn default() -> Self {
         Self::new()
     }
 }
 
-impl EventHandler for DrawCardEventHandler {
+impl EventHandler for PlayerEndTurnEventHandler {
     fn event_type(&self) -> EventType {
         EventType::new(HANDLER_NAME)
     }
 
     fn handle(&self, event: &EventMessage, game_state: &mut GameState, _dispatcher: &Dispatcher) {
-        let draw_card_event: DrawCardEvent = event.unpack();
-        let player_id = draw_card_event.player_id();
+        let event: PlayerEndTurnEvent = event.unpack();
+        let player_id = event.player_id();
+        info!("Player turn end: {player_id:?}");
 
-        info!("Player {player_id:?} is drawing a card.");
-
-        let deck = game_state.deck_mut(player_id);
-
-        if let Some(drew_card) = deck.take_from_top() {
-            let hand = game_state.hand_mut(player_id);
-            info!("Player drew: {drew_card:?}");
-            hand.add_to_right(drew_card);
-        } else {
-            info!("Player had no cards in deck left to draw.");
-        }
-
-        // ... do stuff
+        game_state.set_next_cur_player_turn();
     }
 }

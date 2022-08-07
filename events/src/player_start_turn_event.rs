@@ -26,6 +26,10 @@ impl Event for PlayerStartTurnEvent {
     fn event_type(&self) -> EventType {
         EventType::new(HANDLER_NAME)
     }
+
+    fn et() -> EventType {
+        EventType::new(HANDLER_NAME)
+    }
 }
 
 pub struct PlayerStartTurnEventHandler;

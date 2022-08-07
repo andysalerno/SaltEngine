@@ -28,6 +28,10 @@ impl Event for StartGameEvent {
     fn event_type(&self) -> EventType {
         EventType::new(HANDLER_NAME)
     }
+
+    fn et() -> EventType {
+        EventType::new(HANDLER_NAME)
+    }
 }
 
 pub struct StartGameEventHandler;

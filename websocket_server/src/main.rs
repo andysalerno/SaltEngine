@@ -1,7 +1,7 @@
 use engine::{event::EventHandler, ClientChannel, Dispatcher, FromServer, GameState, PlayerId};
 use events::{
-    DrawCardEventHandler, PlayerStartTurnEvent, PlayerStartTurnEventHandler, StartGameEvent,
-    StartGameEventHandler,
+    DrawCardEventHandler, PlayerEndTurnEvent, PlayerEndTurnEventHandler, PlayerStartTurnEvent,
+    PlayerStartTurnEventHandler, StartGameEvent, StartGameEventHandler,
 };
 use log::info;
 
@@ -23,6 +23,7 @@ fn main() {
             Box::new(DrawCardEventHandler::new()),
             Box::new(StartGameEventHandler::new()),
             Box::new(PlayerStartTurnEventHandler::new()),
+            Box::new(PlayerEndTurnEventHandler::new()),
         ];
         let player_a = Box::new(player_a);
         let player_b = Box::new(player_b);
@@ -40,8 +41,28 @@ fn main() {
 }
 
 fn player_take_turn(game_state: &mut GameState, dispatcher: &Dispatcher) {
-    let event = PlayerStartTurnEvent::new(game_state.player_id_a());
+    let player_turn = game_state.cur_player_turn();
+    let event = PlayerStartTurnEvent::new(player_turn);
     dispatcher.dispatch(&event.into(), game_state);
+
+    let message = if player_turn == game_state.player_id_a() {
+        dispatcher.player_a().try_receive_message()
+    } else if player_turn == game_state.player_id_b() {
+        dispatcher.player_b().try_receive_message()
+    } else {
+        panic!("Unknown player id.")
+    };
+
+    info!("Received message: {message:?}");
+
+    let message = message.unwrap();
+
+    match message {
+        engine::FromClient::EndTurn => {
+            let event = PlayerEndTurnEvent::new(player_turn);
+            dispatcher.dispatch(&event.into(), game_state);
+        }
+    }
 }
 
 fn init_logger() {

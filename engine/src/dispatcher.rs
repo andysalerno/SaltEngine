@@ -1,7 +1,7 @@
 use crate::{
     event::{EventHandler, EventMessage, EventType},
     game_client::{ClientChannel, FromServer},
-    GameState,
+    FromClient, GameState, PlayerId,
 };
 use log::info;
 use std::collections::HashMap;

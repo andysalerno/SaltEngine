@@ -25,7 +25,19 @@ impl ClientChannel for WebSocketPlayer {
     }
 
     fn try_receive_message(&self) -> Option<FromClient> {
-        None
+        info!("Starting receive from client...");
+        let message = self
+            .0
+            .lock()
+            .unwrap()
+            .read_message()
+            .ok()
+            .map(|m| m.into_text().unwrap())
+            .map(|m| serde_json::from_str(&m).unwrap());
+
+        info!("Received from client: {message:?}");
+
+        message
     }
 }
 

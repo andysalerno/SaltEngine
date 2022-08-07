@@ -13,6 +13,11 @@ pub struct GameState {
     hand_player_b: Hand,
     player_id_a: PlayerId,
     player_id_b: PlayerId,
+    cur_player_turn: PlayerId,
+
+    // todo: replace with board entities
+    player_a_health: i32,
+    player_b_health: i32,
 }
 
 impl GameState {
@@ -26,6 +31,9 @@ impl GameState {
             hand_player_b: Hand::new_empty(),
             player_id_a,
             player_id_b,
+            cur_player_turn: player_id_a,
+            player_a_health: 15,
+            player_b_health: 15,
         }
     }
 
@@ -86,6 +94,28 @@ impl GameState {
     #[must_use]
     pub fn set_card_at_pos(&mut self, pos: GamePos, card: Card) -> Option<Card> {
         self.cards_on_board.insert(pos, card)
+    }
+
+    #[must_use]
+    pub const fn cur_player_turn(&self) -> PlayerId {
+        self.cur_player_turn
+    }
+
+    pub fn set_next_cur_player_turn(&mut self) {
+        let next_player_turn = match self.player(self.cur_player_turn()) {
+            Player::PlayerA => self.player_id_b(),
+            Player::PlayerB => self.player_id_a(),
+        };
+
+        self.cur_player_turn = next_player_turn;
+    }
+
+    #[must_use]
+    pub fn player_health(&self, player_id: PlayerId) -> i32 {
+        match self.player(player_id) {
+            Player::PlayerA => self.player_a_health,
+            Player::PlayerB => self.player_b_health,
+        }
     }
 
     #[must_use]
