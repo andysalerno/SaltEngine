@@ -12,11 +12,6 @@ pub enum FromServer {
     Hello(PlayerId, PlayerId),
 }
 
-// pub trait ClientChannel {
-//     fn push_message(&self, message: FromServer);
-//     fn try_receive_message(&self) -> Option<FromClient>;
-// }
-
 pub trait MessageChannel {
     type Send: Serialize + DeserializeOwned;
     type Receive: Serialize + DeserializeOwned;

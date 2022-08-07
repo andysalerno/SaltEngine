@@ -1,10 +1,9 @@
 use engine::{
-    event::{Event, EventHandler, EventMessage, EventType},
-    FromClient, FromServer, GameState, PlayerId,
+    event::{Event, EventHandler, EventMessage},
+    FromClient, FromServer, GameState, MessageChannel, PlayerId,
 };
 use events::PlayerStartTurnEvent;
 use log::info;
-use websocket_channel::WebSocketChannel;
 
 mod websocket_channel;
 
@@ -16,7 +15,7 @@ fn main() {
     let handlers: Vec<Box<dyn EventHandler>> = Vec::new();
 
     // First, we expect a Hello message, with our player IDs.
-    let (my_id, enemy_id) = match receiver.receive().expect("connection must be open.") {
+    let (my_id, enemy_id) = match receiver.try_receive().expect("connection must be open.") {
         engine::FromServer::Event(_) => panic!("Expected Hello."),
         engine::FromServer::Hello(a, b) => (a, b),
     };
@@ -27,7 +26,7 @@ fn main() {
 
     loop {
         info!("waiting for message...");
-        let message = receiver.receive().unwrap();
+        let message = receiver.try_receive().unwrap();
         info!("received message: {message:?}");
 
         let event = match message {
@@ -39,7 +38,11 @@ fn main() {
     }
 }
 
-fn handle_event(event: EventMessage, my_id: PlayerId, receiver: &WebSocketChannel) {
+fn handle_event(
+    event: EventMessage,
+    my_id: PlayerId,
+    receiver: &impl MessageChannel<Send = FromClient, Receive = FromServer>,
+) {
     if event.event_type() == &PlayerStartTurnEvent::et() {
         let event: PlayerStartTurnEvent = event.unpack();
         if event.player_id() == my_id {

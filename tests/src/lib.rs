@@ -3,9 +3,8 @@ mod tests {
     use std::{rc::Rc, sync::Mutex};
 
     use engine::{
-        deck::Deck,
-        event::{EventHandler, EventMessage},
-        CardDefinition, Dispatcher, FromClient, FromServer, GameState, MessageChannel, PlayerId,
+        deck::Deck, event::EventHandler, CardDefinition, Dispatcher, FromClient, FromServer,
+        GameState, MessageChannel, PlayerId,
     };
     use events::{DrawCardEventHandler, StartGameEvent, StartGameEventHandler};
     use log::info;
