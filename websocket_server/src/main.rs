@@ -1,4 +1,4 @@
-use engine::{event::EventHandler, Dispatcher, FromServer, GameState, MessageChannel, PlayerId};
+use engine::{event::EventHandler, ClientChannel, Dispatcher, FromServer, GameState, PlayerId};
 use events::{
     DrawCardEventHandler, PlayerEndTurnEvent, PlayerEndTurnEventHandler, PlayerStartTurnEvent,
     PlayerStartTurnEventHandler, StartGameEvent, StartGameEventHandler,
@@ -10,12 +10,16 @@ mod websocket_player;
 fn main() {
     init_logger();
 
-    let (player_a, player_b) = websocket_player::accept_connections();
-
     let player_a_id = PlayerId::new();
     let player_b_id = PlayerId::new();
-    player_a.send(FromServer::Hello(player_a_id, player_b_id));
-    player_b.send(FromServer::Hello(player_b_id, player_a_id));
+
+    let (player_a, player_b) = websocket_player::accept_connections();
+
+    let player_a_channel = ClientChannel::new(player_a_id, Box::new(player_a));
+    let player_b_channel = ClientChannel::new(player_b_id, Box::new(player_b));
+
+    player_a_channel.send(FromServer::Hello(player_a_id, player_b_id));
+    player_b_channel.send(FromServer::Hello(player_b_id, player_a_id));
 
     info!("Both players connected. Starting game.");
     let dispatcher = {
@@ -25,9 +29,7 @@ fn main() {
             Box::new(PlayerStartTurnEventHandler::new()),
             Box::new(PlayerEndTurnEventHandler::new()),
         ];
-        let player_a = Box::new(player_a);
-        let player_b = Box::new(player_b);
-        Dispatcher::new(handlers, player_a, player_b)
+        Dispatcher::new(handlers, player_a_channel, player_b_channel)
     };
 
     // First, dispatch the StartGame event. Both players draw cards to prepare for gameplay.
@@ -46,9 +48,9 @@ fn player_take_turn(game_state: &mut GameState, dispatcher: &Dispatcher) {
     dispatcher.dispatch(&event.into(), game_state);
 
     let message = if player_turn == game_state.player_id_a() {
-        dispatcher.player_a().try_receive()
+        dispatcher.player_a_channel().try_receive()
     } else if player_turn == game_state.player_id_b() {
-        dispatcher.player_b().try_receive()
+        dispatcher.player_b_channel().try_receive()
     } else {
         panic!("Unknown player id.")
     };

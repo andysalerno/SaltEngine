@@ -1,3 +1,5 @@
+use serde::{Deserialize, Serialize};
+
 /// An instance of a card in the game,
 /// created from some definition.
 #[derive(Debug)]
@@ -42,7 +44,7 @@ impl Card {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct CardDefinition {
     title: String,
     cost: usize,

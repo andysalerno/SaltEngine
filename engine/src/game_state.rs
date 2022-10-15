@@ -124,7 +124,7 @@ impl GameState {
     }
 
     #[must_use]
-    pub fn is_game_over(&self) -> bool {
+    pub const fn is_game_over(&self) -> bool {
         false
     }
 

@@ -43,7 +43,7 @@ fn handle_event(
     my_id: PlayerId,
     receiver: &impl MessageChannel<Send = FromClient, Receive = FromServer>,
 ) {
-    if event.event_type() == &PlayerStartTurnEvent::et() {
+    if event.event_type() == &PlayerStartTurnEvent::event_type() {
         let event: PlayerStartTurnEvent = event.unpack();
         if event.player_id() == my_id {
             info!("My turn has started!");

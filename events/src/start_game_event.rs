@@ -8,7 +8,9 @@ use serde::{Deserialize, Serialize};
 use crate::DrawCardEvent;
 
 const HANDLER_NAME: &str = "StartGameEventHandler";
+const INITIAL_CARD_DRAW_COUNT: usize = 6;
 
+/// An event that triggers the start of the game.
 #[derive(Serialize, Deserialize, Debug)]
 pub struct StartGameEvent {}
 
@@ -25,11 +27,11 @@ impl Default for StartGameEvent {
 }
 
 impl Event for StartGameEvent {
-    fn event_type(&self) -> EventType {
-        EventType::new(HANDLER_NAME)
-    }
+    // fn event_type(&self) -> EventType {
+    //     EventType::new(HANDLER_NAME)
+    // }
 
-    fn et() -> EventType {
+    fn event_type() -> EventType {
         EventType::new(HANDLER_NAME)
     }
 }
@@ -59,7 +61,7 @@ impl EventHandler for StartGameEventHandler {
         info!("Begin phase: players draw cards.");
 
         // Both players draw cards.
-        for _ in 0..6 {
+        for _ in 0..INITIAL_CARD_DRAW_COUNT {
             let draw_card_event = EventMessage::from(DrawCardEvent::new(game_state.player_id_a()));
             dispatcher.dispatch(&draw_card_event, game_state);
 

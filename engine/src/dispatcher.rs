@@ -1,21 +1,40 @@
 use crate::{
     event::{EventHandler, EventMessage, EventType},
-    // game_client::{ClientChannel, FromServer},
     game_client::{FromServer, MessageChannel},
-    FromClient,
-    GameState,
-    PlayerId,
+    FromClient, GameState, PlayerId,
 };
 use log::info;
 use std::collections::HashMap;
 
-type ClientChannel = dyn MessageChannel<Send = FromServer, Receive = FromClient>;
+pub struct ClientChannel {
+    player_id: PlayerId,
+    channel: Box<dyn MessageChannel<Send = FromServer, Receive = FromClient>>,
+}
+
+impl ClientChannel {
+    #[must_use]
+    pub fn new(
+        player_id: PlayerId,
+        channel: Box<dyn MessageChannel<Send = FromServer, Receive = FromClient>>,
+    ) -> Self {
+        Self { player_id, channel }
+    }
+
+    #[must_use]
+    pub fn try_receive(&self) -> Option<FromClient> {
+        self.channel.try_receive()
+    }
+
+    pub fn send(&self, message: FromServer) {
+        self.channel.send(message);
+    }
+}
 
 pub struct Dispatcher {
     // event_stack: ...
     event_handler_mapping: HashMap<EventType, Box<dyn EventHandler>>,
-    player_a: Box<ClientChannel>,
-    player_b: Box<ClientChannel>,
+    player_a_channel: ClientChannel,
+    player_b_channel: ClientChannel,
 }
 
 impl Dispatcher {
@@ -24,8 +43,8 @@ impl Dispatcher {
     #[must_use]
     pub fn new(
         handlers: Vec<Box<dyn EventHandler>>,
-        player_a: Box<ClientChannel>,
-        player_b: Box<ClientChannel>,
+        player_a_channel: ClientChannel,
+        player_b_channel: ClientChannel,
     ) -> Self {
         // consume the handlers and map them.
         let handlers_provided = handlers.len();
@@ -45,8 +64,8 @@ impl Dispatcher {
 
         Self {
             event_handler_mapping: mapping,
-            player_a,
-            player_b,
+            player_a_channel,
+            player_b_channel,
         }
     }
 
@@ -64,21 +83,39 @@ impl Dispatcher {
 
         info!("Dispatching event {event:?}");
 
-        self.player_a.send(FromServer::Event(event.clone()));
-        self.player_b.send(FromServer::Event(event.clone()));
+        self.player_a_channel
+            .channel
+            .send(FromServer::Event(event.clone()));
+        self.player_b_channel
+            .channel
+            .send(FromServer::Event(event.clone()));
 
         matching_handler.handle(event, game_state, self);
     }
 
     #[must_use]
-    // pub fn player_a(&self) -> &dyn ClientChannel {
-    pub fn player_a(&self) -> &ClientChannel {
-        self.player_a.as_ref()
+    pub const fn player_a_channel(&self) -> &ClientChannel {
+        &self.player_a_channel
+    }
+
+    /// Provides the `ClientChannel` for the given player.
+    ///
+    /// # Panics
+    ///
+    /// Panics if a value is provided for `player_id` that does not match either player.
+    #[must_use]
+    pub fn player_channel(&self, player_id: PlayerId) -> &ClientChannel {
+        if player_id == self.player_a_channel.player_id {
+            &self.player_a_channel
+        } else if player_id == self.player_b_channel.player_id {
+            &self.player_b_channel
+        } else {
+            panic!("Unknown player ID provided: {player_id:?}");
+        }
     }
 
     #[must_use]
-    // pub fn player_b(&self) -> &dyn ClientChannel {
-    pub fn player_b(&self) -> &ClientChannel {
-        self.player_b.as_ref()
+    pub const fn player_b_channel(&self) -> &ClientChannel {
+        &self.player_b_channel
     }
 }

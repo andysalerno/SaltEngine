@@ -1,9 +1,11 @@
 use engine::{
     event::{Event, EventHandler, EventMessage, EventType},
-    Dispatcher, GameState, PlayerId,
+    CardDefinition, Dispatcher, GameState, PlayerId,
 };
 use log::info;
 use serde::{Deserialize, Serialize};
+
+use crate::HiddenInfo;
 
 const HANDLER_NAME: &str = "DrawCardEventHandler";
 
@@ -23,11 +25,11 @@ impl DrawCardEvent {
 }
 
 impl Event for DrawCardEvent {
-    fn event_type(&self) -> EventType {
-        EventType::new(HANDLER_NAME)
-    }
+    // fn event_type(&self) -> EventType {
+    //     EventType::new(HANDLER_NAME)
+    // }
 
-    fn et() -> EventType {
+    fn event_type() -> EventType {
         EventType::new(HANDLER_NAME)
     }
 }

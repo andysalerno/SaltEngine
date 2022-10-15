@@ -22,14 +22,14 @@ impl EventMessage {
 /// A trait for any kind of event body, which can be serialized and deserialized,
 /// and provides a unique `EventType` so that exactly one correct handler can be picked.
 pub trait Event: Serialize + DeserializeOwned {
-    fn event_type(&self) -> EventType;
-    fn et() -> EventType;
+    // fn event_type(&self) -> EventType;
+    fn event_type() -> EventType;
 }
 
 impl<T: Event> From<T> for EventMessage {
     fn from(e: T) -> Self {
         Self {
-            kind: e.event_type(),
+            kind: T::event_type(),
             // currently we just hard-code serde_json as the global serializer
             body: serde_json::to_string(&e).expect("Could not serialize event"),
         }
