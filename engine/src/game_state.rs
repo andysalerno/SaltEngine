@@ -7,12 +7,16 @@ pub enum GamePos {}
 #[derive(Debug)]
 pub struct GameState {
     cards_on_board: HashMap<GamePos, Card>,
+
     deck_player_a: Deck,
     deck_player_b: Deck,
+
     hand_player_a: Hand,
     hand_player_b: Hand,
+
     player_id_a: PlayerId,
     player_id_b: PlayerId,
+
     cur_player_turn: PlayerId,
 
     // todo: replace with board entities

@@ -1,9 +1,14 @@
+use id_macro::id;
 use serde::{Deserialize, Serialize};
+
+#[id]
+pub struct CardId;
 
 /// An instance of a card in the game,
 /// created from some definition.
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Card {
+    id: CardId,
     definition: Box<CardDefinition>,
     title: String,
     current_cost: usize,
@@ -15,6 +20,7 @@ impl Card {
     #[must_use]
     pub fn new(definition: Box<CardDefinition>) -> Self {
         Self {
+            id: CardId::new(),
             title: definition.title().to_owned(),
             current_attack: definition.attack(),
             current_cost: definition.cost(),
@@ -44,6 +50,8 @@ impl Card {
     }
 }
 
+/// The definition of a card,
+/// including its title, attack, cost, etc.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CardDefinition {
     title: String,
@@ -79,6 +87,7 @@ impl CardDefinition {
     }
 }
 
+/// A builder for `CardDefinition`s.
 pub struct CardDefinitionBuilder {
     title: String,
     cost: usize,

@@ -2,6 +2,7 @@
 
 members = [
     "engine",
+    "id",
     "cards",
     "events",
     "game_client",

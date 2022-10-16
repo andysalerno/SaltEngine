@@ -1,3 +1,4 @@
+mod creature_attacks_target_event;
 mod draw_card_event;
 mod player_end_turn_event;
 mod player_start_turn_event;
