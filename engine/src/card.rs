@@ -44,7 +44,7 @@ impl Card {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CardDefinition {
     title: String,
     cost: usize,

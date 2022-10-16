@@ -52,6 +52,11 @@ checksum = "ec8a7b6a70fde80372154c65702f00a0f56f3e1c36abbc6c440484be248856db"
 [[package]]
 name = "cards"
 version = "0.1.0"
+dependencies = [
+ "engine",
+ "log",
+ "serde",
+]
 
 [[package]]
 name = "cfg-if"
@@ -531,6 +536,7 @@ dependencies = [
 name = "websocket_server"
 version = "0.1.0"
 dependencies = [
+ "cards",
  "engine",
  "env_logger",
  "events",

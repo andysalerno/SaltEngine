@@ -83,12 +83,14 @@ impl Dispatcher {
 
         info!("Dispatching event {event:?}");
 
-        self.player_a_channel
-            .channel
-            .send(FromServer::Event(event.clone()));
-        self.player_b_channel
-            .channel
-            .send(FromServer::Event(event.clone()));
+        // Instead of naively sending each raw event to clients like this,
+        // there is a secondary sets of client-only events that each event is responsible for sending
+        // self.player_a_channel
+        //     .channel
+        //     .send(FromServer::Event(event.clone()));
+        // self.player_b_channel
+        //     .channel
+        //     .send(FromServer::Event(event.clone()));
 
         matching_handler.handle(event, game_state, self);
     }
@@ -109,6 +111,22 @@ impl Dispatcher {
             &self.player_a_channel
         } else if player_id == self.player_b_channel.player_id {
             &self.player_b_channel
+        } else {
+            panic!("Unknown player ID provided: {player_id:?}");
+        }
+    }
+
+    /// Provides the `ClientChannel` for the opponent of the given player.
+    ///
+    /// # Panics
+    ///
+    /// Panics if a value is provided for `player_id` that does not match either player.
+    #[must_use]
+    pub fn opponent_channel(&self, player_id: PlayerId) -> &ClientChannel {
+        if player_id == self.player_a_channel.player_id {
+            &self.player_b_channel
+        } else if player_id == self.player_b_channel.player_id {
+            &self.player_a_channel
         } else {
             panic!("Unknown player ID provided: {player_id:?}");
         }

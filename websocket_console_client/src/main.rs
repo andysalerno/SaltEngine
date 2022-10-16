@@ -2,7 +2,7 @@ use engine::{
     event::{Event, EventHandler, EventMessage},
     FromClient, FromServer, GameState, MessageChannel, PlayerId,
 };
-use events::PlayerStartTurnEvent;
+use events::{CardDrawnClientEvent, HiddenInfo, PlayerStartTurnEvent};
 use log::info;
 
 mod websocket_channel;
@@ -54,6 +54,14 @@ fn handle_event(
             info!("Sent.");
         } else {
             info!("Enemy turn has started.")
+        }
+    } else if event.event_type() == &CardDrawnClientEvent::event_type() {
+        let event: CardDrawnClientEvent = event.unpack();
+
+        if let HiddenInfo::Visible(drawn) = event.card_drawn() {
+            info!("I draw a card: {drawn:?}");
+        } else {
+            info!("Opponent drew a card.");
         }
     }
 }

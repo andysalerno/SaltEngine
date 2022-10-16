@@ -1,3 +1,4 @@
+use cards::SleepingDog;
 use engine::{event::EventHandler, ClientChannel, Dispatcher, FromServer, GameState, PlayerId};
 use events::{
     DrawCardEventHandler, PlayerEndTurnEvent, PlayerEndTurnEventHandler, PlayerStartTurnEvent,
@@ -34,6 +35,18 @@ fn main() {
 
     // First, dispatch the StartGame event. Both players draw cards to prepare for gameplay.
     let mut game_state = GameState::new(player_a_id, player_b_id);
+
+    // Add cards to decks for both players.
+    for player_id in [player_a_id, player_b_id] {
+        let player_a_deck = game_state.deck_mut(player_id);
+        player_a_deck.add_card_to_bottom(SleepingDog::make_definition());
+        player_a_deck.add_card_to_bottom(SleepingDog::make_definition());
+        player_a_deck.add_card_to_bottom(SleepingDog::make_definition());
+        player_a_deck.add_card_to_bottom(SleepingDog::make_definition());
+        player_a_deck.add_card_to_bottom(SleepingDog::make_definition());
+        player_a_deck.add_card_to_bottom(SleepingDog::make_definition());
+    }
+
     dispatcher.dispatch(&StartGameEvent::new().into(), &mut game_state);
 
     // Then, keep getting player input until the game is over.

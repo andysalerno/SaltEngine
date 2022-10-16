@@ -1,13 +1,13 @@
 use engine::{
     event::{Event, EventHandler, EventMessage, EventType},
-    Dispatcher, GameState, PlayerId,
+    Dispatcher, FromServer, GameState, PlayerId,
 };
 use log::info;
 use serde::{Deserialize, Serialize};
 
 const HANDLER_NAME: &str = "PlayerStartTurnEvent";
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct PlayerStartTurnEvent {
     player_id: PlayerId,
 }
@@ -51,9 +51,16 @@ impl EventHandler for PlayerStartTurnEventHandler {
         EventType::new(HANDLER_NAME)
     }
 
-    fn handle(&self, event: &EventMessage, _game_state: &mut GameState, _dispatcher: &Dispatcher) {
+    fn handle(&self, event: &EventMessage, _game_state: &mut GameState, dispatcher: &Dispatcher) {
         let event: PlayerStartTurnEvent = event.unpack();
         let player_id = event.player_id();
         info!("Player turn start: {player_id:?}");
+
+        dispatcher
+            .player_a_channel()
+            .send(FromServer::Event(event.clone().into()));
+        dispatcher
+            .player_b_channel()
+            .send(FromServer::Event(event.into()));
     }
 }
