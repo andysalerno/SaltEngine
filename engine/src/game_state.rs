@@ -208,4 +208,36 @@ impl CardMappings {
             cards_by_id: HashMap::new(),
         }
     }
+
+    pub fn set_card_at_pos(&mut self, pos: GamePos, card: Card) {
+        let id = card.id();
+        self.cards_by_id.insert(id, card);
+        self.cards_on_board.insert(pos, id);
+    }
+
+    pub fn card_at_pos(&self, pos: GamePos) -> Option<&Card> {
+        self.cards_on_board
+            .get(&pos)
+            .and_then(|id| self.cards_by_id.get(id))
+    }
+
+    pub fn card(&self, id: CardId) -> Option<&Card> {
+        self.cards_by_id.get(&id)
+    }
+
+    pub fn card_mut(&mut self, id: CardId) -> Option<&mut Card> {
+        self.cards_by_id.get_mut(&id)
+    }
+
+    pub fn card_at_pos_mut(&mut self, pos: GamePos) -> Option<&mut Card> {
+        self.cards_on_board
+            .get_mut(&pos)
+            .and_then(|id| self.cards_by_id.get_mut(id))
+    }
+
+    pub fn remove_card_at_pos(&mut self, pos: GamePos) -> Option<Card> {
+        self.cards_on_board
+            .remove(&pos)
+            .and_then(|id| self.cards_by_id.remove(&id))
+    }
 }

@@ -48,6 +48,10 @@ impl Card {
     pub const fn current_health(&self) -> i16 {
         self.current_health
     }
+
+    pub fn id(&self) -> CardId {
+        self.id
+    }
 }
 
 /// The definition of a card,
