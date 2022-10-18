@@ -1,12 +1,14 @@
-use crate::{deck::Deck, hand::Hand, Card, PlayerId};
-use std::collections::HashMap;
+use crate::{card::CardId, deck::Deck, hand::Hand, Card, PlayerId};
+use std::{collections::HashMap, sync::Arc};
 
 #[derive(Debug, PartialEq, Eq, Hash, Copy, Clone)]
 pub enum GamePos {}
 
 #[derive(Debug)]
 pub struct GameState {
-    cards_on_board: HashMap<GamePos, Card>,
+    cards: Vec<Arc<Card>>,
+    cards_on_board: HashMap<GamePos, Arc<Card>>,
+    cards_by_id: HashMap<CardId, Arc<Card>>,
 
     deck_player_a: Deck,
     deck_player_b: Deck,
@@ -28,7 +30,9 @@ impl GameState {
     #[must_use]
     pub fn new(player_id_a: PlayerId, player_id_b: PlayerId) -> Self {
         Self {
+            cards: Vec::new(),
             cards_on_board: HashMap::new(),
+            cards_by_id: HashMap::new(),
             deck_player_a: Deck::new(Vec::new()),
             deck_player_b: Deck::new(Vec::new()),
             hand_player_a: Hand::new_empty(),
@@ -43,12 +47,17 @@ impl GameState {
 
     #[must_use]
     pub fn card_at_pos(&self, pos: GamePos) -> Option<&Card> {
-        self.cards_on_board.get(&pos)
+        let ac = self.cards_on_board.get(&pos);
+
+        let c: Option<&Card> = ac.map(|c| &(**c));
+
+        c
     }
 
     #[must_use]
     pub fn card_at_pos_mut(&mut self, pos: GamePos) -> Option<&mut Card> {
-        self.cards_on_board.get_mut(&pos)
+        // won't work
+        self.cards_on_board.get_mut(&pos).and_then(Arc::get_mut)
     }
 
     #[must_use]
@@ -96,7 +105,8 @@ impl GameState {
     /// Inserts the `Card` at the given `GamePos`. Returns the previous `Card` in that position
     /// if there was one.
     #[must_use]
-    pub fn set_card_at_pos(&mut self, pos: GamePos, card: Card) -> Option<Card> {
+    pub fn set_card_at_pos(&mut self, pos: GamePos, card: Card) -> Option<Arc<Card>> {
+        let card = Arc::new(card);
         self.cards_on_board.insert(pos, card)
     }
 
@@ -183,4 +193,19 @@ impl GameStateBuilder {
 enum Player {
     PlayerA,
     PlayerB,
+}
+
+#[derive(Debug)]
+struct CardMappings {
+    cards_on_board: HashMap<GamePos, CardId>,
+    cards_by_id: HashMap<CardId, Card>,
+}
+
+impl CardMappings {
+    fn new() -> Self {
+        Self {
+            cards_on_board: HashMap::new(),
+            cards_by_id: HashMap::new(),
+        }
+    }
 }
