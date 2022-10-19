@@ -23,10 +23,6 @@ impl PlayerStartTurnEvent {
 }
 
 impl Event for PlayerStartTurnEvent {
-    // fn event_type(&self) -> EventType {
-    //     EventType::new(HANDLER_NAME)
-    // }
-
     fn event_type() -> EventType {
         EventType::new(HANDLER_NAME)
     }

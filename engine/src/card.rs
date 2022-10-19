@@ -49,7 +49,12 @@ impl Card {
         self.current_health
     }
 
-    pub fn id(&self) -> CardId {
+    pub fn set_health(&mut self, next_health: i16) {
+        self.current_health = next_health;
+    }
+
+    #[must_use]
+    pub const fn id(&self) -> CardId {
         self.id
     }
 }

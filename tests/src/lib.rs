@@ -6,7 +6,10 @@ mod tests {
         deck::Deck, event::EventHandler, CardDefinition, ClientChannel, Dispatcher, FromClient,
         FromServer, GameState, MessageChannel, PlayerId,
     };
-    use events::{DrawCardEventHandler, StartGameEvent, StartGameEventHandler};
+    use events::{
+        CardDrawnClientEvent, CreatureAttacksTargetEventHandler, DrawCardEvent,
+        DrawCardEventHandler, PlayerStartTurnEvent, StartGameEvent, StartGameEventHandler,
+    };
     use log::info;
 
     #[test]
@@ -16,10 +19,6 @@ mod tests {
         let player_a_id = PlayerId::new();
         let player_b_id = PlayerId::new();
 
-        // Keep track of messages received by both players.
-        let a_messages = Rc::new(Mutex::new(Vec::new()));
-        let b_messages = Rc::new(Mutex::new(Vec::new()));
-
         let dispatcher = {
             let handlers: Vec<Box<dyn EventHandler>> = vec![
                 Box::new(DrawCardEventHandler::new()),
@@ -27,23 +26,13 @@ mod tests {
             ];
 
             let player_a_channel = {
-                let mut client = DummyClient::new();
-                let messages = Rc::clone(&a_messages);
-                client.on_push_message(move |message| {
-                    info!("player_a saw message: {message:?}");
-                    messages.lock().unwrap().push(message);
-                });
+                let client = DummyClient::new();
 
                 ClientChannel::new(player_a_id, Box::new(client))
             };
 
             let player_b_channel = {
-                let mut client = DummyClient::new();
-                let messages = Rc::clone(&b_messages);
-                client.on_push_message(move |message| {
-                    info!("player_b saw message: {message:?}");
-                    messages.lock().unwrap().push(message);
-                });
+                let client = DummyClient::new();
 
                 ClientChannel::new(player_b_id, Box::new(client))
             };
@@ -54,8 +43,8 @@ mod tests {
         let mut game_state = {
             let mut builder = GameState::builder(player_a_id, player_b_id);
             builder
-                .with_player_a_deck(make_deck())
-                .with_player_b_deck(make_deck());
+                .with_player_a_deck(make_deck(10))
+                .with_player_b_deck(make_deck(10));
             builder.build()
         };
 
@@ -63,7 +52,7 @@ mod tests {
         let hand_len = game_state.hand(player_a_id).len();
         assert!(hand_len == 0);
 
-        dispatcher.dispatch(&StartGameEvent::new().into(), &mut game_state);
+        dispatcher.dispatch(StartGameEvent::new(), &mut game_state);
 
         let hand_len = game_state.hand(player_a_id).len();
 
@@ -71,72 +60,123 @@ mod tests {
     }
 
     #[test]
+    fn on_player_a_draws_card_expects_card_hidden_from_player_b() {
+        init_logger();
+
+        let handlers: Vec<Box<dyn EventHandler>> = vec![Box::new(DrawCardEventHandler::new())];
+
+        let player_a_id = PlayerId::new();
+        let player_b_id = PlayerId::new();
+
+        let (dispatcher, a_observer, b_observer) =
+            make_dispatcher(player_a_id, player_b_id, handlers);
+
+        let mut game_state = {
+            let mut builder = GameState::builder(player_a_id, player_b_id);
+            builder
+                .with_player_a_deck(make_deck(10))
+                .with_player_b_deck(make_deck(10));
+            builder.build()
+        };
+
+        // 1. player_a draws a card
+        dispatcher.dispatch(DrawCardEvent::new(player_a_id), &mut game_state);
+
+        // 2. Acquire message received by a
+        let a_received = a_observer.pop_received();
+
+        // 3. Acquire message received by a
+        let b_received = b_observer.pop_received();
+
+        let a_received = a_received.unwrap();
+        let b_received = b_received.unwrap();
+
+        let a_event: CardDrawnClientEvent = match a_received {
+            FromServer::Event(e) => e,
+            _ => panic!("expected an event"),
+        }
+        .unpack();
+
+        let b_event: CardDrawnClientEvent = match b_received {
+            FromServer::Event(e) => e,
+            _ => panic!("expected an event"),
+        }
+        .unpack();
+
+        assert!(a_event.card_drawn().is_visible());
+        assert!(b_event.card_drawn().is_hidden());
+    }
+
+    // #[test]
     fn on_creature_attack_expects_take_damage() {
         init_logger();
 
         let handlers: Vec<Box<dyn EventHandler>> = vec![
             Box::new(DrawCardEventHandler::new()),
             Box::new(StartGameEventHandler::new()),
+            Box::new(CreatureAttacksTargetEventHandler::new()),
         ];
 
         let player_a_id = PlayerId::new();
         let player_b_id = PlayerId::new();
 
-        let dispatcher = make_dispatcher(player_a_id, player_b_id, handlers);
+        let (dispatcher, _, _) = make_dispatcher(player_a_id, player_b_id, handlers);
 
         let mut game_state = {
             let mut builder = GameState::builder(player_a_id, player_b_id);
             builder
-                .with_player_a_deck(make_deck())
-                .with_player_b_deck(make_deck());
+                .with_player_a_deck(make_deck(10))
+                .with_player_b_deck(make_deck(10));
             builder.build()
         };
 
-        dispatcher.dispatch(&StartGameEvent::new().into(), &mut game_state);
+        // 1. Start game
+        dispatcher.dispatch(StartGameEvent::new(), &mut game_state);
+
+        // 2. PlayerA turn starts
+        dispatcher.dispatch(PlayerStartTurnEvent::new(player_a_id), &mut game_state);
+
+        // 3. Receive action from PlayerA
     }
 
     fn make_dispatcher(
         player_a_id: PlayerId,
         player_b_id: PlayerId,
         handlers: impl IntoIterator<Item = Box<dyn EventHandler>>,
-    ) -> Dispatcher {
-        let a_messages = Rc::new(Mutex::new(Vec::new()));
-        let b_messages = Rc::new(Mutex::new(Vec::new()));
-
+    ) -> (Dispatcher, ClientObserver, ClientObserver) {
         let handlers = handlers.into_iter().collect();
+
+        let a_observer;
+        let b_observer;
 
         let player_a_channel = {
             let mut client = DummyClient::new();
-            let messages = Rc::clone(&a_messages);
-            client.on_push_message(move |message| {
-                info!("player_a saw message: {message:?}");
-                messages.lock().unwrap().push(message);
-            });
+            a_observer = client.observer();
 
             ClientChannel::new(player_a_id, Box::new(client))
         };
 
         let player_b_channel = {
             let mut client = DummyClient::new();
-            let messages = Rc::clone(&b_messages);
-            client.on_push_message(move |message| {
-                info!("player_b saw message: {message:?}");
-                messages.lock().unwrap().push(message);
-            });
+            b_observer = client.observer();
 
             ClientChannel::new(player_b_id, Box::new(client))
         };
 
-        Dispatcher::new(handlers, player_a_channel, player_b_channel)
+        (
+            Dispatcher::new(handlers, player_a_channel, player_b_channel),
+            a_observer,
+            b_observer,
+        )
     }
 
-    fn make_deck() -> Deck {
+    fn make_deck(card_count: usize) -> Deck {
         let mut deck = Deck::new_empty();
 
         let mut builder = CardDefinition::builder();
         builder.title("test_card");
 
-        for _ in 0..10 {
+        for _ in 0..card_count {
             deck.add_card_to_bottom(builder.build());
         }
 
@@ -147,34 +187,66 @@ mod tests {
         let _ = env_logger::builder().is_test(true).try_init();
     }
 
-    struct DummyClient<'a> {
-        on_push_message: Box<dyn Fn(FromServer) + 'a>,
+    struct DummyClient {
+        observer: ClientObserver,
     }
 
-    impl<'a> DummyClient<'a> {
+    #[derive(Clone)]
+    struct ClientObserver {
+        received_messages: Rc<Mutex<Vec<FromServer>>>,
+        messages_to_send: Rc<Mutex<Vec<FromClient>>>,
+    }
+
+    impl ClientObserver {
         fn new() -> Self {
             Self {
-                on_push_message: Box::new(|_| {}),
+                received_messages: Rc::new(Mutex::new(Vec::new())),
+                messages_to_send: Rc::new(Mutex::new(Vec::new())),
             }
         }
 
-        fn on_push_message<TFn>(&mut self, action: TFn)
-        where
-            TFn: Fn(FromServer) + 'a,
-        {
-            self.on_push_message = Box::new(action);
+        fn push_received(&self, message: FromServer) {
+            self.received_messages.lock().unwrap().push(message);
+        }
+
+        fn pop_received(&self) -> Option<FromServer> {
+            self.received_messages.lock().unwrap().pop()
+        }
+
+        fn push_sent(&self, message: FromClient) {
+            self.messages_to_send.lock().unwrap().push(message);
+        }
+
+        fn pop_sent(&self) -> Option<FromClient> {
+            self.messages_to_send.lock().unwrap().pop()
         }
     }
 
-    impl<'a> MessageChannel for DummyClient<'a> {
+    impl DummyClient {
+        fn new() -> Self {
+            Self {
+                observer: ClientObserver::new(),
+            }
+        }
+
+        fn observer(&self) -> ClientObserver {
+            self.observer.clone()
+        }
+    }
+
+    impl MessageChannel for DummyClient {
         type Send = FromServer;
         type Receive = FromClient;
+
         fn send(&self, message: FromServer) {
-            (self.on_push_message)(message);
+            info!("Player receives message: {message:?}");
+            self.observer.push_received(message);
         }
 
         fn try_receive(&self) -> Option<Self::Receive> {
-            None
+            let from_player = self.observer.pop_sent();
+            info!("Receiving message from player: {from_player:?}");
+            from_player
         }
     }
 }

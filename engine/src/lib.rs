@@ -14,7 +14,7 @@ mod game_state;
 mod hand;
 mod player_id;
 
-pub use card::{Card, CardDefinition};
+pub use card::{Card, CardDefinition, CardId};
 pub use dispatcher::{ClientChannel, Dispatcher};
 // pub use game_client::{ClientChannel, MessageChannel, FromClient, FromServer};
 pub use game_client::{FromClient, FromServer, MessageChannel};

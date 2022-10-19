@@ -62,11 +62,11 @@ impl EventHandler for StartGameEventHandler {
 
         // Both players draw cards.
         for _ in 0..INITIAL_CARD_DRAW_COUNT {
-            let draw_card_event = EventMessage::from(DrawCardEvent::new(game_state.player_id_a()));
-            dispatcher.dispatch(&draw_card_event, game_state);
+            let draw_card_event = DrawCardEvent::new(game_state.player_id_a());
+            dispatcher.dispatch(draw_card_event, game_state);
 
-            let draw_card_event = EventMessage::from(DrawCardEvent::new(game_state.player_id_b()));
-            dispatcher.dispatch(&draw_card_event, game_state);
+            let draw_card_event = DrawCardEvent::new(game_state.player_id_b());
+            dispatcher.dispatch(draw_card_event, game_state);
         }
 
         info!("End phase: players draw cards.");

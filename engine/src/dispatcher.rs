@@ -71,7 +71,9 @@ impl Dispatcher {
 
     /// # Panics
     /// Panics if there is no valid handler for the event.
-    pub fn dispatch(&self, event: &EventMessage, game_state: &mut GameState) {
+    // pub fn dispatch(&self, event: &EventMessage, game_state: &mut GameState) {
+    pub fn dispatch(&self, event: impl Into<EventMessage>, game_state: &mut GameState) {
+        let event = event.into();
         let event_type = event.event_type();
 
         let matching_handler = self
@@ -92,7 +94,7 @@ impl Dispatcher {
         //     .channel
         //     .send(FromServer::Event(event.clone()));
 
-        matching_handler.handle(event, game_state, self);
+        matching_handler.handle(&event, game_state, self);
     }
 
     #[must_use]

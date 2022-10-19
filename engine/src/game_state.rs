@@ -6,9 +6,7 @@ pub enum GamePos {}
 
 #[derive(Debug)]
 pub struct GameState {
-    cards: Vec<Arc<Card>>,
-    cards_on_board: HashMap<GamePos, Arc<Card>>,
-    cards_by_id: HashMap<CardId, Arc<Card>>,
+    cards: CardMappings,
 
     deck_player_a: Deck,
     deck_player_b: Deck,
@@ -30,9 +28,7 @@ impl GameState {
     #[must_use]
     pub fn new(player_id_a: PlayerId, player_id_b: PlayerId) -> Self {
         Self {
-            cards: Vec::new(),
-            cards_on_board: HashMap::new(),
-            cards_by_id: HashMap::new(),
+            cards: CardMappings::new(),
             deck_player_a: Deck::new(Vec::new()),
             deck_player_b: Deck::new(Vec::new()),
             hand_player_a: Hand::new_empty(),
@@ -47,17 +43,12 @@ impl GameState {
 
     #[must_use]
     pub fn card_at_pos(&self, pos: GamePos) -> Option<&Card> {
-        let ac = self.cards_on_board.get(&pos);
-
-        let c: Option<&Card> = ac.map(|c| &(**c));
-
-        c
+        self.cards.card_at_pos(pos)
     }
 
     #[must_use]
     pub fn card_at_pos_mut(&mut self, pos: GamePos) -> Option<&mut Card> {
-        // won't work
-        self.cards_on_board.get_mut(&pos).and_then(Arc::get_mut)
+        self.cards.card_at_pos_mut(pos)
     }
 
     #[must_use]
@@ -104,10 +95,18 @@ impl GameState {
 
     /// Inserts the `Card` at the given `GamePos`. Returns the previous `Card` in that position
     /// if there was one.
+    pub fn set_card_at_pos(&mut self, pos: GamePos, card: Card) {
+        self.cards.set_card_at_pos(pos, card);
+    }
+
     #[must_use]
-    pub fn set_card_at_pos(&mut self, pos: GamePos, card: Card) -> Option<Arc<Card>> {
-        let card = Arc::new(card);
-        self.cards_on_board.insert(pos, card)
+    pub fn card(&self, id: CardId) -> Option<&Card> {
+        self.cards.card(id)
+    }
+
+    #[must_use]
+    pub fn card_mut(&mut self, id: CardId) -> Option<&mut Card> {
+        self.cards.card_mut(id)
     }
 
     #[must_use]

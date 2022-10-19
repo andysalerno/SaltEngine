@@ -47,7 +47,7 @@ fn main() {
         player_a_deck.add_card_to_bottom(SleepingDog::make_definition());
     }
 
-    dispatcher.dispatch(&StartGameEvent::new().into(), &mut game_state);
+    dispatcher.dispatch(StartGameEvent::new(), &mut game_state);
 
     // Then, keep getting player input until the game is over.
     while !game_state.is_game_over() {
@@ -58,7 +58,7 @@ fn main() {
 fn player_take_turn(game_state: &mut GameState, dispatcher: &Dispatcher) {
     let player_turn = game_state.cur_player_turn();
     let event = PlayerStartTurnEvent::new(player_turn);
-    dispatcher.dispatch(&event.into(), game_state);
+    dispatcher.dispatch(event, game_state);
 
     let message = if player_turn == game_state.player_id_a() {
         dispatcher.player_a_channel().try_receive()
@@ -75,7 +75,7 @@ fn player_take_turn(game_state: &mut GameState, dispatcher: &Dispatcher) {
     match message {
         engine::FromClient::EndTurn => {
             let event = PlayerEndTurnEvent::new(player_turn);
-            dispatcher.dispatch(&event.into(), game_state);
+            dispatcher.dispatch(event, game_state);
         }
     }
 }

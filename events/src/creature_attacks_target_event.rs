@@ -8,30 +8,40 @@ mod event {
     use super::HANDLER_NAME;
     use engine::{
         event::{Event, EventType},
-        PlayerId,
+        CardId, PlayerId,
     };
     use serde::{Deserialize, Serialize};
 
     #[derive(Serialize, Deserialize, Debug)]
     pub struct CreatureAttacksTargetEvent {
         player_id: PlayerId,
+        attacker: CardId,
+        target: CardId,
     }
 
     impl CreatureAttacksTargetEvent {
-        pub fn new(player_id: PlayerId) -> Self {
-            Self { player_id }
+        pub fn new(player_id: PlayerId, attacker: CardId, target: CardId) -> Self {
+            Self {
+                player_id,
+                attacker,
+                target,
+            }
         }
 
         pub fn player_id(&self) -> PlayerId {
             self.player_id
         }
+
+        pub fn attacker(&self) -> CardId {
+            self.attacker
+        }
+
+        pub fn target(&self) -> CardId {
+            self.target
+        }
     }
 
     impl Event for CreatureAttacksTargetEvent {
-        // fn event_type(&self) -> EventType {
-        //     EventType::new(HANDLER_NAME)
-        // }
-
         fn event_type() -> EventType {
             EventType::new(HANDLER_NAME)
         }
@@ -48,21 +58,21 @@ mod handler {
     };
     use log::info;
 
-    pub struct CreatureAttacksTargetEvenetHandler;
+    pub struct CreatureAttacksTargetEventHandler;
 
-    impl CreatureAttacksTargetEvenetHandler {
+    impl CreatureAttacksTargetEventHandler {
         pub fn new() -> Self {
             Self
         }
     }
 
-    impl Default for CreatureAttacksTargetEvenetHandler {
+    impl Default for CreatureAttacksTargetEventHandler {
         fn default() -> Self {
             Self::new()
         }
     }
 
-    impl EventHandler for CreatureAttacksTargetEvenetHandler {
+    impl EventHandler for CreatureAttacksTargetEventHandler {
         fn event_type(&self) -> EventType {
             EventType::new(HANDLER_NAME)
         }
@@ -71,10 +81,32 @@ mod handler {
             &self,
             event: &EventMessage,
             game_state: &mut GameState,
-            dispatcher: &Dispatcher,
+            _dispatcher: &Dispatcher,
         ) {
-            let draw_card_event: CreatureAttacksTargetEvent = event.unpack();
-            let player_id = draw_card_event.player_id();
+            let event: CreatureAttacksTargetEvent = event.unpack();
+
+            let attacker_card = game_state
+                .card(event.attacker())
+                .expect("Expected card to exist.");
+            info!("Found attacker: {attacker_card:?}");
+
+            let damage = attacker_card.current_attack();
+
+            let target = game_state
+                .card_mut(event.target())
+                .expect("Expected card to exist.");
+            info!("Found target: {target:?}");
+
+            let initial_health = target.current_health();
+
+            if initial_health < damage {
+                info!("Target: {target:?} is destroyed");
+            }
+
+            let next_health = initial_health - damage;
+            target.set_health(next_health);
+
+            info!("Target has new health: {next_health}");
         }
     }
 }
