@@ -3,12 +3,13 @@ mod tests {
     use std::{rc::Rc, sync::Mutex};
 
     use engine::{
-        deck::Deck, event::EventHandler, CardDefinition, ClientChannel, Dispatcher, FromClient,
-        FromServer, GameState, MessageChannel, PlayerId,
+        deck::Deck, event::EventHandler, Card, CardDefinition, ClientChannel, Dispatcher,
+        FromClient, FromServer, GamePos, GameState, MessageChannel, PlayerId,
     };
     use events::{
-        CardDrawnClientEvent, CreatureAttacksTargetEventHandler, DrawCardEvent,
-        DrawCardEventHandler, PlayerStartTurnEvent, StartGameEvent, StartGameEventHandler,
+        CardDrawnClientEvent, CreatureAttacksTargetEvent, CreatureAttacksTargetEventHandler,
+        DrawCardEvent, DrawCardEventHandler, PlayerStartTurnEvent, PlayerStartTurnEventHandler,
+        StartGameEvent, StartGameEventHandler,
     };
     use log::info;
 
@@ -83,13 +84,10 @@ mod tests {
         dispatcher.dispatch(DrawCardEvent::new(player_a_id), &mut game_state);
 
         // 2. Acquire message received by a
-        let a_received = a_observer.pop_received();
+        let a_received = a_observer.pop_received().unwrap();
 
-        // 3. Acquire message received by a
-        let b_received = b_observer.pop_received();
-
-        let a_received = a_received.unwrap();
-        let b_received = b_received.unwrap();
+        // 3. Acquire message received by b
+        let b_received = b_observer.pop_received().unwrap();
 
         let a_event: CardDrawnClientEvent = match a_received {
             FromServer::Event(e) => e,
@@ -103,16 +101,23 @@ mod tests {
         }
         .unpack();
 
-        assert!(a_event.card_drawn().is_visible());
-        assert!(b_event.card_drawn().is_hidden());
+        assert!(
+            a_event.card_drawn().is_visible(),
+            "PlayerA drew the card, so it should be visible to them."
+        );
+        assert!(
+            b_event.card_drawn().is_hidden(),
+            "PlayerB should not see what card was drawn by PlayerA."
+        );
     }
 
-    // #[test]
+    #[test]
     fn on_creature_attack_expects_take_damage() {
         init_logger();
 
         let handlers: Vec<Box<dyn EventHandler>> = vec![
             Box::new(DrawCardEventHandler::new()),
+            Box::new(PlayerStartTurnEventHandler::new()),
             Box::new(StartGameEventHandler::new()),
             Box::new(CreatureAttacksTargetEventHandler::new()),
         ];
@@ -133,10 +138,32 @@ mod tests {
         // 1. Start game
         dispatcher.dispatch(StartGameEvent::new(), &mut game_state);
 
+        let attacker_card = Card::new(Box::new(
+            CardDefinition::builder()
+                .title("test_card")
+                .health(5)
+                .build(),
+        ));
+        let attacker_card_id = attacker_card.id();
+        game_state.set_card_at_pos(GamePos::SlotIndex(0), attacker_card);
+
+        let target_card = Card::new(Box::new(
+            CardDefinition::builder()
+                .title("test_card")
+                .health(5)
+                .build(),
+        ));
+        let target_card_id = target_card.id();
+        game_state.set_card_at_pos(GamePos::SlotIndex(1), target_card);
+
         // 2. PlayerA turn starts
         dispatcher.dispatch(PlayerStartTurnEvent::new(player_a_id), &mut game_state);
 
         // 3. Receive action from PlayerA
+        let attack_event =
+            CreatureAttacksTargetEvent::new(player_a_id, attacker_card_id, target_card_id);
+
+        dispatcher.dispatch(attack_event, &mut game_state);
     }
 
     fn make_dispatcher(

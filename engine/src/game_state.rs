@@ -2,7 +2,9 @@ use crate::{card::CardId, deck::Deck, hand::Hand, Card, PlayerId};
 use std::{collections::HashMap, sync::Arc};
 
 #[derive(Debug, PartialEq, Eq, Hash, Copy, Clone)]
-pub enum GamePos {}
+pub enum GamePos {
+    SlotIndex(usize),
+}
 
 #[derive(Debug)]
 pub struct GameState {

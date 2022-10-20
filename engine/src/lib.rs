@@ -18,5 +18,5 @@ pub use card::{Card, CardDefinition, CardId};
 pub use dispatcher::{ClientChannel, Dispatcher};
 // pub use game_client::{ClientChannel, MessageChannel, FromClient, FromServer};
 pub use game_client::{FromClient, FromServer, MessageChannel};
-pub use game_state::GameState;
+pub use game_state::{GamePos, GameState};
 pub use player_id::PlayerId;
