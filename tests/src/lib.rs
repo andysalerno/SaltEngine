@@ -142,6 +142,7 @@ mod tests {
             CardDefinition::builder()
                 .title("test_card")
                 .health(5)
+                .attack(1)
                 .build(),
         ));
         let attacker_card_id = attacker_card.id();
@@ -163,7 +164,15 @@ mod tests {
         let attack_event =
             CreatureAttacksTargetEvent::new(player_a_id, attacker_card_id, target_card_id);
 
+        let original_health = game_state.card(target_card_id).unwrap().current_health();
         dispatcher.dispatch(attack_event, &mut game_state);
+        let final_health = game_state.card(target_card_id).unwrap().current_health();
+
+        assert_eq!(
+            final_health,
+            original_health - 1,
+            "Expected the card to take damage equal to the attacker's attack value."
+        );
     }
 
     fn make_dispatcher(
