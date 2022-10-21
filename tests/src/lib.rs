@@ -175,6 +175,80 @@ mod tests {
         );
     }
 
+    #[test]
+    fn on_set_card_expects_get_by_id() {
+        init_logger();
+
+        let player_a_id = PlayerId::new();
+        let player_b_id = PlayerId::new();
+
+        let mut game_state = GameState::builder(player_a_id, player_b_id).build();
+
+        let attacker_card = Card::new(Box::new(
+            CardDefinition::builder()
+                .title("test_card_1")
+                .health(5)
+                .attack(1)
+                .build(),
+        ));
+
+        let card_id = attacker_card.id();
+
+        game_state.set_card_at_pos(GamePos::SlotIndex(0), attacker_card);
+
+        let found_by_id = game_state.card(card_id);
+
+        assert_eq!("test_card_1", found_by_id.unwrap().definition().title());
+    }
+
+    #[test]
+    fn on_set_card_expects_get_by_pos() {
+        init_logger();
+
+        let player_a_id = PlayerId::new();
+        let player_b_id = PlayerId::new();
+
+        let mut game_state = GameState::builder(player_a_id, player_b_id).build();
+
+        let attacker_card = Card::new(Box::new(
+            CardDefinition::builder()
+                .title("test_card_1")
+                .health(5)
+                .attack(1)
+                .build(),
+        ));
+
+        game_state.set_card_at_pos(GamePos::SlotIndex(0), attacker_card);
+
+        let found_by_pos = game_state.card_at_pos(GamePos::SlotIndex(0));
+
+        assert_eq!("test_card_1", found_by_pos.unwrap().definition().title());
+    }
+
+    #[test]
+    fn on_set_card_expects_get_by_pos_empty_if_different_pos() {
+        init_logger();
+
+        let player_a_id = PlayerId::new();
+        let player_b_id = PlayerId::new();
+
+        let mut game_state = GameState::builder(player_a_id, player_b_id).build();
+
+        let attacker_card = Card::new(Box::new(
+            CardDefinition::builder()
+                .title("test_card_1")
+                .health(5)
+                .attack(1)
+                .build(),
+        ));
+
+        game_state.set_card_at_pos(GamePos::SlotIndex(0), attacker_card);
+
+        let found_by_different_pos = game_state.card_at_pos(GamePos::SlotIndex(1));
+
+        assert!(found_by_different_pos.is_none());
+    }
+
     fn make_dispatcher(
         player_a_id: PlayerId,
         player_b_id: PlayerId,
@@ -186,14 +260,14 @@ mod tests {
         let b_observer;
 
         let player_a_channel = {
-            let mut client = DummyClient::new();
+            let client = DummyClient::new();
             a_observer = client.observer();
 
             ClientChannel::new(player_a_id, Box::new(client))
         };
 
         let player_b_channel = {
-            let mut client = DummyClient::new();
+            let client = DummyClient::new();
             b_observer = client.observer();
 
             ClientChannel::new(player_b_id, Box::new(client))
