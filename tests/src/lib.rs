@@ -186,7 +186,8 @@ mod tests {
         let player_a_id = PlayerId::new();
         let player_b_id = PlayerId::new();
 
-        let (dispatcher, _, _) = make_dispatcher(player_a_id, player_b_id, handlers);
+        let (dispatcher, client_a_observer, client_b_observer) =
+            make_dispatcher(player_a_id, player_b_id, handlers);
 
         let mut game_state = GameState::builder(player_a_id, player_b_id).build();
 
@@ -208,6 +209,27 @@ mod tests {
 
         assert!(card_at_pos.is_some());
         assert_eq!(card_id, card_at_pos.unwrap().id());
+
+        let a_received = client_a_observer.pop_received();
+        let b_received = client_b_observer.pop_received();
+
+        match a_received {
+            Some(FromServer::Event(e)) => {
+                let event: CreaturePlacedOnBoardEvent = e.unpack();
+
+                assert_eq!(event.card().id(), card_id);
+            }
+            _ => panic!("Expected a received message from server."),
+        }
+
+        match b_received {
+            Some(FromServer::Event(e)) => {
+                let event: CreaturePlacedOnBoardEvent = e.unpack();
+
+                assert_eq!(event.card().id(), card_id);
+            }
+            _ => panic!("Expected a received message from server."),
+        }
     }
 
     #[test]
