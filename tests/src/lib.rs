@@ -8,8 +8,9 @@ mod tests {
     };
     use events::{
         CardDrawnClientEvent, CreatureAttacksTargetEvent, CreatureAttacksTargetEventHandler,
-        DrawCardEvent, DrawCardEventHandler, PlayerStartTurnEvent, PlayerStartTurnEventHandler,
-        StartGameEvent, StartGameEventHandler,
+        CreaturePlacedOnBoardEvent, CreaturePlacedOnBoardEventHandler, DrawCardEvent,
+        DrawCardEventHandler, PlayerStartTurnEvent, PlayerStartTurnEventHandler, StartGameEvent,
+        StartGameEventHandler,
     };
     use log::info;
 
@@ -173,6 +174,40 @@ mod tests {
             original_health - 1,
             "Expected the card to take damage equal to the attacker's attack value."
         );
+    }
+
+    #[test]
+    fn creature_placed_event_expects_creature_placed() {
+        init_logger();
+
+        let handlers: Vec<Box<dyn EventHandler>> =
+            vec![Box::new(CreaturePlacedOnBoardEventHandler::new())];
+
+        let player_a_id = PlayerId::new();
+        let player_b_id = PlayerId::new();
+
+        let (dispatcher, _, _) = make_dispatcher(player_a_id, player_b_id, handlers);
+
+        let mut game_state = GameState::builder(player_a_id, player_b_id).build();
+
+        let card_to_place = Card::new(Box::new(
+            CardDefinition::builder()
+                .title("test_card")
+                .health(5)
+                .attack(1)
+                .build(),
+        ));
+
+        let card_id = card_to_place.id();
+
+        let pos = GamePos::SlotIndex(3);
+        let event = CreaturePlacedOnBoardEvent::new(player_a_id, card_to_place, pos);
+        dispatcher.dispatch(event, &mut game_state);
+
+        let card_at_pos = game_state.card_at_pos(pos);
+
+        assert!(card_at_pos.is_some());
+        assert_eq!(card_id, card_at_pos.unwrap().id());
     }
 
     #[test]

@@ -1,7 +1,9 @@
-use crate::{card::CardId, deck::Deck, hand::Hand, Card, PlayerId};
-use std::{collections::HashMap, sync::Arc};
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug, PartialEq, Eq, Hash, Copy, Clone)]
+use crate::{card::CardId, deck::Deck, hand::Hand, Card, PlayerId};
+use std::collections::HashMap;
+
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Hash, Copy, Clone)]
 pub enum GamePos {
     SlotIndex(usize),
 }

@@ -1,4 +1,5 @@
 mod creature_attacks_target_event;
+mod creature_placed_on_board_event;
 mod draw_card_event;
 mod player_end_turn_event;
 mod player_start_turn_event;
@@ -6,6 +7,9 @@ mod start_game_event;
 
 pub use creature_attacks_target_event::{
     CreatureAttacksTargetEvent, CreatureAttacksTargetEventHandler,
+};
+pub use creature_placed_on_board_event::{
+    CreaturePlacedOnBoardEvent, CreaturePlacedOnBoardEventHandler,
 };
 pub use draw_card_event::{CardDrawnClientEvent, DrawCardEvent, DrawCardEventHandler};
 pub use player_end_turn_event::{PlayerEndTurnEvent, PlayerEndTurnEventHandler};
