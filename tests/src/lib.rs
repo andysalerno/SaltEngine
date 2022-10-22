@@ -436,10 +436,23 @@ mod tests {
         // start game (triggers card draw)
         dispatcher.dispatch(StartGameEvent::new(), &mut game_state);
 
-        let summon_from_hand_event =
-            PlayerSummonsCreatureEvent::new(player_a_id, card_id, GamePos::SlotIndex(4));
+        let pos = GamePos::SlotIndex(4);
+        let summon_from_hand_event = PlayerSummonsCreatureEvent::new(player_a_id, card_id, pos);
 
         dispatcher.dispatch(summon_from_hand_event, &mut game_state);
+
+        let card_at_pos = game_state.card_at_pos(pos);
+        assert!(
+            card_at_pos.is_some(),
+            "Expected the card to have been placed on the target pos."
+        );
+
+        let maybe_card_in_hand = game_state.hand(player_a_id).card(card_id);
+
+        assert!(
+            maybe_card_in_hand.is_none(),
+            "Expected card to not exist in hand anymore."
+        );
     }
 
     fn make_dispatcher(
