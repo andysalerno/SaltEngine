@@ -8,9 +8,9 @@ mod tests {
     };
     use events::{
         CardDrawnClientEvent, CreatureAttacksTargetEvent, CreatureAttacksTargetEventHandler,
-        CreaturePlacedOnBoardEvent, CreaturePlacedOnBoardEventHandler, DrawCardEvent,
-        DrawCardEventHandler, PlayerStartTurnEvent, PlayerStartTurnEventHandler, StartGameEvent,
-        StartGameEventHandler,
+        CreaturePlacedOnBoardEvent, CreaturePlacedOnBoardEventHandler, CreatureTakesDamageEvent,
+        CreatureTakesDamageEventHandler, DrawCardEvent, DrawCardEventHandler, PlayerStartTurnEvent,
+        PlayerStartTurnEventHandler, StartGameEvent, StartGameEventHandler,
     };
     use log::info;
 
@@ -120,6 +120,7 @@ mod tests {
             Box::new(DrawCardEventHandler::new()),
             Box::new(PlayerStartTurnEventHandler::new()),
             Box::new(StartGameEventHandler::new()),
+            Box::new(CreatureTakesDamageEventHandler::new()),
             Box::new(CreatureAttacksTargetEventHandler::new()),
         ];
 

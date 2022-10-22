@@ -51,7 +51,10 @@ mod event {
 /// Module containing the handler for the draw card event.
 mod handler {
     use super::HANDLER_NAME;
-    use crate::{creature_attacks_target_event::CreatureAttacksTargetEvent, HiddenInfo};
+    use crate::{
+        creature_attacks_target_event::CreatureAttacksTargetEvent,
+        creature_takes_damage_event::CreatureTakesDamageEvent, HiddenInfo,
+    };
     use engine::{
         event::{EventHandler, EventMessage, EventType},
         Dispatcher, FromServer, GameState,
@@ -81,32 +84,32 @@ mod handler {
             &self,
             event: &EventMessage,
             game_state: &mut GameState,
-            _dispatcher: &Dispatcher,
+            dispatcher: &Dispatcher,
         ) {
-            let event: CreatureAttacksTargetEvent = event.unpack();
+            let unpacked_event: CreatureAttacksTargetEvent = event.unpack();
 
             let attacker_card = game_state
-                .card(event.attacker())
+                .card(unpacked_event.attacker())
                 .expect("Expected card to exist.");
             info!("Found attacker: {attacker_card:?}");
 
             let damage = attacker_card.current_attack();
 
             let target = game_state
-                .card_mut(event.target())
+                .card_mut(unpacked_event.target())
                 .expect("Expected card to exist.");
             info!("Found target: {target:?}");
 
-            let initial_health = target.current_health();
+            // First, show players this event, before continuing the chain.
+            dispatcher
+                .player_a_channel()
+                .send(FromServer::Event(event.clone()));
+            dispatcher
+                .player_b_channel()
+                .send(FromServer::Event(event.clone()));
 
-            if initial_health < damage {
-                info!("Target: {target:?} is destroyed");
-            }
-
-            let next_health = initial_health - damage;
-            target.set_health(next_health);
-
-            info!("Target has new health: {next_health}");
+            let damage_event = CreatureTakesDamageEvent::new(unpacked_event.target(), damage);
+            dispatcher.dispatch(damage_event, game_state);
         }
     }
 }
