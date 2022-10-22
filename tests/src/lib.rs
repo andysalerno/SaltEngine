@@ -1,10 +1,12 @@
 #[cfg(test)]
 mod tests {
-    use std::{rc::Rc, sync::Mutex};
+    use std::{collections::VecDeque, rc::Rc, sync::Mutex};
 
     use engine::{
-        deck::Deck, event::EventHandler, Card, CardDefinition, ClientChannel, Dispatcher,
-        FromClient, FromServer, GamePos, GameState, MessageChannel, PlayerId,
+        deck::Deck,
+        event::{Event, EventHandler},
+        Card, CardDefinition, ClientChannel, Dispatcher, FromClient, FromServer, GamePos,
+        GameState, MessageChannel, PlayerId,
     };
     use events::{
         CardDrawnClientEvent, CreatureAttacksTargetEvent, CreatureAttacksTargetEventHandler,
@@ -117,9 +119,6 @@ mod tests {
         init_logger();
 
         let handlers: Vec<Box<dyn EventHandler>> = vec![
-            Box::new(DrawCardEventHandler::new()),
-            Box::new(PlayerStartTurnEventHandler::new()),
-            Box::new(StartGameEventHandler::new()),
             Box::new(CreatureTakesDamageEventHandler::new()),
             Box::new(CreatureAttacksTargetEventHandler::new()),
         ];
@@ -136,9 +135,6 @@ mod tests {
                 .with_player_b_deck(make_deck(10));
             builder.build()
         };
-
-        // 1. Start game
-        dispatcher.dispatch(StartGameEvent::new(), &mut game_state);
 
         let attacker_card = Card::new(Box::new(
             CardDefinition::builder()
@@ -159,10 +155,6 @@ mod tests {
         let target_card_id = target_card.id();
         game_state.set_card_at_pos(GamePos::SlotIndex(1), target_card);
 
-        // 2. PlayerA turn starts
-        dispatcher.dispatch(PlayerStartTurnEvent::new(player_a_id), &mut game_state);
-
-        // 3. Receive action from PlayerA
         let attack_event =
             CreatureAttacksTargetEvent::new(player_a_id, attacker_card_id, target_card_id);
 
@@ -174,6 +166,95 @@ mod tests {
             final_health,
             original_health - 1,
             "Expected the card to take damage equal to the attacker's attack value."
+        );
+    }
+
+    #[test]
+    fn on_creature_attack_expects_events_dispatched_in_order() {
+        init_logger();
+
+        let handlers: Vec<Box<dyn EventHandler>> = vec![
+            Box::new(CreatureTakesDamageEventHandler::new()),
+            Box::new(CreatureAttacksTargetEventHandler::new()),
+        ];
+
+        let player_a_id = PlayerId::new();
+        let player_b_id = PlayerId::new();
+
+        let (dispatcher, player_a_observer, player_b_observer) =
+            make_dispatcher(player_a_id, player_b_id, handlers);
+
+        let mut game_state = {
+            let mut builder = GameState::builder(player_a_id, player_b_id);
+            builder
+                .with_player_a_deck(make_deck(10))
+                .with_player_b_deck(make_deck(10));
+            builder.build()
+        };
+
+        let attacker_card = Card::new(Box::new(
+            CardDefinition::builder()
+                .title("test_card")
+                .health(5)
+                .attack(1)
+                .build(),
+        ));
+        let attacker_card_id = attacker_card.id();
+        game_state.set_card_at_pos(GamePos::SlotIndex(0), attacker_card);
+
+        let target_card = Card::new(Box::new(
+            CardDefinition::builder()
+                .title("test_card")
+                .health(5)
+                .build(),
+        ));
+        let target_card_id = target_card.id();
+        game_state.set_card_at_pos(GamePos::SlotIndex(1), target_card);
+
+        let attack_event =
+            CreatureAttacksTargetEvent::new(player_a_id, attacker_card_id, target_card_id);
+
+        dispatcher.dispatch(attack_event, &mut game_state);
+
+        // check what events the players saw
+        let event_1 = match player_a_observer.pop_received() {
+            Some(FromServer::Event(e)) => e,
+            _ => panic!("Expected event from server"),
+        };
+
+        assert_eq!(
+            *event_1.event_type(),
+            CreatureAttacksTargetEvent::event_type()
+        );
+
+        let event_1 = match player_b_observer.pop_received() {
+            Some(FromServer::Event(e)) => e,
+            _ => panic!("Expected event from server"),
+        };
+
+        assert_eq!(
+            *event_1.event_type(),
+            CreatureAttacksTargetEvent::event_type()
+        );
+
+        let event_2 = match player_a_observer.pop_received() {
+            Some(FromServer::Event(e)) => e,
+            _ => panic!("Expected event from server"),
+        };
+
+        assert_eq!(
+            *event_2.event_type(),
+            CreatureTakesDamageEvent::event_type()
+        );
+
+        let event_2 = match player_b_observer.pop_received() {
+            Some(FromServer::Event(e)) => e,
+            _ => panic!("Expected event from server"),
+        };
+
+        assert_eq!(
+            *event_2.event_type(),
+            CreatureTakesDamageEvent::event_type()
         );
     }
 
@@ -361,32 +442,32 @@ mod tests {
 
     #[derive(Clone)]
     struct ClientObserver {
-        received_messages: Rc<Mutex<Vec<FromServer>>>,
-        messages_to_send: Rc<Mutex<Vec<FromClient>>>,
+        received_messages: Rc<Mutex<VecDeque<FromServer>>>,
+        messages_to_send: Rc<Mutex<VecDeque<FromClient>>>,
     }
 
     impl ClientObserver {
         fn new() -> Self {
             Self {
-                received_messages: Rc::new(Mutex::new(Vec::new())),
-                messages_to_send: Rc::new(Mutex::new(Vec::new())),
+                received_messages: Rc::new(Mutex::new(VecDeque::new())),
+                messages_to_send: Rc::new(Mutex::new(VecDeque::new())),
             }
         }
 
-        fn push_received(&self, message: FromServer) {
-            self.received_messages.lock().unwrap().push(message);
+        fn enqueue_received(&self, message: FromServer) {
+            self.received_messages.lock().unwrap().push_back(message);
         }
 
         fn pop_received(&self) -> Option<FromServer> {
-            self.received_messages.lock().unwrap().pop()
+            self.received_messages.lock().unwrap().pop_front()
         }
 
-        fn push_sent(&self, message: FromClient) {
-            self.messages_to_send.lock().unwrap().push(message);
+        fn enqueue_sent(&self, message: FromClient) {
+            self.messages_to_send.lock().unwrap().push_back(message);
         }
 
         fn pop_sent(&self) -> Option<FromClient> {
-            self.messages_to_send.lock().unwrap().pop()
+            self.messages_to_send.lock().unwrap().pop_front()
         }
     }
 
@@ -408,7 +489,7 @@ mod tests {
 
         fn send(&self, message: FromServer) {
             info!("Player receives message: {message:?}");
-            self.observer.push_received(message);
+            self.observer.enqueue_received(message);
         }
 
         fn try_receive(&self) -> Option<Self::Receive> {
