@@ -1,5 +1,5 @@
 use engine::{
-    event::{Event, EventHandler, EventMessage},
+    event::{Event, EventMessage},
     FromClient, FromServer, GameState, MessageChannel, PlayerId,
 };
 use events::{CardDrawnClientEvent, HiddenInfo, PlayerStartTurnEvent};
@@ -12,15 +12,11 @@ fn main() {
 
     let receiver = websocket_channel::connect();
 
-    let handlers: Vec<Box<dyn EventHandler>> = Vec::new();
-
     // First, we expect a Hello message, with our player IDs.
     let (my_id, enemy_id) = match receiver.try_receive().expect("connection must be open.") {
         engine::FromServer::Event(_) => panic!("Expected Hello."),
         engine::FromServer::Hello(a, b) => (a, b),
     };
-
-    let game_state = GameState::new(my_id, enemy_id);
 
     info!("I am: {my_id:?}. Enemy is: {enemy_id:?}");
 

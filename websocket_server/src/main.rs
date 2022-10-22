@@ -1,5 +1,7 @@
 use cards::SleepingDog;
-use engine::{event::EventHandler, ClientChannel, Dispatcher, FromServer, GameState, PlayerId};
+use engine::{
+    event::EventHandler, Card, ClientChannel, Dispatcher, FromServer, GameState, PlayerId,
+};
 use events::{
     DrawCardEventHandler, PlayerEndTurnEvent, PlayerEndTurnEventHandler, PlayerStartTurnEvent,
     PlayerStartTurnEventHandler, StartGameEvent, StartGameEventHandler,
@@ -39,12 +41,12 @@ fn main() {
     // Add cards to decks for both players.
     for player_id in [player_a_id, player_b_id] {
         let player_a_deck = game_state.deck_mut(player_id);
-        player_a_deck.add_card_to_bottom(SleepingDog::make_definition());
-        player_a_deck.add_card_to_bottom(SleepingDog::make_definition());
-        player_a_deck.add_card_to_bottom(SleepingDog::make_definition());
-        player_a_deck.add_card_to_bottom(SleepingDog::make_definition());
-        player_a_deck.add_card_to_bottom(SleepingDog::make_definition());
-        player_a_deck.add_card_to_bottom(SleepingDog::make_definition());
+        player_a_deck.add_card_to_bottom(Card::new(SleepingDog::make_definition()));
+        player_a_deck.add_card_to_bottom(Card::new(SleepingDog::make_definition()));
+        player_a_deck.add_card_to_bottom(Card::new(SleepingDog::make_definition()));
+        player_a_deck.add_card_to_bottom(Card::new(SleepingDog::make_definition()));
+        player_a_deck.add_card_to_bottom(Card::new(SleepingDog::make_definition()));
+        player_a_deck.add_card_to_bottom(Card::new(SleepingDog::make_definition()));
     }
 
     dispatcher.dispatch(StartGameEvent::new(), &mut game_state);

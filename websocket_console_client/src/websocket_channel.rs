@@ -5,6 +5,9 @@ use tungstenite::{stream::MaybeTlsStream, WebSocket};
 
 struct WebSocketChannel(Mutex<WebSocket<MaybeTlsStream<TcpStream>>>);
 
+const PORT: usize = 9001;
+const HOST: &str = "ws://localhost";
+
 impl MessageChannel for WebSocketChannel {
     type Receive = FromServer;
     type Send = FromClient;
@@ -36,8 +39,9 @@ impl WebSocketChannel {
 
 pub(crate) fn connect() -> impl MessageChannel<Send = FromClient, Receive = FromServer> {
     info!("Connecting...");
+    let uri = format!("{HOST}:{PORT}");
     let socket = loop {
-        match tungstenite::connect("ws://localhost:9001") {
+        match tungstenite::connect(&uri) {
             Ok((socket, _)) => break socket,
             _ => continue,
         }

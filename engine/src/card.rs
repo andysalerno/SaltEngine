@@ -6,7 +6,7 @@ pub struct CardId;
 
 /// An instance of a card in the game,
 /// created from some definition.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Clone, Deserialize)]
 pub struct Card {
     id: CardId,
     definition: Box<CardDefinition>,
@@ -18,7 +18,8 @@ pub struct Card {
 
 impl Card {
     #[must_use]
-    pub fn new(definition: Box<CardDefinition>) -> Self {
+    pub fn new(definition: impl Into<Box<CardDefinition>>) -> Self {
+        let definition = definition.into();
         Self {
             id: CardId::new(),
             title: definition.title().to_owned(),

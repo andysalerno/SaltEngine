@@ -4,6 +4,7 @@ mod creature_takes_damage_event;
 mod draw_card_event;
 mod player_end_turn_event;
 mod player_start_turn_event;
+mod player_summons_creature_event;
 mod start_game_event;
 
 use serde::{Deserialize, Serialize};

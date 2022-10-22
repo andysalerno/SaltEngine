@@ -1,12 +1,12 @@
-use crate::CardDefinition;
+use crate::{Card, CardDefinition};
 
 #[derive(Debug)]
 pub struct Hand {
-    cards: Vec<CardDefinition>,
+    cards: Vec<Card>,
 }
 
 impl Hand {
-    pub fn new(cards: Vec<CardDefinition>) -> Self {
+    pub fn new(cards: Vec<Card>) -> Self {
         Self { cards }
     }
 
@@ -15,7 +15,7 @@ impl Hand {
     }
 
     /// Add a card to the right side of the hand.
-    pub fn add_to_right(&mut self, card: CardDefinition) {
+    pub fn add_to_right(&mut self, card: Card) {
         self.cards.push(card);
     }
 

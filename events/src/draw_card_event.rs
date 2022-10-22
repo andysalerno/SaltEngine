@@ -117,7 +117,7 @@ mod client_event {
     use crate::HiddenInfo;
     use engine::{
         event::{Event, EventType},
-        CardDefinition, PlayerId,
+        Card, CardDefinition, PlayerId,
     };
     use serde::{Deserialize, Serialize};
 
@@ -125,11 +125,11 @@ mod client_event {
     #[derive(Clone, Debug, Serialize, Deserialize)]
     pub struct CardDrawnClientEvent {
         player_id: PlayerId,
-        card_drawn: HiddenInfo<CardDefinition>,
+        card_drawn: HiddenInfo<Card>,
     }
 
     impl CardDrawnClientEvent {
-        pub fn new(player_id: PlayerId, card_drawn: HiddenInfo<CardDefinition>) -> Self {
+        pub fn new(player_id: PlayerId, card_drawn: HiddenInfo<Card>) -> Self {
             Self {
                 player_id,
                 card_drawn,
@@ -140,7 +140,7 @@ mod client_event {
             self.player_id
         }
 
-        pub fn card_drawn(&self) -> &HiddenInfo<CardDefinition> {
+        pub fn card_drawn(&self) -> &HiddenInfo<Card> {
             &self.card_drawn
         }
     }

@@ -11,8 +11,8 @@ mod tests {
     use events::{
         CardDrawnClientEvent, CreatureAttacksTargetEvent, CreatureAttacksTargetEventHandler,
         CreaturePlacedOnBoardEvent, CreaturePlacedOnBoardEventHandler, CreatureTakesDamageEvent,
-        CreatureTakesDamageEventHandler, DrawCardEvent, DrawCardEventHandler, PlayerStartTurnEvent,
-        PlayerStartTurnEventHandler, StartGameEvent, StartGameEventHandler,
+        CreatureTakesDamageEventHandler, DrawCardEvent, DrawCardEventHandler, StartGameEvent,
+        StartGameEventHandler,
     };
     use log::info;
 
@@ -184,78 +184,90 @@ mod tests {
         let (dispatcher, player_a_observer, player_b_observer) =
             make_dispatcher(player_a_id, player_b_id, handlers);
 
-        let mut game_state = {
-            let mut builder = GameState::builder(player_a_id, player_b_id);
-            builder
-                .with_player_a_deck(make_deck(10))
-                .with_player_b_deck(make_deck(10));
-            builder.build()
+        let mut game_state = GameState::builder(player_a_id, player_b_id).build();
+
+        // Add attacker to board
+        let attacker_card_id = {
+            let attacker_card = Card::new(Box::new(
+                CardDefinition::builder()
+                    .title("test_card")
+                    .health(5)
+                    .attack(1)
+                    .build(),
+            ));
+            let id = attacker_card.id();
+            game_state.set_card_at_pos(GamePos::SlotIndex(0), attacker_card);
+
+            id
         };
 
-        let attacker_card = Card::new(Box::new(
-            CardDefinition::builder()
-                .title("test_card")
-                .health(5)
-                .attack(1)
-                .build(),
-        ));
-        let attacker_card_id = attacker_card.id();
-        game_state.set_card_at_pos(GamePos::SlotIndex(0), attacker_card);
+        // Add target to board
+        let target_card_id = {
+            let target_card = Card::new(Box::new(
+                CardDefinition::builder()
+                    .title("test_card")
+                    .health(5)
+                    .build(),
+            ));
+            let id = target_card.id();
+            game_state.set_card_at_pos(GamePos::SlotIndex(1), target_card);
 
-        let target_card = Card::new(Box::new(
-            CardDefinition::builder()
-                .title("test_card")
-                .health(5)
-                .build(),
-        ));
-        let target_card_id = target_card.id();
-        game_state.set_card_at_pos(GamePos::SlotIndex(1), target_card);
-
-        let attack_event =
-            CreatureAttacksTargetEvent::new(player_a_id, attacker_card_id, target_card_id);
-
-        dispatcher.dispatch(attack_event, &mut game_state);
-
-        // check what events the players saw
-        let event_1 = match player_a_observer.pop_received() {
-            Some(FromServer::Event(e)) => e,
-            _ => panic!("Expected event from server"),
+            id
         };
 
-        assert_eq!(
-            *event_1.event_type(),
-            CreatureAttacksTargetEvent::event_type()
-        );
+        // Attacker attacks target
+        {
+            let attack_event =
+                CreatureAttacksTargetEvent::new(player_a_id, attacker_card_id, target_card_id);
 
-        let event_1 = match player_b_observer.pop_received() {
-            Some(FromServer::Event(e)) => e,
-            _ => panic!("Expected event from server"),
-        };
+            dispatcher.dispatch(attack_event, &mut game_state);
+        }
 
-        assert_eq!(
-            *event_1.event_type(),
-            CreatureAttacksTargetEvent::event_type()
-        );
+        // Validate: players see attack event first
+        {
+            let event_1 = match player_a_observer.pop_received() {
+                Some(FromServer::Event(e)) => e,
+                _ => panic!("Expected event from server"),
+            };
 
-        let event_2 = match player_a_observer.pop_received() {
-            Some(FromServer::Event(e)) => e,
-            _ => panic!("Expected event from server"),
-        };
+            assert_eq!(
+                *event_1.event_type(),
+                CreatureAttacksTargetEvent::event_type()
+            );
 
-        assert_eq!(
-            *event_2.event_type(),
-            CreatureTakesDamageEvent::event_type()
-        );
+            let event_1 = match player_b_observer.pop_received() {
+                Some(FromServer::Event(e)) => e,
+                _ => panic!("Expected event from server"),
+            };
 
-        let event_2 = match player_b_observer.pop_received() {
-            Some(FromServer::Event(e)) => e,
-            _ => panic!("Expected event from server"),
-        };
+            assert_eq!(
+                *event_1.event_type(),
+                CreatureAttacksTargetEvent::event_type()
+            );
+        }
 
-        assert_eq!(
-            *event_2.event_type(),
-            CreatureTakesDamageEvent::event_type()
-        );
+        // Validate: players see damage event next
+        {
+            let event_2 = match player_a_observer.pop_received() {
+                Some(FromServer::Event(e)) => e,
+                _ => panic!("Expected event from server"),
+            };
+
+            assert_eq!(
+                *event_2.event_type(),
+                CreatureTakesDamageEvent::event_type()
+            );
+
+            let event_2 = match player_b_observer.pop_received() {
+                Some(FromServer::Event(e)) => e,
+                _ => panic!("Expected event from server"),
+            };
+
+            assert_eq!(
+                *event_2.event_type(),
+                CreatureTakesDamageEvent::event_type()
+            );
+        }
     }
 
     #[test]
@@ -426,7 +438,7 @@ mod tests {
         builder.title("test_card");
 
         for _ in 0..card_count {
-            deck.add_card_to_bottom(builder.build());
+            deck.add_card_to_bottom(Card::new(builder.build()));
         }
 
         deck
