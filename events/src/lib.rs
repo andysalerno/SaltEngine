@@ -19,6 +19,9 @@ pub use creature_takes_damage_event::{CreatureTakesDamageEvent, CreatureTakesDam
 pub use draw_card_event::{CardDrawnClientEvent, DrawCardEvent, DrawCardEventHandler};
 pub use player_end_turn_event::{PlayerEndTurnEvent, PlayerEndTurnEventHandler};
 pub use player_start_turn_event::{PlayerStartTurnEvent, PlayerStartTurnEventHandler};
+pub use player_summons_creature_event::{
+    PlayerSummonsCreatureEvent, PlayerSummonsCreatureEventHandler,
+};
 pub use start_game_event::{StartGameEvent, StartGameEventHandler};
 
 /// Information on an event that may be visible to one player but hidden to another.

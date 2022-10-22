@@ -11,7 +11,8 @@ mod tests {
     use events::{
         CardDrawnClientEvent, CreatureAttacksTargetEvent, CreatureAttacksTargetEventHandler,
         CreaturePlacedOnBoardEvent, CreaturePlacedOnBoardEventHandler, CreatureTakesDamageEvent,
-        CreatureTakesDamageEventHandler, DrawCardEvent, DrawCardEventHandler, StartGameEvent,
+        CreatureTakesDamageEventHandler, DrawCardEvent, DrawCardEventHandler,
+        PlayerSummonsCreatureEvent, PlayerSummonsCreatureEventHandler, StartGameEvent,
         StartGameEventHandler,
     };
     use log::info;
@@ -398,6 +399,47 @@ mod tests {
         let found_by_different_pos = game_state.card_at_pos(GamePos::SlotIndex(1));
 
         assert!(found_by_different_pos.is_none());
+    }
+
+    #[test]
+    fn on_summon_from_hand_expects_card_removed_from_hand() {
+        init_logger();
+
+        let handlers: Vec<Box<dyn EventHandler>> = vec![
+            Box::new(CreaturePlacedOnBoardEventHandler::new()),
+            Box::new(PlayerSummonsCreatureEventHandler::new()),
+            Box::new(StartGameEventHandler::new()),
+            Box::new(DrawCardEventHandler::new()),
+        ];
+
+        let player_a_id = PlayerId::new();
+        let player_b_id = PlayerId::new();
+
+        let (dispatcher, _, _) = make_dispatcher(player_a_id, player_b_id, handlers);
+
+        let mut game_state = {
+            let mut builder = GameState::builder(player_a_id, player_b_id);
+            builder
+                .with_player_a_deck(make_deck(10))
+                .with_player_b_deck(make_deck(10));
+            builder.build()
+        };
+
+        let card_id = {
+            let top_card = game_state.deck_mut(player_a_id).take_from_top().unwrap();
+            let id = top_card.id();
+            game_state.deck_mut(player_a_id).add_card_to_top(top_card);
+
+            id
+        };
+
+        // start game (triggers card draw)
+        dispatcher.dispatch(StartGameEvent::new(), &mut game_state);
+
+        let summon_from_hand_event =
+            PlayerSummonsCreatureEvent::new(player_a_id, card_id, GamePos::SlotIndex(4));
+
+        dispatcher.dispatch(summon_from_hand_event, &mut game_state);
     }
 
     fn make_dispatcher(

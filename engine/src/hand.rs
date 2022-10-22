@@ -1,4 +1,4 @@
-use crate::{Card, CardDefinition};
+use crate::{Card, CardDefinition, CardId};
 
 #[derive(Debug)]
 pub struct Hand {
@@ -12,6 +12,21 @@ impl Hand {
 
     pub const fn new_empty() -> Self {
         Self { cards: Vec::new() }
+    }
+
+    pub fn card(&self, card_id: CardId) -> Option<&Card> {
+        self.cards.iter().find(|c| c.id() == card_id)
+    }
+
+    pub fn cards(&self) -> impl Iterator<Item = &Card> {
+        self.cards.iter()
+    }
+
+    pub fn take_card(&mut self, card_id: CardId) -> Option<Card> {
+        self.cards
+            .iter()
+            .position(|c| c.id() == card_id)
+            .map(|index| self.cards.remove(index))
     }
 
     /// Add a card to the right side of the hand.

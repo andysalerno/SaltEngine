@@ -14,15 +14,15 @@ mod event {
     #[derive(Serialize, Deserialize, Debug)]
     pub struct PlayerSummonsCreatureEvent {
         player_id: PlayerId,
-        card: CardId,
+        card_id: CardId,
         target_pos: GamePos,
     }
 
     impl PlayerSummonsCreatureEvent {
-        pub fn new(player_id: PlayerId, card: CardId, target_pos: GamePos) -> Self {
+        pub fn new(player_id: PlayerId, card_id: CardId, target_pos: GamePos) -> Self {
             Self {
                 player_id,
-                card,
+                card_id,
                 target_pos,
             }
         }
@@ -31,8 +31,8 @@ mod event {
             self.player_id
         }
 
-        pub fn card(&self) -> CardId {
-            self.card
+        pub fn card_id(&self) -> CardId {
+            self.card_id
         }
 
         pub fn target_pos(&self) -> GamePos {
@@ -81,8 +81,26 @@ mod handler {
             dispatcher: &Dispatcher,
         ) {
             let unpacked: PlayerSummonsCreatureEvent = event.unpack();
+            let card_id = unpacked.card_id();
+            let pos = unpacked.target_pos();
 
-            let card_in_hand = game_state.hand(unpacked.player_id());
+            let card = game_state
+                .hand_mut(unpacked.player_id())
+                .take_card(card_id)
+                .expect("Attempt to summon card, but ID did not match card in hand.");
+
+            info!("Card taken from player's hand: {card_id:?}");
+
+            game_state.set_card_at_pos(pos, card);
+
+            info!("Card placed on board at position: {pos:?}");
+
+            dispatcher
+                .player_a_channel()
+                .send(FromServer::Event(event.clone()));
+            dispatcher
+                .player_b_channel()
+                .send(FromServer::Event(event.clone()));
         }
     }
 }
