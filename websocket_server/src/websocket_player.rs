@@ -46,7 +46,9 @@ pub(crate) fn accept_connections() -> (
     impl MessageChannel<Send = FromServer, Receive = FromClient>,
     impl MessageChannel<Send = FromServer, Receive = FromClient>,
 ) {
-    let server = TcpListener::bind("127.0.0.1:9001").unwrap();
+    let addr = "127.0.0.1:9001";
+    info!("Listening on {addr}...");
+    let server = TcpListener::bind(addr).unwrap();
 
     info!("Waiting for first player to connect...");
     let player_a = tungstenite::accept(server.accept().unwrap().0).unwrap();

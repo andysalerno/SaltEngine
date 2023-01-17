@@ -8,7 +8,11 @@ body {
     height: 100vh;
 }
 
-.extra-zone {}
+.extra-zone {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}
 
 .game {
     display: grid;
