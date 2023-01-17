@@ -1,3 +1,4 @@
+
 // The global context.
 const context = {
     socket: null,
@@ -76,7 +77,8 @@ function handleCardDrawn(event) {
         const cardsCount = context.myHand.push(event.card_drawn.Visible);
         const index = cardsCount - 1;
 
-        const template = document.getElementById("card-hand-template");
+        // const template = document.getElementById("card-hand-template");
+        const template = document.getElementById("card-hand-template-alpine");
         const cloned = template.content.cloneNode(true);
 
         const myHand = document.querySelector(".my-hand");
@@ -94,3 +96,19 @@ removeCardFromSlot();
 setUpEvents();
 
 wsConnect();
+
+document.addEventListener('alpine:init', () => {
+    Alpine.data('cardhand', () => ({
+        title: 'some title',
+        attack: 3,
+        health: 5,
+
+        toggle() {
+            this.open = !this.open
+        }
+    }));
+
+    Alpine.data('myhandslot', (slotIndex) => ({
+        index: slotIndex
+    }));
+});

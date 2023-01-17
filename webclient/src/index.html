@@ -2,8 +2,8 @@
 <html>
 
 <head>
-    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <script defer src="js.js"></script>
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <link rel="stylesheet" href="style.css">
 
     <template id="card-board-template">
@@ -23,6 +23,16 @@
             <div class="card-footer">
                 <div class="attack-val">3</div>
                 <div class="hp-val">5</div>
+            </div>
+        </div>
+    </template>
+    <template id="card-hand-template-alpine">
+        <div x-data="cardhand" class="card-hand">
+            <div x-text="title" class="card-title"></div>
+            <div class="card-body"></div>
+            <div class="card-footer">
+                <div x-text="attack" class="attack-val"></div>
+                <div x-text="health" class="hp-val"></div>
             </div>
         </div>
     </template>
@@ -69,16 +79,12 @@
                 <div class="card-slot"></div>
             </div>
             <div class="my-hand">
-                <div class="hand-slot"></div>
-                <div class="hand-slot"></div>
-                <div class="hand-slot"></div>
-                <div class="hand-slot"></div>
-                <div class="hand-slot"></div>
-                <div class="hand-slot"></div>
-                <div class="hand-slot"></div>
-                <div class="hand-slot"></div>
-                <div class="hand-slot"></div>
-                <div class="hand-slot"></div>
+                <div x-data="myhandslot(0)" class="hand-slot"></div>
+                <div x-data="myhandslot(1)" class="hand-slot"></div>
+                <div x-data="myhandslot(2)" class="hand-slot"></div>
+                <div x-data="myhandslot(3)" class="hand-slot"></div>
+                <div x-data="myhandslot(4)" class="hand-slot"></div>
+                <div x-data="myhandslot(5)" class="hand-slot"></div>
             </div>
         </div>
         <div class="extra-zone"></div>
