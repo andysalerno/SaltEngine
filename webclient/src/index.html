@@ -3,7 +3,19 @@
 
 <head>
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script defer src="js.js"></script>
     <link rel="stylesheet" href="style.css">
+
+    <template id="card-board-template">
+        <div class="card-board">
+            <div class="card-title">title: test title</div>
+            <div class="card-body">body: test body</div>
+            <div class="card-footer">
+                <div class="attack-val">3</div>
+                <div class="hp-val">5</div>
+            </div>
+        </div>
+    </template>
 </head>
 
 <body>
@@ -14,39 +26,49 @@
             <div class="op-hand">
                 opponent hand
             </div>
-            <div class="op-side-1">
-                opponent side 1
+            <div class="board-row op-side-1">
+                <div class="card-slot"></div>
+                <div class="card-slot"></div>
+                <div class="card-slot"></div>
+                <div class="card-slot"></div>
+                <div class="card-slot"></div>
+                <div class="card-slot"></div>
             </div>
-            <div class="op-side-2">
-                opponent side 2
+            <div class="board-row op-side-2">
+                <div class="card-slot"></div>
+                <div class="card-slot"></div>
+                <div class="card-slot"></div>
+                <div class="card-slot"></div>
+                <div class="card-slot"></div>
+                <div class="card-slot"></div>
             </div>
-            <div class="my-side-2">
-                <div class="card-slot">
-                </div>
-                <div class="card-slot">
-                    <div class="card-board">
-                        <div class="card-title">title: test title</div>
-                        <div class="card-body">body: test body</div>
-                        <div class="card-footer">
-                            <div class="attack-val">3</div>
-                            <div class="hp-val">5</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="card-slot">
-                </div>
-                <div class="card-slot">
-                </div>
-                <div class="card-slot">
-                </div>
-                <div class="card-slot">
-                </div>
+            <div class="board-row my-side-2">
+                <div class="card-slot"></div>
+                <div class="card-slot"></div>
+                <div class="card-slot"></div>
+                <div class="card-slot"></div>
+                <div class="card-slot"></div>
+                <div class="card-slot"></div>
             </div>
-            <div class="my-side-1">
-                my side 1
+            <div class="board-row my-side-1">
+                <div class="card-slot"></div>
+                <div class="card-slot"></div>
+                <div class="card-slot"></div>
+                <div class="card-slot"></div>
+                <div class="card-slot"></div>
+                <div class="card-slot"></div>
             </div>
             <div class="my-hand">
-                my hand
+                <div class="hand-slot"></div>
+                <div class="hand-slot"></div>
+                <div class="hand-slot"></div>
+                <div class="hand-slot"></div>
+                <div class="hand-slot"></div>
+                <div class="hand-slot"></div>
+                <div class="hand-slot"></div>
+                <div class="hand-slot"></div>
+                <div class="hand-slot"></div>
+                <div class="hand-slot"></div>
             </div>
         </div>
         <div class="extra-zone"></div>

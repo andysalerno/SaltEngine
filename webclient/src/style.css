@@ -23,7 +23,9 @@ body {
 
 .my-side-1 {}
 
-.my-side-2 {
+.my-side-2 {}
+
+.board-row {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
 }
@@ -34,25 +36,41 @@ body {
     grid-template-rows: auto 1fr auto;
 }
 
-.card-slot {}
+.card-slot {
+    border: 1px solid grey;
+}
 
 .card-title {
     text-align: center;
     padding-top: 10px;
     padding-bottom: 10px;
+    border: 1px solid grey;
 }
 
 .card-footer {
     display: grid;
     grid-template-columns: 1fr 1fr;
+    border: 1px solid grey;
 }
 
 .hp-val {
     padding-right: 10px;
     text-align: right;
+    border: 1px solid grey;
 }
 
 .attack-val {
     padding-left: 10px;
     text-align: left;
+    border: 1px solid grey;
+}
+
+.my-hand {
+    display: grid;
+    border: 1px solid grey;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+}
+
+.hand-slot {
+    border: 1px solid grey;
 }
