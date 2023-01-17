@@ -40,14 +40,23 @@ body {
     grid-template-rows: auto 1fr auto;
 }
 
+.card-board>.card-title {
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+.card-hand {
+    height: 100%;
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+}
+
 .card-slot {
     border: 1px solid grey;
 }
 
 .card-title {
     text-align: center;
-    padding-top: 10px;
-    padding-bottom: 10px;
     border: 1px solid grey;
 }
 
