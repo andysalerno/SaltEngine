@@ -9,6 +9,10 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@types/alpinejs": "^3.7.1",
     "eslint": "^8.32.0"
+  },
+  "dependencies": {
+    "alpinejs": "^3.11.1"
   }
 }

@@ -1,14 +1,23 @@
+import Alpine from 'alpinejs';
+import './style.css'
+
+type Context = {
+    socket: WebSocket | null,
+    myId: string | null,
+    enemyId: string | null,
+    myHand: Array<any>
+};
 
 // The global context.
-const context = {
+const context: Context = {
     socket: null,
     myId: null,
     enemyId: null,
-    myHand: []
+    myHand: [],
 };
 
 function addCardToSlot() {
-    const template = document.getElementById("card-board-template");
+    const template = document.getElementById("card-board-template") as HTMLTemplateElement;
     const cloned = template.content.cloneNode(true);
 
     const slot = document.querySelectorAll(".board-row.my-side-2 > .card-slot")[2];
@@ -25,7 +34,7 @@ function removeCardFromSlot() {
 function wsConnect() {
     const socket = new WebSocket("ws://127.0.0.1:9001");
 
-    const textBox = document.querySelector(".extra-zone");
+    const textBox = document.querySelector(".extra-zone") as HTMLDivElement;
 
     socket.onopen = () => {
         textBox.innerHTML += "Opened!</br>";
@@ -43,13 +52,14 @@ function wsConnect() {
 }
 
 function setUpEvents() {
-    const textBox = document.querySelector(".extra-zone");
+    const textBox = document.querySelector(".extra-zone") as HTMLDivElement;
 
     textBox.addEventListener("click", (event) => {
-        if (event.target.style.overflow === "visible") {
-            event.target.style.overflow = "hidden";
+        const target = event?.target as HTMLDivElement;
+        if (target.style.overflow === "visible") {
+            target.style.overflow = "hidden";
         } else {
-            event.target.style.overflow = "visible";
+            target.style.overflow = "visible";
         }
 
     });
@@ -78,12 +88,12 @@ function handleCardDrawn(event) {
         const index = cardsCount - 1;
 
         // const template = document.getElementById("card-hand-template");
-        const template = document.getElementById("card-hand-template-alpine");
+        const template = document.getElementById("card-hand-template-alpine") as HTMLTemplateElement;
         const cloned = template.content.cloneNode(true);
 
-        const myHand = document.querySelector(".my-hand");
-        const handSlot = myHand.querySelectorAll(".hand-slot")[index];
-        handSlot.appendChild(cloned);
+        const myHand = document.querySelector<HTMLDivElement>(".my-hand");
+        const handSlot = myHand?.querySelectorAll<HTMLDivElement>(".hand-slot")[index];
+        handSlot?.appendChild(cloned);
     } else {
         logGameMessage("Enemy drew a card.");
     }
@@ -112,3 +122,5 @@ document.addEventListener('alpine:init', () => {
         index: slotIndex
     }));
 });
+
+Alpine.start();
