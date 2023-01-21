@@ -1,5 +1,4 @@
 import Alpine from 'alpinejs';
-import './style.css'
 
 type Context = {
     socket: WebSocket | null,
@@ -65,13 +64,13 @@ function setUpEvents() {
     });
 }
 
-function logGameMessage(message) {
+function logGameMessage(message: string) {
     const rightBox = document.querySelectorAll(".extra-zone")[1];
 
     rightBox.innerHTML += message + "</br>";
 }
 
-function onMessageReceived(message) {
+function onMessageReceived(message: any) {
     if (message.Hello) {
         context.myId = message.Hello[0].guid;
         context.enemyId = message.Hello[1].guid;
@@ -81,7 +80,7 @@ function onMessageReceived(message) {
     }
 }
 
-function handleCardDrawn(event) {
+function handleCardDrawn(event: any) {
     if (event.player_id.guid == context.myId) {
         logGameMessage("I drew a card.");
         const cardsCount = context.myHand.push(event.card_drawn.Visible);
