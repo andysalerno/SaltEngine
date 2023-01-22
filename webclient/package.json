@@ -1,6 +1,7 @@
 {
   "private": true,
   "devDependencies": {
+    "@types/alpinejs": "^3.7.1",
     "ts-loader": "^9.4.2",
     "typescript": "^4.9.4",
     "webpack": "^5.75.0",
