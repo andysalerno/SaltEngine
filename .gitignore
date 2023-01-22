@@ -5,3 +5,4 @@
 /webclient/src/node_modules
 /webclient/node_modules
 /webclient/src/out/*.js
+/webclient/dist

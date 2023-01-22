@@ -9,6 +9,5 @@ members = [
     "game_runner",
     "websocket_console_client",
     "websocket_server",
-    "tests",
-    "webclient"
+    "tests"
 ]
