@@ -28,11 +28,11 @@
     </template>
     <template id="card-hand-template-alpine">
         <div x-data="cardhand" class="card-hand">
-            <div x-text="title" class="card-title"></div>
+            <div x-text="getTitle" class="card-title"></div>
             <div class="card-body"></div>
             <div class="card-footer">
                 <div x-text="attack" class="attack-val"></div>
-                <div x-text="health" class="hp-val"></div>
+                <div x-text="handlen" class="hp-val"></div>
             </div>
         </div>
     </template>
