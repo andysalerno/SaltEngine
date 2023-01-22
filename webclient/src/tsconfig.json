@@ -1,10 +1,10 @@
 {
     "compilerOptions": {
-        "target": "ES2016",
-        "module": "AMD",
+        "target": "ES2015",
+        "module": "ES2015",
         "strict": true,
         "rootDir": ".",
-        "outFile": "./out/js.js",
+        "outDir": "./out",
         "esModuleInterop": true,
         "skipLibCheck": true,
         "forceConsistentCasingInFileNames": true
