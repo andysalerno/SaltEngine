@@ -109,6 +109,13 @@ function handleTurnStart(event: PlayerStartTurnEvent) {
 function myTurnStart(event: PlayerStartTurnEvent) {
     logGameMessage("My turn started. Mana: " + event.starting_mana);
     getContext().myMana = event.starting_mana;
+
+    const context = getContext();
+
+    if (context.myHand.length > 0) {
+        context.myHand[0].title = "it kinda works";
+    }
+
     activateHand();
     activateEndTurnBox();
 }
