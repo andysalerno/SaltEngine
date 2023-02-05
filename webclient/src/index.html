@@ -16,12 +16,11 @@
         </div>
     </template>
     <template id="card-hand-template">
-        <div x-data="cardhand" class="card-hand" :class="{ 'active': getIsActive }">
+        <div x-data="cardhand" class="card-hand" :class="{ 'active': getIsActive }" :draggable="getIsActive">
             <div x-text="getTitleAndMana" class="card-title"></div>
             <div class="card-body"></div>
             <div class="card-footer">
                 <div x-text="getAttack" class="attack-val"></div>
-                <div x-text="getIsActive" class="attack-val"></div>
                 <div x-text="getHealth" class="hp-val"></div>
             </div>
         </div>
@@ -52,20 +51,20 @@
                 <div class="card-slot"></div>
             </div>
             <div class="board-row my-side-2">
-                <div class="card-slot"></div>
-                <div class="card-slot"></div>
-                <div class="card-slot"></div>
-                <div class="card-slot"></div>
-                <div class="card-slot"></div>
-                <div class="card-slot"></div>
+                <div x-data="boardSlot(6)" class="card-slot" :class="{ 'active': getIsActive }"></div>
+                <div x-data="boardSlot(7)" class="card-slot" :class="{ 'active': getIsActive }"></div>
+                <div x-data="boardSlot(8)" class="card-slot" :class="{ 'active': getIsActive }"></div>
+                <div x-data="boardSlot(9)" class="card-slot" :class="{ 'active': getIsActive }"></div>
+                <div x-data="boardSlot(10)" class="card-slot" :class="{ 'active': getIsActive }"></div>
+                <div x-data="boardSlot(11)" class="card-slot" :class="{ 'active': getIsActive }"></div>
             </div>
             <div class="board-row my-side-1">
-                <div class="card-slot"></div>
-                <div class="card-slot"></div>
-                <div class="card-slot"></div>
-                <div class="card-slot"></div>
-                <div class="card-slot"></div>
-                <div class="card-slot"></div>
+                <div x-data="boardSlot(0)" class="card-slot" :class="{ 'active': getIsActive }"></div>
+                <div x-data="boardSlot(1)" class="card-slot" :class="{ 'active': getIsActive }"></div>
+                <div x-data="boardSlot(2)" class="card-slot" :class="{ 'active': getIsActive }"></div>
+                <div x-data="boardSlot(3)" class="card-slot" :class="{ 'active': getIsActive }"></div>
+                <div x-data="boardSlot(4)" class="card-slot" :class="{ 'active': getIsActive }"></div>
+                <div x-data="boardSlot(5)" class="card-slot" :class="{ 'active': getIsActive }"></div>
             </div>
             <div class="my-hand">
                 <div class="hand-slot"></div>

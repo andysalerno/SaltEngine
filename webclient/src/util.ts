@@ -26,13 +26,17 @@ export function addCardToHand(card: CardDrawn) {
 
     const template = document.getElementById("card-hand-template") as HTMLTemplateElement;
     const cloned = template.content.cloneNode(true) as DocumentFragment;
-    cloned.firstElementChild?.setAttribute("x-data", `cardhand(${index})`);
-    // cloned.firstElementChild?.setAttribute("x-data", `$store.gameContext`);
-    // cloned.firstElementChild?.setAttribute("x-data",
-    //     `{
-    //     health: 10,
-    //     attack: 5
-    //  }`);
+    const child = cloned.firstElementChild;
+    child?.setAttribute("x-data", `cardhand(${index})`);
+
+    // Attach drag listeners
+    child?.addEventListener('dragstart', () => {
+        getContext().isDraggingCard = true;
+
+    });
+    child?.addEventListener('dragend', () => {
+        getContext().isDraggingCard = false;
+    });
 
     const myHand = document.querySelector<HTMLDivElement>(".my-hand");
     const handSlot = myHand?.querySelectorAll<HTMLDivElement>(".hand-slot")[index];

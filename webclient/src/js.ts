@@ -1,4 +1,5 @@
 import Alpine from 'alpinejs';
+import { BoardSlot } from './boardslot';
 import { CardDrawnEvent, CardDrawn, isHello, isEvent, PlayerStartTurnEvent, FromClient } from './message';
 import { activateEndTurnBox, addCardToHand, deActivateEndTurnBox, getEndTurnBox, logGameMessage, parseJson, sendMessage } from './util';
 
@@ -8,7 +9,10 @@ type Context = {
     enemyId: string | null,
     myHand: Array<CardDrawn>,
     myMana: number,
-    isMyTurn: boolean
+    isMyTurn: boolean,
+    myBoardSide: Array<BoardSlot>,
+
+    isDraggingCard: boolean
 };
 
 function addCardToSlot() {
@@ -18,12 +22,6 @@ function addCardToSlot() {
     const slot = document.querySelectorAll(".board-row.my-side-2 > .card-slot")[2];
 
     slot.appendChild(cloned);
-}
-
-function removeCardFromSlot() {
-    // const slot = document.querySelectorAll(".board-row.my-side-2 > .card-slot")[2];
-    // const child = slot.querySelector(".card-board");
-    // slot.removeChild(child);
 }
 
 function wsConnect() {
@@ -84,6 +82,7 @@ function onMessageReceived(message: any) {
 }
 
 function endMyTurn() {
+    getContext().isMyTurn = false;
     const message = JSON.stringify(FromClient.EndTurn);
     sendMessage(message);
 
@@ -133,8 +132,6 @@ function activateHand() {
 
 addCardToSlot();
 
-removeCardFromSlot();
-
 setUpEvents();
 
 document.addEventListener('alpine:init', () => {
@@ -165,18 +162,38 @@ document.addEventListener('alpine:init', () => {
         }
     }));
 
+
     const context: Context = {
         socket: null,
         myId: null,
         enemyId: null,
         myHand: [],
         myMana: 0,
-        isMyTurn: false
+        isMyTurn: false,
+        myBoardSide: [],
+        isDraggingCard: false
     };
+
+    for (let i = 0; i < 12; i++) {
+        context.myBoardSide.push(new BoardSlot(i));
+    }
+
     Alpine.store('gameContext', context);
 
     Alpine.store('myhand', () => ({
         hand: context.myHand
+    }));
+
+    Alpine.data('boardSlot', (slotNum) => ({
+        boundTo: context.myBoardSide[slotNum as number],
+
+        get getSlotNum(): number {
+            return this.boundTo.getSlotNum();
+        },
+
+        get getIsActive(): boolean {
+            return getContext().isDraggingCard;
+        }
     }));
 
     (window as any).AlpineContext = Alpine.store('gameContext');
