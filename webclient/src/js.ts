@@ -110,12 +110,6 @@ function myTurnStart(event: PlayerStartTurnEvent) {
     logGameMessage("My turn started. Mana: " + event.starting_mana);
     getContext().myMana = event.starting_mana;
 
-    const context = getContext();
-
-    if (context.myHand.length > 0) {
-        context.myHand[0].title = "it kinda works";
-    }
-
     activateHand();
     activateEndTurnBox();
 }
@@ -142,7 +136,7 @@ setUpEvents();
 
 document.addEventListener('alpine:init', () => {
     Alpine.data('cardhand', (cardNum) => ({
-        boundTo: context.myHand[cardNum as number],
+        boundTo: getContext().myHand[cardNum as number],
 
         get getTitle(): string {
             return this.boundTo.title;
@@ -157,23 +151,12 @@ document.addEventListener('alpine:init', () => {
         },
 
         get getIsActive(): boolean {
-
-            // ... But context can update and won't trigger this callback... it's not bound... I don't think...
-            return this.boundTo.current_cost <= context.myMana;
+            return this.boundTo.current_cost <= getContext().myMana;
         },
 
         get getTitleAndMana(): string {
             return this.boundTo.title + " " + this.boundTo.current_cost;
         }
-    }));
-
-    Alpine.data('myhandslot', (slotIndex) => ({
-        index: slotIndex,
-
-    }));
-
-    Alpine.store('myhand', () => ({
-        hand: context.myHand
     }));
 
     const context: Context = {
@@ -184,6 +167,10 @@ document.addEventListener('alpine:init', () => {
         myMana: 0,
     };
     Alpine.store('gameContext', context);
+
+    Alpine.store('myhand', () => ({
+        hand: context.myHand
+    }));
 
     (window as any).AlpineContext = Alpine.store('gameContext');
 
