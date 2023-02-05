@@ -9,6 +9,14 @@ export interface CardDrawnEvent {
     card_drawn: Visible<CardDrawn>;
 }
 
+export interface PlayerStartTurnEvent {
+    player_id: Id;
+    starting_mana: number
+}
+
+export enum FromClient {
+    EndTurn = "EndTurn"
+}
 
 export interface CardDrawn {
     title: string;

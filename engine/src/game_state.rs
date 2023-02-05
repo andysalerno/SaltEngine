@@ -21,6 +21,9 @@ pub struct GameState {
     player_id_a: PlayerId,
     player_id_b: PlayerId,
 
+    base_mana_a: i32,
+    base_mana_b: i32,
+
     cur_player_turn: PlayerId,
 
     // todo: replace with board entities
@@ -39,6 +42,8 @@ impl GameState {
             hand_player_b: Hand::new_empty(),
             player_id_a,
             player_id_b,
+            base_mana_a: 0,
+            base_mana_b: 0,
             cur_player_turn: player_id_a,
             player_a_health: 15,
             player_b_health: 15,
@@ -125,6 +130,14 @@ impl GameState {
         };
 
         self.cur_player_turn = next_player_turn;
+    }
+
+    #[must_use]
+    pub fn player_base_mana(&self, player_id: PlayerId) -> i32 {
+        match self.player(player_id) {
+            Player::PlayerA => self.base_mana_a,
+            Player::PlayerB => self.base_mana_b,
+        }
     }
 
     #[must_use]

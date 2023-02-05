@@ -10,11 +10,15 @@ const HANDLER_NAME: &str = "PlayerStartTurnEvent";
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct PlayerStartTurnEvent {
     player_id: PlayerId,
+    starting_mana: i32,
 }
 
 impl PlayerStartTurnEvent {
-    pub fn new(player_id: PlayerId) -> Self {
-        Self { player_id }
+    pub fn new(player_id: PlayerId, starting_mana: i32) -> Self {
+        Self {
+            player_id,
+            starting_mana,
+        }
     }
 
     pub fn player_id(&self) -> PlayerId {

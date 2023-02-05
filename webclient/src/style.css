@@ -17,6 +17,7 @@ div {
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
+    display: grid;
 }
 
 .game {
@@ -91,4 +92,15 @@ div {
 
 .hand-slot {
     border: 1px solid grey;
+}
+
+.endTurnButton {
+    text-align: center;
+    border: 1px solid gray;
+}
+
+.endTurnButton.active:hover {
+    background-color: grey;
+    text-align: center;
+    border: 1px solid gray;
 }

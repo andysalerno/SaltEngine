@@ -1,12 +1,14 @@
 use cards::SleepingDog;
 use engine::{
-    event::EventHandler, Card, ClientChannel, Dispatcher, FromServer, GameState, PlayerId,
+    event::EventHandler, Card, ClientChannel, Dispatcher, FromClient, FromServer, GameState,
+    PlayerId,
 };
 use events::{
     DrawCardEventHandler, PlayerEndTurnEvent, PlayerEndTurnEventHandler, PlayerStartTurnEvent,
     PlayerStartTurnEventHandler, StartGameEvent, StartGameEventHandler,
 };
 use log::info;
+use serde::Serialize;
 
 mod websocket_player;
 
@@ -15,6 +17,11 @@ fn main() {
 
     let player_a_id = PlayerId::new();
     let player_b_id = PlayerId::new();
+
+    let message = FromClient::EndTurn;
+    let text = serde_json::to_string(&message).unwrap();
+
+    info!("EndTurn message: {text:?}");
 
     let (player_a, player_b) = websocket_player::accept_connections();
 
@@ -59,7 +66,8 @@ fn main() {
 
 fn player_take_turn(game_state: &mut GameState, dispatcher: &Dispatcher) {
     let player_turn = game_state.cur_player_turn();
-    let event = PlayerStartTurnEvent::new(player_turn);
+    let next_base_mana = game_state.player_base_mana(player_turn) + 1;
+    let event = PlayerStartTurnEvent::new(player_turn, next_base_mana);
     dispatcher.dispatch(event, game_state);
 
     let message = if player_turn == game_state.player_id_a() {
