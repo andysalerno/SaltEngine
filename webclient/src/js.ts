@@ -1,6 +1,6 @@
 import Alpine from 'alpinejs';
 import { CardDrawnEvent, CardDrawn, isHello, isEvent, PlayerStartTurnEvent, FromClient } from './message';
-import { activateEndTurnBox, addCardToHand, deActivateEndTurnBox, getEndTurnBox, parseJson } from './util';
+import { activateEndTurnBox, addCardToHand, deActivateEndTurnBox, getEndTurnBox, logGameMessage, parseJson, sendMessage } from './util';
 
 type Context = {
     socket: WebSocket | null,
@@ -71,17 +71,6 @@ function setUpEvents() {
     endTurnBox.addEventListener("click", (event) => {
         endMyTurn();
     });
-}
-
-function logGameMessage(message: string) {
-    const rightBox = document.querySelector(".gameEventLog") as HTMLDivElement;
-
-    rightBox.innerHTML += message + "</br>";
-}
-
-function sendMessage(message: string) {
-    logGameMessage("Sending: " + message);
-    context.socket?.send(message);
 }
 
 

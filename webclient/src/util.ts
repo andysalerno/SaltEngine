@@ -32,3 +32,21 @@ export function addCardToHand(card: CardDrawn) {
     const handSlot = myHand?.querySelectorAll<HTMLDivElement>(".hand-slot")[index];
     handSlot?.appendChild(cloned);
 }
+
+export function logGameMessage(message: string) {
+    const rightBox = document.querySelector(".gameEventLog") as HTMLDivElement;
+
+    rightBox.innerHTML += message + "</br>";
+}
+
+export function sendMessage(message: any) {
+    let toSend;
+    if (typeof message === 'string') {
+        toSend = message;
+    } else {
+        toSend = JSON.stringify(message);
+    }
+
+    logGameMessage("Sending: " + toSend);
+    context.socket?.send(toSend);
+}
