@@ -7,7 +7,8 @@ type Context = {
     myId: string | null,
     enemyId: string | null,
     myHand: Array<CardDrawn>,
-    myMana: number
+    myMana: number,
+    isMyTurn: boolean
 };
 
 function addCardToSlot() {
@@ -108,7 +109,9 @@ function handleTurnStart(event: PlayerStartTurnEvent) {
 
 function myTurnStart(event: PlayerStartTurnEvent) {
     logGameMessage("My turn started. Mana: " + event.starting_mana);
-    getContext().myMana = event.starting_mana;
+    const context = getContext();
+    context.myMana = event.starting_mana;
+    context.isMyTurn = true;
 
     activateHand();
     activateEndTurnBox();
@@ -153,7 +156,8 @@ document.addEventListener('alpine:init', () => {
 
         get getIsActive(): boolean {
             // return this.isMarkedActive;
-            return this.boundTo.current_cost <= getContext().myMana;
+            const context = getContext();
+            return this.boundTo.current_cost <= context.myMana && context.isMyTurn;
         },
 
         get getTitleAndMana(): string {
@@ -167,6 +171,7 @@ document.addEventListener('alpine:init', () => {
         enemyId: null,
         myHand: [],
         myMana: 0,
+        isMyTurn: false
     };
     Alpine.store('gameContext', context);
 
