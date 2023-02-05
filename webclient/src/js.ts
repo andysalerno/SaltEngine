@@ -137,6 +137,7 @@ setUpEvents();
 document.addEventListener('alpine:init', () => {
     Alpine.data('cardhand', (cardNum) => ({
         boundTo: getContext().myHand[cardNum as number],
+        isMarkedActive: false,
 
         get getTitle(): string {
             return this.boundTo.title;
@@ -151,6 +152,7 @@ document.addEventListener('alpine:init', () => {
         },
 
         get getIsActive(): boolean {
+            // return this.isMarkedActive;
             return this.boundTo.current_cost <= getContext().myMana;
         },
 

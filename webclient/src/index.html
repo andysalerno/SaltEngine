@@ -16,7 +16,7 @@
         </div>
     </template>
     <template id="card-hand-template">
-        <div x-data="cardhand" class="card-hand">
+        <div x-data="cardhand" class="card-hand" :class="{ 'active': getIsActive }">
             <div x-text="getTitleAndMana" class="card-title"></div>
             <div class="card-body"></div>
             <div class="card-footer">

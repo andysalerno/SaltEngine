@@ -58,8 +58,11 @@ div {
 }
 
 .card-hand.active {
-    background-color: grey;
     border: 2px solid lightgreen;
+}
+
+.card-hand.active:hover {
+    background-color: grey;
 }
 
 .card-hand.active:hover {
