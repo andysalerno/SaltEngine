@@ -6,18 +6,9 @@ type Context = {
     socket: WebSocket | null,
     myId: string | null,
     enemyId: string | null,
-    myHand: Array<CardDrawn>
+    myHand: Array<CardDrawn>,
+    myMana: number
 };
-
-// The global context.
-export const context: Context = {
-    socket: null,
-    myId: null,
-    enemyId: null,
-    myHand: [],
-};
-
-(window as any).Context = context;
 
 function addCardToSlot() {
     const template = document.getElementById("card-board-template") as HTMLTemplateElement;
@@ -51,7 +42,7 @@ function wsConnect() {
         onMessageReceived(parsed);
     };
 
-    context.socket = socket;
+    getContext().socket = socket;
 }
 
 function setUpEvents() {
@@ -79,6 +70,7 @@ function setUpEvents() {
 
 function onMessageReceived(message: any) {
     if (isHello(message)) {
+        const context = getContext();
         context.myId = message.Hello[0].guid;
         context.enemyId = message.Hello[1].guid;
     } else if (isEvent(message, "CardDrawnClientEvent")) {
@@ -98,7 +90,7 @@ function endMyTurn() {
 }
 
 function handleCardDrawn(event: CardDrawnEvent) {
-    if (event.player_id.guid == context.myId) {
+    if (event.player_id.guid == getContext().myId) {
         logGameMessage("I drew a card.");
         addCardToHand(event.card_drawn.Visible);
     } else {
@@ -107,7 +99,7 @@ function handleCardDrawn(event: CardDrawnEvent) {
 }
 
 function handleTurnStart(event: PlayerStartTurnEvent) {
-    if (event.player_id.guid === context.myId) {
+    if (event.player_id.guid === getContext().myId) {
         myTurnStart(event);
     } else {
         enemyTurnStart(event);
@@ -116,6 +108,7 @@ function handleTurnStart(event: PlayerStartTurnEvent) {
 
 function myTurnStart(event: PlayerStartTurnEvent) {
     logGameMessage("My turn started. Mana: " + event.starting_mana);
+    getContext().myMana = event.starting_mana;
     activateHand();
     activateEndTurnBox();
 }
@@ -124,7 +117,15 @@ function enemyTurnStart(event: PlayerStartTurnEvent) {
     logGameMessage("Enemy turn started. Mana: " + event.starting_mana);
 }
 
-function activateHand() { }
+function activateHand() {
+    const context = getContext();
+    for (let handCard of context.myHand) {
+        if (handCard.current_cost <= context.myMana) {
+            // The player can play this card, so add a visual queue.
+
+        }
+    }
+}
 
 addCardToSlot();
 
@@ -132,23 +133,30 @@ removeCardFromSlot();
 
 setUpEvents();
 
-wsConnect();
-
 document.addEventListener('alpine:init', () => {
     Alpine.data('cardhand', (cardNum) => ({
-        title: 'some title',
-        attack: cardNum,
-        cardNum: cardNum,
-        health: 5,
+        boundTo: context.myHand[cardNum as number],
 
         get getTitle(): string {
-            const card = context.myHand[this.cardNum as number];
-            return card.title;
+            return this.boundTo.title;
+        },
+
+        get getAttack(): number {
+            return this.boundTo.current_attack;
+        },
+
+        get getHealth(): number {
+            return this.boundTo.current_health;
+        },
+
+        get getIsActive(): boolean {
+
+            // ... But context can update and won't trigger this callback... it's not bound... I don't think...
+            return this.boundTo.current_cost <= context.myMana;
         },
 
         get getTitleAndMana(): string {
-            const card = context.myHand[this.cardNum as number];
-            return card.title + " " + card.current_cost;
+            return this.boundTo.title + " " + this.boundTo.current_cost;
         }
     }));
 
@@ -160,6 +168,23 @@ document.addEventListener('alpine:init', () => {
     Alpine.store('myhand', () => ({
         hand: context.myHand
     }));
+
+    const context: Context = {
+        socket: null,
+        myId: null,
+        enemyId: null,
+        myHand: [],
+        myMana: 0,
+    };
+    Alpine.store('gameContext', context);
+
+    (window as any).AlpineContext = Alpine.store('gameContext');
+
+    wsConnect();
 });
+
+export function getContext(): Context {
+    return Alpine.store('gameContext') as Context;
+}
 
 Alpine.start();
