@@ -69,10 +69,13 @@ function setUpEvents() {
 
     const endTurnBox = getEndTurnBox();
     endTurnBox.addEventListener("click", (event) => {
-        endMyTurn();
+        if (event.target instanceof HTMLDivElement) {
+            if (event.target.classList.contains("active")) {
+                endMyTurn();
+            }
+        }
     });
 }
-
 
 function onMessageReceived(message: any) {
     if (isHello(message)) {
