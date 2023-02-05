@@ -1,6 +1,6 @@
 import Alpine from 'alpinejs';
 import { CardDrawnEvent, CardDrawn, isHello, isEvent, PlayerStartTurnEvent, FromClient } from './message';
-import { activateEndTurnBox, deActivateEndTurnBox, getEndTurnBox } from './util';
+import { activateEndTurnBox, addCardToHand, deActivateEndTurnBox, getEndTurnBox, parseJson } from './util';
 
 type Context = {
     socket: WebSocket | null,
@@ -10,7 +10,7 @@ type Context = {
 };
 
 // The global context.
-const context: Context = {
+export const context: Context = {
     socket: null,
     myId: null,
     enemyId: null,
@@ -84,9 +84,6 @@ function sendMessage(message: string) {
     context.socket?.send(message);
 }
 
-function parseJson<T>(json: any): T {
-    return JSON.parse(json) as T;
-}
 
 function onMessageReceived(message: any) {
     if (isHello(message)) {
@@ -111,16 +108,7 @@ function endMyTurn() {
 function handleCardDrawn(event: CardDrawnEvent) {
     if (event.player_id.guid == context.myId) {
         logGameMessage("I drew a card.");
-        const cardsCount = context.myHand.push(event.card_drawn.Visible);
-        const index = cardsCount - 1;
-
-        const template = document.getElementById("card-hand-template") as HTMLTemplateElement;
-        const cloned = template.content.cloneNode(true) as DocumentFragment;
-        cloned.firstElementChild?.setAttribute("x-data", `cardhand(${index})`);
-
-        const myHand = document.querySelector<HTMLDivElement>(".my-hand");
-        const handSlot = myHand?.querySelectorAll<HTMLDivElement>(".hand-slot")[index];
-        handSlot?.appendChild(cloned);
+        addCardToHand(event.card_drawn.Visible);
     } else {
         logGameMessage("Enemy drew a card.");
     }
@@ -164,10 +152,6 @@ document.addEventListener('alpine:init', () => {
         get getTitle(): string {
             const card = context.myHand[this.cardNum as number];
             return card.title;
-        },
-
-        get getMana(): string {
-            return "3";
         },
 
         get getTitleAndMana(): string {

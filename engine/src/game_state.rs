@@ -140,6 +140,17 @@ impl GameState {
         }
     }
 
+    pub fn add_player_base_mana(&mut self, player_id: PlayerId, gain_count: i32) -> i32 {
+        let mana: &mut i32 = match self.player(player_id) {
+            Player::PlayerA => &mut self.base_mana_a,
+            Player::PlayerB => &mut self.base_mana_b,
+        };
+
+        *mana += gain_count;
+
+        *mana
+    }
+
     #[must_use]
     pub fn player_health(&self, player_id: PlayerId) -> i32 {
         match self.player(player_id) {

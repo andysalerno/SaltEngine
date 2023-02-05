@@ -5,6 +5,8 @@ use engine::{
 use log::info;
 use serde::{Deserialize, Serialize};
 
+use crate::gain_mana_event::GainManaEvent;
+
 const HANDLER_NAME: &str = "PlayerStartTurnEvent";
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -51,11 +53,15 @@ impl EventHandler for PlayerStartTurnEventHandler {
         EventType::new(HANDLER_NAME)
     }
 
-    fn handle(&self, event: &EventMessage, _game_state: &mut GameState, dispatcher: &Dispatcher) {
+    fn handle(&self, event: &EventMessage, game_state: &mut GameState, dispatcher: &Dispatcher) {
         let event: PlayerStartTurnEvent = event.unpack();
         let player_id = event.player_id();
         info!("Player turn start: {player_id:?}");
 
+        // Increment player's mana before starting turn.
+        dispatcher.dispatch(GainManaEvent::new(player_id, 1), game_state);
+
+        // Dispatch turn start message to clients.
         dispatcher
             .player_a_channel()
             .send(FromServer::Event(event.clone().into()));
