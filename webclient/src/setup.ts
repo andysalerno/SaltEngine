@@ -14,8 +14,6 @@ export function setUpSlots() {
             // At this point we know the div/slot we are dropping on.
             event.preventDefault();
 
-            // Now drop it on the correct slot
-
             const target = event.target as HTMLElement;
             const slotNumAttr = target.getAttribute("slotNum");
 

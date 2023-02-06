@@ -35,20 +35,152 @@
                 opponent hand
             </div>
             <div class="board-row op-side-1">
-                <div class="card-slot"></div>
-                <div class="card-slot"></div>
-                <div class="card-slot"></div>
-                <div class="card-slot"></div>
-                <div class="card-slot"></div>
-                <div class="card-slot"></div>
+                <div x-data="enemyBoardSlot(0)" slotNum="0" class="card-slot" :class="{ 'active': getIsActive }">
+                    <template x-if="boundTo.occupant !== undefined">
+                        <div class="card-board">
+                            <div x-text="boundTo.occupant.title" class="card-title"></div>
+                            <div x-text="boundTo.occupant.title" class="card-body"></div>
+                            <div class="card-footer">
+                                <div x-text="boundTo.occupant.current_attack" class="attack-val"></div>
+                                <div x-text="boundTo.occupant.current_health" class="hp-val"></div>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+                <div x-data="enemyBoardSlot(1)" slotNum="0" class="card-slot" :class="{ 'active': getIsActive }">
+                    <template x-if="boundTo.occupant !== undefined">
+                        <div class="card-board">
+                            <div x-text="boundTo.occupant.title" class="card-title"></div>
+                            <div x-text="boundTo.occupant.title" class="card-body"></div>
+                            <div class="card-footer">
+                                <div x-text="boundTo.occupant.current_attack" class="attack-val"></div>
+                                <div x-text="boundTo.occupant.current_health" class="hp-val"></div>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+                <div x-data="enemyBoardSlot(2)" slotNum="0" class="card-slot" :class="{ 'active': getIsActive }">
+                    <template x-if="boundTo.occupant !== undefined">
+                        <div class="card-board">
+                            <div x-text="boundTo.occupant.title" class="card-title"></div>
+                            <div x-text="boundTo.occupant.title" class="card-body"></div>
+                            <div class="card-footer">
+                                <div x-text="boundTo.occupant.current_attack" class="attack-val"></div>
+                                <div x-text="boundTo.occupant.current_health" class="hp-val"></div>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+                <div x-data="enemyBoardSlot(3)" slotNum="0" class="card-slot" :class="{ 'active': getIsActive }">
+                    <template x-if="boundTo.occupant !== undefined">
+                        <div class="card-board">
+                            <div x-text="boundTo.occupant.title" class="card-title"></div>
+                            <div x-text="boundTo.occupant.title" class="card-body"></div>
+                            <div class="card-footer">
+                                <div x-text="boundTo.occupant.current_attack" class="attack-val"></div>
+                                <div x-text="boundTo.occupant.current_health" class="hp-val"></div>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+                <div x-data="enemyBoardSlot(4)" slotNum="0" class="card-slot" :class="{ 'active': getIsActive }">
+                    <template x-if="boundTo.occupant !== undefined">
+                        <div class="card-board">
+                            <div x-text="boundTo.occupant.title" class="card-title"></div>
+                            <div x-text="boundTo.occupant.title" class="card-body"></div>
+                            <div class="card-footer">
+                                <div x-text="boundTo.occupant.current_attack" class="attack-val"></div>
+                                <div x-text="boundTo.occupant.current_health" class="hp-val"></div>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+                <div x-data="enemyBoardSlot(5)" slotNum="0" class="card-slot" :class="{ 'active': getIsActive }">
+                    <template x-if="boundTo.occupant !== undefined">
+                        <div class="card-board">
+                            <div x-text="boundTo.occupant.title" class="card-title"></div>
+                            <div x-text="boundTo.occupant.title" class="card-body"></div>
+                            <div class="card-footer">
+                                <div x-text="boundTo.occupant.current_attack" class="attack-val"></div>
+                                <div x-text="boundTo.occupant.current_health" class="hp-val"></div>
+                            </div>
+                        </div>
+                    </template>
+                </div>
             </div>
             <div class="board-row op-side-2">
-                <div class="card-slot"></div>
-                <div class="card-slot"></div>
-                <div class="card-slot"></div>
-                <div class="card-slot"></div>
-                <div class="card-slot"></div>
-                <div class="card-slot"></div>
+                <div x-data="enemyBoardSlot(6)" slotNum="0" class="card-slot" :class="{ 'active': getIsActive }">
+                    <template x-if="boundTo.occupant !== undefined">
+                        <div class="card-board">
+                            <div x-text="boundTo.occupant.title" class="card-title"></div>
+                            <div x-text="boundTo.occupant.title" class="card-body"></div>
+                            <div class="card-footer">
+                                <div x-text="boundTo.occupant.current_attack" class="attack-val"></div>
+                                <div x-text="boundTo.occupant.current_health" class="hp-val"></div>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+                <div x-data="enemyBoardSlot(7)" slotNum="0" class="card-slot" :class="{ 'active': getIsActive }">
+                    <template x-if="boundTo.occupant !== undefined">
+                        <div class="card-board">
+                            <div x-text="boundTo.occupant.title" class="card-title"></div>
+                            <div x-text="boundTo.occupant.title" class="card-body"></div>
+                            <div class="card-footer">
+                                <div x-text="boundTo.occupant.current_attack" class="attack-val"></div>
+                                <div x-text="boundTo.occupant.current_health" class="hp-val"></div>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+                <div x-data="enemyBoardSlot(8)" slotNum="0" class="card-slot" :class="{ 'active': getIsActive }">
+                    <template x-if="boundTo.occupant !== undefined">
+                        <div class="card-board">
+                            <div x-text="boundTo.occupant.title" class="card-title"></div>
+                            <div x-text="boundTo.occupant.title" class="card-body"></div>
+                            <div class="card-footer">
+                                <div x-text="boundTo.occupant.current_attack" class="attack-val"></div>
+                                <div x-text="boundTo.occupant.current_health" class="hp-val"></div>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+                <div x-data="enemyBoardSlot(9)" slotNum="0" class="card-slot" :class="{ 'active': getIsActive }">
+                    <template x-if="boundTo.occupant !== undefined">
+                        <div class="card-board">
+                            <div x-text="boundTo.occupant.title" class="card-title"></div>
+                            <div x-text="boundTo.occupant.title" class="card-body"></div>
+                            <div class="card-footer">
+                                <div x-text="boundTo.occupant.current_attack" class="attack-val"></div>
+                                <div x-text="boundTo.occupant.current_health" class="hp-val"></div>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+                <div x-data="enemyBoardSlot(10)" slotNum="0" class="card-slot" :class="{ 'active': getIsActive }">
+                    <template x-if="boundTo.occupant !== undefined">
+                        <div class="card-board">
+                            <div x-text="boundTo.occupant.title" class="card-title"></div>
+                            <div x-text="boundTo.occupant.title" class="card-body"></div>
+                            <div class="card-footer">
+                                <div x-text="boundTo.occupant.current_attack" class="attack-val"></div>
+                                <div x-text="boundTo.occupant.current_health" class="hp-val"></div>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+                <div x-data="enemyBoardSlot(11)" slotNum="0" class="card-slot" :class="{ 'active': getIsActive }">
+                    <template x-if="boundTo.occupant !== undefined">
+                        <div class="card-board">
+                            <div x-text="boundTo.occupant.title" class="card-title"></div>
+                            <div x-text="boundTo.occupant.title" class="card-body"></div>
+                            <div class="card-footer">
+                                <div x-text="boundTo.occupant.current_attack" class="attack-val"></div>
+                                <div x-text="boundTo.occupant.current_health" class="hp-val"></div>
+                            </div>
+                        </div>
+                    </template>
+                </div>
             </div>
             <div class="board-row my-side">
                 <div x-data="boardSlot(6)" slotNum="6" class="card-slot" :class="{ 'active': getIsActive }">

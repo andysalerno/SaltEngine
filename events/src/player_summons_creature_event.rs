@@ -47,7 +47,31 @@ mod event {
     }
 }
 
+mod client_event {
+    use engine::{
+        event::{Event, EventType},
+        CardDefinition, CardId, GamePos, PlayerId,
+    };
+    use serde::{Deserialize, Serialize};
+
+    #[derive(Clone, Serialize, Deserialize, Debug)]
+    pub struct PlayerSummonsCreatureClientEvent {
+        pub player_id: PlayerId,
+        pub card_id: CardId,
+        pub target_pos: GamePos,
+        pub definition: CardDefinition,
+    }
+
+    impl Event for PlayerSummonsCreatureClientEvent {
+        fn event_type() -> EventType {
+            EventType::new("PlayerSummonsCreatureClientEvent")
+        }
+    }
+}
+
 mod handler {
+    use crate::player_summons_creature_event::client_event::PlayerSummonsCreatureClientEvent;
+
     use super::{PlayerSummonsCreatureEvent, HANDLER_NAME};
     use engine::{
         event::{EventHandler, EventMessage, EventType},
@@ -81,26 +105,43 @@ mod handler {
             dispatcher: &Dispatcher,
         ) {
             let unpacked: PlayerSummonsCreatureEvent = event.unpack();
+            let player_id = unpacked.player_id();
             let card_id = unpacked.card_id();
             let pos = unpacked.target_pos();
 
             let card = game_state
-                .hand_mut(unpacked.player_id())
+                .hand_mut(player_id)
                 .take_card(card_id)
                 .expect("Attempt to summon card, but ID did not match card in hand.");
 
             info!("Card taken from player's hand: {card_id:?}");
 
+            let definition = card.definition().clone();
+
             game_state.set_card_at_pos(pos, card);
 
             info!("Card placed on board at position: {pos:?}");
 
+            let client_event = PlayerSummonsCreatureClientEvent {
+                player_id,
+                card_id,
+                target_pos: pos,
+                definition,
+            };
+
             dispatcher
                 .player_a_channel()
-                .send(FromServer::Event(event.clone()));
+                .send(FromServer::Event(client_event.clone().into()));
             dispatcher
                 .player_b_channel()
-                .send(FromServer::Event(event.clone()));
+                .send(FromServer::Event(client_event.into()));
+
+            // dispatcher
+            //     .player_a_channel()
+            //     .send(FromServer::Event(event.clone()));
+            // dispatcher
+            //     .player_b_channel()
+            //     .send(FromServer::Event(event.clone()));
         }
     }
 }

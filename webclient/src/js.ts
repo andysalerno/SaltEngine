@@ -1,6 +1,6 @@
 import Alpine from 'alpinejs';
 import { BoardSlot } from './boardslot';
-import { CardDrawnEvent, CardDrawn, isHello, isEvent, PlayerStartTurnEvent, FromClient } from './message';
+import { CardDrawnEvent, CardDrawn, isHello, isEvent, PlayerStartTurnEvent, FromClient, PlayerSummonsCreatureClientEvent } from './message';
 import { setUpEndTurnButton, setUpExtraZone, setUpSlots } from './setup';
 import { activateEndTurnBox, addCardToHand, deActivateEndTurnBox, getEndTurnBox, logGameMessage, parseJson, sendMessage } from './util';
 
@@ -12,6 +12,7 @@ type Context = {
     myMana: number,
     isMyTurn: boolean,
     myBoardSide: Array<BoardSlot>,
+    enemyBoardSide: Array<BoardSlot>,
 
     draggingCard: CardDrawn | undefined
 };
@@ -54,6 +55,10 @@ function onMessageReceived(message: any) {
         const body = parseJson<PlayerStartTurnEvent>(message.Event.body);
         handleTurnStart(body);
     }
+    else if (isEvent(message, "PlayerSummonsCreatureClientEvent")) {
+        const body = parseJson<PlayerSummonsCreatureClientEvent>(message.Event.body);
+        handlePlayerSummonsCreature(body);
+    }
 }
 
 function handleCardDrawn(event: CardDrawnEvent) {
@@ -70,6 +75,12 @@ function handleTurnStart(event: PlayerStartTurnEvent) {
         myTurnStart(event);
     } else {
         enemyTurnStart(event);
+    }
+}
+
+function handlePlayerSummonsCreature(event: PlayerSummonsCreatureClientEvent) {
+    if (event.player_id.player_id.guid == getContext().enemyId) {
+
     }
 }
 
@@ -135,17 +146,35 @@ document.addEventListener('alpine:init', () => {
         myMana: 0,
         isMyTurn: false,
         myBoardSide: [],
+        enemyBoardSide: [],
         draggingCard: undefined
     };
 
     for (let i = 0; i < 12; i++) {
         context.myBoardSide.push(new BoardSlot(i));
+        context.enemyBoardSide.push(new BoardSlot(i));
     }
 
     Alpine.store('gameContext', context);
 
     Alpine.store('myhand', () => ({
         hand: context.myHand
+    }));
+
+    Alpine.data('enemyBoardSlot', (slotNum) => ({
+        boundTo: context.enemyBoardSide[slotNum as number],
+
+        get getSlotNum(): number {
+            return this.boundTo.getSlotNum();
+        },
+
+        get title(): string {
+            return this.boundTo.occupant.title;
+        },
+
+        get getIsActive(): boolean {
+            return false;
+        }
     }));
 
     Alpine.data('boardSlot', (slotNum) => ({
