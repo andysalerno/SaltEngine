@@ -31,9 +31,7 @@ div {
 
 .op-side-2 {}
 
-.my-side-1 {}
-
-.my-side-2 {}
+.my-side {}
 
 .board-row {
     display: grid;

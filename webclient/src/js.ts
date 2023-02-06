@@ -1,6 +1,7 @@
 import Alpine from 'alpinejs';
 import { BoardSlot } from './boardslot';
 import { CardDrawnEvent, CardDrawn, isHello, isEvent, PlayerStartTurnEvent, FromClient } from './message';
+import { setUpEndTurnButton, setUpExtraZone, setUpSlots } from './setup';
 import { activateEndTurnBox, addCardToHand, deActivateEndTurnBox, getEndTurnBox, logGameMessage, parseJson, sendMessage } from './util';
 
 type Context = {
@@ -19,7 +20,7 @@ function addCardToSlot() {
     const template = document.getElementById("card-board-template") as HTMLTemplateElement;
     const cloned = template.content.cloneNode(true);
 
-    const slot = document.querySelectorAll(".board-row.my-side-2 > .card-slot")[2];
+    const slot = document.querySelectorAll(".board-row.my-side > .card-slot")[2];
 
     slot.appendChild(cloned);
 }
@@ -45,26 +46,9 @@ function wsConnect() {
 }
 
 function setUpEvents() {
-    const textBox = document.querySelector(".extra-zone") as HTMLDivElement;
-
-    textBox.addEventListener("click", (event) => {
-        const target = event?.target as HTMLDivElement;
-        if (target.style.overflow === "visible") {
-            target.style.overflow = "hidden";
-        } else {
-            target.style.overflow = "visible";
-        }
-
-    });
-
-    const endTurnBox = getEndTurnBox();
-    endTurnBox.addEventListener("click", (event) => {
-        if (event.target instanceof HTMLDivElement) {
-            if (event.target.classList.contains("active")) {
-                endMyTurn();
-            }
-        }
-    });
+    setUpExtraZone();
+    setUpSlots();
+    setUpEndTurnButton();
 }
 
 function onMessageReceived(message: any) {
@@ -79,14 +63,6 @@ function onMessageReceived(message: any) {
         const body = parseJson<PlayerStartTurnEvent>(message.Event.body);
         handleTurnStart(body);
     }
-}
-
-function endMyTurn() {
-    getContext().isMyTurn = false;
-    const message = JSON.stringify(FromClient.EndTurn);
-    sendMessage(message);
-
-    deActivateEndTurnBox();
 }
 
 function handleCardDrawn(event: CardDrawnEvent) {
@@ -189,6 +165,10 @@ document.addEventListener('alpine:init', () => {
 
         get getSlotNum(): number {
             return this.boundTo.getSlotNum();
+        },
+
+        get title(): string {
+            return this.boundTo.occupant.title;
         },
 
         get getIsActive(): boolean {
