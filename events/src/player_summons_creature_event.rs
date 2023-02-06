@@ -135,13 +135,6 @@ mod handler {
             dispatcher
                 .player_b_channel()
                 .send(FromServer::Event(client_event.into()));
-
-            // dispatcher
-            //     .player_a_channel()
-            //     .send(FromServer::Event(event.clone()));
-            // dispatcher
-            //     .player_b_channel()
-            //     .send(FromServer::Event(event.clone()));
         }
     }
 }

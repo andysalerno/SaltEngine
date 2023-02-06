@@ -18,14 +18,6 @@ fn main() {
     let player_a_id = PlayerId::new();
     let player_b_id = PlayerId::new();
 
-    // let example = FromClient::SummonFromHand {
-    //     card_id: CardId::new(),
-    //     target_pos: GamePos::SlotIndex(7),
-    // };
-
-    // let s = serde_json::to_string(&example);
-    // info!("Example: {s:?}");
-
     let (player_a, player_b) = websocket_player::accept_connections();
 
     let player_a_channel = ClientChannel::new(player_a_id, Box::new(player_a));
@@ -75,30 +67,35 @@ fn player_take_turn(game_state: &mut GameState, dispatcher: &Dispatcher) {
     let event = PlayerStartTurnEvent::new(player_turn, next_base_mana);
     dispatcher.dispatch(event, game_state);
 
-    let message = if player_turn == game_state.player_id_a() {
-        dispatcher.player_a_channel().try_receive()
-    } else if player_turn == game_state.player_id_b() {
-        dispatcher.player_b_channel().try_receive()
-    } else {
-        panic!("Unknown player id.")
-    };
+    // Loop while player takes actions - break when they end the turn or quit.
+    loop {
+        let message = if player_turn == game_state.player_id_a() {
+            dispatcher.player_a_channel().try_receive()
+        } else if player_turn == game_state.player_id_b() {
+            dispatcher.player_b_channel().try_receive()
+        } else {
+            panic!("Unknown player id.")
+        };
 
-    info!("Received message: {message:?}");
+        info!("Received message: {message:?}");
 
-    let message = message.unwrap();
+        let message = message.unwrap();
 
-    match message {
-        engine::FromClient::EndTurn => {
-            let event = PlayerEndTurnEvent::new(player_turn);
-            dispatcher.dispatch(event, game_state);
-        }
-        engine::FromClient::SummonFromHand {
-            card_id,
-            target_pos,
-        } => {
-            let event = PlayerSummonsCreatureEvent::new(player_turn, card_id, target_pos);
+        match message {
+            engine::FromClient::EndTurn => {
+                let event = PlayerEndTurnEvent::new(player_turn);
+                dispatcher.dispatch(event, game_state);
 
-            dispatcher.dispatch(event, game_state);
+                return;
+            }
+            engine::FromClient::SummonFromHand {
+                card_id,
+                target_pos,
+            } => {
+                let event = PlayerSummonsCreatureEvent::new(player_turn, card_id, target_pos);
+
+                dispatcher.dispatch(event, game_state);
+            }
         }
     }
 }
