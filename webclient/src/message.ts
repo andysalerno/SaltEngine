@@ -1,4 +1,6 @@
 // {"Event":{"kind":"CardDrawnClientEvent","body":"{\"player_id\":{\"guid\":\"1f4edd7a-3b84-49be-ac0b-9e7d726b286f\"},\"card_drawn\":{\"Visible\":{\"id\":{\"id\":\"89d8c455-2e42-4b22-a483-64265c65f9a9\"},\"definition\":{\"title\":\"Sleeping Dog\",\"cost\":1,\"attack\":0,\"health\":3},\"title\":\"Sleeping Dog\",\"current_cost\":1,\"current_attack\":0,\"current_health\":3}}}"}}
+// {"SummonFromHand":{"card_id":{"id":"a2b34d4a-fcce-4b4a-8500-e49b771b2af0"},"target_pos":{"SlotIndex":7}}}
+// "Event":{"kind":"PlayerSummonsCreatureEvent","body":"{\"player_id\":{\"guid\":\"113e9d90-d1e3-4c0b-b47c-1370c63d29e7\"},\"card_id\":{\"id\":\"71bc93a8-5899-4790-8d53-22891036a1d6\"},\"target_pos\":{\"SlotIndex\":1}}"}
 
 export interface Id {
     guid: string;
@@ -15,7 +17,20 @@ export interface PlayerStartTurnEvent {
 }
 
 export enum FromClient {
-    EndTurn = "EndTurn"
+    EndTurn = "EndTurn",
+}
+
+export type CardId = {
+    id: string
+}
+
+export type GamePos = {
+    SlotIndex: number
+}
+
+export type SummonFromHand = {
+    card_id: CardId,
+    target_pos: GamePos
 }
 
 export interface CardDrawn {
@@ -24,7 +39,7 @@ export interface CardDrawn {
     current_cost: number;
     current_health: number;
     definition: any;
-    id: { id: string };
+    id: CardId;
 }
 
 export interface Event<TEvent> {

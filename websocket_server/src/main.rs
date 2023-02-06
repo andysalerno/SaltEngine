@@ -1,10 +1,12 @@
 use cards::SleepingDog;
 use engine::{
-    event::EventHandler, Card, ClientChannel, Dispatcher, FromServer, GameState, PlayerId,
+    event::EventHandler, Card, CardId, ClientChannel, Dispatcher, FromClient, FromServer, GamePos,
+    GameState, PlayerId,
 };
 use events::{
     DrawCardEventHandler, GainManaEventHandler, PlayerEndTurnEvent, PlayerEndTurnEventHandler,
-    PlayerStartTurnEvent, PlayerStartTurnEventHandler, StartGameEvent, StartGameEventHandler,
+    PlayerStartTurnEvent, PlayerStartTurnEventHandler, PlayerSummonsCreatureEvent,
+    PlayerSummonsCreatureEventHandler, StartGameEvent, StartGameEventHandler,
 };
 use log::info;
 
@@ -15,6 +17,14 @@ fn main() {
 
     let player_a_id = PlayerId::new();
     let player_b_id = PlayerId::new();
+
+    // let example = FromClient::SummonFromHand {
+    //     card_id: CardId::new(),
+    //     target_pos: GamePos::SlotIndex(7),
+    // };
+
+    // let s = serde_json::to_string(&example);
+    // info!("Example: {s:?}");
 
     let (player_a, player_b) = websocket_player::accept_connections();
 
@@ -32,6 +42,7 @@ fn main() {
             Box::new(PlayerStartTurnEventHandler::new()),
             Box::new(PlayerEndTurnEventHandler::new()),
             Box::new(GainManaEventHandler::new()),
+            Box::new(PlayerSummonsCreatureEventHandler::new()),
         ];
         Dispatcher::new(handlers, player_a_channel, player_b_channel)
     };
@@ -79,6 +90,14 @@ fn player_take_turn(game_state: &mut GameState, dispatcher: &Dispatcher) {
     match message {
         engine::FromClient::EndTurn => {
             let event = PlayerEndTurnEvent::new(player_turn);
+            dispatcher.dispatch(event, game_state);
+        }
+        engine::FromClient::SummonFromHand {
+            card_id,
+            target_pos,
+        } => {
+            let event = PlayerSummonsCreatureEvent::new(player_turn, card_id, target_pos);
+
             dispatcher.dispatch(event, game_state);
         }
     }

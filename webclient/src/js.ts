@@ -160,7 +160,9 @@ document.addEventListener('alpine:init', () => {
         },
 
         get getIsActive(): boolean {
-            return getContext().draggingCard !== undefined;
+            const context = getContext();
+            return context.draggingCard !== undefined
+                && this.boundTo.occupant === undefined;
         }
     }));
 

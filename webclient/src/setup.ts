@@ -1,5 +1,5 @@
 import { getContext } from "./js";
-import { endMyTurn, getEndTurnBox, setCardOnBoardSlot } from "./util";
+import { endMyTurn, getEndTurnBox, sendSummonFromHandRequest, setCardOnBoardSlot } from "./util";
 
 export function setUpSlots() {
     // Set drag/drop logic for card slots
@@ -23,6 +23,10 @@ export function setUpSlots() {
                 const slotNum = parseInt(slotNumAttr);
                 const draggingCard = getContext().draggingCard;
                 if (draggingCard !== undefined) {
+                    // Send the message to server
+                    sendSummonFromHandRequest(draggingCard.id, slotNum);
+
+                    // Update visual local state
                     setCardOnBoardSlot(draggingCard, slotNum);
                 }
             }

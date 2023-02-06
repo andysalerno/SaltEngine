@@ -1,5 +1,5 @@
 import { getContext } from "./js";
-import { CardDrawn, FromClient } from "./message";
+import { CardDrawn, CardId, FromClient, SummonFromHand } from "./message";
 
 export function getEndTurnBox(): HTMLDivElement {
     return document.querySelector(".endTurnButton") as HTMLDivElement;
@@ -63,6 +63,18 @@ export function endMyTurn() {
     sendMessage(message);
 
     deActivateEndTurnBox();
+}
+
+export function sendSummonFromHandRequest(card_id: CardId, slotNum: number) {
+
+    const summonFromHand: SummonFromHand = {
+        card_id: card_id,
+        target_pos: {
+            SlotIndex: slotNum
+        }
+    };
+
+    sendMessage({ SummonFromHand: summonFromHand });
 }
 
 export function sendMessage(message: any) {

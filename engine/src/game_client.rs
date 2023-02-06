@@ -1,9 +1,13 @@
-use crate::{event::EventMessage, PlayerId};
+use crate::{event::EventMessage, CardId, GamePos, PlayerId};
 use serde::{de::DeserializeOwned, Deserialize, Serialize};
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub enum FromClient {
     EndTurn,
+    SummonFromHand {
+        card_id: CardId,
+        target_pos: GamePos,
+    },
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
