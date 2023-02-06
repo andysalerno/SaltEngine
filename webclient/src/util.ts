@@ -31,10 +31,12 @@ export function addCardToHand(card: CardDrawn) {
     // Attach drag listeners
     child?.addEventListener('dragstart', () => {
         getContext().isDraggingCard = true;
+        getContext().draggingCard = card;
 
     });
     child?.addEventListener('dragend', () => {
         getContext().isDraggingCard = false;
+        getContext().draggingCard = undefined;
     });
 
     const myHand = document.querySelector<HTMLDivElement>(".my-hand");

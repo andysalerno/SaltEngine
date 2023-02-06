@@ -1,3 +1,4 @@
+import { getContext } from "./js";
 import { endMyTurn, getEndTurnBox, setCardOnBoardSlot } from "./util";
 
 export function setUpSlots() {
@@ -13,16 +14,18 @@ export function setUpSlots() {
             // At this point we know the div/slot we are dropping on.
             event.preventDefault();
 
-            const dummyCard = {
-                title: "dummytitle",
-                current_attack: 1,
-                current_cost: 2,
-                current_health: 3,
-                definition: undefined,
-                id: { id: "myid" },
-            };
+            // Now drop it on the correct slot
 
-            setCardOnBoardSlot(dummyCard, 0);
+            const target = event.target as HTMLElement;
+            const slotNumAttr = target.getAttribute("slotNum");
+
+            if (slotNumAttr !== null) {
+                const slotNum = parseInt(slotNumAttr);
+                const draggingCard = getContext().draggingCard;
+                if (draggingCard !== undefined) {
+                    setCardOnBoardSlot(draggingCard, slotNum);
+                }
+            }
         });
     }
 }

@@ -13,17 +13,9 @@ type Context = {
     isMyTurn: boolean,
     myBoardSide: Array<BoardSlot>,
 
-    isDraggingCard: boolean
+    isDraggingCard: boolean,
+    draggingCard: CardDrawn | undefined
 };
-
-function addCardToSlot() {
-    const template = document.getElementById("card-board-template") as HTMLTemplateElement;
-    const cloned = template.content.cloneNode(true);
-
-    const slot = document.querySelectorAll(".board-row.my-side > .card-slot")[2];
-
-    slot.appendChild(cloned);
-}
 
 function wsConnect() {
     const socket = new WebSocket("ws://127.0.0.1:9001");
@@ -106,8 +98,6 @@ function activateHand() {
     }
 }
 
-addCardToSlot();
-
 setUpEvents();
 
 document.addEventListener('alpine:init', () => {
@@ -138,7 +128,6 @@ document.addEventListener('alpine:init', () => {
         }
     }));
 
-
     const context: Context = {
         socket: null,
         myId: null,
@@ -147,7 +136,8 @@ document.addEventListener('alpine:init', () => {
         myMana: 0,
         isMyTurn: false,
         myBoardSide: [],
-        isDraggingCard: false
+        isDraggingCard: false,
+        draggingCard: undefined
     };
 
     for (let i = 0; i < 12; i++) {
@@ -172,7 +162,8 @@ document.addEventListener('alpine:init', () => {
         },
 
         get getIsActive(): boolean {
-            return getContext().isDraggingCard;
+            // return getContext().isDraggingCard;
+            return getContext().draggingCard !== undefined;
         }
     }));
 
