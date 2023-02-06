@@ -13,7 +13,6 @@ type Context = {
     isMyTurn: boolean,
     myBoardSide: Array<BoardSlot>,
 
-    isDraggingCard: boolean,
     draggingCard: CardDrawn | undefined
 };
 
@@ -136,7 +135,6 @@ document.addEventListener('alpine:init', () => {
         myMana: 0,
         isMyTurn: false,
         myBoardSide: [],
-        isDraggingCard: false,
         draggingCard: undefined
     };
 
@@ -162,7 +160,6 @@ document.addEventListener('alpine:init', () => {
         },
 
         get getIsActive(): boolean {
-            // return getContext().isDraggingCard;
             return getContext().draggingCard !== undefined;
         }
     }));
