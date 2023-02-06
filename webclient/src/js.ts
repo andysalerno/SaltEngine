@@ -1,8 +1,8 @@
 import Alpine from 'alpinejs';
 import { BoardSlot } from './boardslot';
-import { CardDrawnEvent, CardDrawn, isHello, isEvent, PlayerStartTurnEvent, FromClient, PlayerSummonsCreatureClientEvent } from './message';
+import { CardDrawnEvent, CardDrawn, isHello, isEvent, PlayerStartTurnEvent, FromClient, PlayerSummonsCreatureClientEvent, CardOnBoard } from './message';
 import { setUpEndTurnButton, setUpExtraZone, setUpSlots } from './setup';
-import { activateEndTurnBox, addCardToHand, deActivateEndTurnBox, getEndTurnBox, logGameMessage, parseJson, sendMessage } from './util';
+import { activateEndTurnBox, addCardToHand, deActivateEndTurnBox, getEndTurnBox, logGameMessage, parseJson, sendMessage, setCardOnEnemyBoardSlot } from './util';
 
 type Context = {
     socket: WebSocket | null,
@@ -79,8 +79,21 @@ function handleTurnStart(event: PlayerStartTurnEvent) {
 }
 
 function handlePlayerSummonsCreature(event: PlayerSummonsCreatureClientEvent) {
-    if (event.player_id.player_id.guid == getContext().enemyId) {
+    if (event.player_id.guid == getContext().enemyId) {
+        logGameMessage(`Enemy summoned: ${event.definition.title}`);
 
+        const definition = event.definition;
+
+        let cardOnBoard: CardOnBoard = {
+            title: definition.title,
+            current_attack: definition.attack,
+            current_cost: definition.cost,
+            current_health: definition.health,
+            definition: definition,
+            id: event.card_id,
+        };
+
+        setCardOnEnemyBoardSlot(cardOnBoard, event.target_pos.SlotIndex);
     }
 }
 

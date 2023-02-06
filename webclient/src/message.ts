@@ -50,12 +50,21 @@ export interface CardDrawn {
     current_attack: number;
     current_cost: number;
     current_health: number;
-    definition: any;
+    definition: CardDefinition;
+    id: CardId;
+}
+
+export type CardOnBoard = {
+    title: string;
+    current_attack: number;
+    current_cost: number;
+    current_health: number;
+    definition: CardDefinition;
     id: CardId;
 }
 
 export type PlayerSummonsCreatureClientEvent = {
-    player_id: PlayerId,
+    player_id: Id,
     card_id: CardId,
     target_pos: GamePos,
     definition: CardDefinition

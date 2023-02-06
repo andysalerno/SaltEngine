@@ -1,5 +1,5 @@
 import { getContext } from "./js";
-import { CardDrawn, CardId, FromClient, SummonFromHand } from "./message";
+import { CardDrawn, CardId, CardOnBoard, FromClient, SummonFromHand } from "./message";
 
 export function getEndTurnBox(): HTMLDivElement {
     return document.querySelector(".endTurnButton") as HTMLDivElement;
@@ -42,10 +42,18 @@ export function addCardToHand(card: CardDrawn) {
     handSlot?.appendChild(cloned);
 }
 
-export function setCardOnBoardSlot(card: CardDrawn, slotNum: number) {
+export function setCardOnBoardSlot(card: CardOnBoard, slotNum: number) {
     const context = getContext();
 
     const slot = context.myBoardSide[slotNum];
+
+    slot.occupant = card;
+}
+
+export function setCardOnEnemyBoardSlot(card: CardOnBoard, slotNum: number) {
+    const context = getContext();
+
+    const slot = context.enemyBoardSide[slotNum];
 
     slot.occupant = card;
 }

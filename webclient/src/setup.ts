@@ -1,4 +1,5 @@
 import { getContext } from "./js";
+import { CardOnBoard } from "./message";
 import { endMyTurn, getEndTurnBox, sendSummonFromHandRequest, setCardOnBoardSlot } from "./util";
 
 export function setUpSlots() {
@@ -24,8 +25,10 @@ export function setUpSlots() {
                     // Send the message to server
                     sendSummonFromHandRequest(draggingCard.id, slotNum);
 
+                    let cardOnBoard: CardOnBoard = draggingCard;
+
                     // Update visual local state
-                    setCardOnBoardSlot(draggingCard, slotNum);
+                    setCardOnBoardSlot(cardOnBoard, slotNum);
                 }
             }
         });

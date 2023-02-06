@@ -1,18 +1,18 @@
-import { CardDrawn } from "./message";
+import { CardDrawn, CardOnBoard } from "./message";
 
 export class BoardSlot {
     _slotNum: number;
-    _occupant?: CardDrawn;
+    _occupant?: CardOnBoard;
 
     constructor(slotNum: number) {
         this._slotNum = slotNum;
     }
 
-    set occupant(occupant: CardDrawn | undefined) {
+    set occupant(occupant: CardOnBoard | undefined) {
         this._occupant = occupant;
     }
 
-    get occupant(): CardDrawn | undefined {
+    get occupant(): CardOnBoard | undefined {
         return this._occupant;
     }
 
