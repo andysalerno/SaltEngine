@@ -152,15 +152,11 @@ document.addEventListener('alpine:init', () => {
     Alpine.data('cardhand', (slotNum) => ({
         // We remain bound to the same HandSlot object permanently
         boundTo: context.myHand.slots[slotNum as number],
-        slotNum: slotNum,
-
-        // get boundTo(): HandSlot | undefined {
-        //     return getContext().myHand.slots[this.slotNum as number];
-        // },
 
         get isActive(): boolean {
             const slot = this.boundTo as HandSlot;
-            return slot.occupant !== undefined;
+            const isMyTurn = getContext().isMyTurn;
+            return slot.occupant !== undefined && isMyTurn;
         },
 
         dragStart() {
@@ -202,8 +198,23 @@ document.addEventListener('alpine:init', () => {
 
         get getIsActive(): boolean {
             const context = getContext();
-            return context.draggingCard !== undefined
-                && this.boundTo.occupant === undefined;
+            const occupant = this.boundTo.occupant;
+
+            // If we're dragging a creature card, and we are valid target (an empty slot), then we are active.
+            if (context.draggingCard !== undefined) {
+                if (occupant === undefined) {
+                    return true;
+                }
+
+                return false;
+            }
+
+            // If it is our turn and this slot has an occupant that can attack, then we are active.
+            if (context.isMyTurn && occupant !== undefined) {
+                return true;
+            }
+
+            return false;
         }
     }));
 

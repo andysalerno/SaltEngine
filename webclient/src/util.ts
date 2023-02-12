@@ -23,15 +23,6 @@ export function addCardToHand(card: CardDrawn) {
     const context = getContext();
 
     context.myHand.add_card(card);
-
-    // // Attach drag listeners
-    // child?.addEventListener('dragstart', () => {
-    //     getContext().draggingCard = card;
-
-    // });
-    // child?.addEventListener('dragend', () => {
-    //     getContext().draggingCard = undefined;
-    // });
 }
 
 export function removeCardFromHand(id: CardId) {
