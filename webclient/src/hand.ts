@@ -16,8 +16,11 @@ export class HandSlot {
         return this._occupant;
     }
 
-    remove_occupant() {
+    remove_occupant(): CardDrawn | undefined {
+        const previous = this._occupant;
         this._occupant = undefined;
+
+        return previous;
     }
 }
 
@@ -57,8 +60,23 @@ export class Hand {
             return;
         }
 
+        // Remove the occupant at the given index.
         const slot = this._slots[index];
         slot.remove_occupant();
+
+        // We removed at index 'n', so indexes 'n+1' and on must move left one
+        for (let i = index; i < this._slots.length - 1; i++) {
+            const cur_slot = this._slots[i];
+            const next_slot = this._slots[i + 1];
+
+            const next = next_slot.remove_occupant();
+
+            if (next !== undefined) {
+                cur_slot.occupant = next;
+            } else {
+                cur_slot.remove_occupant();
+            }
+        }
 
         this._size--;
     }

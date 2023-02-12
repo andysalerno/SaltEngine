@@ -150,7 +150,13 @@ document.addEventListener('alpine:init', () => {
     Alpine.store('gameContext', context);
 
     Alpine.data('cardhand', (slotNum) => ({
+        // We remain bound to the same HandSlot object permanently
         boundTo: context.myHand.slots[slotNum as number],
+        slotNum: slotNum,
+
+        // get boundTo(): HandSlot | undefined {
+        //     return getContext().myHand.slots[this.slotNum as number];
+        // },
 
         get isActive(): boolean {
             const slot = this.boundTo as HandSlot;
