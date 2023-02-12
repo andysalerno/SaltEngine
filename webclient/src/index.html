@@ -332,12 +332,136 @@
                 </div>
             </div>
             <div class="my-hand">
-                <div class="hand-slot"></div>
-                <div class="hand-slot"></div>
-                <div class="hand-slot"></div>
-                <div class="hand-slot"></div>
-                <div class="hand-slot"></div>
-                <div class="hand-slot"></div>
+                <div class="hand-slot" x-data="cardhand(0)">
+                    <template x-if="boundTo.occupant !== undefined">
+                        <div class="card-hand" :class="{ 'active': isActive }" :draggable="isActive"
+                            x-on:dragstart="dragStart()" x-on:dragend="dragEnd()">
+                            <div x-text="boundTo.occupant.title" class="card-title"></div>
+                            <div class="card-body"></div>
+                            <div class="card-footer">
+                                <div x-text="boundTo.occupant.current_attack" class="attack-val"></div>
+                                <div x-text="boundTo.occupant.current_health" class="hp-val"></div>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+                <div class="hand-slot" x-data="cardhand(1)">
+                    <template x-if="boundTo.occupant !== undefined">
+                        <div class="card-hand" :class="{ 'active': isActive }" :draggable="isActive"
+                            x-on:dragstart="dragStart()" x-on:dragend="dragEnd()">
+                            <div x-text="boundTo.occupant.title" class="card-title"></div>
+                            <div class="card-body"></div>
+                            <div class="card-footer">
+                                <div x-text="boundTo.occupant.current_attack" class="attack-val"></div>
+                                <div x-text="boundTo.occupant.current_health" class="hp-val"></div>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+                <div class="hand-slot" x-data="cardhand(2)">
+                    <template x-if="boundTo.occupant !== undefined">
+                        <div class="card-hand" :class="{ 'active': isActive }" :draggable="isActive"
+                            x-on:dragstart="dragStart()" x-on:dragend="dragEnd()">
+                            <div x-text="boundTo.occupant.title" class="card-title"></div>
+                            <div class="card-body"></div>
+                            <div class="card-footer">
+                                <div x-text="boundTo.occupant.current_attack" class="attack-val"></div>
+                                <div x-text="boundTo.occupant.current_health" class="hp-val"></div>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+                <div class="hand-slot" x-data="cardhand(3)">
+                    <template x-if="boundTo.occupant !== undefined">
+                        <div class="card-hand" :class="{ 'active': isActive }" :draggable="isActive"
+                            x-on:dragstart="dragStart()" x-on:dragend="dragEnd()">
+                            <div x-text="boundTo.occupant.title" class="card-title"></div>
+                            <div class="card-body"></div>
+                            <div class="card-footer">
+                                <div x-text="boundTo.occupant.current_attack" class="attack-val"></div>
+                                <div x-text="boundTo.occupant.current_health" class="hp-val"></div>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+                <div class="hand-slot" x-data="cardhand(4)">
+                    <template x-if="boundTo.occupant !== undefined">
+                        <div class="card-hand" :class="{ 'active': isActive }" :draggable="isActive"
+                            x-on:dragstart="dragStart()" x-on:dragend="dragEnd()">
+                            <div x-text="boundTo.occupant.title" class="card-title"></div>
+                            <div class="card-body"></div>
+                            <div class="card-footer">
+                                <div x-text="boundTo.occupant.current_attack" class="attack-val"></div>
+                                <div x-text="boundTo.occupant.current_health" class="hp-val"></div>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+                <div class="hand-slot" x-data="cardhand(5)">
+                    <template x-if="boundTo.occupant !== undefined">
+                        <div class="card-hand" :class="{ 'active': isActive }" :draggable="isActive"
+                            x-on:dragstart="dragStart()" x-on:dragend="dragEnd()">
+                            <div x-text="boundTo.occupant.title" class="card-title"></div>
+                            <div class="card-body"></div>
+                            <div class="card-footer">
+                                <div x-text="boundTo.occupant.current_attack" class="attack-val"></div>
+                                <div x-text="boundTo.occupant.current_health" class="hp-val"></div>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+                <div class="hand-slot" x-data="cardhand(6)">
+                    <template x-if="boundTo.occupant !== undefined">
+                        <div class="card-hand" :class="{ 'active': isActive }" :draggable="isActive"
+                            x-on:dragstart="dragStart()" x-on:dragend="dragEnd()">
+                            <div x-text="boundTo.occupant.title" class="card-title"></div>
+                            <div class="card-body"></div>
+                            <div class="card-footer">
+                                <div x-text="boundTo.occupant.current_attack" class="attack-val"></div>
+                                <div x-text="boundTo.occupant.current_health" class="hp-val"></div>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+                <div class="hand-slot" x-data="cardhand(7)">
+                    <template x-if="boundTo.occupant !== undefined">
+                        <div class="card-hand" :class="{ 'active': isActive }" :draggable="isActive"
+                            x-on:dragstart="dragStart()" x-on:dragend="dragEnd()">
+                            <div x-text="boundTo.occupant.title" class="card-title"></div>
+                            <div class="card-body"></div>
+                            <div class="card-footer">
+                                <div x-text="boundTo.occupant.current_attack" class="attack-val"></div>
+                                <div x-text="boundTo.occupant.current_health" class="hp-val"></div>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+                <div class="hand-slot" x-data="cardhand(8)">
+                    <template x-if="boundTo.occupant !== undefined">
+                        <div class="card-hand" :class="{ 'active': isActive }" :draggable="isActive"
+                            x-on:dragstart="dragStart()" x-on:dragend="dragEnd()">
+                            <div x-text="boundTo.occupant.title" class="card-title"></div>
+                            <div class="card-body"></div>
+                            <div class="card-footer">
+                                <div x-text="boundTo.occupant.current_attack" class="attack-val"></div>
+                                <div x-text="boundTo.occupant.current_health" class="hp-val"></div>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+                <div class="hand-slot" x-data="cardhand(9)">
+                    <template x-if="boundTo.occupant !== undefined">
+                        <div class="card-hand" :class="{ 'active': isActive }" :draggable="isActive"
+                            x-on:dragstart="dragStart()" x-on:dragend="dragEnd()">
+                            <div x-text="boundTo.occupant.title" class="card-title"></div>
+                            <div class="card-body"></div>
+                            <div class="card-footer">
+                                <div x-text="boundTo.occupant.current_attack" class="attack-val"></div>
+                                <div x-text="boundTo.occupant.current_health" class="hp-val"></div>
+                            </div>
+                        </div>
+                    </template>
+                </div>
             </div>
         </div>
         <div class="extra-zone">

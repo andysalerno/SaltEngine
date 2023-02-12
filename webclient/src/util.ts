@@ -20,26 +20,48 @@ export function parseJson<T>(json: any): T {
 }
 
 export function addCardToHand(card: CardDrawn) {
-    const cardsCount = getContext().myHand.push(card);
-    const index = cardsCount - 1;
+    const context = getContext();
 
-    const template = document.getElementById("card-hand-template") as HTMLTemplateElement;
-    const cloned = template.content.cloneNode(true) as DocumentFragment;
-    const child = cloned.firstElementChild;
-    child?.setAttribute("x-data", `cardhand(${index})`);
+    context.myHand.add_card(card);
 
-    // Attach drag listeners
-    child?.addEventListener('dragstart', () => {
-        getContext().draggingCard = card;
+    // // Attach drag listeners
+    // child?.addEventListener('dragstart', () => {
+    //     getContext().draggingCard = card;
 
-    });
-    child?.addEventListener('dragend', () => {
-        getContext().draggingCard = undefined;
-    });
+    // });
+    // child?.addEventListener('dragend', () => {
+    //     getContext().draggingCard = undefined;
+    // });
+}
 
-    const myHand = document.querySelector<HTMLDivElement>(".my-hand");
-    const handSlot = myHand?.querySelectorAll<HTMLDivElement>(".hand-slot")[index];
-    handSlot?.appendChild(cloned);
+export function removeCardFromHand(id: CardId) {
+    const context = getContext();
+    const indexInHand = context.myHand.cards.findIndex(card => card.id.id === id.id);
+
+    if (indexInHand < 0) {
+        console.error("Expected to find card in hand, but couldn't.");
+        return;
+    }
+
+    // Remove from DOM
+    const handDom = document.querySelector<HTMLDivElement>(".my-hand");
+    const handSlot = handDom?.querySelectorAll<HTMLDivElement>(".hand-slot")[indexInHand];
+
+    if (handSlot === undefined) {
+        console.error(`Did not find hand slot with index ${indexInHand}`);
+        return;
+    }
+
+    const handSlotChild = handSlot?.firstChild;
+
+    if (handSlotChild === undefined || handSlotChild === null) {
+        console.error("Did not find a child div on the hand slot.");
+    } else {
+        handSlot?.removeChild(handSlotChild);
+    }
+
+    // Remove from hand state
+    context.myHand.remove_with_id(id);
 }
 
 export function setCardOnBoardSlot(card: CardOnBoard, slotNum: number) {

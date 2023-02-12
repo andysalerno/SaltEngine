@@ -1,14 +1,15 @@
 import Alpine from 'alpinejs';
 import { BoardSlot } from './boardslot';
+import { Hand, HandSlot } from './hand';
 import { CardDrawnEvent, CardDrawn, isHello, isEvent, PlayerStartTurnEvent, FromClient, PlayerSummonsCreatureClientEvent, CardOnBoard } from './message';
 import { setUpEndTurnButton, setUpExtraZone, setUpSlots } from './setup';
-import { activateEndTurnBox, addCardToHand, deActivateEndTurnBox, getEndTurnBox, logGameMessage, parseJson, sendMessage, setCardOnEnemyBoardSlot } from './util';
+import { activateEndTurnBox, addCardToHand, deActivateEndTurnBox, getEndTurnBox, logGameMessage, parseJson, removeCardFromHand, sendMessage, setCardOnEnemyBoardSlot } from './util';
 
 type Context = {
     socket: WebSocket | null,
     myId: string | null,
     enemyId: string | null,
-    myHand: Array<CardDrawn>,
+    myHand: Hand,
     myMana: number,
     isMyTurn: boolean,
     myBoardSide: Array<BoardSlot>,
@@ -94,6 +95,10 @@ function handlePlayerSummonsCreature(event: PlayerSummonsCreatureClientEvent) {
         };
 
         setCardOnEnemyBoardSlot(cardOnBoard, event.target_pos.SlotIndex);
+    } else {
+        // We immediately placed it on the board when we released the moue button.
+        // But now we can remove it from the hand.
+        removeCardFromHand(event.card_id);
     }
 }
 
@@ -113,7 +118,7 @@ function enemyTurnStart(event: PlayerStartTurnEvent) {
 
 function activateHand() {
     const context = getContext();
-    for (let handCard of context.myHand) {
+    for (let handCard of context.myHand.cards) {
         if (handCard.current_cost <= context.myMana) {
             // The player can play this card, so add a visual queue.
 
@@ -124,38 +129,12 @@ function activateHand() {
 setUpEvents();
 
 document.addEventListener('alpine:init', () => {
-    Alpine.data('cardhand', (cardNum) => ({
-        boundTo: getContext().myHand[cardNum as number],
-        isMarkedActive: false,
-
-        get getTitle(): string {
-            return this.boundTo.title;
-        },
-
-        get getAttack(): number {
-            return this.boundTo.current_attack;
-        },
-
-        get getHealth(): number {
-            return this.boundTo.current_health;
-        },
-
-        get getIsActive(): boolean {
-            // return this.isMarkedActive;
-            const context = getContext();
-            return this.boundTo.current_cost <= context.myMana && context.isMyTurn;
-        },
-
-        get getTitleAndMana(): string {
-            return this.boundTo.title + " " + this.boundTo.current_cost;
-        }
-    }));
 
     const context: Context = {
         socket: null,
         myId: null,
         enemyId: null,
-        myHand: [],
+        myHand: new Hand(),
         myMana: 0,
         isMyTurn: false,
         myBoardSide: [],
@@ -170,8 +149,22 @@ document.addEventListener('alpine:init', () => {
 
     Alpine.store('gameContext', context);
 
-    Alpine.store('myhand', () => ({
-        hand: context.myHand
+    Alpine.data('cardhand', (slotNum) => ({
+        boundTo: context.myHand.slots[slotNum as number],
+
+        get isActive(): boolean {
+            const slot = this.boundTo as HandSlot;
+            return slot.occupant !== undefined;
+        },
+
+        dragStart() {
+            getContext().draggingCard = this.boundTo.occupant;
+        },
+
+        dragEnd() {
+            getContext().draggingCard = undefined;
+        }
+
     }));
 
     Alpine.data('enemyBoardSlot', (slotNum) => ({

@@ -112,6 +112,14 @@ div {
     border: 1px solid grey;
 }
 
+.hand-slot.active {
+    border: 2px solid lightgreen;
+}
+
+.hand-slot.active.hover {
+    background-color: grey;
+}
+
 .endTurnButton {
     text-align: center;
     border: 1px solid gray;
