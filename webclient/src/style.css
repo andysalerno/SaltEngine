@@ -128,3 +128,7 @@ div {
 .endTurnButton.active:hover {
     background-color: grey;
 }
+
+.gameEventLog {
+    overflow: scroll;
+}

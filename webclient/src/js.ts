@@ -1,4 +1,5 @@
 import Alpine from 'alpinejs';
+import { cardAttacksTarget } from './attack';
 import { BoardSlot } from './boardslot';
 import { Hand, HandSlot } from './hand';
 import { CardDrawnEvent, CardDrawn, isHello, isEvent, PlayerStartTurnEvent, FromClient, PlayerSummonsCreatureClientEvent, CardOnBoard } from './message';
@@ -16,6 +17,7 @@ type Context = {
     enemyBoardSide: Array<BoardSlot>,
 
     draggingCard: CardDrawn | undefined
+    draggingCardToAttack: CardDrawn | undefined
 };
 
 function wsConnect() {
@@ -139,7 +141,8 @@ document.addEventListener('alpine:init', () => {
         isMyTurn: false,
         myBoardSide: [],
         enemyBoardSide: [],
-        draggingCard: undefined
+        draggingCard: undefined,
+        draggingCardToAttack: undefined
     };
 
     for (let i = 0; i < 12; i++) {
@@ -182,6 +185,26 @@ document.addEventListener('alpine:init', () => {
 
         get getIsActive(): boolean {
             return false;
+        },
+
+        clickEnd() {
+            const attacker = getContext().draggingCardToAttack;
+
+            if (attacker == undefined) {
+                return;
+            }
+
+            const target = this.boundTo?.occupant as CardDrawn | undefined;
+
+            logGameMessage(`${attacker.title} attacks ${target?.title}`);
+
+            if (target === undefined) {
+                return;
+            }
+
+            cardAttacksTarget(attacker, target);
+
+            getContext().draggingCardToAttack = undefined;
         }
     }));
 
@@ -215,6 +238,19 @@ document.addEventListener('alpine:init', () => {
             }
 
             return false;
+        },
+
+        clickStart() {
+            logGameMessage("Clicked on board slot...");
+            if (this.getIsActive) {
+                getContext().draggingCardToAttack = this.boundTo.occupant;
+                logGameMessage("...and board slot was active.");
+            }
+        },
+
+        clickEnd() {
+            logGameMessage("Unclicked board slot.");
+            getContext().draggingCardToAttack = undefined;
         }
     }));
 

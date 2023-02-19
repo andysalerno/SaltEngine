@@ -14,7 +14,8 @@
                 opponent hand
             </div>
             <div class="board-row op-side-1">
-                <div x-data="enemyBoardSlot(0)" slotNum="0" class="card-slot" :class="{ 'active': getIsActive }">
+                <div x-data="enemyBoardSlot(0)" slotNum="0" class="card-slot" :class="{ 'active': getIsActive }"
+                    x-on:mousedown="clickStart()" x-on:mouseup="clickEnd()">
                     <template x-if="boundTo.occupant !== undefined">
                         <div class="card-board">
                             <div x-text="boundTo.occupant.title" class="card-title"></div>
@@ -26,7 +27,8 @@
                         </div>
                     </template>
                 </div>
-                <div x-data="enemyBoardSlot(1)" slotNum="0" class="card-slot" :class="{ 'active': getIsActive }">
+                <div x-data="enemyBoardSlot(1)" slotNum="0" class="card-slot" :class="{ 'active': getIsActive }"
+                    x-on:mousedown="clickStart()" x-on:mouseup="clickEnd()">
                     <template x-if="boundTo.occupant !== undefined">
                         <div class="card-board">
                             <div x-text="boundTo.occupant.title" class="card-title"></div>
@@ -38,7 +40,8 @@
                         </div>
                     </template>
                 </div>
-                <div x-data="enemyBoardSlot(2)" slotNum="0" class="card-slot" :class="{ 'active': getIsActive }">
+                <div x-data="enemyBoardSlot(2)" slotNum="0" class="card-slot" :class="{ 'active': getIsActive }"
+                    x-on:mousedown="clickStart()" x-on:mouseup="clickEnd()">
                     <template x-if="boundTo.occupant !== undefined">
                         <div class="card-board">
                             <div x-text="boundTo.occupant.title" class="card-title"></div>
@@ -50,7 +53,8 @@
                         </div>
                     </template>
                 </div>
-                <div x-data="enemyBoardSlot(3)" slotNum="0" class="card-slot" :class="{ 'active': getIsActive }">
+                <div x-data="enemyBoardSlot(3)" slotNum="0" class="card-slot" :class="{ 'active': getIsActive }"
+                    x-on:mousedown="clickStart()" x-on:mouseup="clickEnd()">
                     <template x-if="boundTo.occupant !== undefined">
                         <div class="card-board">
                             <div x-text="boundTo.occupant.title" class="card-title"></div>
@@ -62,7 +66,8 @@
                         </div>
                     </template>
                 </div>
-                <div x-data="enemyBoardSlot(4)" slotNum="0" class="card-slot" :class="{ 'active': getIsActive }">
+                <div x-data="enemyBoardSlot(4)" slotNum="0" class="card-slot" :class="{ 'active': getIsActive }"
+                    x-on:mousedown="clickStart()" x-on:mouseup="clickEnd()">
                     <template x-if="boundTo.occupant !== undefined">
                         <div class="card-board">
                             <div x-text="boundTo.occupant.title" class="card-title"></div>
@@ -74,7 +79,8 @@
                         </div>
                     </template>
                 </div>
-                <div x-data="enemyBoardSlot(5)" slotNum="0" class="card-slot" :class="{ 'active': getIsActive }">
+                <div x-data="enemyBoardSlot(5)" slotNum="0" class="card-slot" :class="{ 'active': getIsActive }"
+                    x-on:mousedown="clickStart()" x-on:mouseup="clickEnd()">
                     <template x-if="boundTo.occupant !== undefined">
                         <div class="card-board">
                             <div x-text="boundTo.occupant.title" class="card-title"></div>
@@ -88,7 +94,8 @@
                 </div>
             </div>
             <div class="board-row op-side-2">
-                <div x-data="enemyBoardSlot(6)" slotNum="0" class="card-slot" :class="{ 'active': getIsActive }">
+                <div x-data="enemyBoardSlot(6)" slotNum="0" class="card-slot" :class="{ 'active': getIsActive }"
+                    x-on:mousedown="clickStart()" x-on:mouseup="clickEnd()">
                     <template x-if="boundTo.occupant !== undefined">
                         <div class="card-board">
                             <div x-text="boundTo.occupant.title" class="card-title"></div>
@@ -100,7 +107,9 @@
                         </div>
                     </template>
                 </div>
-                <div x-data="enemyBoardSlot(7)" slotNum="0" class="card-slot" :class="{ 'active': getIsActive }">
+                <div x-data="enemyBoardSlot(7)" slotNum="0" class="card-slot" :class="{ 'active': getIsActive }"
+                    x-on:mousedown="clickStart()" x-on:mouseup="clickEnd()">
+
                     <template x-if="boundTo.occupant !== undefined">
                         <div class="card-board">
                             <div x-text="boundTo.occupant.title" class="card-title"></div>
@@ -112,7 +121,8 @@
                         </div>
                     </template>
                 </div>
-                <div x-data="enemyBoardSlot(8)" slotNum="0" class="card-slot" :class="{ 'active': getIsActive }">
+                <div x-data="enemyBoardSlot(8)" slotNum="0" class="card-slot" :class="{ 'active': getIsActive }"
+                    x-on:mousedown="clickStart()" x-on:mouseup="clickEnd()">
                     <template x-if="boundTo.occupant !== undefined">
                         <div class="card-board">
                             <div x-text="boundTo.occupant.title" class="card-title"></div>
@@ -124,7 +134,8 @@
                         </div>
                     </template>
                 </div>
-                <div x-data="enemyBoardSlot(9)" slotNum="0" class="card-slot" :class="{ 'active': getIsActive }">
+                <div x-data="enemyBoardSlot(9)" slotNum="0" class="card-slot" :class="{ 'active': getIsActive }"
+                    x-on:mousedown="clickStart()" x-on:mouseup="clickEnd()">
                     <template x-if="boundTo.occupant !== undefined">
                         <div class="card-board">
                             <div x-text="boundTo.occupant.title" class="card-title"></div>
@@ -136,7 +147,8 @@
                         </div>
                     </template>
                 </div>
-                <div x-data="enemyBoardSlot(10)" slotNum="0" class="card-slot" :class="{ 'active': getIsActive }">
+                <div x-data="enemyBoardSlot(10)" slotNum="0" class="card-slot" :class="{ 'active': getIsActive }"
+                    x-on:mousedown="clickStart()" x-on:mouseup="clickEnd()">
                     <template x-if="boundTo.occupant !== undefined">
                         <div class="card-board">
                             <div x-text="boundTo.occupant.title" class="card-title"></div>
@@ -148,7 +160,8 @@
                         </div>
                     </template>
                 </div>
-                <div x-data="enemyBoardSlot(11)" slotNum="0" class="card-slot" :class="{ 'active': getIsActive }">
+                <div x-data="enemyBoardSlot(11)" slotNum="0" class="card-slot" :class="{ 'active': getIsActive }"
+                    x-on:mousedown="clickStart()" x-on:mouseup="clickEnd()">
                     <template x-if="boundTo.occupant !== undefined">
                         <div class="card-board">
                             <div x-text="boundTo.occupant.title" class="card-title"></div>
@@ -162,7 +175,8 @@
                 </div>
             </div>
             <div class="board-row my-side">
-                <div x-data="boardSlot(6)" slotNum="6" class="card-slot" :class="{ 'active': getIsActive }">
+                <div x-data="boardSlot(6)" slotNum="6" class="card-slot" :class="{ 'active': getIsActive }"
+                    x-on:mousedown="clickStart()" x-on:mouseup="clickEnd()">
                     <template x-if="boundTo.occupant !== undefined">
                         <div class="card-board">
                             <div x-text="boundTo.occupant.title" class="card-title"></div>
@@ -174,7 +188,8 @@
                         </div>
                     </template>
                 </div>
-                <div x-data="boardSlot(7)" slotNum="7" class="card-slot" :class="{ 'active': getIsActive }">
+                <div x-data="boardSlot(7)" slotNum="7" class="card-slot" :class="{ 'active': getIsActive }"
+                    x-on:mousedown="clickStart()" x-on:mouseup="clickEnd()">
                     <template x-if="boundTo.occupant !== undefined">
                         <div class="card-board">
                             <div x-text="boundTo.occupant.title" class="card-title"></div>
@@ -186,7 +201,8 @@
                         </div>
                     </template>
                 </div>
-                <div x-data="boardSlot(8)" slotNum="8" class="card-slot" :class="{ 'active': getIsActive }">
+                <div x-data="boardSlot(8)" slotNum="8" class="card-slot" :class="{ 'active': getIsActive }"
+                    x-on:mousedown="clickStart()" x-on:mouseup="clickEnd()">
                     <template x-if="boundTo.occupant !== undefined">
                         <div class="card-board">
                             <div x-text="boundTo.occupant.title" class="card-title"></div>
@@ -199,7 +215,8 @@
                         </div>
                     </template>
                 </div>
-                <div x-data="boardSlot(9)" slotNum="9" class="card-slot" :class="{ 'active': getIsActive }">
+                <div x-data="boardSlot(9)" slotNum="9" class="card-slot" :class="{ 'active': getIsActive }"
+                    x-on:mousedown="clickStart()" x-on:mouseup="clickEnd()">
                     <template x-if="boundTo.occupant !== undefined">
                         <div class="card-board">
                             <div x-text="boundTo.occupant.title" class="card-title"></div>
@@ -211,7 +228,8 @@
                         </div>
                     </template>
                 </div>
-                <div x-data="boardSlot(10)" slotNum="10" class="card-slot" :class="{ 'active': getIsActive }">
+                <div x-data="boardSlot(10)" slotNum="10" class="card-slot" :class="{ 'active': getIsActive }"
+                    x-on:mousedown="clickStart()" x-on:mouseup="clickEnd()">
                     <template x-if="boundTo.occupant !== undefined">
                         <div class="card-board">
                             <div x-text="boundTo.occupant.title" class="card-title"></div>
@@ -223,7 +241,8 @@
                         </div>
                     </template>
                 </div>
-                <div x-data="boardSlot(11)" slotNum="11" class="card-slot" :class="{ 'active': getIsActive }">
+                <div x-data="boardSlot(11)" slotNum="11" class="card-slot" :class="{ 'active': getIsActive }"
+                    x-on:mousedown="clickStart()" x-on:mouseup="clickEnd()">
                     <template x-if="boundTo.occupant !== undefined">
                         <div class="card-board">
                             <div x-text="boundTo.occupant.title" class="card-title"></div>
@@ -237,7 +256,8 @@
                 </div>
             </div>
             <div class="board-row my-side">
-                <div x-data="boardSlot(0)" slotNum="0" class="card-slot" :class="{ 'active': getIsActive }">
+                <div x-data="boardSlot(0)" slotNum="0" class="card-slot" :class="{ 'active': getIsActive }"
+                    x-on:mousedown="clickStart()" x-on:mouseup="clickEnd()">
                     <template x-if="boundTo.occupant !== undefined">
                         <div class="card-board">
                             <div x-text="boundTo.occupant.title" class="card-title"></div>
@@ -249,7 +269,8 @@
                         </div>
                     </template>
                 </div>
-                <div x-data="boardSlot(1)" slotNum="1" class="card-slot" :class="{ 'active': getIsActive }">
+                <div x-data="boardSlot(1)" slotNum="1" class="card-slot" :class="{ 'active': getIsActive }"
+                    x-on:mousedown="clickStart()" x-on:mouseup="clickEnd()">
                     <template x-if="boundTo.occupant !== undefined">
                         <div class="card-board">
                             <div x-text="boundTo.occupant.title" class="card-title"></div>
@@ -261,7 +282,8 @@
                         </div>
                     </template>
                 </div>
-                <div x-data="boardSlot(2)" slotNum="2" class="card-slot" :class="{ 'active': getIsActive }">
+                <div x-data="boardSlot(2)" slotNum="2" class="card-slot" :class="{ 'active': getIsActive }"
+                    x-on:mousedown="clickStart()" x-on:mouseup="clickEnd()">
                     <template x-if="boundTo.occupant !== undefined">
                         <div class="card-board">
                             <div x-text="boundTo.occupant.title" class="card-title"></div>
@@ -273,7 +295,8 @@
                         </div>
                     </template>
                 </div>
-                <div x-data="boardSlot(3)" slotNum="3" class="card-slot" :class="{ 'active': getIsActive }">
+                <div x-data="boardSlot(3)" slotNum="3" class="card-slot" :class="{ 'active': getIsActive }"
+                    x-on:mousedown="clickStart()" x-on:mouseup="clickEnd()">
                     <template x-if="boundTo.occupant !== undefined">
                         <div class="card-board">
                             <div x-text="boundTo.occupant.title" class="card-title"></div>
@@ -285,7 +308,8 @@
                         </div>
                     </template>
                 </div>
-                <div x-data="boardSlot(4)" slotNum="4" class="card-slot" :class="{ 'active': getIsActive }">
+                <div x-data="boardSlot(4)" slotNum="4" class="card-slot" :class="{ 'active': getIsActive }"
+                    x-on:mousedown="clickStart()" x-on:mouseup="clickEnd()">
                     <template x-if="boundTo.occupant !== undefined">
                         <div class="card-board">
                             <div x-text="boundTo.occupant.title" class="card-title"></div>
@@ -297,7 +321,8 @@
                         </div>
                     </template>
                 </div>
-                <div x-data="boardSlot(5)" slotNum="5" class="card-slot" :class="{ 'active': getIsActive }">
+                <div x-data="boardSlot(5)" slotNum="5" class="card-slot" :class="{ 'active': getIsActive }"
+                    x-on:mousedown="clickStart()" x-on:mouseup="clickEnd()">
                     <template x-if="boundTo.occupant !== undefined">
                         <div class="card-board">
                             <div x-text="boundTo.occupant.title" class="card-title"></div>
