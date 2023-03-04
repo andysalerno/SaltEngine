@@ -69,6 +69,7 @@ div {
 
 .card-slot {
     border: 1px solid grey;
+    margin: 5px;
 }
 
 .card-slot.active {
@@ -110,6 +111,7 @@ div {
 
 .hand-slot {
     border: 1px solid grey;
+    margin: 2px;
 }
 
 .hand-slot.active {
@@ -131,4 +133,9 @@ div {
 
 .gameEventLog {
     overflow: scroll;
+}
+
+div {
+    /* Disable user text selection everywhere by default */
+    user-select: none;
 }
