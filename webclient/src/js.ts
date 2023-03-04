@@ -1,4 +1,5 @@
 import Alpine from 'alpinejs';
+import { fadeOutIn } from './animations';
 import { cardAttacksTarget } from './attack';
 import { BoardSlot } from './boardslot';
 import { Hand, HandSlot } from './hand';
@@ -198,6 +199,14 @@ document.addEventListener('alpine:init', () => {
 
         get getIsActive(): boolean {
             return false;
+        },
+
+        init() {
+            this.$watch("boundTo.occupant.current_health", (newVal, oldVal) => {
+                if (newVal < oldVal) {
+                    this.$el.animate(fadeOutIn, { duration: 500, iterations: 1 });
+                }
+            });
         },
 
         clickEnd() {

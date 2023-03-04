@@ -139,3 +139,23 @@ div {
     /* Disable user text selection everywhere by default */
     user-select: none;
 }
+
+.glowing {
+    animation-name: glowRed;
+    animation-duration: 1s;
+    animation-iteration-count: 1;
+}
+
+@keyframes glowRed {
+
+    0%,
+    50%,
+    100% {
+        opacity: 1;
+    }
+
+    25%,
+    75% {
+        opacity: 0;
+    }
+}
