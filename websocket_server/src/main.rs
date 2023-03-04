@@ -4,10 +4,11 @@ use engine::{
     GameState, PlayerId,
 };
 use events::{
-    CreatureAttacksTargetEvent, CreatureAttacksTargetEventHandler, CreatureTakesDamageEventHandler,
-    DrawCardEventHandler, GainManaEventHandler, PlayerEndTurnEvent, PlayerEndTurnEventHandler,
-    PlayerStartTurnEvent, PlayerStartTurnEventHandler, PlayerSummonsCreatureEvent,
-    PlayerSummonsCreatureEventHandler, StartGameEvent, StartGameEventHandler,
+    CreatureAttacksTargetEvent, CreatureAttacksTargetEventHandler, CreatureDestroyedEventHandler,
+    CreatureTakesDamageEventHandler, DrawCardEventHandler, GainManaEventHandler,
+    PlayerEndTurnEvent, PlayerEndTurnEventHandler, PlayerStartTurnEvent,
+    PlayerStartTurnEventHandler, PlayerSummonsCreatureEvent, PlayerSummonsCreatureEventHandler,
+    StartGameEvent, StartGameEventHandler,
 };
 use log::info;
 
@@ -38,6 +39,7 @@ fn main() {
             Box::new(PlayerSummonsCreatureEventHandler::new()),
             Box::new(CreatureAttacksTargetEventHandler::new()),
             Box::new(CreatureTakesDamageEventHandler::new()),
+            Box::new(CreatureDestroyedEventHandler::new()),
         ];
         Dispatcher::new(handlers, player_a_channel, player_b_channel)
     };

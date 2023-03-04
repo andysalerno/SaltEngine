@@ -47,6 +47,7 @@ mod handler {
     use super::HANDLER_NAME;
     use crate::{
         creature_attacks_target_event::CreatureAttacksTargetEvent,
+        creature_destroyed_event::CreatureDestroyedEvent,
         creature_takes_damage_event::CreatureTakesDamageEvent, HiddenInfo,
     };
     use engine::{
@@ -104,6 +105,11 @@ mod handler {
             dispatcher
                 .player_b_channel()
                 .send(FromServer::Event(event.clone()));
+
+            if next_health <= 0 {
+                let destroyed_event = CreatureDestroyedEvent::new(unpacked_event.card_to_damage());
+                dispatcher.dispatch(destroyed_event, game_state);
+            }
         }
     }
 }

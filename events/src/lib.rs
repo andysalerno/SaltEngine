@@ -1,4 +1,5 @@
 mod creature_attacks_target_event;
+mod creature_destroyed_event;
 mod creature_placed_on_board_event;
 mod creature_takes_damage_event;
 mod draw_card_event;
@@ -13,6 +14,7 @@ use serde::{Deserialize, Serialize};
 pub use creature_attacks_target_event::{
     CreatureAttacksTargetEvent, CreatureAttacksTargetEventHandler,
 };
+pub use creature_destroyed_event::{CreatureDestroyedEvent, CreatureDestroyedEventHandler};
 pub use creature_placed_on_board_event::{
     CreaturePlacedOnBoardEvent, CreaturePlacedOnBoardEventHandler,
 };
