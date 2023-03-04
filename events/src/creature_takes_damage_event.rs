@@ -1,7 +1,7 @@
 pub use self::event::*;
 pub use self::handler::*;
 
-const HANDLER_NAME: &str = "CreatureTakesDamageEventHandler";
+const HANDLER_NAME: &str = "CreatureTakesDamageEvent";
 
 /// Module containing the event for drawing a card.
 mod event {

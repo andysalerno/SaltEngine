@@ -4,6 +4,7 @@ use engine::{
     GameState, PlayerId,
 };
 use events::{
+    CreatureAttacksTargetEvent, CreatureAttacksTargetEventHandler, CreatureTakesDamageEventHandler,
     DrawCardEventHandler, GainManaEventHandler, PlayerEndTurnEvent, PlayerEndTurnEventHandler,
     PlayerStartTurnEvent, PlayerStartTurnEventHandler, PlayerSummonsCreatureEvent,
     PlayerSummonsCreatureEventHandler, StartGameEvent, StartGameEventHandler,
@@ -35,6 +36,8 @@ fn main() {
             Box::new(PlayerEndTurnEventHandler::new()),
             Box::new(GainManaEventHandler::new()),
             Box::new(PlayerSummonsCreatureEventHandler::new()),
+            Box::new(CreatureAttacksTargetEventHandler::new()),
+            Box::new(CreatureTakesDamageEventHandler::new()),
         ];
         Dispatcher::new(handlers, player_a_channel, player_b_channel)
     };
@@ -93,6 +96,15 @@ fn player_take_turn(game_state: &mut GameState, dispatcher: &Dispatcher) {
                 target_pos,
             } => {
                 let event = PlayerSummonsCreatureEvent::new(player_turn, card_id, target_pos);
+
+                dispatcher.dispatch(event, game_state);
+            }
+            FromClient::Attack {
+                attacker_card_id,
+                target_card_id,
+            } => {
+                let event =
+                    CreatureAttacksTargetEvent::new(player_turn, attacker_card_id, target_card_id);
 
                 dispatcher.dispatch(event, game_state);
             }

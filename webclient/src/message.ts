@@ -75,6 +75,11 @@ export type PlayerSummonsCreatureClientEvent = {
     definition: CardDefinition
 }
 
+export type CreatureTakesDamageEvent = {
+    card_to_damage: CardId;
+    damage: number;
+}
+
 export interface Event<TEvent> {
     kind: string;
     body: TEvent;

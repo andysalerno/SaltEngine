@@ -2,9 +2,9 @@ import Alpine from 'alpinejs';
 import { cardAttacksTarget } from './attack';
 import { BoardSlot } from './boardslot';
 import { Hand, HandSlot } from './hand';
-import { CardDrawnEvent, CardDrawn, isHello, isEvent, PlayerStartTurnEvent, FromClient, PlayerSummonsCreatureClientEvent, CardOnBoard } from './message';
+import { CardDrawnEvent, CardDrawn, isHello, isEvent, PlayerStartTurnEvent, FromClient, PlayerSummonsCreatureClientEvent, CardOnBoard, CreatureTakesDamageEvent } from './message';
 import { setUpEndTurnButton, setUpExtraZone, setUpSlots } from './setup';
-import { activateEndTurnBox, addCardToHand, deActivateEndTurnBox, getEndTurnBox, logGameMessage, parseJson, removeCardFromHand, sendMessage, setCardOnEnemyBoardSlot } from './util';
+import { activateEndTurnBox, addCardToHand, deActivateEndTurnBox, findBoardCardById, getEndTurnBox, logGameMessage, parseJson, removeCardFromHand, sendMessage, setCardOnEnemyBoardSlot } from './util';
 
 type Context = {
     socket: WebSocket | null,
@@ -62,6 +62,10 @@ function onMessageReceived(message: any) {
         const body = parseJson<PlayerSummonsCreatureClientEvent>(message.Event.body);
         handlePlayerSummonsCreature(body);
     }
+    else if (isEvent(message, "CreatureTakesDamageEvent")) {
+        const body = parseJson<CreatureTakesDamageEvent>(message.Event.body);
+        handleCreatureTakesDamage(body);
+    }
 }
 
 function handleCardDrawn(event: CardDrawnEvent) {
@@ -78,6 +82,15 @@ function handleTurnStart(event: PlayerStartTurnEvent) {
         myTurnStart(event);
     } else {
         enemyTurnStart(event);
+    }
+}
+
+function handleCreatureTakesDamage(event: CreatureTakesDamageEvent) {
+    const cardToDamage = findBoardCardById(event.card_to_damage);
+
+    if (cardToDamage !== undefined) {
+        // cardToDamage.current_health -= event.damage;
+        cardToDamage.current_health -= 1;
     }
 }
 

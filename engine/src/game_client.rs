@@ -8,6 +8,10 @@ pub enum FromClient {
         card_id: CardId,
         target_pos: GamePos,
     },
+    Attack {
+        attacker_card_id: CardId,
+        target_card_id: CardId,
+    },
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]

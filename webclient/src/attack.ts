@@ -9,5 +9,5 @@ export function cardAttacksTarget(attacker: CardDrawn, target: CardDrawn) {
         target_card_id: target.id
     };
 
-    sendMessage(attack);
+    sendMessage({ Attack: attack });
 }

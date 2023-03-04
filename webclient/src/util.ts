@@ -19,6 +19,22 @@ export function parseJson<T>(json: any): T {
     return JSON.parse(json) as T;
 }
 
+export function findBoardCardById(cardId: CardId): CardOnBoard | undefined {
+    const context = getContext();
+
+    const mySlot = context.myBoardSide.find(s => s.occupant?.id?.id === cardId?.id);
+
+    if (mySlot !== undefined) {
+        return mySlot.occupant;
+    }
+
+    const enemySlot = context.enemyBoardSide.find(s => s.occupant?.id?.id === cardId?.id);
+
+    if (enemySlot !== undefined) {
+        return enemySlot.occupant;
+    }
+}
+
 export function addCardToHand(card: CardDrawn) {
     const context = getContext();
 
