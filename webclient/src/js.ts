@@ -3,9 +3,13 @@ import { fadeOutIn } from './animations';
 import { cardAttacksTarget } from './attack';
 import { BoardSlot } from './boardslot';
 import { Hand, HandSlot } from './hand';
-import { CardDrawnEvent, CardDrawn, isHello, isEvent, PlayerStartTurnEvent, FromClient, PlayerSummonsCreatureClientEvent, CardOnBoard, CreatureTakesDamageEvent } from './message';
+import { handleCardDrawn } from './handlers/cardDrawn';
+import { handleCreatureTakesDamage } from './handlers/creatureTakesDamage';
+import { handlePlayerSummonsCreature } from './handlers/playerSummonsCreature';
+import { handleTurnStart } from './handlers/turnStart';
+import { CardDrawnEvent, CardDrawn, isHello, isEvent, PlayerStartTurnEvent, PlayerSummonsCreatureClientEvent, CreatureTakesDamageEvent } from './message';
 import { setUpEndTurnButton, setUpExtraZone, setUpSlots } from './setup';
-import { activateEndTurnBox, addCardToHand, deActivateEndTurnBox, findBoardCardById, getEndTurnBox, logGameMessage, parseJson, removeCardFromHand, sendMessage, setCardOnEnemyBoardSlot } from './util';
+import { logGameMessage, parseJson } from './util';
 
 type Context = {
     socket: WebSocket | null,
@@ -69,78 +73,6 @@ function onMessageReceived(message: any) {
     }
 }
 
-function handleCardDrawn(event: CardDrawnEvent) {
-    if (event.player_id.guid == getContext().myId) {
-        logGameMessage("I drew a card.");
-        addCardToHand(event.card_drawn.Visible);
-    } else {
-        logGameMessage("Enemy drew a card.");
-    }
-}
-
-function handleTurnStart(event: PlayerStartTurnEvent) {
-    if (event.player_id.guid === getContext().myId) {
-        myTurnStart(event);
-    } else {
-        enemyTurnStart(event);
-    }
-}
-
-function handleCreatureTakesDamage(event: CreatureTakesDamageEvent) {
-    const cardToDamage = findBoardCardById(event.card_to_damage);
-
-    if (cardToDamage !== undefined) {
-        // cardToDamage.current_health -= event.damage;
-        cardToDamage.current_health -= 1;
-    }
-}
-
-function handlePlayerSummonsCreature(event: PlayerSummonsCreatureClientEvent) {
-    if (event.player_id.guid == getContext().enemyId) {
-        logGameMessage(`Enemy summoned: ${event.definition.title}`);
-
-        const definition = event.definition;
-
-        let cardOnBoard: CardOnBoard = {
-            title: definition.title,
-            current_attack: definition.attack,
-            current_cost: definition.cost,
-            current_health: definition.health,
-            definition: definition,
-            id: event.card_id,
-        };
-
-        setCardOnEnemyBoardSlot(cardOnBoard, event.target_pos.SlotIndex);
-    } else {
-        // We immediately placed it on the board when we released the moue button.
-        // But now we can remove it from the hand.
-        removeCardFromHand(event.card_id);
-    }
-}
-
-function myTurnStart(event: PlayerStartTurnEvent) {
-    logGameMessage("My turn started. Mana: " + event.starting_mana);
-    const context = getContext();
-    context.myMana = event.starting_mana;
-    context.isMyTurn = true;
-
-    activateHand();
-    activateEndTurnBox();
-}
-
-function enemyTurnStart(event: PlayerStartTurnEvent) {
-    logGameMessage("Enemy turn started. Mana: " + event.starting_mana);
-}
-
-function activateHand() {
-    const context = getContext();
-    for (let handCard of context.myHand.cards) {
-        if (handCard.current_cost <= context.myMana) {
-            // The player can play this card, so add a visual queue.
-
-        }
-    }
-}
 
 setUpEvents();
 
