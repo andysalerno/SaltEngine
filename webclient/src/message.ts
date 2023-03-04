@@ -38,6 +38,11 @@ export type SummonFromHand = {
     target_pos: GamePos
 }
 
+export type Attack = {
+    attacker_card_id: CardId,
+    target_card_id: CardId
+}
+
 export type CardDefinition = {
     title: string,
     cost: number,
