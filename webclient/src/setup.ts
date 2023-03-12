@@ -25,7 +25,7 @@ export function setUpSlots() {
                     // Send the message to server
                     sendSummonFromHandRequest(draggingCard.id, slotNum);
 
-                    let cardOnBoard: CardOnBoard = draggingCard;
+                    const cardOnBoard = new CardOnBoard(draggingCard);
 
                     // Update visual local state
                     setCardOnBoardSlot(cardOnBoard, slotNum);

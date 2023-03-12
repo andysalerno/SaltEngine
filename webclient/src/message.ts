@@ -59,13 +59,26 @@ export interface CardDrawn {
     id: CardId;
 }
 
-export type CardOnBoard = {
+export class CardOnBoard {
+    readonly definition: CardDefinition;
+    readonly id: CardId;
+
     title: string;
     current_attack: number;
     current_cost: number;
     current_health: number;
-    definition: CardDefinition;
-    id: CardId;
+
+    can_attack: boolean;
+
+    constructor(drawn: CardDrawn) {
+        this.title = drawn.title;
+        this.current_attack = drawn.current_attack;
+        this.current_cost = drawn.current_cost;
+        this.current_health = drawn.current_health;
+        this.definition = drawn.definition;
+        this.id = drawn.id;
+        this.can_attack = false;
+    }
 }
 
 export type PlayerSummonsCreatureClientEvent = {

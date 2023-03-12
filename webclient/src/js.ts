@@ -8,7 +8,7 @@ import { handleCreatureDestroyed } from './handlers/creatureDestroyed';
 import { handleCreatureTakesDamage } from './handlers/creatureTakesDamage';
 import { handlePlayerSummonsCreature } from './handlers/playerSummonsCreature';
 import { handleTurnStart } from './handlers/turnStart';
-import { CardDrawnEvent, CardDrawn, isHello, isEvent, PlayerStartTurnEvent, PlayerSummonsCreatureClientEvent, CreatureTakesDamageEvent, CreatureDestroyedEvent } from './message';
+import { CardDrawnEvent, CardDrawn, isHello, isEvent, PlayerStartTurnEvent, PlayerSummonsCreatureClientEvent, CreatureTakesDamageEvent, CreatureDestroyedEvent, CardOnBoard } from './message';
 import { setUpEndTurnButton, setUpExtraZone, setUpSlots } from './setup';
 import { logGameMessage, parseJson } from './util';
 
@@ -23,7 +23,7 @@ type Context = {
     enemyBoardSide: Array<BoardSlot>,
 
     draggingCard: CardDrawn | undefined
-    draggingCardToAttack: CardDrawn | undefined
+    draggingCardToAttack: CardOnBoard | undefined
 };
 
 function wsConnect() {
@@ -153,7 +153,7 @@ document.addEventListener('alpine:init', () => {
                 return;
             }
 
-            const target = this.boundTo?.occupant as CardDrawn | undefined;
+            const target = this.boundTo?.occupant as CardOnBoard | undefined;
 
             logGameMessage(`${attacker.title} attacks ${target?.title}`);
 
@@ -180,7 +180,7 @@ document.addEventListener('alpine:init', () => {
 
         get getIsActive(): boolean {
             const context = getContext();
-            const occupant = this.boundTo.occupant;
+            const occupant = this.boundTo.occupant as CardOnBoard | undefined;
 
             // If we're dragging a creature card, and we are valid target (an empty slot), then we are active.
             if (context.draggingCard !== undefined) {
@@ -192,7 +192,7 @@ document.addEventListener('alpine:init', () => {
             }
 
             // If it is our turn and this slot has an occupant that can attack, then we are active.
-            if (context.isMyTurn && occupant !== undefined) {
+            if (context.isMyTurn && occupant !== undefined && occupant.can_attack) {
                 return true;
             }
 

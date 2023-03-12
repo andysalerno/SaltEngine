@@ -16,6 +16,7 @@ export function handlePlayerSummonsCreature(event: PlayerSummonsCreatureClientEv
             current_health: definition.health,
             definition: definition,
             id: event.card_id,
+            can_attack: false,
         };
 
         setCardOnEnemyBoardSlot(cardOnBoard, event.target_pos.SlotIndex);

@@ -17,6 +17,7 @@ function myTurnStart(event: PlayerStartTurnEvent) {
     context.isMyTurn = true;
 
     activateHand();
+    activateCardsOnBoard();
     activateEndTurnBox();
 }
 
@@ -31,5 +32,17 @@ function activateHand() {
             // The player can play this card, so add a visual queue.
 
         }
+    }
+}
+
+function activateCardsOnBoard() {
+    const context = getContext();
+
+    for (let cardOnBoard of context.myBoardSide.map(s => s.occupant)) {
+        if (cardOnBoard === undefined) {
+            continue;
+        }
+
+        cardOnBoard.can_attack = true;
     }
 }

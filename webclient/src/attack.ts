@@ -1,7 +1,7 @@
-import { Attack, CardDrawn } from "./message";
+import { Attack, CardDrawn, CardOnBoard } from "./message";
 import { logGameMessage, sendMessage } from "./util";
 
-export function cardAttacksTarget(attacker: CardDrawn, target: CardDrawn) {
+export function cardAttacksTarget(attacker: CardOnBoard, target: CardOnBoard) {
     logGameMessage(`${attacker} attacks ${target}`);
 
     const attack: Attack = {
@@ -10,4 +10,6 @@ export function cardAttacksTarget(attacker: CardDrawn, target: CardDrawn) {
     };
 
     sendMessage({ Attack: attack });
+
+    attacker.can_attack = false;
 }
