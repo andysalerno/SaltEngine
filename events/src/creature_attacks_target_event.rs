@@ -100,6 +100,8 @@ mod handler {
                 .expect("Expected card to exist.");
             info!("Found target: {target:?}");
 
+            let target_attack = target.current_attack();
+
             // First, show players this event, before continuing the chain.
             dispatcher
                 .player_a_channel()
@@ -108,7 +110,13 @@ mod handler {
                 .player_b_channel()
                 .send(FromServer::Event(event.clone()));
 
+            // Target takes damage from attacker
             let damage_event = CreatureTakesDamageEvent::new(unpacked_event.target(), damage);
+            dispatcher.dispatch(damage_event, game_state);
+
+            // Attacker takes damage from target
+            let damage_event =
+                CreatureTakesDamageEvent::new(unpacked_event.attacker(), target_attack);
             dispatcher.dispatch(damage_event, game_state);
         }
     }

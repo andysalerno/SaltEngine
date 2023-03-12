@@ -199,6 +199,14 @@ document.addEventListener('alpine:init', () => {
             return false;
         },
 
+        init() {
+            this.$watch("boundTo?.occupant?.current_health", (newVal: number, oldVal: number) => {
+                if (newVal < oldVal) {
+                    this.$el.animate(fadeOutIn, { duration: 500, iterations: 1 });
+                }
+            });
+        },
+
         clickStart() {
             logGameMessage("Clicked on board slot...");
             if (this.getIsActive) {
