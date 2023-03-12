@@ -19,4 +19,8 @@ export class BoardSlot {
     get getSlotNum(): number {
         return this._slotNum;
     }
+
+    clear() {
+        this._occupant = undefined;
+    }
 }

@@ -4,10 +4,11 @@ import { cardAttacksTarget } from './attack';
 import { BoardSlot } from './boardslot';
 import { Hand, HandSlot } from './hand';
 import { handleCardDrawn } from './handlers/cardDrawn';
+import { handleCreatureDestroyed } from './handlers/creatureDestroyed';
 import { handleCreatureTakesDamage } from './handlers/creatureTakesDamage';
 import { handlePlayerSummonsCreature } from './handlers/playerSummonsCreature';
 import { handleTurnStart } from './handlers/turnStart';
-import { CardDrawnEvent, CardDrawn, isHello, isEvent, PlayerStartTurnEvent, PlayerSummonsCreatureClientEvent, CreatureTakesDamageEvent } from './message';
+import { CardDrawnEvent, CardDrawn, isHello, isEvent, PlayerStartTurnEvent, PlayerSummonsCreatureClientEvent, CreatureTakesDamageEvent, CreatureDestroyedEvent } from './message';
 import { setUpEndTurnButton, setUpExtraZone, setUpSlots } from './setup';
 import { logGameMessage, parseJson } from './util';
 
@@ -70,6 +71,10 @@ function onMessageReceived(message: any) {
     else if (isEvent(message, "CreatureTakesDamageEvent")) {
         const body = parseJson<CreatureTakesDamageEvent>(message.Event.body);
         handleCreatureTakesDamage(body);
+    }
+    else if (isEvent(message, "CreatureDestroyedEvent")) {
+        const body = parseJson<CreatureDestroyedEvent>(message.Event.body);
+        handleCreatureDestroyed(body);
     }
 }
 

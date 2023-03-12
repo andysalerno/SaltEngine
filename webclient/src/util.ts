@@ -1,3 +1,4 @@
+import { BoardSlot } from "./boardslot";
 import { getContext } from "./js";
 import { CardDrawn, CardId, CardOnBoard, FromClient, SummonFromHand } from "./message";
 
@@ -19,20 +20,33 @@ export function parseJson<T>(json: any): T {
     return JSON.parse(json) as T;
 }
 
-export function findBoardCardById(cardId: CardId): CardOnBoard | undefined {
+export function removeCardFromBoard(cardId: CardId) {
+    const slot = findSlotWithCardId(cardId);
+
+    if (slot === undefined) {
+        return;
+    }
+
+    slot.clear();
+}
+
+export function findSlotWithCardId(cardId: CardId): BoardSlot | undefined {
     const context = getContext();
 
     const mySlot = context.myBoardSide.find(s => s.occupant?.id?.id === cardId?.id);
 
     if (mySlot !== undefined) {
-        return mySlot.occupant;
+        return mySlot;
     }
 
     const enemySlot = context.enemyBoardSide.find(s => s.occupant?.id?.id === cardId?.id);
+    return enemySlot;
+}
 
-    if (enemySlot !== undefined) {
-        return enemySlot.occupant;
-    }
+export function findBoardCardById(cardId: CardId): CardOnBoard | undefined {
+    const slot = findSlotWithCardId(cardId);
+
+    return slot?.occupant;
 }
 
 export function addCardToHand(card: CardDrawn) {

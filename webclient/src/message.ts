@@ -80,6 +80,10 @@ export type CreatureTakesDamageEvent = {
     damage: number;
 }
 
+export type CreatureDestroyedEvent = {
+    creature_destroyed: CardId;
+}
+
 export interface Event<TEvent> {
     kind: string;
     body: TEvent;
